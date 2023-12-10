@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-kccm
+  labels:
+    k8s-app: {{ .Release.Name }}-kccm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: {{ .Release.Name }}-kccm
+  template:
+    metadata:
+      labels:
+        k8s-app: {{ .Release.Name }}-kccm
+    spec:
+      containers:
+      - name: kubevirt-cloud-controller-manager
+        args:
+        - --cloud-provider=kubevirt
+        - --cloud-config=/etc/cloud/cloud-config
+        - --kubeconfig=/etc/kubernetes/kubeconfig/super-admin.svc
+        - --cluster-name={{ .Release.Name }}
+        command:
+        - /bin/kubevirt-cloud-controller-manager
+        image: ghcr.io/kvaps/test:kubevirt-cloud-provider
+        imagePullPolicy: Always
+        #securityContext:
+        #  privileged: true
+        resources:
+          requests:
+            cpu: 100m
+        volumeMounts:
+        - mountPath: /etc/kubernetes/kubeconfig
+          name: kubeconfig
+          readOnly: true
+        - mountPath: /etc/cloud
+          name: cloud-config
+          readOnly: true
+      volumes:
+      - configMap:
+          name: {{ .Release.Name }}-cloud-config
+        name: cloud-config
+      - secret:
+          secretName: {{ .Release.Name }}-admin-kubeconfig
+        name: kubeconfig
+      tolerations:
+      - operator: Exists
+      serviceAccountName: {{ .Release.Name }}-kccm

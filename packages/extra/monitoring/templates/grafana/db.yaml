@@ -1,0 +1,8 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: grafana-db
+spec:
+  instances: 2
+  storage:
+    size: 10Gi

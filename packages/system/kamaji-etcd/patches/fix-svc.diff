@@ -1,0 +1,12 @@
+diff --git a/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/etcd_cm.yaml b/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/etcd_cm.yaml
+index 95a2671..bd8ddcb 100644
+--- a/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/etcd_cm.yaml
++++ b/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/etcd_cm.yaml
+@@ -57,6 +57,7 @@ data:
+       "hosts": [
+ {{- range $count := until (int $.Values.replicas) -}}
+         {{ printf "\"%s-%d.%s.%s.svc.cluster.local\"," ( include "etcd.fullname" $outer ) $count (include "etcd.serviceName" $outer) $.Release.Namespace }}
++        {{ printf "\"%s-%d.%s.%s.svc\"," ( include "etcd.fullname" $outer ) $count (include "etcd.serviceName" $outer) $.Release.Namespace }}
+ {{- end }}
+         "etcd-server.{{ .Release.Namespace }}.svc.cluster.local",
+         "etcd-server.{{ .Release.Namespace }}.svc",

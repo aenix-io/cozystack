@@ -1,0 +1,8 @@
+{{- if index .Values "cert-manager" "enabled" }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    "helm.sh/hook": "pre-install"
+  name: {{ index .Values "cert-manager" "namespace" }}
+{{- end }}

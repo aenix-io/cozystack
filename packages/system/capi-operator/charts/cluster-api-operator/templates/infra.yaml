@@ -1,0 +1,55 @@
+# Infrastructure providers
+{{- if .Values.infrastructure }}
+{{- $infrastructures := split ";" .Values.infrastructure }}
+{{- $infrastructureNamespace := "" }}
+{{- $infrastructureName := "" }}
+{{- $infrastructureVersion := "" }}
+{{- range $infrastructure := $infrastructures }}
+{{- $infrastructureArgs := split ":" $infrastructure }}
+{{- $infrastructureArgsLen := len $infrastructureArgs }}
+{{-  if eq $infrastructureArgsLen 3 }}
+  {{- $infrastructureNamespace = $infrastructureArgs._0 }}
+  {{- $infrastructureName = $infrastructureArgs._1 }}
+  {{- $infrastructureVersion = $infrastructureArgs._2 }}
+{{-  else if eq $infrastructureArgsLen 2 }}
+  {{- $infrastructureNamespace = print $infrastructureArgs._0 "-infrastructure-system" }}
+  {{- $infrastructureName = $infrastructureArgs._0 }}
+  {{- $infrastructureVersion = $infrastructureArgs._1 }}
+{{-  else if eq $infrastructureArgsLen 1 }}
+  {{- $infrastructureNamespace = print $infrastructureArgs._0 "-infrastructure-system" }}
+  {{- $infrastructureName = $infrastructureArgs._0 }}
+{{- else }}
+  {{- fail "infrastructure provider argument should have the following format aws:v1.0.0 or mynamespace:aws:v1.0.0" }}
+{{- end }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "1"
+  name: {{ $infrastructureNamespace }}
+---
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: InfrastructureProvider
+metadata:
+  name: {{ $infrastructureName }}
+  namespace: {{ $infrastructureNamespace }}
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "2"
+{{- if or $infrastructureVersion $.Values.configSecret.name }}
+spec:
+{{- end }}
+{{- if $infrastructureVersion }}
+  version: {{ $infrastructureVersion }}
+{{- end }}
+{{- if $.Values.configSecret.name }}
+  configSecret:
+    name: {{ $.Values.configSecret.name }}
+    {{- if $.Values.configSecret.namespace }}
+    namespace: {{ $.Values.configSecret.namespace }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

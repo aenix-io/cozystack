@@ -1,0 +1,7 @@
+external: false
+
+users:
+  user1:
+    password: hackme
+  user2:
+    password: tttt

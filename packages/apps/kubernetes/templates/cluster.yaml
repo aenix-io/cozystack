@@ -1,0 +1,150 @@
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $etcd := index $myNS.metadata.annotations "namespace.cozystack.io/etcd" }}
+{{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
+{{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 10.243.0.0/16
+    services:
+      cidrBlocks:
+      - 10.95.0.0/16
+  controlPlaneRef:
+    namespace: {{ .Release.Namespace }}
+    apiVersion: controlplane.cluster.x-k8s.io/v1alpha1
+    kind: KamajiControlPlane
+    name: {{ .Release.Name }}
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+    kind: KubevirtCluster
+    name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1alpha1
+kind: KamajiControlPlane
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    cluster.x-k8s.io/role: control-plane
+  annotations:
+    kamaji.clastix.io/kubeconfig-secret-key: "super-admin.svc"
+spec:
+  dataStoreName: "{{ $etcd }}"
+  addons:
+    coreDNS: {}
+    konnectivity: {}
+  kubelet:
+    cgroupfs: systemd
+    preferredAddressTypes:
+    - InternalIP
+    - ExternalIP
+  network:
+    serviceType: ClusterIP
+    ingress:
+      extraAnnotations:
+        nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+      hostname: {{ .Values.host | default (printf "%s.%s" .Release.Name $host) }}:443
+      className: "{{ $ingress }}"
+  deployment:
+  replicas: 2
+  version: 1.29.0
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: KubevirtCluster
+metadata:
+  annotations:
+    cluster.x-k8s.io/managed-by: kamaji
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfigTemplate
+metadata:
+  name: {{ .Release.Name }}-md-0
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    spec:
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs: {}
+        discovery:
+          bootstrapToken:
+            apiServerEndpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc:6443
+      initConfiguration:
+        skipPhases:
+        - addon/kube-proxy
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: KubevirtMachineTemplate
+metadata:
+  name: {{ .Release.Name }}-md-0
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    spec:
+      virtualMachineBootstrapCheck:
+        checkStrategy: ssh
+      virtualMachineTemplate:
+        metadata:
+          namespace: {{ .Release.Namespace }}
+        spec:
+          runStrategy: Always
+          template:
+            spec:
+              domain:
+                cpu:
+                  threads: 1
+                  cores: 2
+                  sockets: 1
+                devices:
+                  disks:
+                  - disk:
+                      bus: virtio
+                    name: containervolume
+                  networkInterfaceMultiqueue: true
+                memory:
+                  guest: 1024Mi
+              evictionStrategy: External
+              volumes:
+              - containerDisk:
+                  image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}@{{ index ($.Files.Get "images/ubuntu-container-disk.json" | fromJson) "containerimage.digest" }}"
+                name: containervolume
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ .Release.Name }}-md-0
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "2"
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "0"
+    capacity.cluster-autoscaler.kubernetes.io/memory: "1024Mi"
+    capacity.cluster-autoscaler.kubernetes.io/cpu: "2"
+spec:
+  clusterName: {{ .Release.Name }}
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: {{ .Release.Name }}-md-0
+          namespace: default
+      clusterName: {{ .Release.Name }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+        kind: KubevirtMachineTemplate
+        name: {{ .Release.Name }}-md-0
+        namespace: default
+      version: v1.23.10

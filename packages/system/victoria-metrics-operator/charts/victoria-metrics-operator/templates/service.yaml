@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+  {{- include "vm-operator.labels" . | nindent 4 }}
+  {{- with .Values.extraLabels }}
+  {{- toYaml . | nindent 4}}
+  {{- end }}
+  name: {{ template "vm-operator.fullname" . }}
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: webhook
+      port: 443
+      targetPort: 9443
+  selector:
+    {{- include "vm-operator.selectorLabels" . | nindent 4 }}
+  type: "ClusterIP"

@@ -1,0 +1,101 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "piraeus-operator.fullname" . }}-controller-manager
+  labels:
+    {{- include "piraeus-operator.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "piraeus-operator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+      {{- include "piraeus-operator.selectorLabels" . | nindent 8 }}
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+    spec:
+      containers:
+      - args:
+          - --health-probe-bind-address=:8081
+        {{- if .Values.kubeRbacProxy.enabled }}
+          - --metrics-bind-address=127.0.0.1:8080
+        {{- else }}
+          - --metrics-bind-address=0
+        {{- end }}
+        {{- range $opt, $val := .Values.operator.options }}
+          - --{{ $opt | kebabcase }}={{ $val }}
+        {{- end }}
+        command:
+        - /manager
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: IMAGE_CONFIG_MAP_NAME
+          value: {{ include "piraeus-operator.fullname" . }}-image-config
+        image: {{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: manager
+        ports:
+        - containerPort: 9443
+          name: webhook-server
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          {{- toYaml .Values.operator.resources | nindent 12 }}
+        securityContext:
+          {{- toYaml .Values.operator.securityContext | nindent 12}}
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+      {{- if .Values.kubeRbacProxy.enabled }}
+      - args:
+        - --secure-listen-address=0.0.0.0:8443
+        - --upstream=http://127.0.0.1:8080/
+        - --tls-private-key-file=/etc/tls/tls.key
+        - --tls-cert-file=/etc/tls/tls.crt
+        {{- range $opt, $val := .Values.kubeRbacProxy.options }}
+        - --{{ $opt | kebabcase }}={{ $val }}
+        {{- end }}
+        image: {{ .Values.kubeRbacProxy.image.repository }}:{{ .Values.kubeRbacProxy.image.tag }}
+        imagePullPolicy: {{ .Values.kubeRbacProxy.image.pullPolicy }}
+        name: kube-rbac-proxy
+        ports:
+        - containerPort: 8443
+          name: https
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.kubeRbacProxy.resources | nindent 12 }}
+        securityContext:
+          {{- toYaml .Values.kubeRbacProxy.securityContext | nindent 12}}
+        volumeMounts:
+          - mountPath: /etc/tls
+            name: cert
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: {{ include "piraeus-operator.serviceAccountName" . }}
+      terminationGracePeriodSeconds: 10
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: {{ include "piraeus-operator.certifcateName" . }}

@@ -1,0 +1,216 @@
+# Default values for kamaji.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- The number of the pod replicas for the Kamaji controller.
+replicaCount: 1
+
+image:
+  # -- The container image of the Kamaji controller.
+  repository: clastix/kamaji
+  pullPolicy: Always
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag:
+
+# -- A list of extra arguments to add to the kamaji controller default ones
+extraArgs: []
+
+
+serviceMonitor:
+  # -- Toggle the ServiceMonitor true if you have Prometheus Operator installed and configured
+  enabled: false
+
+etcd:
+  # -- Install an etcd with enabled multi-tenancy along with Kamaji
+  deploy: true
+
+  # -- The peer API port which servers are listening to.
+  peerApiPort: 2380
+
+  # -- The client request port.
+  port: 2379
+
+  # -- Install specific etcd image
+  image:
+    repository: quay.io/coreos/etcd
+    tag: "v3.5.6"
+    pullPolicy: IfNotPresent
+
+  # -- The livenessProbe for the etcd container
+  livenessProbe:
+    failureThreshold: 8
+    httpGet:
+      path: /health?serializable=true
+      port: 2381
+      scheme: HTTP
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 15
+
+  serviceAccount:
+    # -- Create a ServiceAccount, required to install and provision the etcd backing storage (default: true)
+    create: true
+    # -- Define the ServiceAccount name to use during the setup and provision of the etcd backing storage (default: "")
+    name: ""
+  persistence:
+    size: 10Gi
+    storageClassName: ""
+    accessModes:
+    - ReadWriteOnce
+    # -- The custom annotations to add to the PVC
+    customAnnotations: {}
+    #  volumeType: local
+  
+  # -- (array) Kubernetes affinity rules to apply to Kamaji etcd pods
+  tolerations: []
+
+  overrides:
+    caSecret:
+      # -- Name of the secret which contains CA's certificate and private key. (default: "etcd-certs")
+      name: etcd-certs
+      # -- Namespace of the secret which contains CA's certificate and private key. (default: "kamaji-system")
+      namespace: kamaji-system
+    clientSecret:
+      # -- Name of the secret which contains ETCD client certificates. (default: "root-client-certs")
+      name: root-client-certs
+      # -- Name of the namespace where the secret which contains ETCD client certificates is. (default: "kamaji-system")
+      namespace: kamaji-system
+    # -- (map) Dictionary of the endpoints for the etcd cluster's members, key is the name of the etcd server. Don't define the protocol (TLS is automatically inflected), or any port, inflected from .etcd.peerApiPort value.
+    endpoints:
+      etcd-0: etcd-0.etcd.kamaji-system.svc.cluster.local
+      etcd-1: etcd-1.etcd.kamaji-system.svc.cluster.local
+      etcd-2: etcd-2.etcd.kamaji-system.svc.cluster.local
+  # -- ETCD Compaction interval (e.g. "5m0s"). (default: "0" (disabled))
+  compactionInterval: 0
+
+# -- The address the probe endpoint binds to. (default ":8081")
+healthProbeBindAddress: ":8081"
+
+# -- The livenessProbe for the controller container
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: healthcheck
+  initialDelaySeconds: 15
+  periodSeconds: 20
+
+# -- The readinessProbe for the controller container
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: healthcheck
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# -- (string) The address the metric endpoint binds to. (default ":8080")
+metricsBindAddress: ":8080"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: kamaji-controller-manager
+
+# -- The annotations to apply to the Kamaji controller pods.
+podAnnotations: {}
+
+# -- The securityContext to apply to the Kamaji controller pods.
+podSecurityContext:
+  runAsNonRoot: true
+
+# -- The securityContext to apply to the Kamaji controller container only. It does not apply to the Kamaji RBAC proxy container.
+securityContext:
+  allowPrivilegeEscalation: false
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 100Mi
+  requests:
+    cpu: 100m
+    memory: 20Mi
+
+# -- Kubernetes node selector rules to schedule Kamaji controller
+nodeSelector: {}
+
+# -- Kubernetes node taints that the Kamaji controller pods would tolerate
+tolerations: []
+
+# -- Kubernetes affinity rules to apply to Kamaji controller pods
+affinity: {}
+
+# -- Directory which will be used to work with temporary files. (default "/tmp/kamaji")
+temporaryDirectoryPath: "/tmp/kamaji"
+
+loggingDevel:
+  # -- (string) Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error) (default false)
+  enable: false
+
+datastore:
+  # -- (bool) Enable the Kamaji Datastore creation (default=true)
+  enabled: true
+  # -- (string) The Datastore name override, if empty and enabled=true defaults to `default`, if enabled=false, this is the name of the Datastore to connect to. 
+  nameOverride:
+  # -- (string) The Kamaji Datastore driver, supported: etcd, MySQL, PostgreSQL (defaults=etcd).
+  driver: etcd
+  # -- (array) List of endpoints of the selected Datastore. When letting the Chart install the etcd datastore, this field is populated automatically.
+  endpoints: []
+  basicAuth:
+    usernameSecret:
+      # -- The name of the Secret containing the username used to connect to the relational database.
+      name:
+      # -- The namespace of the Secret containing the username used to connect to the relational database.
+      namespace:
+      # -- The Secret key where the data is stored.
+      keyPath:
+    passwordSecret:
+      # -- The name of the Secret containing the password used to connect to the relational database.
+      name:
+      # -- The namespace of the Secret containing the password used to connect to the relational database.
+      namespace:
+      # -- The Secret key where the data is stored.
+      keyPath:
+  tlsConfig:
+    certificateAuthority:
+      certificate:
+        # -- Name of the Secret containing the CA required to establish the mandatory SSL/TLS connection to the datastore.
+        name:
+        # -- Namespace of the Secret containing the CA required to establish the mandatory SSL/TLS connection to the datastore.
+        namespace:
+        # -- Key of the Secret which contains the content of the certificate.
+        keyPath:
+      privateKey:
+        # -- Name of the Secret containing the CA private key required to establish the mandatory SSL/TLS connection to the datastore.
+        name:
+        # -- Namespace of the Secret containing the CA private key required to establish the mandatory SSL/TLS connection to the datastore.
+        namespace:
+        # -- Key of the Secret which contains the content of the private key.
+        keyPath:
+    clientCertificate:
+      certificate:
+        # -- Name of the Secret containing the client certificate required to establish the mandatory SSL/TLS connection to the datastore.
+        name:
+        # -- Namespace of the Secret containing the client certificate required to establish the mandatory SSL/TLS connection to the datastore.
+        namespace:
+        # -- Key of the Secret which contains the content of the certificate.
+        keyPath:
+      privateKey:
+        # -- Name of the Secret containing the client certificate private key required to establish the mandatory SSL/TLS connection to the datastore.
+        name:
+        # -- Namespace of the Secret containing the client certificate private key required to establish the mandatory SSL/TLS connection to the datastore.
+        namespace:
+        # -- Key of the Secret which contains the content of the private key.
+        keyPath:

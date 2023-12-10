@@ -1,0 +1,35 @@
+{{- if .Values.datastore.enabled }}
+apiVersion: kamaji.clastix.io/v1alpha1
+kind: DataStore
+metadata:
+  name: {{ include "etcd.fullname" . }}
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+spec:
+  driver: etcd
+  endpoints:
+  {{- include "etcd.endpointsYAML" . | nindent 4 }}
+  tlsConfig:
+    certificateAuthority:
+      certificate:
+        secretReference:
+          keyPath: ca.crt
+          name: {{ include "etcd.caSecretName" . }}
+          namespace: {{ .Release.Namespace }}
+      privateKey:
+        secretReference:
+          keyPath: ca.key
+          name: {{ include "etcd.caSecretName" . }}
+          namespace: {{ .Release.Namespace }}
+    clientCertificate:
+      certificate:
+        secretReference:
+          keyPath: tls.crt
+          name: {{ include "etcd.clientSecretName" . }}
+          namespace: {{ .Release.Namespace }}
+      privateKey:
+        secretReference:
+          keyPath: tls.key
+          name: {{ include "etcd.clientSecretName" . }}
+          namespace: {{ .Release.Namespace }}
+{{ end }}

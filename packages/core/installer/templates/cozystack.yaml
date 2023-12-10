@@ -1,0 +1,88 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cozy-system
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cozystack
+  namespace: cozy-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cozystack
+  namespace: cozy-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cozystack
+subjects:
+- kind: ServiceAccount
+  name: cozystack
+  namespace: cozy-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozystack
+  namespace: cozy-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozystack
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cozystack
+    spec:
+      hostNetwork: true
+      serviceAccountName: cozystack
+      containers:
+      - name: cozystack
+        image: "{{ .Files.Get "images/installer.tag" | trim }}@{{ index (.Files.Get "images/installer.json" | fromJson) "containerimage.digest" }}"
+        env:
+        - name: KUBERNETES_SERVICE_HOST
+          value: localhost
+        - name: KUBERNETES_SERVICE_PORT
+          value: "7445"
+      - name: darkhttpd
+        image: "{{ .Files.Get "images/installer.tag" | trim }}@{{ index (.Files.Get "images/installer.json" | fromJson) "containerimage.digest" }}"
+        command:
+        - /usr/bin/darkhttpd
+        - /cozystack/assets
+        - --port
+        - "8123"
+        ports:
+        - name: http
+          containerPort: 8123
+      tolerations:
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoSchedule"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cozystack
+  namespace: cozy-system
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8123
+  selector:
+    app: cozystack
+  type: ClusterIP

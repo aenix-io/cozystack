@@ -1,0 +1,98 @@
+{{- $outer := $ -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "5"
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  name: {{ include "etcd.csrConfigMapName" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  ca-csr.json: |-
+    {
+      "CN": "Clastix CA",
+      "key": {
+        "algo": "rsa",
+        "size": 2048
+      },
+      "names": [
+        {
+          "C": "IT",
+          "ST": "Italy",
+          "L": "Milan"
+        }
+      ]
+    }
+  config.json: |-
+    {
+      "signing": {
+        "default": {
+          "expiry": "8760h"
+        },
+        "profiles": {
+          "server-authentication": {
+            "usages": ["signing", "key encipherment", "server auth"],
+            "expiry": "8760h"
+          },
+          "client-authentication": {
+            "usages": ["signing", "key encipherment", "client auth"],
+            "expiry": "8760h"
+          },
+          "peer-authentication": {
+            "usages": ["signing", "key encipherment", "server auth", "client auth"],
+            "expiry": "8760h"
+          }
+        }
+      }
+    }
+  server-csr.json: |-
+    {
+      "CN": "etcd",
+      "key": {
+        "algo": "rsa",
+        "size": 2048
+      },
+      "hosts": [
+{{- range $count := until (int $.Values.replicas) -}}
+        {{ printf "\"%s-%d.%s.%s.svc.cluster.local\"," ( include "etcd.fullname" $outer ) $count (include "etcd.serviceName" $outer) $.Release.Namespace }}
+        {{ printf "\"%s-%d.%s.%s.svc\"," ( include "etcd.fullname" $outer ) $count (include "etcd.serviceName" $outer) $.Release.Namespace }}
+{{- end }}
+        "etcd-server.{{ .Release.Namespace }}.svc.cluster.local",
+        "etcd-server.{{ .Release.Namespace }}.svc",
+        "etcd-server",
+        "127.0.0.1"
+      ]
+    }
+  peer-csr.json: |-
+    {
+      "CN": "etcd",
+      "key": {
+        "algo": "rsa",
+        "size": 2048
+      },
+      "hosts": [
+{{- range $count := until (int $.Values.replicas) -}}
+        {{ printf "\"%s-%d\"," ( include "etcd.stsName" $outer ) $count }}
+        {{ printf "\"%s-%d.%s\"," ( include "etcd.stsName" $outer ) $count (include "etcd.serviceName" $outer) }}
+        {{ printf "\"%s-%d.%s.%s.svc\"," ( include "etcd.stsName" $outer ) $count (include "etcd.serviceName" $outer) $.Release.Namespace }}
+        {{ printf "\"%s-%d.%s.%s.svc.cluster.local\"," ( include "etcd.stsName" $outer ) $count (include "etcd.serviceName" $outer) $.Release.Namespace }}
+{{- end }}
+        "127.0.0.1"
+      ]
+    }
+  root-client-csr.json: |-
+    {
+      "CN": "root",
+      "key": {
+        "algo": "rsa",
+        "size": 2048
+      },
+      "names": [
+        {
+          "O": "system:masters"
+        }
+      ]
+    }
+

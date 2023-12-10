@@ -1,0 +1,11 @@
+annotations:
+  artifacthub.io/changes: |
+    - "feat: adding CRD and RBAC annotation option"
+apiVersion: v2
+appVersion: 2.1.2
+description: A Helm chart for flux2
+name: flux2
+sources:
+- https://github.com/fluxcd-community/helm-charts
+type: application
+version: 2.11.1

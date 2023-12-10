@@ -1,0 +1,17 @@
+victoria-metrics-operator:
+  fullnameOverride: victoria-metrics-operator
+  admissionWebhooks:
+    enabled: true
+    certManager:
+      enabled: true
+  env:
+  - name: VM_DISABLESELFSERVICESCRAPECREATION
+    value: "true"
+
+  operator:
+    disable_prometheus_converter: false
+    psp_auto_creation_enabled: false
+    enable_converter_ownership: true
+    useCustomConfigReloader: true
+  rbac:
+    pspEnabled: false

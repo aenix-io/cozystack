@@ -1,0 +1,10 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  labels:
+    {{- $data := . | mustMergeOverwrite (dict "component" "issuer") -}}
+    {{- include "kamaji.labels" $data | nindent 4 }}
+  name: kamaji-selfsigned-issuer
+  namespace: {{ .Release.Namespace }}
+spec:
+  selfSigned: {}

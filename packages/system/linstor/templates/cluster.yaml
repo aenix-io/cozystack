@@ -1,0 +1,15 @@
+apiVersion: piraeus.io/v1
+kind: LinstorCluster
+metadata:
+  name: linstorcluster
+spec:
+  #nodeSelector:
+  #  node-role.kubernetes.io/linstor: ""
+  internalTLS:
+    certManager:
+      name: linstor-internal-ca
+      kind: Issuer
+  apiTLS:
+    certManager:
+      name: linstor-api-ca
+      kind: Issuer

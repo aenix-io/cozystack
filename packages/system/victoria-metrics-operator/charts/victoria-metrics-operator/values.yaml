@@ -1,0 +1,176 @@
+# Default values for victoria-metrics.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  # -- Image repository
+  repository: victoriametrics/operator
+  # -- Image tag
+  tag: v0.37.0
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+
+# -- enables CRD creation and management.
+# -- with this option, if you remove this chart, all crd resources will be deleted with it.
+createCRD: true
+
+# -- Tells helm to clean up vm cr resources when uninstalling
+cleanupCRD: false
+cleanupImage:
+  repository: gcr.io/google_containers/hyperkube
+  tag: v1.18.0
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+# -- Secret to pull images
+imagePullSecrets: []
+
+# -- VM operatror deployment name override
+nameOverride: ""
+
+# -- Overrides the full name of server component
+fullnameOverride: ""
+
+# -- VM operator log level
+# -- possible values: info and error.
+logLevel: "info"
+
+rbac:
+  # -- Specifies whether the RBAC resources should be created
+  create: true
+  # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
+  pspEnabled: true
+
+# -- Labels to be added to the all resources
+extraLabels: {}
+# extra Labels for Pods only
+podLabels: {}
+# -- Annotations to be added to the all resources
+annotations: {}
+
+podSecurityContext: {}
+securityContext: {}
+
+operator:
+  # -- By default, operator converts prometheus-operator objects.
+  disable_prometheus_converter: false
+  # -- Compare-options and sync-options for prometheus objects converted by operator for properly use with ArgoCD
+  prometheus_converter_add_argocd_ignore_annotations: false
+  # -- By default, operator doesn't create psp for its objects.
+  psp_auto_creation_enabled: false
+  # -- Enables ownership reference for converted prometheus-operator objects,
+  # it will remove corresponding victoria-metrics objects in case of deletion prometheus one.
+  enable_converter_ownership: false
+  # -- Enables custom config-reloader, bundled with operator.
+  # It should reduce  vmagent and vmauth config sync-time and make it predictable.
+  useCustomConfigReloader: false
+
+# By default, the operator will watch all the namespaces
+# If you want to override this behavior, specify the namespace.
+# Operator supports only single namespace for watching.
+watchNamespace: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## See `kubectl explain poddisruptionbudget.spec` for more
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+podDisruptionBudget:
+  enabled: false
+  # minAvailable: 1
+  # maxUnavailable: 1
+  labels: {}
+
+# -- Resource object
+resources:
+  {}
+  # limits:
+  #   cpu: 120m
+  #   memory: 320Mi
+  # requests:
+  #   cpu: 80m
+  #   memory: 120Mi
+
+# -- Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+# -- Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+tolerations: []
+
+# -- Pod affinity
+affinity: {}
+
+# -- Pod Topology Spread Constraints. Ref: [https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+topologySpreadConstraints: []
+
+# -- operator container additional commandline arguments
+extraArgs: {}
+
+# -- extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD)
+env:
+  []
+  # - name: VM_VMSINGLEDEFAULT_VERSION
+  #   value: v1.43.0
+
+# -- Additional hostPath mounts
+extraHostPathMounts:
+  []
+  # - name: certs-dir
+  #   mountPath: /etc/kubernetes/certs
+  #   subPath: ""
+  #   hostPath: /etc/kubernetes/certs
+#   readOnly: true
+
+# -- Extra Volumes for the pod
+extraVolumes:
+  []
+  # - name: example
+  #   configMap:
+  #     name: example
+
+# -- Extra Volume Mounts for the container
+extraVolumeMounts:
+  []
+  # - name: example
+  #   mountPath: /example
+
+extraContainers:
+  []
+  # - name: config-reloader
+  #   image: reloader-image
+
+# -- Configures resource validation
+admissionWebhooks:
+  # -- Enables validation webhook.
+  enabled: false
+  enabledCRDValidation:
+    vmagent: true
+    vmalert: true
+    vmsingle: true
+    vmauth: true
+    vmrule: true
+    vmalertmanagerConfig: true
+    vmalertmanager: true
+    vmcluster: true
+    vmuser: true
+  # -- What to do in case, when operator not available to validate request.
+  policy: Fail
+  # -- Enables custom ca bundle, if you are not using cert-manager.
+  # -- in case of custom ca, you have to create secret - {{chart-name}}-validation
+  # -- with keys: tls.key, tls.crt, ca.crt
+  caBundle: ""
+  certManager:
+    # -- Enables cert creation and injection by cert-manager.
+    enabled: false
+    # --If needed, provide own issuer. Operator will create self-signed if empty.
+    issuer: {}
+
+# -- configures monitoring with serviceScrape. VMServiceScrape must be pre-installed
+serviceMonitor:
+  enabled: false
+  extraLabels: {}
+  annotations: {}
+  relabelings: []

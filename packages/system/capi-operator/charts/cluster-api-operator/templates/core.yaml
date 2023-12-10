@@ -1,0 +1,53 @@
+# Core provider
+{{- if .Values.core }}
+{{- $coreArgs := split ":" .Values.core }}
+{{- $coreArgsLen :=  len $coreArgs }}
+{{- $coreVersion := "" }}
+{{- $coreNamespace := "" }}
+{{- $coreName := "" }}
+{{- $coreVersion := "" }}
+{{-  if eq $coreArgsLen 3 }}
+  {{- $coreNamespace = $coreArgs._0 }}
+  {{- $coreName = $coreArgs._1 }}
+  {{- $coreVersion = $coreArgs._2 }}
+{{-  else if eq $coreArgsLen 2 }}
+  {{- $coreNamespace = "capi-system" }}
+  {{- $coreName = $coreArgs._0 }}
+  {{- $coreVersion = $coreArgs._1 }}
+{{-  else if eq $coreArgsLen 1 }}
+  {{- $coreNamespace = "capi-system" }}
+  {{- $coreName = $coreArgs._0 }}
+{{- else }}
+  {{- fail "core provider argument should have the following format cluster-api:v1.0.0 or mynamespace:cluster-api:v1.0.0" }}
+{{-  end }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "1"
+  name: {{ $coreNamespace }}
+---
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: CoreProvider
+metadata:
+  name: {{ $coreName }}
+  namespace: {{ $coreNamespace }}
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "2"
+{{- if or $coreVersion $.Values.configSecret.name }}
+spec:
+{{- end}}
+{{- if $coreVersion }}
+  version: {{ $coreVersion }}
+{{- end }}
+{{- if $.Values.configSecret.name }}
+  configSecret:
+    name: {{ $.Values.configSecret.name }}
+    {{- if $.Values.configSecret.namespace }}
+    namespace: {{ $.Values.configSecret.namespace }}
+    {{- end }}
+{{- end }}
+{{- end }}

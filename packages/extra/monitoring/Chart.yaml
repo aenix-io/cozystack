@@ -1,0 +1,6 @@
+apiVersion: v2
+name: monitoring
+description: Monitoring and observability stack
+icon: https://www.svgrepo.com/download/184787/analytics-laptop.svg
+type: application
+version: 1.0.0

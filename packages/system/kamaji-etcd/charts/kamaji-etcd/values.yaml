@@ -1,0 +1,223 @@
+# Default values for kamaji-crane.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Size of the etcd cluster
+replicas: 3
+
+# -- Install an etcd with enabled multi-tenancy
+serviceAccount:
+  # -- Create a ServiceAccount, required to install and provision the etcd backing storage (default: true)
+  create: true
+  # -- Define the ServiceAccount name to use during the setup and provision of the etcd backing storage (default: "")
+  name: ""
+
+image:
+  # -- Install image from specific repo 
+  repository: quay.io/coreos/etcd
+  # -- Install image with specific tag, overwrite the tag in the chart
+  tag: ""
+  # -- Pull policy to use
+  pullPolicy: IfNotPresent
+
+# -- The peer API port which servers are listening to.
+peerApiPort: 2380
+
+# -- The client request port.
+clientPort: 2379
+
+# -- The port where etcd exposes metrics.
+metricsPort: 2381
+
+# -- The livenessProbe for the etcd container
+livenessProbe: {}
+#  failureThreshold: 8
+#  httpGet:
+#    path: /health?serializable=true
+#    port: 2381
+#    scheme: HTTP
+#  initialDelaySeconds: 10
+#  periodSeconds: 10
+#  timeoutSeconds: 15
+
+# -- A list of extra arguments to add to the etcd default ones
+extraArgs: []
+#- --log-level=warn
+#- --logger=zap
+
+# -- Interpret 'auto-compaction-retention' one of: periodic|revision. Use 'periodic' for duration based retention, 'revision' for revision number based retention.
+autoCompactionMode: periodic
+
+# -- Auto compaction retention length. 0 means disable auto compaction.
+autoCompactionRetention: 5m
+
+# -- Number of committed transactions to trigger a snapshot to disk.
+snapshotCount: "10000"
+
+# -- Raise alarms when backend size exceeds the given quota. It will put the cluster into a maintenance mode which only accepts key reads and deletes. 
+quotaBackendBytes: "8589934592" # 8Gi
+
+persistentVolumeClaim:
+  # -- The size of persistent storage for etcd data 
+  size: 10Gi
+  # -- A specific storage class
+  storageClassName: ""
+  # -- The Access Mode to storage
+  accessModes:
+  - ReadWriteOnce
+  # -- The custom annotations to add to the PVC
+  customAnnotations: {}
+  #  volumeType: local
+
+# -- Enable storage defragmentation 
+defragmentation:
+  # -- The job scheduled maintenance time for defrag (empty to disable)
+  schedule: "*/15 * * * *" # https://crontab.guru/
+
+# -- Enable storage backup 
+backup:
+  # -- Enable scheduling backup job
+  enabled: false
+  # -- Enable backup for all endpoints. When disabled, only the leader will be taken
+  all: false
+  # -- The job scheduled maintenance time for backup
+  schedule: "20 3 * * *" # https://crontab.guru/
+  # -- The backup file name prefix
+  snapshotNamePrefix: mysnapshot
+  # -- The backup file date format (bash)
+  snapshotDateFormat: $(date +%Y%m%d)
+  # -- The S3 storage config section
+  s3:
+    # -- The S3 storage url
+    url: http://mys3storage:9000
+    # -- The S3 storage bucket
+    bucket: mybucket
+    # -- The S3 storage object lifecycle management rules; N.B. enabling this option will delete previously set lifecycle rules
+    retention: "" #"--expiry-days 7"
+    # -- The S3 storage ACCESS KEY credential. The plain value has precedence over the valueFrom that can be used to retrieve the value from a Secret.
+    accessKey:
+      value: ""
+      valueFrom: {}
+        # secretKeyRef:
+        #   key: access_key
+        #   name: minio-key
+    # -- The S3 storage SECRET KEY credential. The plain value has precedence over the valueFrom that can be used to retrieve the value from a Secret.
+    secretKey:
+      value: ""
+      valueFrom: {}
+        # secretKeyRef:
+        #   key: secret_key
+        #   name: minio-key
+    # -- The S3 client image config section
+    image:
+      # -- Install image from specific repo 
+      repository: minio/mc
+      # -- Install image with specific tag
+      tag: "RELEASE.2022-11-07T23-47-39Z"
+      # -- Pull policy to use
+      pullPolicy: IfNotPresent
+
+# -- Labels to add to all etcd pods
+podLabels:
+  application: kamaji-etcd
+
+# -- Annotations to add to all etcd pods
+podAnnotations: {}
+
+# -- The securityContext to apply to etcd
+securityContext:
+  allowPrivilegeEscalation: false
+
+# -- The priorityClassName to apply to etcd
+priorityClassName: system-cluster-critical
+
+# -- Resources assigned to the etcd containers
+resources:
+  limits: {}
+  requests: {}
+
+# -- Kubernetes node selector rules to schedule etcd
+nodeSelector:
+  kubernetes.io/os: linux
+
+# -- Kubernetes node taints that the etcd pods would tolerate
+tolerations: []
+
+# -- Kubernetes affinity rules to apply to etcd controller pods
+affinity: {}
+
+# -- Kubernetes topology spread constraints to apply to etcd controller pods
+topologySpreadConstraints: []
+#- maxSkew: 1
+#  topologyKey: topology.kubernetes.io/zone
+#  whenUnsatisfiable: DoNotSchedule
+#  labelSelector:
+#    matchLabels:
+#      application: kamaji-etcd
+
+datastore:
+  # -- Create a datastore custom resource for Kamaji
+  enabled: false
+
+serviceMonitor:
+  # -- Enable ServiceMonitor for Prometheus
+  enabled: false
+  # -- Install the ServiceMonitor into a different Namespace, as the monitoring stack one (default: the release one)
+  namespace: ''
+  # -- Assign additional labels according to Prometheus' serviceMonitorSelector matching labels
+  labels: {}
+  # -- Assign additional Annotations
+  annotations: {}
+  # -- Change matching labels
+  matchLabels: {}
+  # -- Set targetLabels for the serviceMonitor
+  targetLabels: []
+  serviceAccount:
+    # -- ServiceAccount for Metrics RBAC
+    name: etcd
+    # -- ServiceAccount Namespace for Metrics RBAC
+    namespace: etcd-system
+  endpoint:
+    # -- Set the scrape interval for the endpoint of the serviceMonitor
+    interval: "15s"
+    # -- Set the scrape timeout for the endpoint of the serviceMonitor
+    scrapeTimeout: ""
+    # -- Set metricRelabelings for the endpoint of the serviceMonitor
+    metricRelabelings: []
+    # -- Set relabelings for the endpoint of the serviceMonitor
+    relabelings: []
+    #- action: replace
+    #  regex: (.+)
+    #  replacement: $1
+    #  sourceLabels:
+    #  - __meta_kubernetes_pod_name
+    #  targetLabel: member
+    #
+
+alerts:
+  # -- Enable alerts for Alertmanager
+  enabled: false
+  # -- Install the Alerts into a different Namespace, as the monitoring stack one (default: the release one)
+  namespace: ''
+  # -- Assign additional labels according to Prometheus' Alerts matching labels
+  labels: {}
+  # -- Assign additional Annotations
+  annotations: {}
+  # -- The rules for alerts
+  rules: []
+  #  - alert: etcdNoLeader
+  #    annotations:
+  #      message: 'etcd cluster: member {{ $labels.instance }} has no leader.'
+  #    expr: count(etcd_server_has_leader{job=~".*etcd.*"}) == 0
+  #    for: 1m
+  #    labels:
+  #      severity: critical
+  #  - alert: EtcdDataBaseSize
+  #    annotations:
+  #      message: 'etcd cluster: "member {{ $labels.instance }} db has almost exceeded 8GB".'
+  #    expr: |-
+  #      etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"} >= 8589934592
+  #    for: 15m
+  #    labels:
+  #      severity: critical
+  #

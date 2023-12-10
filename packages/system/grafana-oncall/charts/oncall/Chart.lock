@@ -1,0 +1,27 @@
+dependencies:
+- name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.8.0
+- name: mariadb
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.2.5
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.9.10
+- name: rabbitmq
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.0.0
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.13.2
+- name: grafana
+  repository: https://grafana.github.io/helm-charts
+  version: 6.57.1
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.1.4
+- name: prometheus
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 25.8.2
+digest: sha256:edc9fef449a694cd319135e37ac84f8247ac9ad0c48ac86099dae4e428beb7b7
+generated: "2024-01-26T17:54:48.132209769Z"

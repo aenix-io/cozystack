@@ -1,0 +1,8 @@
+external: false
+running: true
+password: hackme
+image: ubuntu
+disk: 5Gi
+resources:
+  cpu: 1
+  memory: 1024M

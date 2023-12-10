@@ -1,0 +1,25 @@
+kube-ovn:
+  global:
+    registry:
+      address: ghcr.io/kvaps
+    images:
+      kubeovn:
+        repository: test
+        tag: kube-ovn-static-v1.13.0-cozystack2
+
+  namespace: cozy-kubeovn
+
+  func:
+    ENABLE_NP: false
+
+  MASTER_NODES_LABEL: "node-role.kubernetes.io/control-plane"
+  networking:
+    ENABLE_SSL: true
+
+  cni_conf:
+    CNI_CONFIG_PRIORITY: "10"
+    MOUNT_LOCAL_BIN_DIR: false
+
+  OPENVSWITCH_DIR: "/var/lib/openvswitch"
+  OVN_DIR: "/var/lib/ovn"
+  DISABLE_MODULES_MANAGEMENT: true

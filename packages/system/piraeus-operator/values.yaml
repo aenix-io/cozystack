@@ -1,0 +1,7 @@
+piraeus:
+  installCRDs: true
+  autogenerate: false
+  tls:
+    certManagerIssuerRef:
+      name: ca-bootstrapper
+      kind: Issuer

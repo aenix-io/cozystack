@@ -1,0 +1,66 @@
+{{- if .Values.oncall.enabled }}
+---
+apiVersion: databases.spotahome.com/v1
+kind: RedisFailover
+metadata:
+  name: grafana-oncall
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  sentinel:
+    replicas: 3
+    resources:
+      requests:
+        cpu: 100m
+      limits:
+        memory: 100Mi
+  redis:
+    replicas: 2
+    resources:
+      requests:
+        cpu: 150m
+        memory: 400Mi
+      limits:
+        cpu: 2
+        memory: 1000Mi
+    storage:
+      persistentVolumeClaim:
+        metadata:
+          name: redisfailover-persistent-data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+    exporter: 
+      enabled: true
+      image: oliver006/redis_exporter:v1.55.0-alpine
+      args:
+        - --web.telemetry-path
+        - /metrics
+      env:
+        - name: REDIS_EXPORTER_LOG_FORMAT
+          value: txt
+    customConfig:
+      - tcp-keepalive 0
+      - loglevel notice
+  auth:
+    secretPath: grafana-oncall-redis-password
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-oncall-redis-password
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace "grafana-oncall-redis-password" }}
+  {{- if $existingSecret }}
+  password: {{ index $existingSecret.data "password" }}
+  {{- else }}
+  password: {{ randAlphaNum 32 | b64enc }}
+  {{- end }}
+{{- end }}

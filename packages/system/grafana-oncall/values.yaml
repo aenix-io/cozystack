@@ -1,0 +1,19 @@
+oncall:
+  database:
+    type: "postgresql"
+  broker:
+    type: "redis"
+  ingress:
+    enabled: false
+  cert-manager:
+    enabled: false
+  mariadb:
+    enabled: false
+  postgresql:
+    enabled: false
+  rabbitmq:
+    enabled: false
+  redis:
+    enabled: false
+  grafana:
+    enabled: false

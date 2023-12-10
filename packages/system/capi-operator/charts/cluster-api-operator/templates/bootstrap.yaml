@@ -1,0 +1,55 @@
+# Bootstrap provider
+{{- if .Values.bootstrap }}
+{{- $bootstraps := split ";" .Values.bootstrap }}
+{{- $bootstrapNamespace := "" }}
+{{- $bootstrapName := "" }}
+{{- $bootstrapVersion := "" }}
+{{- range $bootstrap := $bootstraps }}
+{{- $bootstrapArgs := split ":" $bootstrap }}
+{{- $bootstrapArgsLen :=  len $bootstrapArgs }}
+{{-  if eq $bootstrapArgsLen 3 }}
+  {{- $bootstrapNamespace = $bootstrapArgs._0 }}
+  {{- $bootstrapName = $bootstrapArgs._1 }}
+  {{- $bootstrapVersion = $bootstrapArgs._2 }}
+{{-  else if eq $bootstrapArgsLen 2 }}
+  {{- $bootstrapNamespace = print $bootstrapArgs._0 "-bootstrap-system" }}
+  {{- $bootstrapName = $bootstrapArgs._0 }}
+  {{- $bootstrapVersion = $bootstrapArgs._1 }}
+{{-  else if eq $bootstrapArgsLen 1 }}
+  {{- $bootstrapNamespace = print $bootstrapArgs._0 "-bootstrap-system" }}
+  {{- $bootstrapName = $bootstrapArgs._0 }}
+{{- else }}
+  {{- fail "bootstrap provider argument should have the following format kubeadm:v1.0.0 or mynamespace:kubeadm:v1.0.0" }}
+{{- end }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "1"
+  name: {{ $bootstrapNamespace }}
+---
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: BootstrapProvider
+metadata:
+  name: {{ $bootstrapName }}
+  namespace: {{ $bootstrapNamespace }}
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "2"
+{{- if or $bootstrapVersion $.Values.configSecret.name }}
+spec:
+{{- end}}
+{{- if $bootstrapVersion }}
+  version: {{ $bootstrapVersion }}
+{{- end }}
+{{- if $.Values.configSecret.name }}
+  configSecret:
+    name: {{ $.Values.configSecret.name }}
+    {{- if $.Values.configSecret.namespace }}
+    namespace: {{ $.Values.configSecret.namespace }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

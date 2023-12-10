@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "host": {
+      "type": "string",
+      "form": true,
+      "title": "Domain name for this tenant",
+      "description": "This host will be used for all apps deployed in this tenant"
+    },
+    "etcd": {
+      "type": "boolean",
+      "title": "Deploy own Etcd cluster",
+      "form": true
+    },
+    "monitoring": {
+      "type": "boolean",
+      "title": "Deploy own Monitoring Stack",
+      "form": true
+    },
+    "ingress": {
+      "type": "boolean",
+      "title": "Deploy own Ingress Controller",
+      "form": true
+    }
+  }
+}

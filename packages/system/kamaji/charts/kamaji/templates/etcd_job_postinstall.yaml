@@ -1,0 +1,74 @@
+{{- if .Values.etcd.deploy }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
+  name: "{{ .Release.Name }}-etcd-setup"
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+    spec:
+      serviceAccountName: {{ include "etcd.serviceAccountName" . }}
+      restartPolicy: Never
+      initContainers:
+        - name: kubectl
+          image: {{ printf "clastix/kubectl:%s" (include "etcd.jobsTagKubeVersion" .) }}
+          command:
+            - sh
+            - -c
+            - |-
+              kubectl --namespace={{ .Release.Namespace }} rollout status sts/etcd --timeout=300s
+      containers:
+        - command:
+            - bash
+            - -c
+            - |-
+              etcdctl member list -w table
+              if etcdctl user get root &>/dev/null; then
+                echo "User already exists, nothing to do"
+              else
+                etcdctl user add --no-password=true root &&
+                etcdctl role add root &&
+                etcdctl user grant-role root root &&
+                etcdctl auth enable
+              fi
+          env:
+            - name: ETCDCTL_ENDPOINTS
+              value: https://etcd-0.{{ include "etcd.serviceName" . }}.{{ .Release.Namespace }}.svc.cluster.local:2379
+            - name: ETCDCTL_CACERT
+              value: /opt/certs/ca/ca.crt
+            - name: ETCDCTL_CERT
+              value: /opt/certs/root-certs/tls.crt
+            - name: ETCDCTL_KEY
+              value: /opt/certs/root-certs/tls.key
+          image: quay.io/coreos/etcd:v3.5.1
+          imagePullPolicy: Always
+          name: etcd-client
+          volumeMounts:
+            - name: root-certs
+              mountPath: /opt/certs/root-certs
+            - name: certs
+              mountPath: /opt/certs/ca
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      volumes:
+        - name: root-certs
+          secret:
+            secretName: {{ include "etcd.clientSecretName" . }}
+        - name: certs
+          secret:
+            secretName: {{ include "etcd.caSecretName" . }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

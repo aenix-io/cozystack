@@ -1,0 +1,12 @@
+{{- if .Values.etcd.deploy }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  name: {{ include "etcd.serviceAccountName" . }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+  namespace: {{ .Release.Namespace }}
+{{- end }}

@@ -1,0 +1,30 @@
+namespaces:
+- name: cozy-public
+- name: cozy-system
+  privileged: true
+- name: cozy-cert-manager
+- name: cozy-cilium
+  privileged: true
+- name: cozy-fluxcd
+- name: cozy-grafana-operator
+- name: cozy-kamaji
+- name: cozy-cluster-api
+  privileged: true # for capk only
+- name: cozy-dashboard
+- name: cozy-kubeovn
+  privileged: true
+- name: cozy-kubevirt
+  privileged: true
+- name: cozy-kubevirt-cdi
+- name: cozy-linstor
+  privileged: true
+- name: cozy-mariadb-operator
+- name: cozy-metallb
+  privileged: true
+- name: cozy-monitoring
+  privileged: true
+- name: cozy-postgres-operator
+- name: cozy-rabbitmq-operator
+- name: cozy-redis-operator
+- name: cozy-telepresence
+- name: cozy-victoria-metrics-operator

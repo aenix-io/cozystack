@@ -1,0 +1,33 @@
+apiVersion: kamaji.clastix.io/v1alpha1
+kind: DataStore
+metadata:
+  name: {{ .Release.Namespace }}
+spec:
+  driver: etcd
+  endpoints:
+  - etcd-0.etcd.{{ .Release.Namespace }}.svc:2379
+  - etcd-1.etcd.{{ .Release.Namespace }}.svc:2379
+  - etcd-2.etcd.{{ .Release.Namespace }}.svc:2379
+  tlsConfig:
+    certificateAuthority:
+      certificate:
+        secretReference:
+          keyPath: ca.crt
+          name: etcd-certs
+          namespace: {{ .Release.Namespace }}
+      privateKey:
+        secretReference:
+          keyPath: ca.key
+          name: etcd-certs
+          namespace: {{ .Release.Namespace }}
+    clientCertificate:
+      certificate:
+        secretReference:
+          keyPath: tls.crt
+          name: etcd-root-client-certs
+          namespace: {{ .Release.Namespace }}
+      privateKey:
+        secretReference:
+          keyPath: tls.key
+          name: etcd-root-client-certs
+          namespace: {{ .Release.Namespace }}

@@ -1,0 +1,25 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAgent
+metadata:
+  name: vmagent
+  namespace: cozy-monitoring
+spec:
+  externalLabels:
+    cluster: cozystack
+  extraArgs:
+    promscrape.streamParse: "true"
+  remoteWrite:
+  - url: http://vminsert-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write
+  - url: http://vminsert-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write
+  scrapeInterval: 30s
+  selectAllByDefault: true
+  additionalScrapeConfigs:
+    name: additional-scrape-configs
+    key: prometheus-additional.yaml
+  #statefulMode: true
+  #statefulStorage:
+  #  volumeClaimTemplate:
+  #    spec:
+  #      resources:
+  #          requests:
+  #            storage: 20Gi

@@ -1,0 +1,77 @@
+{{- if .Values.backup.enabled -}}
+{{- if .Values.backup.s3.retention -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation,hook-failed"
+  name: "{{ .Release.Name }}-s3-retention"
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+    spec:
+      serviceAccountName: {{ include "etcd.serviceAccountName" . }}
+      restartPolicy: OnFailure
+      containers:
+      - name: minio-client
+        image: {{ include "minio-client.fullyQualifiedDockerImage" . }}
+        imagePullPolicy: {{ .Values.backup.s3.image.pullPolicy }}
+        command:
+          - bash
+          - -c
+          - |-
+            cd ${MC_CONFIG_DIR}
+            if $MC alias set myminio ${S3_URL} ${S3_ACCESS_KEY} ${S3_SECRET_KEY} \
+            && $MC ping myminio -c 3 -e 3 ; then
+              echo -e "\nCheck for already created object lifecycle management rule(s):"
+              if $MC ilm ls myminio/${S3_BUCKET} ; then
+                echo -e "\nObject lifecycle management rule(s) found - Clean up:"
+                $MC ilm rm --all --force myminio/${S3_BUCKET}
+              else
+                echo -e "\nNo object lifecycle management rule(s) found - Continue"
+              fi
+              echo -e "\nAdding object lifecycle management rule(s):"
+              $MC ilm add {{ .Values.backup.s3.retention }} myminio/${S3_BUCKET}
+              $MC ilm ls myminio/${S3_BUCKET}
+            else
+              echo -e "\nERROR: S3 storage could not be configured;\nCheck your S3 URL/Credentials or network connectivity"
+              exit 1
+            fi
+        env:
+        - name: S3_URL
+          value: {{ .Values.backup.s3.url | quote }}
+        - name: S3_ACCESS_KEY
+      {{- if .Values.backup.s3.accessKey.value }}
+          value: {{ .Values.backup.s3.accessKey.value | quote }}
+      {{- else }}
+          valueFrom:
+            {{- toYaml .Values.backup.s3.accessKey.valueFrom | nindent 12 }}
+      {{- end }}
+        - name: S3_SECRET_KEY
+      {{- if .Values.backup.s3.secretKey.value }}
+          value: {{ .Values.backup.s3.secretKey.value | quote }}
+      {{- else }}
+          valueFrom:
+            {{- toYaml .Values.backup.s3.secretKey.valueFrom | nindent 12 }}
+      {{- end }}
+        - name: S3_BUCKET
+          value: {{ .Values.backup.s3.bucket | quote }}
+        - name: MC_CONFIG_DIR
+          value: /tmp
+        - name: MC
+          value: "/usr/bin/mc --config-dir ${MC_CONFIG_DIR}"
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+{{- end }}
+{{- end }}

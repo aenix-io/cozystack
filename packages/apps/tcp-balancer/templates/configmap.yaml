@@ -1,0 +1,122 @@
+{{- define "backendoptions" }}
+{{- if eq . "tcp" }}
+mode tcp
+balance leastconn
+default-server observe layer4 error-limit 10 on-error mark-down check
+{{- else if eq . "tcp-with-proxy" }}
+mode tcp
+balance leastconn
+default-server observe layer4 error-limit 10 on-error mark-down check send-proxy-v2
+{{- else }}
+{{- fail (printf "mode %s is not supported" .) }}
+{{- end }}
+{{- end }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-haproxy
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  haproxy.cfg: |
+    defaults
+        mode    tcp
+        option  dontlognull
+        timeout http-request    10s
+        timeout queue           20s
+        timeout connect         5s
+        timeout client          5m
+        timeout server          5m
+        timeout tunnel          5m
+        timeout http-keep-alive 10s
+        timeout check           10s
+
+    {{- with .Values.httpAndHttps }}
+    {{- if .targetPorts.http }}
+    frontend http
+        bind :::8080 v4v6
+        mode tcp
+        default_backend http
+        {{- if $.Values.whitelistHTTP }}
+        {{- with $.Values.whitelist }}
+        acl whitelist src{{ range . }} {{ . }}{{ end }}
+        {{- end }}
+        acl all src 0.0.0.0
+        tcp-request content accept if whitelist
+        tcp-request content reject
+        {{- end }}
+        tcp-request content set-dst-port int(80)
+
+    backend http
+        {{- include "backendoptions" (default "tcp" .mode) | nindent 8 }}
+        {{- range $num, $ep := .endpoints }} 
+        server srv{{ $num }} {{ $ep }}:{{ $.Values.httpAndHttps.targetPorts.http }} check
+        {{- end }}
+    {{- end }}
+
+    {{- if .targetPorts.https }}
+    frontend https
+        bind :::8443 v4v6
+        {{- if eq (default "tcp" .mode) "http" }}
+        mode http
+        {{- else }}
+        mode tcp
+        {{- end }}
+        default_backend https
+        {{- if $.Values.whitelistHTTP }}
+        {{- with $.Values.whitelist }}
+        acl whitelist src{{ range . }} {{ . }}{{ end }}
+        {{- end }}
+        acl all src 0.0.0.0
+        tcp-request content accept if whitelist
+        tcp-request content reject
+        {{- end }}
+        tcp-request content set-dst-port int(443)
+
+    backend https
+        {{- include "backendoptions" (default "tcp" .mode) | nindent 8 }}
+        {{- range $num, $ep := .endpoints }} 
+        server srv{{ $num }} {{ $ep }}:{{ $.Values.httpAndHttps.targetPorts.https }} check
+        {{- end }}
+    {{- end }}
+
+    {{- end }}
+
+
+    {{- with .Values.kubernetesAndTalos }}
+    frontend kubernetes
+        bind :::6443 v4v6
+        mode tcp
+        default_backend kubernetes
+        {{- with $.Values.whitelist }}
+        acl whitelist src{{ range . }} {{ . }}{{ end }}
+        {{- end }}
+        acl all src 0.0.0.0
+        tcp-request content accept if whitelist
+        tcp-request content reject
+
+    frontend talos
+        bind :::50000 v4v6
+        mode tcp
+        default_backend talos
+        {{- with $.Values.whitelist }}
+        acl whitelist src{{ range . }} {{ . }}{{ end }}
+        {{- end }}
+        acl all src 0.0.0.0
+        tcp-request content accept if whitelist
+        tcp-request content reject
+
+    backend kubernetes
+        {{- include "backendoptions" (default "tcp" .mode) | nindent 8 }}
+        {{- range $num, $ep := .endpoints }} 
+        server srv{{ $num }} {{ $ep }}:6443 check
+        {{- end }}
+
+    backend talos
+        {{- include "backendoptions" (default "tcp" .mode) | nindent 8 }}
+        {{- range $num, $ep := .endpoints }} 
+        server srv{{ $num }} {{ $ep }}:50000 check
+        {{- end }}
+    {{- end }}

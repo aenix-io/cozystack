@@ -1,0 +1,88 @@
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
+{{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: grafana
+  labels:
+    dashboards: grafana
+spec:
+  config:
+    log:
+      mode: "console"
+    auth:
+      disable_login_form: "false"
+    database:
+      type: postgres
+      name: ${GF_DATABASE_NAME}
+      host: ${GF_DATABASE_HOST}
+      user: ${GF_DATABASE_USER}
+      password: ${GF_DATABASE_PASSWORD}
+      #ssl_mode: require
+    server:
+      root_url: "https://{{ .Values.host | default (printf "grafana.%s" $host) }}"
+    security:
+      admin_user: user
+      admin_password: ${GF_PASSWORD}
+  deployment:
+    spec:
+      replicas: 2
+      template:
+        spec:
+          containers:
+            - name: grafana
+              image: grafana/grafana:10.1.0
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+              readinessProbe:
+                failureThreshold: 3
+              env:
+              - name: GF_INSTALL_PLUGINS
+                value: grafana-worldmap-panel,flant-statusmap-panel,grafana-oncall-app,natel-discrete-panel
+              - name: ONCALL_API_URL
+                value: http://grafana-oncall-engine:8080
+              - name: GF_DATABASE_HOST
+                value: "grafana-db-rw:5432"
+              - name: GF_DATABASE_PASSWORD
+                valueFrom: { secretKeyRef: { name: grafana-db-app, key: password } }
+              - name: GF_DATABASE_NAME
+                value: "app"
+              - name: GF_DATABASE_USER
+                value: "app"
+              - name: GF_PASSWORD
+                valueFrom: { secretKeyRef: { name: grafana-admin-password, key: password } }
+              - name: GF_SECURITY_ADMIN_USER
+                valueFrom:
+                  secretKeyRef:
+                    key: user
+                    name: grafana-admin-password
+              - name: GF_SECURITY_ADMIN_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    key: password
+                    name: grafana-admin-password
+  ingress:
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: "{{ $ingress }}"
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    spec:
+      ingressClassName: "{{ $ingress }}"
+      rules:
+        - host: "{{ .Values.host | default (printf "grafana.%s" $host) }}"
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: grafana-service
+                    port:
+                      number: 3000
+                path: /
+                pathType: Prefix
+      tls:
+      - hosts:
+        - "{{ .Values.host | default (printf "grafana.%s" $host) }}"
+        secretName: grafana-ingress-tls

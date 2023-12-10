@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ingress-nginx
+spec:
+  chart:
+    spec:
+      chart: cozy-ingress-nginx
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-system
+        namespace: cozy-system
+      version: '*'
+  interval: 1m0s
+  timeout: 5m0s
+  values:
+    ingress-nginx:
+      fullnameOverride: {{ trimPrefix "tenant-" .Release.Namespace }}-ingress
+      controller:
+        ingressClass: {{ .Release.Namespace }}
+        ingressClassResource:
+          name: {{ .Release.Namespace }}
+          controllerValue: k8s.io/ingress-nginx-{{ .Release.Namespace }}
+        {{- if not (eq .Release.Namespace "tenant-root") }}
+        admissionWebhooks:
+          enabled: false
+        {{- end }}

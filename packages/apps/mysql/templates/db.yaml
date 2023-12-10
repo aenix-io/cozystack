@@ -1,0 +1,14 @@
+{{- range $name := .Values.databases }}
+{{ $dnsName := replace "_" "-" $name }}
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: Database
+metadata:
+  name: {{ $.Release.Name }}-{{ $dnsName }}
+spec:
+  name: {{ $name }}
+  mariaDbRef:
+    name: {{ $.Release.Name }}
+  characterSet: utf8
+  collate: utf8_general_ci
+{{- end }}

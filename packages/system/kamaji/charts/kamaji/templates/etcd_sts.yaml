@@ -1,0 +1,101 @@
+{{- if .Values.etcd.deploy }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  name: {{ include "etcd.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  serviceName: {{ include "etcd.serviceName" . }}
+  selector:
+    matchLabels:
+      {{- include "etcd.selectorLabels" . | nindent 6 }}
+  replicas: 3
+  template:
+    metadata:
+      name: etcd
+      labels:
+        {{- include "etcd.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: certs
+          secret:
+            secretName: {{ include "etcd.caSecretName" . }}
+      {{- with .Values.etcd.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: etcd
+          image: {{ .Values.etcd.image.repository }}:{{ .Values.etcd.image.tag | default "v3.5.4" }}
+          imagePullPolicy: {{ .Values.etcd.image.pullPolicy }}
+          ports:
+            - containerPort: 2379
+              name: client
+            - containerPort: 2380
+              name: peer
+          volumeMounts:
+            - name: data
+              mountPath: /var/run/etcd
+            - name: certs
+              mountPath: /etc/etcd/pki
+          command:
+            - etcd
+            - --data-dir=/var/run/etcd
+            - --name=$(POD_NAME)
+            - --initial-cluster-state=new
+            - --initial-cluster={{ include "etcd.initialCluster" . }}
+            - --initial-advertise-peer-urls=https://$(POD_NAME).etcd.$(POD_NAMESPACE).svc.cluster.local:2380
+            - --advertise-client-urls=https://$(POD_NAME).etcd.$(POD_NAMESPACE).svc.cluster.local:2379
+            - --initial-cluster-token=kamaji
+            - --listen-client-urls=https://0.0.0.0:2379
+            - --listen-metrics-urls=http://0.0.0.0:2381
+            - --listen-peer-urls=https://0.0.0.0:2380
+            - --client-cert-auth=true
+            - --peer-client-cert-auth=true
+            - --trusted-ca-file=/etc/etcd/pki/ca.crt
+            - --cert-file=/etc/etcd/pki/server.pem
+            - --key-file=/etc/etcd/pki/server-key.pem
+            - --peer-trusted-ca-file=/etc/etcd/pki/ca.crt
+            - --peer-cert-file=/etc/etcd/pki/peer.pem
+            - --peer-key-file=/etc/etcd/pki/peer-key.pem
+            - --auto-compaction-mode=periodic
+            - --auto-compaction-retention=5m
+            - --snapshot-count=10000
+            - --quota-backend-bytes=8589934592
+            - --v=8
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          {{- with .Values.etcd.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.etcd.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      {{- with .Values.etcd.persistence.customAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      storageClassName: {{ .Values.etcd.persistence.storageClassName }}
+      accessModes:
+      {{- range .Values.etcd.persistence.accessModes }}
+      - {{ . | quote }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.etcd.persistence.size }}
+{{- end }}

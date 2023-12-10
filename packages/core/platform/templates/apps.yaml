@@ -1,0 +1,51 @@
+{{- $host := "example.org" }}
+{{- $tenantRoot := list }}
+{{- if .Capabilities.APIVersions.Has "helm.toolkit.fluxcd.io/v2beta1" }}
+{{- $tenantRoot := lookup "helm.toolkit.fluxcd.io/v2beta1" "HelmRelease" "tenant-root" "tenant-root" }}
+{{- end }}
+{{- if and $tenantRoot $tenantRoot.spec $tenantRoot.spec.values $tenantRoot.spec.values.host }}
+{{- $host = $tenantRoot.spec.values.host }}
+{{- else }}
+{{- end }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+    namespace.cozystack.io/etcd: tenant-root
+    namespace.cozystack.io/monitoring: tenant-root
+    namespace.cozystack.io/ingress: tenant-root
+    namespace.cozystack.io/host: "{{ $host }}"
+  name: tenant-root
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: tenant-root
+  namespace: tenant-root
+  labels:
+    cozystack.io/ui: "true"
+spec:
+  interval: 1m
+  releaseName: tenant-root
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  chart:
+    spec:
+      chart: tenant
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-apps
+        namespace: cozy-public
+  values:
+    host: "{{ $host }}"
+  dependsOn:
+  - name: cilium
+    namespace: cozy-cilium
+  - name: kubeovn
+    namespace: cozy-kubeovn

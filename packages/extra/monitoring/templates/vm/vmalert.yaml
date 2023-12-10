@@ -1,0 +1,18 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlert
+metadata:
+  name: vmalert
+spec:
+  datasource:
+    url: http://vmselect-vmcluster.{{ .Release.Namespace }}.svc:8481/select/0/prometheus
+  evaluationInterval: 15s
+  extraArgs:
+    remoteWrite.disablePathAppend: "true"
+  notifiers:
+  - url: http://vmalertmanager.{{ .Release.Namespace }}.svc:9093
+  remoteRead:
+    url: http://vmselect-shortterm.{{ .Release.Namespace }}.svc:8481/select/0/prometheus
+  remoteWrite:
+    url: http://vminsert-shortterm.{{ .Release.Namespace }}.svc:8480/insert/0/prometheus/api/v1/write
+  resources: {}
+  selectAllByDefault: true

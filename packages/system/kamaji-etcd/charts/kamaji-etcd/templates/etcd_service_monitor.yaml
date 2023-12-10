@@ -1,0 +1,47 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "etcd.fullname" . }}-monitor
+  namespace: {{ .Values.serviceMonitor.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.serviceMonitor.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  endpoints:
+  {{- with .Values.serviceMonitor.endpoint }}
+  - interval: {{ .interval }}
+    port: metrics
+    path: /metrics
+    {{- with .scrapeTimeout }}
+    scrapeTimeout: {{ . }}
+    {{- end }}
+    {{- with .metricRelabelings }}
+    metricRelabelings: {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .relabelings }}
+    relabelings: {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}  
+  jobLabel: app.kubernetes.io/name
+  {{- with .Values.serviceMonitor.targetLabels }}
+  targetLabels: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+    {{- if .Values.serviceMonitor.matchLabels }}
+      {{- toYaml .Values.serviceMonitor.matchLabels | nindent 6 }}
+    {{- else }}
+      {{- include "etcd.labels" . | nindent 6 }}
+    {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}
+

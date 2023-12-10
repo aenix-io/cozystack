@@ -1,0 +1,161 @@
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: ghcr.io/mariadb-operator/mariadb-operator
+  pullPolicy: IfNotPresent
+  # -- Image tag to use. By default the chart appVersion is used
+  tag: ""
+imagePullSecrets: []
+
+# -- Controller log level
+logLevel: INFO
+
+# -- Cluster DNS name
+clusterName: cluster.local
+
+ha:
+  # -- Enable high availability
+  enabled: false
+  # -- Number of replicas
+  replicas: 3
+  # -- Lease resource name to be used for leader election
+  leaseId: mariadb.mmontes.io
+
+metrics:
+  # -- Enable prometheus metrics. Prometheus must be installed in the cluster
+  enabled: false
+  serviceMonitor:
+    # -- Enable controller ServiceMonitor
+    enabled: true
+    # -- Labels to be added to the controller ServiceMonitor
+    additionalLabels: {}
+    # release: kube-prometheus-stack
+    # --  Interval to scrape metrics
+    interval: 30s
+    # -- Timeout if metrics can't be retrieved in given time interval
+    scrapeTimeout: 25s
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  enabled: true
+  # -- Automounts the service account token in all containers of the Pod
+  automount: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- Extra Labels to add to the service account
+  extraLabels: {}
+  # -- The name of the service account to use.
+  # If not set and enabled is true, a name is generated using the fullname template
+  name: ""
+
+rbac:
+  # -- Specifies whether RBAC resources should be created
+  enabled: true
+
+# -- Extra arguments to be passed to the controller entrypoint
+extrArgs: []
+
+# -- Extra volumes to pass to pod.
+extraVolumes: []
+
+# -- Extra volumes to mount to the container.
+extraVolumeMounts: []
+
+# -- Annotations to add to controller Pod
+podAnnotations: {}
+
+# -- Security context to add to controller Pod
+podSecurityContext: {}
+
+# -- Security context to add to controller container
+securityContext: {}
+
+# -- Resources to add to controller container
+resources: {}
+# requests:
+#   cpu: 10m
+#   memory: 32Mi
+
+# -- Node selectors to add to controller Pod
+nodeSelector: {}
+
+# -- Tolerations to add to controller Pod
+tolerations: []
+
+# -- Affinity to add to controller Pod
+affinity: {}
+
+webhook:
+  # -- Annotations for webhook configurations.
+  annotations: {}
+  image:
+    repository: ghcr.io/mariadb-operator/mariadb-operator
+    pullPolicy: IfNotPresent
+    # -- Image tag to use. By default the chart appVersion is used
+    tag: ""
+  imagePullSecrets: []
+  certificate:
+    # -- Use cert-manager to issue and rotate the certificate. If set to false, a default certificate will be used.
+    certManager: false
+    # -- Default certificate generated when the chart is installed or upgraded.
+    default:
+      # -- Certificate authority expiration in days.
+      caExpirationDays: 365
+      # -- Certificate expiration in days.
+      certExpirationDays: 365
+      # -- Annotations for certificate Secret.
+      annotations: {}
+      # -- Helm hook to be added to the default certificate.
+      hook: ""
+    # -- Path where the certificate will be mounted.
+    path: /tmp/k8s-webhook-server/serving-certs
+  # -- Port to be used by the webhook server
+  port: 10250
+  # -- Expose the webhook server in the host network
+  hostNetwork: false
+  serviceMonitor:
+    # -- Enable webhook ServiceMonitor. Metrics must be enabled
+    enabled: true
+    # -- Labels to be added to the webhook ServiceMonitor
+    additionalLabels: {}
+    # release: kube-prometheus-stack
+    # --  Interval to scrape metrics
+    interval: 30s
+    # -- Timeout if metrics can't be retrieved in given time interval
+    scrapeTimeout: 25s
+  serviceAccount:
+    # -- Specifies whether a service account should be created
+    enabled: true
+    # -- Automounts the service account token in all containers of the Pod
+    automount: true
+    # -- Annotations to add to the service account
+    annotations: {}
+    # -- Extra Labels to add to the service account
+    extraLabels: {}
+    # -- The name of the service account to use.
+    # If not set and enabled is true, a name is generated using the fullname template
+    name: ""
+  # -- Extra arguments to be passed to the webhook entrypoint
+  extrArgs: []
+  # -- Extra volumes to pass to webhook Pod
+  extraVolumes: []
+  # -- Extra volumes to mount to webhook container
+  extraVolumeMounts: []
+  # -- Annotations to add to webhook Pod
+  podAnnotations: {}
+  # -- Security context to add to webhook Pod
+  podSecurityContext: {}
+  # -- Security context to add to webhook container
+  securityContext: {}
+  # -- Resources to add to webhook container
+  resources: {}
+  # requests:
+  #   cpu: 10m
+  #   memory: 32Mi
+  # -- Node selectors to add to controller Pod
+  nodeSelector: {}
+  # -- Tolerations to add to controller Pod
+  tolerations: []
+  # -- Affinity to add to controller Pod
+  affinity: {}

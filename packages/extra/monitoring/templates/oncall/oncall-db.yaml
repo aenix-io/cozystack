@@ -1,0 +1,11 @@
+{{- if .Values.oncall.enabled }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: grafana-oncall-db
+spec:
+  instances: 2
+  storage:
+    size: 10Gi
+{{- end }}

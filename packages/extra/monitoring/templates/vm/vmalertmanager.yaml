@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager
+type: Opaque
+stringData:
+  alertmanager.yaml: |
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by:
+      - job
+      - alertname
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'webhook'
+    receivers:
+      - name: 'webhook'
+        webhook_configs:
+          - url: http://{{ .Release.Name }}-oncall-engine.{{ .Release.Namespace }}.svc:8080/integrations/v1/alertmanager/Kjb2NWxxSlgGtxz9F4ihovQBB/
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanager
+metadata:
+  name: alertmanager
+spec:
+  replicaCount: 2
+  configSecret: alertmanager

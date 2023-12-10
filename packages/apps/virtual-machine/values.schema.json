@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "running": {
+      "type": "boolean",
+      "title": "Running"
+    },
+    "external": {
+      "type": "boolean",
+      "title": "Enable external Access"
+    },
+    "image": {
+      "type": "string",
+      "form": true,
+      "enum": ["ubuntu", "cirros", "alpine", "fedora"],
+      "title": "Choose image"
+    },
+    "password": {
+      "type": "string",
+      "title": "Password"
+    },
+    "disk": {
+      "type": "string",
+      "title": "Disk Size"
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "memory": {
+          "type": "string",
+          "x-display": "slider",
+          "title": "Memory",
+          "minimum": 10,
+          "maximum": 2048
+        },
+        "cpu": {
+          "type": "integer",
+          "title": "CPU",
+          "minimum": 1,
+          "maximum": 4
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  {{- if .Values.serviceMonitor.labels }}
+    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
+  {{- end }}
+  {{- with .Values.customAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "etcd.fullname" . }}-metrics-role
+  namespace: {{ .Values.serviceMonitor.namespace | default .Release.Namespace }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - endpoints
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+    {{- if .Values.serviceMonitor.labels }}
+    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+  name: {{ include "etcd.fullname" . }}-metrics-rolebinding
+  namespace: {{ .Values.serviceMonitor.namespace | default .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "etcd.fullname" . }}-metrics-role
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceMonitor.serviceAccount.name }}
+  namespace: {{ .Values.serviceMonitor.serviceAccount.namespace | default .Release.Namespace }}
+{{- end }}

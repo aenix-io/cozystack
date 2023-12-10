@@ -1,0 +1,233 @@
+{{- if and .Values.admissionWebhooks.enabled }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name:  {{ include "vm-operator.fullname" . }}-admission
+  {{- if .Values.admissionWebhooks.certManager.enabled }}
+  annotations:
+    certmanager.k8s.io/inject-ca-from: {{ printf "%s/%s-validation" .Release.Namespace ( include "vm-operator.fullname" .) | quote }}
+    cert-manager.io/inject-ca-from: {{ printf "%s/%s-validation" .Release.Namespace (include "vm-operator.fullname" .) | quote }}
+  {{- end }}
+  labels:
+{{ include "vm-operator.labels" . | indent 4 }}
+{{- with .Values.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+webhooks:
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmagent }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmagent
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+      {{- end }}
+    failurePolicy: {{.Values.admissionWebhooks.policy}}
+    name: vmagent.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmagents
+{{- end }}
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmalert }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmalert
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+    {{- end }}
+    failurePolicy: {{.Values.admissionWebhooks.policy}}
+    name: vmalert.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmalerts
+  {{- end }}
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmalertmanager }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmalertmanager
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+    {{- end }}
+    failurePolicy: {{.Values.admissionWebhooks.policy}}
+    name: vmalertmanager.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmalertmanagers
+  {{- end }}
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmauth }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmauth
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+    {{- end }}
+    failurePolicy: Ignore
+    name: vmauth.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmauths
+  {{- end }}
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmcluster }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmcluster
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+    {{- end }}
+    failurePolicy: {{.Values.admissionWebhooks.policy}}
+    name: vmcluster.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmclusters
+  {{- end }}
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmsingle }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmsingle
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+    {{- end }}
+    failurePolicy: {{.Values.admissionWebhooks.policy}}
+    name: vmsingle.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmsingles
+  {{- end }}
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmuser }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmuser
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+    {{- end }}
+    failurePolicy: {{.Values.admissionWebhooks.policy}}
+    name: vmuser.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmusers
+  {{- end }}
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmrule }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmrule
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+    {{- end }}
+    failurePolicy: {{.Values.admissionWebhooks.policy}}
+    name: vmrule.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmrules
+{{- end }}
+{{- if .Values.admissionWebhooks.enabledCRDValidation.vmalertmanagerConfig }}
+  - clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "vm-operator.fullname" . }}
+        path: /validate-operator-victoriametrics-com-v1beta1-vmalertmanagerconfig
+      {{- if and .Values.admissionWebhooks.caBundle (not .Values.admissionWebhooks.certManager.enabled) }}
+      caBundle: {{ .Values.admissionWebhooks.caBundle }}
+    {{- end }}
+    failurePolicy: {{.Values.admissionWebhooks.policy}}
+    name: vmalertmanagerconfig.victoriametrics.com
+    admissionReviewVersions: [ "v1", "v1beta1" ]
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - operator.victoriametrics.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - vmalertmanagerconfigs
+{{- end }}
+{{- end }}

@@ -1,0 +1,40 @@
+annotations:
+  artifacthub.io/category: monitoring-logging
+  artifacthub.io/changes: |-
+    **Release date:** 2023-08-30
+
+    ![AppVersion: 0.37.0](https://img.shields.io/static/v1?label=AppVersion&message=0.37.0&color=success&logo=)
+    ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+    - Bump operator version to [v0.37.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.37.0)
+    - `psp_auto_creation_enabled` for operator is disabled by default
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: Sources
+      url: https://github.com/VictoriaMetrics/helm-charts
+    - name: Charts repo
+      url: https://victoriametrics.github.io/helm-charts/
+    - name: Docs
+      url: https://docs.victoriametrics.com/operator
+  artifacthub.io/operator: "true"
+apiVersion: v1
+appVersion: 0.37.0
+description: Victoria Metrics Operator
+home: https://github.com/VictoriaMetrics/operator
+icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
+keywords:
+- victoriametrics
+- operator
+- monitoring
+- kubernetes
+- observability
+- tsdb
+- metrics
+- metricsql
+- timeseries
+kubeVersion: '>=1.23.0-0'
+name: victoria-metrics-operator
+sources:
+- https://github.com/VictoriaMetrics/helm-charts
+- https://github.com/VictoriaMetrics/operator
+version: 0.26.0

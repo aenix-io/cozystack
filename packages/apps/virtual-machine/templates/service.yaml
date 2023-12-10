@@ -1,0 +1,27 @@
+{{- if .Values.external }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "virtual-machine.fullname" . }}
+  labels:
+    {{- include "virtual-machine.labels" . | nindent 4 }}
+spec:
+  type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
+  {{- if .Values.external }}
+  externalTrafficPolicy: Local
+  allocateLoadBalancerNodePorts: false
+  {{- end }}
+  selector:
+    {{- include "virtual-machine.labels" . | nindent 4 }}
+  ports:
+  - name: ssh
+    port: 22
+    targetPort: 22
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443
+{{- end }}

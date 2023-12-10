@@ -1,0 +1,127 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-init-script
+stringData:
+  init.sh: |
+    #!/bin/bash
+    set -e
+    echo "== create users"
+    {{- if .Values.users }}
+    psql -v ON_ERROR_STOP=1 <<\EOT
+    {{- range $user, $u := .Values.users }}
+    SELECT 'CREATE ROLE {{ $user }} LOGIN INHERIT;'
+    WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ $user }}')\gexec
+    ALTER ROLE {{ $user }} WITH PASSWORD '{{ $u.password }}' LOGIN INHERIT {{ ternary "REPLICATION" "NOREPLICATION" (default false $u.replication) }};
+    COMMENT ON ROLE {{ $user }} IS 'user managed by helm';
+    {{- end }}
+    EOT
+    {{- end }}
+
+    echo "== delete users"
+    MANAGED_USERS=$(echo '\du+' | psql | awk -F'|' '$4 == " user managed by helm" {print $1}' | awk NF=NF RS= OFS=' ')
+    DEFINED_USERS="{{ join " " (keys .Values.users) }}"
+    DELETE_USERS=$(for user in $MANAGED_USERS; do case " $DEFINED_USERS " in *" $user "*) :;; *) echo $user;; esac; done)
+
+    echo "users to delete: $DELETE_USERS"
+    for user in $DELETE_USERS; do
+    # https://stackoverflow.com/a/51257346/2931267
+    psql -v ON_ERROR_STOP=1 --echo-all <<EOT
+    REASSIGN OWNED BY $user TO postgres;
+    DROP OWNED BY $user;
+    DROP USER $user;
+    EOT
+    done
+    
+    echo "== create databases and roles"
+    {{- if .Values.databases }}
+    psql -v ON_ERROR_STOP=1 --echo-all <<\EOT
+    {{- range $database, $d := .Values.databases }}
+    SELECT 'CREATE DATABASE {{ $database }}'
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ $database }}')\gexec
+    COMMENT ON DATABASE {{ $database }} IS 'database managed by helm';
+    SELECT 'CREATE ROLE {{ $database }}_admin NOINHERIT;'
+    WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ $database }}_admin')\gexec
+    COMMENT ON ROLE {{ $database }}_admin IS 'role managed by helm';
+    SELECT 'CREATE ROLE {{ $database }}_readonly NOINHERIT;'
+    WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ $database }}_readonly')\gexec
+    COMMENT ON ROLE {{ $database }}_readonly IS 'role managed by helm';
+    {{- end }}
+    EOT
+    {{- end }}
+
+    echo "== grant privileges on databases to roles"
+    {{- range $database, $d := .Values.databases }}
+
+    # admin
+    psql -v ON_ERROR_STOP=1 --echo-all -d "{{ $database }}" <<\EOT
+    DO $$DECLARE r record;
+    DECLARE
+        v_schema varchar := 'public';
+        v_new_owner varchar := '{{ $database }}_admin';
+    BEGIN
+        FOR r IN
+            select 'ALTER TABLE "' || table_schema || '"."' || table_name || '" OWNER TO ' || v_new_owner || ';' as a from information_schema.tables where table_schema = v_schema
+            union all
+            select 'ALTER TABLE "' || sequence_schema || '"."' || sequence_name || '" OWNER TO ' || v_new_owner || ';' as a from information_schema.sequences where sequence_schema = v_schema
+            union all
+            select 'ALTER TABLE "' || table_schema || '"."' || table_name || '" OWNER TO ' || v_new_owner || ';' as a from information_schema.views where table_schema = v_schema
+            union all
+            select 'ALTER FUNCTION "'||nsp.nspname||'"."'||p.proname||'"('||pg_get_function_identity_arguments(p.oid)||') OWNER TO ' || v_new_owner || ';' as a from pg_proc p join pg_namespace nsp ON p.pronamespace = nsp.oid where nsp.nspname = v_schema
+        LOOP
+            EXECUTE r.a;
+        END LOOP;
+    END$$;
+    ALTER DATABASE {{ $database }} OWNER TO {{ $database }}_admin;
+    ALTER SCHEMA public OWNER TO {{ $database }}_admin;
+    GRANT ALL ON SCHEMA public TO {{ $database }}_admin;
+    GRANT ALL ON ALL TABLES IN SCHEMA public TO {{ $database }}_admin;
+    GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO {{ $database }}_admin;
+    GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO {{ $database }}_admin;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO {{ $database }}_admin;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO {{ $database }}_admin;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO {{ $database }}_admin;
+    EOT
+
+    # readonly
+    psql -v ON_ERROR_STOP=1 --echo-all -d "{{ $database }}" <<\EOT
+    GRANT CONNECT ON DATABASE {{ $database }} TO {{ $database }}_readonly;
+    GRANT USAGE ON SCHEMA public TO {{ $database }}_readonly;
+    GRANT SELECT ON ALL TABLES IN SCHEMA public TO {{ $database }}_readonly;
+    GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO {{ $database }}_readonly;
+    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO {{ $database }}_readonly;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO {{ $database }}_readonly;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO {{ $database }}_readonly;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO {{ $database }}_readonly;
+    EOT
+    {{- end }}
+
+    echo "== assign roles to users"
+    psql -v ON_ERROR_STOP=1 --echo-all <<\EOT
+    {{- range $database, $d := .Values.databases }}
+    {{- range $user, $u := $.Values.roles }}
+    {{- if has $user $d.users.admin }}
+    GRANT {{ $database }}_admin TO {{ $user }};
+    {{- else }}
+    REVOKE {{ $database }}_admin FROM {{ $user }};
+    {{- end }}
+    {{- if has $user $d.users.readonly }}
+    GRANT {{ $database }}_readonly TO {{ $user }};
+    {{- else }}
+    REVOKE {{ $database }}_readonly FROM {{ $user }};
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    EOT
+
+    echo "== create extensions"
+    {{- range $database, $d := .Values.databases }}
+    {{- if $d.extensions }}
+    psql -v ON_ERROR_STOP=1 --echo-all -d "{{ $database }}" <<\EOT
+    {{- range $extension := $d.extensions }}
+    CREATE EXTENSION IF NOT EXISTS {{ $extension }};
+    {{- end }}
+    EOT
+    {{- end }}
+    {{- end }}

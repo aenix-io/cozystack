@@ -1,0 +1,22 @@
+{{- if .Values.alerts.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "etcd.fullname" . }}-alerts
+  namespace: {{ .Values.alerts.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+    {{- with .Values.alerts.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.alerts.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+  - name: kamaji-etcd
+    {{- with .Values.alerts.rules }}
+    rules: {{- toYaml . | nindent 6 }}
+    {{- end }}
+{{- end }}

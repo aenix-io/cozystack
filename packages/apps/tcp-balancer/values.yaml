@@ -1,0 +1,18 @@
+external: false
+httpAndHttps:
+  mode: tcp
+  targetPorts:
+    http: 80
+    https: 443
+  endpoints:
+   - 10.100.3.1
+   - 10.100.3.11
+   - 10.100.3.2
+   - 10.100.3.12
+   - 10.100.3.3
+   - 10.100.3.13
+
+whitelistHTTP: false
+whitelist:
+- "1.2.3.4"
+- "10.100.0.0/16"

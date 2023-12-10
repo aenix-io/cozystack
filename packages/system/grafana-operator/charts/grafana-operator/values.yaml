@@ -1,0 +1,80 @@
+# -- If the operator should run in namespace-scope or not,
+# if true the operator will only be able to manage instances in the same namespace
+namespaceScope: false
+
+# -- If you want to run multiple replicas of the grafana-operator, this is not recommended.
+leaderElect: false
+
+# -- Sets the WATCH_NAMESPACE environment variable,
+# it defines which namespaces the operator should be listening for.
+# By default it's all namespaces, if you only want to listen for the same namespace as the operator is deployed to look at namespaceScope.
+watchNamespaces: ""
+
+# -- Additional environment variables
+env: []
+  # -- grafana image, e.g. docker.io/grafana/grafana:9.1.6, overwrites the default grafana image defined in the operator
+  # - name: RELATED_IMAGE_GRAFANA
+  #   value: "docker.io/grafana/grafana:9.1.6"
+  # - name: MY_VAR
+  #   value: "myvalue"
+
+image:
+  # -- grafana operator image repository
+  repository: ghcr.io/grafana/grafana-operator
+  # -- The image pull policy to use in grafana operator container
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# -- image pull secrets
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+metricsService:
+  # -- metrics service type
+  type: ClusterIP
+  # -- metrics service port
+  metricsPort: 9090
+
+# -- additional labels to add to all resources
+additionalLabels: {}
+
+# -- pod annotations
+podAnnotations: {}
+
+# -- pod security context
+podSecurityContext: {}
+
+# -- grafana operator container security context
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+# -- grafana operator container resources
+resources: {}
+
+# -- pod priority class name
+priorityClassName: ""
+
+# -- pod node selector
+nodeSelector: {}
+
+# -- pod tolerations
+tolerations: []
+
+# -- pod affinity
+affinity: {}

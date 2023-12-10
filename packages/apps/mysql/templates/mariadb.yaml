@@ -1,0 +1,71 @@
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: MariaDB
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  rootPasswordSecretKeyRef:
+    name: {{ .Release.Name }}
+    key: root-password
+
+  image: "mariadb:11.0.2"
+
+  port: 3306
+
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - mariadb
+          - key: app.kubernetes.io/instance
+            operator: In
+            values:
+            - {{ .Release.Name }}
+        topologyKey: "kubernetes.io/hostname"
+
+  replication:
+    enabled: true
+    #primary:
+    #  podIndex: 0
+    #  automaticFailover: true
+
+  metrics:
+    exporter:
+      image: prom/mysqld-exporter:v0.14.0
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 300m
+          memory: 512Mi
+      port: 9104
+    serviceMonitor:
+      interval: 10s
+      scrapeTimeout: 10s
+
+  myCnfConfigMapKeyRef:
+    name: {{ .Release.Name }}-my-cnf
+    key: config
+
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: {{ .Values.size }}
+    accessModes:
+      - ReadWriteOnce
+
+
+
+  {{- if .Values.external }}
+  primaryService:
+    type: LoadBalancer
+  {{- end }}
+
+  #secondaryService:
+  #  type: LoadBalancer

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: tenant
+description: Additional tenant namespace
+icon: https://upload.wikimedia.org/wikipedia/commons/0/04/User_icon_1.svg
+
+type: application
+version: 1.0.0

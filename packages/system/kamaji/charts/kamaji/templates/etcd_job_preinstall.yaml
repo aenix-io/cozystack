@@ -1,0 +1,72 @@
+{{- if .Values.etcd.deploy }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": "hook-succeeded"
+  name: "{{ .Release.Name }}-etcd-certs"
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+    spec:
+      serviceAccountName: {{ include "etcd.serviceAccountName" . }}
+      restartPolicy: Never
+      initContainers:
+        - name: cfssl
+          image: cfssl/cfssl:latest
+          command:
+            - bash
+            - -c
+            - |-
+              cfssl gencert -initca /csr/ca-csr.json | cfssljson -bare /certs/ca &&
+              mv /certs/ca.pem /certs/ca.crt && mv /certs/ca-key.pem /certs/ca.key &&
+              cfssl gencert -ca=/certs/ca.crt -ca-key=/certs/ca.key -config=/csr/config.json -profile=peer-authentication /csr/peer-csr.json | cfssljson -bare /certs/peer &&
+              cfssl gencert -ca=/certs/ca.crt -ca-key=/certs/ca.key -config=/csr/config.json -profile=peer-authentication /csr/server-csr.json | cfssljson -bare /certs/server &&
+              cfssl gencert -ca=/certs/ca.crt -ca-key=/certs/ca.key -config=/csr/config.json -profile=client-authentication /csr/root-client-csr.json | cfssljson -bare /certs/root-client
+          volumeMounts:
+            - mountPath: /certs
+              name: certs
+            - mountPath: /csr
+              name: csr
+      containers:
+        - name: kubectl
+          image: {{ printf "clastix/kubectl:%s" (include "etcd.jobsTagKubeVersion" .) }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              if kubectl get secret {{ include "etcd.caSecretName" . }} --namespace={{ .Release.Namespace }} &>/dev/null; then
+                echo "Secret {{ include "etcd.caSecretName" . }} already exists"
+              else
+                echo "Creating secret {{ include "etcd.caSecretName" . }}"
+                kubectl --namespace={{ .Release.Namespace }} create secret generic {{ include "etcd.caSecretName" . }} --from-file=/certs/ca.crt --from-file=/certs/ca.key --from-file=/certs/peer-key.pem --from-file=/certs/peer.pem --from-file=/certs/server-key.pem --from-file=/certs/server.pem
+              fi
+              if kubectl get secret {{ include "etcd.clientSecretName" . }} --namespace={{ .Release.Namespace }} &>/dev/null; then
+                echo "Secret {{ include "etcd.clientSecretName" . }} already exists"
+              else
+                echo "Creating secret {{ include "etcd.clientSecretName" . }}"
+                kubectl --namespace={{ .Release.Namespace }} create secret tls {{ include "etcd.clientSecretName" . }} --key=/certs/root-client-key.pem --cert=/certs/root-client.pem
+              fi
+          volumeMounts:
+            - mountPath: /certs
+              name: certs
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      volumes:
+        - name: csr
+          configMap:
+            name: {{ include "etcd.csrConfigMapName" . }}
+        - name: certs
+          emptyDir: {}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

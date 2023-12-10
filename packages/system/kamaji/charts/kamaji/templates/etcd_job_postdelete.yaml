@@ -1,0 +1,35 @@
+{{- if .Values.etcd.deploy }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
+  name: "{{ .Release.Name }}-etcd-teardown"
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+    spec:
+      serviceAccountName: {{ include "etcd.serviceAccountName" . }}
+      restartPolicy: Never
+      containers:
+        - name: kubectl
+          image: {{ printf "clastix/kubectl:%s" (include "etcd.jobsTagKubeVersion" .) }}
+          command:
+            - kubectl
+            - --namespace={{ .Release.Namespace }}
+            - delete
+            - secret
+            - --ignore-not-found=true
+            - {{ include "etcd.caSecretName" . }}
+            - {{ include "etcd.clientSecretName" . }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

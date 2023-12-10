@@ -1,0 +1,84 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "tenant.name" . }}
+  namespace: {{ include "tenant.name" . }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "tenant.name" . }}
+  namespace: {{ include "tenant.name" . }}
+  annotations:
+    kubernetes.io/service-account.name: {{ include "tenant.name" . }}
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "tenant.name" . }}
+  namespace: {{ include "tenant.name" . }}
+rules:
+- apiGroups: [""]
+  resources: ["*"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: ["helm.toolkit.fluxcd.io"]
+  resources: ["helmreleases"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "tenant.name" . }}
+  namespace: {{ include "tenant.name" . }}
+subjects:
+{{- if ne .Release.Namespace "tenant-root" }}
+- kind: ServiceAccount
+  name: tenant-root
+  namespace: tenant-root
+{{- end }}
+{{- if hasPrefix "tenant-" .Release.Namespace }}
+{{- $parts := splitList "-" .Release.Namespace }}
+{{- range $i, $v := $parts }}
+{{- if ne $i 0 }}
+- kind: ServiceAccount
+  name: {{ join "-" (slice $parts 0 (add $i 1)) }}
+  namespace: {{ join "-" (slice $parts 0 (add $i 1)) }}
+{{- end }}
+{{- end }}
+{{- end }}
+- kind: ServiceAccount
+  name: {{ include "tenant.name" . }}
+  namespace: {{ include "tenant.name" . }}
+roleRef:
+  kind: Role
+  name: {{ include "tenant.name" . }}
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "tenant.name" . }}
+  namespace: cozy-public
+rules:
+- apiGroups: ["source.toolkit.fluxcd.io"]
+  resources: ["helmrepositories"]
+  verbs: ["get", "list"]
+- apiGroups: ["source.toolkit.fluxcd.io"]
+  resources: ["helmcharts"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "tenant.name" . }}
+  namespace: cozy-public
+subjects:
+- kind: ServiceAccount
+  name: {{ include "tenant.name" . }}
+  namespace: {{ include "tenant.name" . }}
+roleRef:
+  kind: Role
+  name: {{ include "tenant.name" . }}
+  apiGroup: rbac.authorization.k8s.io

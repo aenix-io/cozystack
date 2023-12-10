@@ -1,0 +1,94 @@
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cozy-system
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cozystack
+  namespace: cozy-system
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cozystack
+  namespace: cozy-system
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cozystack
+subjects:
+- kind: ServiceAccount
+  name: cozystack
+  namespace: cozy-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cozystack
+  namespace: cozy-system
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8123
+  selector:
+    app: cozystack
+  type: ClusterIP
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozystack
+  namespace: cozy-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozystack
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cozystack
+    spec:
+      hostNetwork: true
+      serviceAccountName: cozystack
+      containers:
+      - name: cozystack
+        image: "ghcr.io/aenix-io/cozystack/installer:v0.0.1@sha256:d9edaf7fd53910c979575caf633875af2d16cc8611f79553cee8c18aade067b3"
+        env:
+        - name: KUBERNETES_SERVICE_HOST
+          value: localhost
+        - name: KUBERNETES_SERVICE_PORT
+          value: "7445"
+      - name: darkhttpd
+        image: "ghcr.io/aenix-io/cozystack/installer:v0.0.1@sha256:d9edaf7fd53910c979575caf633875af2d16cc8611f79553cee8c18aade067b3"
+        command:
+        - /usr/bin/darkhttpd
+        - /cozystack/assets
+        - --port
+        - "8123"
+        ports:
+        - name: http
+          containerPort: 8123
+      tolerations:
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoSchedule"
