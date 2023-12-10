@@ -1,0 +1,9 @@
+_helm:
+  name: linstor
+  namespace: cozy-linstor
+  createNamespace: true
+  privilegedNamespace: true
+  crds: CreateReplace
+  dependsOn:
+  - name: cert-manager
+  - name: piraeus-operator
