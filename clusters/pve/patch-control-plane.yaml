@@ -1,0 +1,27 @@
+machine:
+  network:
+    interfaces:
+    - interface: eth0
+      vip:
+        ip: 192.168.0.110
+
+cluster:
+  apiServer:
+    certSANs:
+    - 127.0.0.1
+    - 192.168.0.101
+  controllerManager:
+    extraArgs:
+      bind-address: 0.0.0.0
+      #secure-port: "10257"
+  scheduler:
+    extraArgs:
+      bind-address: 0.0.0.0
+      #secure-port: "10251"
+  proxy:
+    disabled: true
+  discovery:
+    enabled: false
+  etcd:
+    advertisedSubnets:
+    - 192.168.0.0/24

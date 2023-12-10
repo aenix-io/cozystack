@@ -1,0 +1,30 @@
+{{- with .Values.group }}
+# TODO: make more generic configuration
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: portforward
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods/portforward
+  verbs:
+  - create
+  namespaces:
+  - infra-telepresence
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab:portforward
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: portforward
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: {{ . }}
+{{- end }}

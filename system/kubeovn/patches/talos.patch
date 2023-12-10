@@ -1,0 +1,30 @@
+--- a/install.sh	2023-12-08 11:35:47.047963122 +0100
++++ b/install.sh	2023-12-10 16:49:32.081266054 +0100
+@@ -49,9 +49,9 @@
+ VPC_NAT_IMAGE="vpc-nat-gateway"
+ VERSION="v1.12.3"
+ IMAGE_PULL_POLICY="IfNotPresent"
+-POD_CIDR="10.16.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
+-POD_GATEWAY="10.16.0.1"
+-SVC_CIDR="10.96.0.0/12"                # Do NOT overlap with NODE/POD/JOIN CIDR
++POD_CIDR="10.244.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
++POD_GATEWAY="10.224.0.1"
++SVC_CIDR="10.96.0.0/16"                # Do NOT overlap with NODE/POD/JOIN CIDR
+ JOIN_CIDR="100.64.0.0/16"              # Do NOT overlap with NODE/POD/SVC CIDR
+ PINGER_EXTERNAL_ADDRESS="114.114.114.114"  # Pinger check external ip probe
+ PINGER_EXTERNAL_DOMAIN="alauda.cn."         # Pinger check external domain probe
+@@ -3573,7 +3573,12 @@
+           image: "$REGISTRY/kube-ovn:$VERSION"
+           imagePullPolicy: $IMAGE_PULL_POLICY
+           command: 
+-          - /kube-ovn/start-ovs.sh
++          - /bin/bash
++          - -c
++          - |
++              ln -sf /bin/true /usr/sbin/modinfo
++              ln -sf /bin/true /usr/sbin/modprobe
++              exec /kube-ovn/start-ovs.sh
+           securityContext:
+             runAsUser: 0
+             privileged: true
+             path: $LOG_DIR/openvswitch

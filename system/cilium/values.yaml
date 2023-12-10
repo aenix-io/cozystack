@@ -1,0 +1,27 @@
+_helm:
+  name: cilium
+  namespace: cozy-cilium
+  createNamespace: true
+  privilegedNamespace: true
+
+cilium:
+  hubble:
+    enabled: false
+  externalIPs:
+    enabled: true
+  tunnel: disabled
+  autoDirectNodeRoutes: true
+  kubeProxyReplacement: strict
+  bpf:
+    masquerade: true
+  loadBalancer:
+    algorithm: maglev
+  cgroup:
+    autoMount:
+      enabled: false
+    hostRoot: /sys/fs/cgroup
+  ipam:
+    mode: "kubernetes"
+  k8sServiceHost: 192.168.0.110
+  k8sServicePort: 6443
+  ipv4NativeRoutingCIDR: 10.244.0.0/16

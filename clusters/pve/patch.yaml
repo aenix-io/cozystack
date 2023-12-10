@@ -1,0 +1,20 @@
+machine:
+  certSANs:
+  - 127.0.0.1
+  kubelet:
+    nodeIP:
+      validSubnets:
+      - 192.168.0.0/24
+  kernel:
+    modules:
+      - name: openvswitch
+
+
+cluster:
+  network:
+    cni:
+      name: none
+    podSubnets:
+        - 10.244.0.0/16
+    serviceSubnets:
+        - 10.96.0.0/16

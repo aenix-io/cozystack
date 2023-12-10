@@ -1,0 +1,21 @@
+diff --git a/apps/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml b/apps/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml
+index a608b69..1b5c622 100644
+--- a/apps/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml
++++ b/apps/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml
+@@ -105,9 +105,13 @@ spec:
+             - "true"
+         {{- else }}
+         command:
+-        - cilium-agent
+-        args:
+-        - --config-dir=/tmp/cilium/config-map
++        # Workaround: https://github.com/cilium/cilium/pull/27561
++        - /bin/sh
++        - -c
++        - |
++          rm -rf /run/cilium/cgroupv2
++          ln -sf /sys/fs/cgroup /run/cilium/cgroupv2
++          exec cilium-agent --config-dir=/tmp/cilium/config-map
+         {{- with .Values.extraArgs }}
+         {{- toYaml . | trim | nindent 8 }}
+         {{- end }}

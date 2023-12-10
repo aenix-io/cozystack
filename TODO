@@ -1,0 +1,3 @@
+remove control-plane taints 
+namespace for kube-ovn and its plugin
+main installation script and uplaod secrets to kubernetes

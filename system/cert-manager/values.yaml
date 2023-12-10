@@ -1,0 +1,8 @@
+_helm:
+  name: cert-manager
+  namespace: cozy-cert-manager
+  createNamespace: true
+  crds: CreateReplace
+
+cert-manager:
+  installCRDs: true

@@ -1,0 +1,4 @@
+_helm:
+  name: traffic-manager
+  namespace: cozy-telepresence
+  createNamespace: true
