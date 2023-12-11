@@ -1,0 +1,32 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: public-ips
+  namespace: {{ .Release.namespace }}
+spec:
+  autoAssign: false
+  {{- with .Values.metallb.publicAddresses }}
+  addresses:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: private-ips
+  namespace: {{ .Release.namespace }}
+spec:
+  {{- with .Values.metallb.privateAddresses }}
+  addresses:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2adv
+  namespace: {{ .Release.namespace }}
+spec:
+  ipAddressPools:
+  - public-ips
+  - private-ips

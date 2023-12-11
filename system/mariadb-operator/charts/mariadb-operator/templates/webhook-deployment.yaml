@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mariadb-operator.fullname" . }}-webhook
+  labels:
+    {{ include "mariadb-operator-webhook.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{ include "mariadb-operator-webhook.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{ with .Values.webhook.podAnnotations }}
+      annotations:
+        {{ toYaml . | nindent 8 }}
+      {{ end }}
+      labels:
+        {{ include "mariadb-operator-webhook.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.webhook.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mariadb-operator-webhook.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.webhook.serviceAccount.automount }}
+      {{ with .Values.webhook.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{ end }}
+      {{ with .Values.webhook.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 }}
+      {{ end }}
+      {{ with .Values.webhook.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 }}
+      {{ end }}
+      {{ with .Values.webhook.podSecurityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 }}
+      {{ end }}
+      hostNetwork: {{ .Values.webhook.hostNetwork }}
+      containers:
+        - image: "{{ .Values.webhook.image.repository }}:{{ .Values.webhook.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.webhook.image.pullPolicy }}
+          name: webhook
+          args:
+            - webhook
+            - --cert-dir={{ .Values.webhook.certificate.path }}
+            - --port={{ .Values.webhook.port }}
+            - --metrics-addr=:8080
+            - --health-addr=:8081
+            - --log-level={{ .Values.logLevel }}
+            {{- range .Values.extrArgs }}
+            - {{ . }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.webhook.port }}
+              protocol: TCP
+              name: https
+            - containerPort: 8080
+              protocol: TCP
+              name: metrics
+            - containerPort: 8081
+              protocol: TCP
+              name: health
+          volumeMounts:
+            - mountPath: {{ .Values.webhook.certificate.path }}
+              name: cert
+              readOnly: true
+          {{- if .Values.webhook.extraVolumeMounts }}
+          {{- toYaml .Values.webhook.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          {{ with .Values.webhook.resources }}
+          resources:
+            {{ toYaml . | nindent 12 }}
+          {{ end }}
+          {{ with .Values.webhook.securityContext}}
+          securityContext:
+            {{ toYaml . | nindent 12 }}
+          {{ end }}
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: {{ include "mariadb-operator-webhook.certificate" . }}
+      {{- if .Values.webhook.extraVolumes }}
+      {{- toYaml .Values.webhook.extraVolumes | nindent 8 }}
+      {{- end }}

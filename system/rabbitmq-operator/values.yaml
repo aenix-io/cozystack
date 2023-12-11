@@ -1,0 +1,5 @@
+_helm:
+  name: rabbitmq-operator
+  namespace: cozy-rabbitmq-operator
+  createNamespace: true
+  crds: CreateReplace

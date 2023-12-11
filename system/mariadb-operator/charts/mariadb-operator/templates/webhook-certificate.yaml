@@ -1,0 +1,25 @@
+{{ if .Values.webhook.certificate.certManager }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "mariadb-operator.fullname" . }}-selfsigned-issuer
+  labels:
+    {{ include "mariadb-operator-webhook.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "mariadb-operator.fullname" . }}-webhook-cert
+  labels:
+    {{ include "mariadb-operator-webhook.labels" . | nindent 4 }}
+spec:
+  dnsNames:
+    - {{ include "mariadb-operator-webhook.subjectName" . }}
+    - {{ include "mariadb-operator-webhook.altName" . }}
+  issuerRef:
+    kind: Issuer
+    name: {{ include "mariadb-operator.fullname" . }}-selfsigned-issuer
+  secretName: {{ include "mariadb-operator.fullname" . }}-webhook-cert
+{{ end }}

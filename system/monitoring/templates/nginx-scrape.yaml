@@ -34,7 +34,7 @@ spec:
   jobLabel: jobLabel
   namespaceSelector:
     matchNames:
-    - infra-ingress-nginx
+    - cozy-ingress-nginx
   podMetricsEndpoints:
   - port: metrics2
     honorLabels: true

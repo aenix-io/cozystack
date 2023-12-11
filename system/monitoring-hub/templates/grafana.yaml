@@ -16,16 +16,15 @@ spec:
         enabled: "true"
         allow_sign_up: "true"
         auto_login: "false"
-        client_id: c1286be57609c1456cb92703e8fecade823c7f0c35d866c5d3d7065ee326402a
-        client_secret: eb4ebd228ba34a028aa6811d0882db8b8f13235353ad782f5c4a59b46cee6eba
+        client_id: e03e8bbe-1a4f-4555-906e-710f1b148d7b
+        client_secret: d57d2398-ce98-4309-a799-ac6d7cf54367
         scopes: api
         auth_url: "https://git.example.org/oauth/authorize"
         token_url: "https://git.example.org/oauth/token"
         api_url: "https://git.example.org/api/v4"
-        #allowed_domains: 173.0.146.94.nip.io
-        #allowed_groups: '["aemedia/auth/infra-admins"]'
-        #role_attribute_path: "contains(info.groups_direct[*], 'aemedia/') && 'Admin' || contains(info.groups_direct[*], 'aemedia/auth/infra-admins') && 'Editor' || 'Viewer'"
-        role_attribute_path: "is_admin && 'Admin' || 'Viewer'"
+        #allowed_groups: '["cluster-admins"]'
+        role_attribute_path: "contains(info.groups_direct[*], 'grafana-admin') && 'Admin' || contains(info.groups_direct[*], 'grafana-editor') && 'Editor' || 'Viewer'"
+        #role_attribute_path: "is_admin && 'Admin' || 'Viewer'"
         #tls_skip_verify_insecure: "false"
         #use_pkce: "true"
         #use_refresh_token: "true"

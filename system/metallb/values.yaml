@@ -1,0 +1,18 @@
+_helm:
+  name: metallb
+  namespace: cozy-metallb
+  createNamespace: true
+  privilegedNamespace: true
+  crds: CreateReplace
+
+metallb:
+  crds:
+    enabled: true
+
+  speaker:
+    tolerateMaster: false
+
+  publicAddresses:
+  - 1.2.3.4
+  privateAddresses:
+  - 192.168.100.200-192.168.100.250

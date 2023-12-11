@@ -1,0 +1,17 @@
+apiVersion: v2
+appVersion: v0.0.22
+description: Run and operate MariaDB in a cloud native way
+home: https://github.com/mariadb-operator/mariadb-operator
+icon: https://mariadb-operator.github.io/mariadb-operator/assets/mariadb.png
+keywords:
+- mariadb
+- operator
+- mariadb-operator
+- database
+kubeVersion: '>= 1.16.0-0'
+maintainers:
+- email: mariadb-operator@proton.me
+  name: mmontes11
+name: mariadb-operator
+type: application
+version: 0.22.0
