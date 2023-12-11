@@ -1,14 +1,25 @@
 machine:
   certSANs:
   - 127.0.0.1
+  - 135.181.169.168
   kubelet:
     nodeIP:
       validSubnets:
-      - 192.168.0.0/24
+      - 192.168.100.0/24
   kernel:
     modules:
+      - name: drbd
+        parameters:
+          - usermode_helper=disabled
       - name: openvswitch
 
+  install:
+    disk: /dev/sda
+    image: ghcr.io/siderolabs/installer:v1.6.0-beta.1
+    wipe: false
+    
+    extensions:
+      - image: ghcr.io/siderolabs/drbd:9.2.6-v1.6.0-beta.1
 
 cluster:
   network:

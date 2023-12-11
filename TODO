@@ -8,3 +8,5 @@ grafana admin password
 grafana redis password
 autoconfigure ONCALL_API_URL
 oidc
+rename vm, vm-longterm
+talos setup via tcp-proxy
