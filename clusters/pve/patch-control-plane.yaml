@@ -6,6 +6,7 @@ machine:
         ip: 192.168.0.110
 
 cluster:
+  allowSchedulingOnControlPlanes: true
   apiServer:
     certSANs:
     - 127.0.0.1
