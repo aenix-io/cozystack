@@ -1,0 +1,11 @@
+_helm:
+  name: postgres-operator
+  namespace: cozy-postgres-operator
+  createNamespace: true
+  crds: CreateReplace
+  dependsOn:
+  - name: cert-manager
+
+cloudnative-pg:
+  crds:
+    create: true

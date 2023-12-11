@@ -1,2 +1,3 @@
 *.yaml
+!values.yaml
 install.sh.orig

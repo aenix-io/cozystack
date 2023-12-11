@@ -1,0 +1,18 @@
+_helm:
+  name: kubeapps
+  namespace: cozy-kubeapps
+  createNamespace: true
+  crds: CreateReplace
+  dependsOn:
+  - name: postgres-operator
+  - name: redis-operator
+
+kubeapps:
+  postgresql:
+    enabled: false
+
+  packaging:
+    helm:
+      enabled: false
+    flux:
+      enabled: true

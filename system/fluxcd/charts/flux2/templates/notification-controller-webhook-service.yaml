@@ -1,0 +1,26 @@
+{{- if and .Values.notificationController.create }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Namespace | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote  }}
+    app.kubernetes.io/part-of: flux
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    control-plane: controller
+    {{- with .Values.notificationController.webhookReceiver.service.labels }}{{ toYaml . | nindent 4 }}{{ end }}
+  name: webhook-receiver
+  {{- with .Values.notificationController.webhookReceiver.service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 9292
+  selector:
+    app: notification-controller
+  type: ClusterIP
+{{- end }}

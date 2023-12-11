@@ -1,0 +1,52 @@
+_helm:
+  name: ingress-nginx
+  namespace: cozy-ingress-nginx
+  createNamespace: true
+  dependsOn:
+  - name: cert-manager
+
+ingress-nginx:
+  controller:
+    image:
+      registry: ghcr.io
+      image: kvaps/ingress-nginx-with-protobuf-exporter/controller
+      tag: v1.8.1
+      digest: "sha256:7933a0729c716a8bf879218451ff43ee9c1a8f4850feffb12f81eb9439aefc23"
+    allowSnippetAnnotations: true
+    replicaCount: 2
+    admissionWebhooks:
+      certManager:
+        enabled: true
+    metrics:
+      enabled: true
+    extraContainers:
+    - name: protobuf-exporter
+      image: ghcr.io/kvaps/ingress-nginx-with-protobuf-exporter/protobuf-exporter:v1.8.1@sha256:9b6f3f2688592a0f25038bc15e107642d7374359cbd87442920df1c45f27fe4d
+      args:
+      - --server.telemetry-address=0.0.0.0:9090
+      - --server.exporter-address=0.0.0.0:9091
+    service:
+      type: NodePort # ClusterIP
+      externalTrafficPolicy: "Local"
+      #allocateLoadBalancerNodePorts: false
+    config:
+      # proxy protocol
+      use-proxy-protocol: "true"
+      use-forwarded-headers: "true"
+      compute-full-forwarded-for: "true"
+      real-ip-header: "proxy_protocol"
+      enable-real-ip: "true"
+      # keep-alive
+      proxy-connect-timeout: "10s"
+      proxy-read-timeout: "10s"
+      keep-alive-requests: "1000000"
+      upstream-keepalive-requests: "100000"
+      upstream-keepalive-time: '1m'
+      upstream-keepalive-timeout: "60"
+      upstream-keepalive-connections: "320"
+      ssl-session-tickets: "true"
+
+
+  defaultBackend:
+    ##
+    enabled: true

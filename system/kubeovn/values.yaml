@@ -1,0 +1,8 @@
+_helm:
+  name: kubeovn
+  namespace: cozy-kubeovn
+  createNamespace: true
+  privilegedNamespace: true
+  crds: CreateReplace
+  dependsOn:
+  - name: cilium

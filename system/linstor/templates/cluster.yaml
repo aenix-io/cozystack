@@ -3,8 +3,8 @@ kind: LinstorCluster
 metadata:
   name: linstorcluster
 spec:
-  nodeSelector:
-    node-role.kubernetes.io/linstor: ""
+  #nodeSelector:
+  #  node-role.kubernetes.io/linstor: ""
   internalTLS:
     certManager:
       name: linstor-internal-ca
