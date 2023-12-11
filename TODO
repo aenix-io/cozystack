@@ -1,3 +1,10 @@
 remove control-plane taints 
 namespace for kube-ovn and its plugin
 main installation script and uplaod secrets to kubernetes
+talosctl upgrade -i ghcr.io/siderolabs/installer:v1.6.0-beta.1
+turn ubuntu to talos
+kubectl exec -ti -n cozy-linstor srv3 -- vgcreate data /dev/sdb
+grafana admin password
+grafana redis password
+autoconfigure ONCALL_API_URL
+oidc

@@ -1,0 +1,52 @@
+_helm:
+  name: monitoring-hub
+  namespace: cozy-monitoring-hub
+  createNamespace: true
+  dependsOn:
+  - name: grafana-operator
+  - name: postgres-operator
+
+adminPassword: Moh4ooN9phaech6Sai9aoGiezu4doh2i # TODO
+
+oncall:
+  fullnameOverride: grafana-oncall
+  #base_url: oncall.grafana.example.org
+  database:
+    type: postgresql
+
+  ingress:
+    enabled: false
+
+  externalGrafana:
+    url: "https://grafana.example.org/"
+
+  broker:
+    type: redis
+
+  cert-manager:
+    enabled: false
+
+  externalPostgresql:
+    host: grafana-oncall-db-rw
+    port: 5432
+    db_name: app
+    user: app
+    existingSecret: grafana-oncall-db-app
+    passwordKey: password
+
+  externalRedis:
+    host: rfrm-grafana-oncall
+    password: ""
+    #existingSecret: grafana-oncall-keydb
+    #passwordKey: password
+
+  mariadb:
+    enabled: false
+  postgresql:
+    enabled: false
+  rabbitmq:
+    enabled: false
+  redis:
+    enabled: false
+  grafana:
+    enabled: false

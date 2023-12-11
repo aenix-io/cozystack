@@ -1,0 +1,102 @@
+{{- if .Values.migrate.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  {{- if .Values.migrate.useHook }}
+  name: {{ printf "%s-migrate" (include "oncall.engine.fullname" .) }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+    {{- with .Values.migrate.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- else }}
+  name: {{ printf "%s-migrate-%s" (include "oncall.engine.fullname" .) (now | date "2006-01-02-15-04-05") }}
+  {{- with .Values.migrate.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  labels:
+    {{- include "oncall.engine.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 15
+  {{- if .Values.migrate.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.migrate.ttlSecondsAfterFinished }}
+  {{- end }}
+  template:
+    metadata:
+      name: {{ printf "%s-migrate-%s" (include "oncall.engine.fullname" .) (now | date "2006-01-02-15-04-05") }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        random-annotation: {{ randAlphaNum 10 | lower }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oncall.engine.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "oncall.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.migrate.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrate.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}-migrate
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: {{ include "oncall.engine.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+          - /bin/sh
+          - -c
+          {{- if eq .Values.database.type "mysql" }}
+          - |
+            until (nc -vz $MYSQL_HOST $MYSQL_PORT);
+            do
+                echo "waiting for MySQL"; sleep 1;
+            done
+            python manage.py migrate
+          {{- else if eq .Values.database.type "postgresql" }}
+          - |
+            until (nc -vz $DATABASE_HOST $DATABASE_PORT);
+            do
+                echo "waiting for PostgreSQL"; sleep 1;
+            done
+            python manage.py migrate
+          {{- else }}
+          - python manage.py migrate
+          {{- end }}
+        env:
+          {{- include "snippet.oncall.env" . | nindent 12 }}
+          {{- include "snippet.oncall.smtp.env" . | nindent 12 }}
+          {{- include "snippet.oncall.exporter.env" . | nindent 12 }}
+          {{- include "snippet.db.env" . | nindent 12 }}
+          {{- include "snippet.broker.env" . | nindent 12 }}
+          {{- include "oncall.extraEnvs" . | nindent 12 }}
+        resources:
+          {{- toYaml .Values.migrate.resources | nindent 12 }}
+        {{- with .Values.migrate.extraVolumeMounts }}
+        volumeMounts: {{- . | toYaml | nindent 10 }}
+        {{- end }}
+      {{- with .Values.migrate.extraContainers }}
+      {{- tpl . $ | nindent 6 }}
+      {{- end }}
+      {{- with .Values.migrate.extraVolumes }}
+      volumes: {{- . | toYaml | nindent 8 }}
+      {{- end }}
+{{- end }}

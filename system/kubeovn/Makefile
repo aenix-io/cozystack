@@ -1,9 +1,9 @@
 update:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/kubeovn/kube-ovn  | awk -F'[/^]' 'END{print $$3}') && \
 	wget https://raw.githubusercontent.com/kubeovn/kube-ovn/$$tag/dist/images/install.sh -O install.sh
+	patch -p3 < patches/talos.patch
 	sed -i '/path:/ s|/etc/origin/|/var/lib/|' install.sh
 	sed -i '/mountPath:/ s|/usr/local/bin|/opt/bin|' install.sh
-	patch -p1 < patches/talos.patch
 	sed -i 's/kube-system/cozy-kubeovn/g' install.sh
 
 apply:

@@ -1,0 +1,19 @@
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: vm
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  datasource:
+    name: vm
+    type: prometheus
+    access: proxy
+    url: http://vmselect-vmcluster.cozy-monitoring-hub.svc:8481/select/0/prometheus/
+    isDefault: true
+    jsonData:
+      'tlsSkipVerify': true
+      'timeInterval': "30s"
+    editable: true

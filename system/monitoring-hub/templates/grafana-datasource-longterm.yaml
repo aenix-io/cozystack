@@ -1,0 +1,19 @@
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: vm-longterm
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  datasource:
+    name: vm-longterm
+    type: prometheus
+    access: proxy
+    url: http://vmselect-vmcluster-longterm.cozy-monitoring-hub.svc:8481/longterm/select/0/prometheus/
+    isDefault: false
+    jsonData:
+      'tlsSkipVerify': true
+      'timeInterval': "6m"
+    editable: true

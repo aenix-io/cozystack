@@ -1,0 +1,710 @@
+# Values for configuring the deployment of Grafana OnCall
+
+# Set the domain name Grafana OnCall will be installed on.
+# If you want to install grafana as a part of this release make sure to configure grafana.grafana.ini.server.domain too
+base_url: example.com
+base_url_protocol: https
+
+## Optionally specify an array of imagePullSecrets.
+## Secrets must be manually created in the namespace.
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+## e.g:
+## imagePullSecrets:
+##   - name: myRegistryKeySecretName
+imagePullSecrets: []
+
+image:
+  # Grafana OnCall docker image repository
+  repository: grafana/oncall
+  tag:
+  pullPolicy: Always
+
+# Whether to create additional service for external connections
+# ClusterIP service is always created
+service:
+  enabled: false
+  type: LoadBalancer
+  port: 8080
+  annotations: {}
+
+# Engine pods configuration
+engine:
+  replicaCount: 1
+  resources:
+    {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # Labels for engine pods
+  podLabels: {}
+
+  ## Deployment update strategy
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  ## Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  ## Topology spread constraints for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+  topologySpreadConstraints: []
+
+  ## Priority class for the pods
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
+  priorityClassName: ""
+
+  # Extra containers which runs as sidecar
+  extraContainers: ""
+  # extraContainers: |
+  # - name: cloud-sql-proxy
+  #   image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.1.2
+  #   args:
+  #     - --private-ip
+  #     - --port=5432
+  #     - example:europe-west3:grafana-oncall-db
+
+  # Extra volume mounts for the main app container
+  extraVolumeMounts: []
+  # - name: postgres-tls
+  #   configMap:
+  #     name: my-postgres-tls
+  #     defaultMode: 0640
+  # - name: redis-tls
+  #   configMap:
+  #     name: my-redis-tls
+  #     defaultMode: 0640
+
+  # Extra volumes for the pod
+  extraVolumes: []
+  # - mountPath: /mnt/postgres-tls
+  #   name: postgres-tls
+  # - mountPath: /mnt/redis-tls
+  #   name: redis-tls
+
+detached_integrations_service:
+  enabled: false
+  type: LoadBalancer
+  port: 8080
+  annotations: {}
+
+# Integrations pods configuration
+detached_integrations:
+  enabled: false
+  replicaCount: 1
+  resources:
+    {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  ## Deployment update strategy
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  ## Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  ## Topology spread constraints for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+  topologySpreadConstraints: []
+
+  ## Priority class for the pods
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
+  priorityClassName: ""
+
+  # Extra containers which runs as sidecar
+  extraContainers: ""
+  # extraContainers: |
+  # - name: cloud-sql-proxy
+  #   image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.1.2
+  #   args:
+  #     - --private-ip
+  #     - --port=5432
+  #     - example:europe-west3:grafana-oncall-db
+
+  # Extra volume mounts for the container
+  extraVolumeMounts: []
+  # - name: postgres-tls
+  #   configMap:
+  #     name: my-postgres-tls
+  #     defaultMode: 0640
+  # - name: redis-tls
+  #   configMap:
+  #     name: my-redis-tls
+  #     defaultMode: 0640
+
+  # Extra volumes for the pod
+  extraVolumes: []
+  # - mountPath: /mnt/postgres-tls
+  #   name: postgres-tls
+  # - mountPath: /mnt/redis-tls
+  #   name: redis-tls
+
+# Celery workers pods configuration
+celery:
+  replicaCount: 1
+  worker_queue: "default,critical,long,slack,telegram,webhook,celery,grafana"
+  worker_concurrency: "1"
+  worker_max_tasks_per_child: "100"
+  worker_beat_enabled: "True"
+  ## Restart of the celery workers once in a given interval as an additional precaution to the probes
+  ## If this setting is enabled TERM signal will be sent to celery workers
+  ## It will lead to warm shutdown (waiting for the tasks to complete) and restart the container
+  ## If this setting is set numbers of pod restarts will increase
+  ## Comment this line out if you want to remove restarts
+  worker_shutdown_interval: "65m"
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 300
+    timeoutSeconds: 10
+  resources:
+    {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # Labels for celery pods
+  podLabels: {}
+
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  ## Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  ## Topology spread constraints for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+  topologySpreadConstraints: []
+
+  ## Priority class for the pods
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
+  priorityClassName: ""
+
+  # Extra containers which runs as sidecar
+  extraContainers: ""
+  # extraContainers: |
+  # - name: cloud-sql-proxy
+  #   image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.1.2
+  #   args:
+  #     - --private-ip
+  #     - --port=5432
+  #     - example:europe-west3:grafana-oncall-db
+
+  # Extra volume mounts for the main container
+  extraVolumeMounts: []
+  # - name: postgres-tls
+  #   configMap:
+  #     name: my-postgres-tls
+  #     defaultMode: 0640
+  # - name: redis-tls
+  #   configMap:
+  #     name: my-redis-tls
+  #     defaultMode: 0640
+
+  # Extra volumes for the pod
+  extraVolumes: []
+  # - mountPath: /mnt/postgres-tls
+  #   name: postgres-tls
+  # - mountPath: /mnt/redis-tls
+  #   name: redis-tls
+
+# Telegram polling pod configuration
+telegramPolling:
+  enabled: false
+  resources:
+    {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # Labels for telegram-polling pods
+  podLabels: {}
+
+  # Extra volume mounts for the main container
+  extraVolumeMounts: []
+  # - name: postgres-tls
+  #   configMap:
+  #     name: my-postgres-tls
+  #     defaultMode: 0640
+  # - name: redis-tls
+  #   configMap:
+  #     name: my-redis-tls
+  #     defaultMode: 0640
+
+  # Extra volumes for the pod
+  extraVolumes: []
+  # - mountPath: /mnt/postgres-tls
+  #   name: postgres-tls
+  # - mountPath: /mnt/redis-tls
+  #   name: redis-tls
+
+oncall:
+  # this is intended to be used for local development. In short, it will mount the ./engine dir into
+  # any backend related containers, to allow hot-reloading + also run the containers with slightly modified
+  # startup commands (which configures the hot-reloading)
+  devMode: false
+
+  # Override default MIRAGE_CIPHER_IV (must be 16 bytes long)
+  # For existing installation, this should not be changed.
+  # mirageCipherIV: 1234567890abcdef
+  # oncall secrets
+  secrets:
+    # Use existing secret. (secretKey and mirageSecretKey is required)
+    existingSecret: ""
+    # The key in the secret containing secret key
+    secretKey: ""
+    # The key in the secret containing mirage secret key
+    mirageSecretKey: ""
+  # Slack configures the Grafana Oncall Slack ChatOps integration.
+  slack:
+    # Enable the Slack ChatOps integration for the Oncall Engine.
+    enabled: false
+    # Sets the Slack bot slash-command
+    commandName: oncall
+    # clientId configures the Slack app OAuth2 client ID.
+    # api.slack.com/apps/<yourApp> -> Basic Information -> App Credentials -> Client ID
+    clientId: ~
+    # clientSecret configures the Slack app OAuth2 client secret.
+    # api.slack.com/apps/<yourApp> -> Basic Information -> App Credentials -> Client Secret
+    clientSecret: ~
+    # signingSecret - configures the Slack app signature secret used to sign
+    # requests comming from Slack.
+    # api.slack.com/apps/<yourApp> -> Basic Information -> App Credentials -> Signing Secret
+    signingSecret: ~
+    # Use existing secret for clientId, clientSecret and signingSecret.
+    # clientIdKey, clientSecretKey and signingSecretKey are required
+    existingSecret: ""
+    # The key in the secret containing OAuth2 client ID
+    clientIdKey: ""
+    # The key in the secret containing OAuth2 client secret
+    clientSecretKey: ""
+    # The key in the secret containing the Slack app signature secret
+    signingSecretKey: ""
+    # OnCall external URL
+    redirectHost: ~
+  telegram:
+    enabled: false
+    token: ~
+    webhookUrl: ~
+    # Use existing secret. (tokenKey is required)
+    existingSecret: ""
+    # The key in the secret containing Telegram token
+    tokenKey: ""
+  smtp:
+    enabled: true
+    host: ~
+    port: ~
+    username: ~
+    password: ~
+    tls: ~
+    fromEmail: ~
+  exporter:
+    enabled: false
+    authToken: ~
+  twilio:
+    # Twilio account SID/username to allow OnCall to send SMSes and make phone calls
+    accountSid: ""
+    # Twilio password to allow OnCall to send SMSes and make calls
+    authToken: ""
+    # Number from which you will receive calls and SMS
+    # (NOTE: must be quoted, otherwise would be rendered as float value)
+    phoneNumber: ""
+    # SID of Twilio service for number verification. You can create a service in Twilio web interface.
+    # twilio.com -> verify -> create new service
+    verifySid: ""
+    # Twilio API key SID/username to allow OnCall to send SMSes and make phone calls
+    apiKeySid: ""
+    # Twilio API key secret/password to allow OnCall to send SMSes and make phone calls
+    apiKeySecret: ""
+    # Use existing secret for authToken, phoneNumber, verifySid, apiKeySid and apiKeySecret.
+    existingSecret: ""
+    # Twilio password to allow OnCall to send SMSes and make calls
+    # The key in the secret containing the auth token
+    authTokenKey: ""
+    # The key in the secret containing the phone number
+    phoneNumberKey: ""
+    # The key in the secret containing verify service sid
+    verifySidKey: ""
+    # The key in the secret containing api key sid
+    apiKeySidKey: ""
+    # The key in the secret containing the api key secret
+    apiKeySecretKey: ""
+    # Phone notifications limit (the only non-secret value).
+    # TODO: rename to phoneNotificationLimit
+    limitPhone:
+
+# Whether to run django database migrations automatically
+migrate:
+  enabled: true
+  # TTL can be unset by setting ttlSecondsAfterFinished: ""
+  ttlSecondsAfterFinished: 20
+  # use a helm hook to manage the migration job
+  useHook: false
+  annotations: {}
+
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  ## Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # Extra containers which runs as sidecar
+  extraContainers: ""
+  # extraContainers: |
+  # - name: cloud-sql-proxy
+  #   image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.1.2
+  #   args:
+  #     - --private-ip
+  #     - --port=5432
+  #     - example:europe-west3:grafana-oncall-db
+  resources:
+    {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # Extra volume mounts for the main container
+  extraVolumeMounts: []
+  # - name: postgres-tls
+  #   configMap:
+  #     name: my-postgres-tls
+  #     defaultMode: 0640
+  # - name: redis-tls
+  #   configMap:
+  #     name: my-redis-tls
+  #     defaultMode: 0640
+
+  # Extra volumes for the pod
+  extraVolumes: []
+  # - mountPath: /mnt/postgres-tls
+  #   name: postgres-tls
+  # - mountPath: /mnt/redis-tls
+  #   name: redis-tls
+
+# Sets environment variables with name capitalized and prefixed with UWSGI_,
+# and dashes are substituted with underscores.
+# see more: https://uwsgi-docs.readthedocs.io/en/latest/Configuration.html#environment-variables
+# Set null to disable all UWSGI environment variables
+uwsgi:
+  listen: 1024
+
+# Additional env variables to add to deployments
+env: {}
+
+# Enable ingress object for external access to the resources
+ingress:
+  enabled: true
+  #  className: ""
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/issuer: "letsencrypt-prod"
+  tls:
+    - hosts:
+        - "{{ .Values.base_url }}"
+      secretName: certificate-tls
+  # Extra paths to prepend to the host configuration. If using something
+  # like an ALB ingress controller, you may want to configure SSL redirects
+  extraPaths: []
+  # - path: /*
+  #   backend:
+  #     serviceName: ssl-redirect
+  #     servicePort: use-annotation
+  ## Or for k8s > 1.19
+  # - path: /*
+  #   pathType: Prefix
+  #   backend:
+  #     service:
+  #       name: ssl-redirect
+  #       port:
+  #         name: use-annotation
+
+# Whether to install ingress controller
+ingress-nginx:
+  enabled: true
+
+# Install cert-manager as a part of the release
+cert-manager:
+  enabled: true
+  # Instal CRD resources
+  installCRDs: true
+  webhook:
+    timeoutSeconds: 30
+    # cert-manager tries to use the already used port, changing to another one
+    # https://github.com/cert-manager/cert-manager/issues/3237
+    # https://cert-manager.io/docs/installation/compatibility/
+    securePort: 10260
+  # Fix self-checks https://github.com/jetstack/cert-manager/issues/4286
+  podDnsPolicy: None
+  podDnsConfig:
+    nameservers:
+      - 8.8.8.8
+      - 1.1.1.1
+
+database:
+  # can be either mysql or postgresql
+  type: mysql
+
+# MySQL is included into this release for the convenience.
+# It is recommended to host it separately from this release
+# Set mariadb.enabled = false and configure externalMysql
+mariadb:
+  enabled: true
+  auth:
+    database: oncall
+    existingSecret:
+  primary:
+    extraEnvVars:
+      - name: MARIADB_COLLATE
+        value: utf8mb4_unicode_ci
+      - name: MARIADB_CHARACTER_SET
+        value: utf8mb4
+  secondary:
+    extraEnvVars:
+      - name: MARIADB_COLLATE
+        value: utf8mb4_unicode_ci
+      - name: MARIADB_CHARACTER_SET
+        value: utf8mb4
+
+# Make sure to create the database with the following parameters:
+# CREATE DATABASE oncall CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+externalMysql:
+  host:
+  port:
+  db_name:
+  user:
+  password:
+  # Use an existing secret for the mysql password.
+  existingSecret:
+  # The key in the secret containing the mysql username
+  usernameKey:
+  # The key in the secret containing the mysql password
+  passwordKey:
+  # Extra options (see example below)
+  # Reference: https://pymysql.readthedocs.io/en/latest/modules/connections.html
+  options:
+  # options: >-
+  #   ssl_verify_cert=true
+  #   ssl_verify_identity=true
+  #   ssl_ca=/mnt/mysql-tls/ca.crt
+  #   ssl_cert=/mnt/mysql-tls/client.crt
+  #   ssl_key=/mnt/mysql-tls/client.key
+
+# PostgreSQL is included into this release for the convenience.
+# It is recommended to host it separately from this release
+# Set postgresql.enabled = false and configure externalPostgresql
+postgresql:
+  enabled: false
+  auth:
+    database: oncall
+    existingSecret:
+
+# Make sure to create the database with the following parameters:
+# CREATE DATABASE oncall WITH ENCODING UTF8;
+externalPostgresql:
+  host:
+  port:
+  db_name:
+  user:
+  password:
+  # Use an existing secret for the database password
+  existingSecret:
+  # The key in the secret containing the database password
+  passwordKey:
+  # Extra options (see example below)
+  # Reference: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS
+  options:
+  # options: >-
+  #   sslmode=verify-full
+  #   sslrootcert=/mnt/postgres-tls/ca.crt
+  #   sslcert=/mnt/postgres-tls/client.crt
+  #   sslkey=/mnt/postgres-tls/client.key
+
+# RabbitMQ is included into this release for the convenience.
+# It is recommended to host it separately from this release
+# Set rabbitmq.enabled = false and configure externalRabbitmq
+rabbitmq:
+  enabled: true
+  auth:
+    existingPasswordSecret:
+
+broker:
+  type: rabbitmq
+
+externalRabbitmq:
+  host:
+  port:
+  user:
+  password:
+  protocol:
+  vhost:
+  # Use an existing secret for the rabbitmq password
+  existingSecret:
+  # The key in the secret containing the rabbitmq password
+  passwordKey: ""
+  # The key in the secret containing the rabbitmq username
+  usernameKey: username
+
+# Redis is included into this release for the convenience.
+# It is recommended to host it separately from this release
+redis:
+  enabled: true
+  auth:
+    existingSecret:
+
+externalRedis:
+  protocol:
+  host:
+  port:
+  database:
+  username:
+  password:
+  # Use an existing secret for the redis password
+  existingSecret:
+  # The key in the secret containing the redis password
+  passwordKey:
+
+  # SSL options
+  ssl_options:
+    enabled: false
+    # CA certificate
+    ca_certs:
+    # Client SSL certs
+    certfile:
+    keyfile:
+    # SSL verification mode: "cert_none" | "cert_optional" | "cert_required"
+    cert_reqs:
+
+# Grafana is included into this release for the convenience.
+# It is recommended to host it separately from this release
+grafana:
+  enabled: true
+  grafana.ini:
+    server:
+      domain: example.com
+      root_url: "%(protocol)s://%(domain)s/grafana"
+      serve_from_sub_path: true
+  persistence:
+    enabled: true
+  # Disable psp as PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+
+  rbac:
+    pspEnabled: false
+  plugins:
+    - grafana-oncall-app
+
+externalGrafana:
+  # Example: https://grafana.mydomain.com
+  url:
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsGroup: 2000
+  # runAsUser: 1000
+
+init:
+  securityContext:
+    {}
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # privileged: false
+    # readOnlyRootFilesystem: true
+    # runAsGroup: 2000
+    # runAsNonRoot: true
+    # runAsUser: 1000
+  resources:
+    {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+ui:
+  # this is intended to be used for local development. In short, it will spin up an additional container
+  # running the plugin frontend, such that hot reloading can be enabled
+  enabled: false
+  image:
+    repository: oncall/ui
+    tag: dev
+  # Additional env vars for the ui container
+  env: {}

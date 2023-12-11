@@ -1,0 +1,65 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "oncall.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+  {{- end }}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "oncall.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+      {{- tpl (toYaml .Values.ingress.tls) . | nindent 4 }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.base_url | quote }}
+    http:
+      paths:
+{{- if .Values.ingress.extraPaths }}
+{{ toYaml .Values.ingress.extraPaths | indent 6}}
+{{- end }}
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "oncall.engine.fullname" . }}
+            port:
+              number: 8080
+      {{ if .Values.grafana.enabled }}
+      - path: /grafana
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "oncall.grafana.fullname" . }}
+            port:
+              number: 80
+      {{- end }}
+      {{ if .Values.detached_integrations.enabled }}
+      - path: /integrations
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "oncall.detached_integrations.fullname" . }}
+            port:
+              number: 8080
+      {{- end }}
+{{- end }}

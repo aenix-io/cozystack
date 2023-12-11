@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vm-operator.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{ include "vm-operator.labels" . | indent 4 }}
+{{- with .Values.extraLabels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+  annotations:
+{{- if .Values.admissionWebhooks.certManager.enabled }}
+
+{{- end }}
+{{- with .Values.annotations }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{.Values.replicaCount}}
+  selector:
+    matchLabels:
+      {{- include "vm-operator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+{{- with .Values.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}
+{{- end }}
+      labels:
+        {{- include "vm-operator.selectorLabels" . | nindent 8}}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- with .Values.podSecurityContext }}
+      securityContext:
+{{- toYaml . | nindent 8 }}
+{{- end }}
+      serviceAccountName: {{ template "vm-operator.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+          {{- end }}
+            - name: WATCH_NAMESPACE
+              value: {{ .Values.watchNamespace | quote }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: {{ .Chart.Name }}
+            {{- if .Values.operator.useCustomConfigReloader }}
+            - name: VM_USECUSTOMCONFIGRELOADER
+              value: "true"
+            {{- end }}
+            {{- if .Values.operator.disable_prometheus_converter }}
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PODMONITOR
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_SERVICESCRAPE
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PROMETHEUSRULE
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_PROBE
+              value: "false"
+            - name: VM_ENABLEDPROMETHEUSCONVERTER_ALERTMANAGERCONFIG
+              value: "false"
+            {{- else if .Values.operator.prometheus_converter_add_argocd_ignore_annotations }}
+            - name: VM_PROMETHEUSCONVERTERADDARGOCDIGNOREANNOTATIONS
+              value: "true"
+            {{- end }}
+            - name: VM_PSPAUTOCREATEENABLED
+              value: {{ .Values.operator.psp_auto_creation_enabled | quote }}
+            - name: VM_ENABLEDPROMETHEUSCONVERTEROWNERREFERENCES
+              value: {{.Values.operator.enable_converter_ownership | quote}}
+          args:
+            - --zap-log-level={{ .Values.logLevel }}
+            - --enable-leader-election
+            {{- if .Values.admissionWebhooks.enabled }}
+            - --webhook.enable=true
+            {{- end }}
+            {{- range $key, $value := .Values.extraArgs }}
+            - --{{ $key }}={{ $value }}
+            {{- end }}
+          command:
+            - manager
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9443
+              name: webhook
+              protocol: TCP
+          volumeMounts:
+            {{- if .Values.admissionWebhooks.enabled }}
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.securityContext }}
+          securityContext:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with.Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range $constraint := .Values.topologySpreadConstraints }}
+        - {{ toYaml $constraint | nindent 10 | trim }}
+          {{- if not $constraint.labelSelector }}
+          labelSelector:
+            matchLabels:
+              {{- include "vm-operator.selectorLabels" $ | nindent 14 }}
+          {{- end }}
+        {{- end }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      volumes:
+      {{- if .Values.admissionWebhooks.enabled }}
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: {{ template "vm-operator.fullname" . }}-validation
+      {{- end }}
+      {{- with .Values.extraVolumes }}
+      {{- toYaml .| nindent 10 }}
+      {{- end }}

@@ -1,0 +1,41 @@
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: Database
+metadata:
+  name: grafana-oncall-db
+spec:
+  mariaDbRef:
+    name: grafana-db
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-oncall-db
+stringData:
+  password: iengohwedae8hah9Shee
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: User
+metadata:
+  name: oncall
+spec:
+  mariaDbRef:
+    name: grafana-db
+  passwordSecretKeyRef:
+    name: grafana-oncall-db
+    key: password
+  maxUserConnections: 20
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: Grant
+metadata:
+  name: oncall
+spec:
+  mariaDbRef:
+    name: grafana-db
+  privileges:
+    - "ALL"
+  database: grafana-oncall-db
+  table: "*"
+  username: oncall
+  grantOption: true

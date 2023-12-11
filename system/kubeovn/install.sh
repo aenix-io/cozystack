@@ -50,7 +50,7 @@ VPC_NAT_IMAGE="vpc-nat-gateway"
 VERSION="v1.12.3"
 IMAGE_PULL_POLICY="IfNotPresent"
 POD_CIDR="10.244.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
-POD_GATEWAY="10.224.0.1"
+POD_GATEWAY="10.244.0.1"
 SVC_CIDR="10.96.0.0/16"                # Do NOT overlap with NODE/POD/JOIN CIDR
 JOIN_CIDR="100.64.0.0/16"              # Do NOT overlap with NODE/POD/SVC CIDR
 PINGER_EXTERNAL_ADDRESS="114.114.114.114"  # Pinger check external ip probe
@@ -4268,6 +4268,7 @@ spec:
           args:
           - --external-address=$PINGER_EXTERNAL_ADDRESS
           - --external-dns=$PINGER_EXTERNAL_DOMAIN
+          - --ds-namespace=cozy-kubeovn
           - --logtostderr=false
           - --alsologtostderr=true
           - --log_file=/var/log/kube-ovn/kube-ovn-pinger.log

@@ -7,4 +7,5 @@ update:
 	helm pull ingress-nginx/ingress-nginx --untar --untardir charts
 	patch -p 3 < patches/add-metrics2.patch
 	rm -f charts/ingress-nginx/templates/controller-deployment.yaml.orig
+	rm -rf charts/ingress-nginx/changelog/
 	#sed -i '/  type:/a \  allocateLoadBalancerNodePorts: false' charts/ingress-nginx/templates/controller-service.yaml

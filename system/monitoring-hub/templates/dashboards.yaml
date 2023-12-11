@@ -1,0 +1,27 @@
+{{ range $path, $bytes := $.Files.Glob "grafana-dashboards/**.json" }}
+{{ $parts := split "/" ( trimSuffix ".json" (trimPrefix "grafana-dashboards/" $path)) }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ $parts._0 }}-{{ $parts._1 }}
+  namespace: cozy-monitoring-hub
+spec:
+  folder: {{ $parts._0 }}
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  {{- if regexMatch "flant-statusmap-panel|grafana-worldmap-panel" (toString $bytes) }}
+  plugins:
+    {{- if regexMatch "flant-statusmap-panel" (toString $bytes) }}
+    - name: flant-statusmap-panel
+      version: 0.5.1
+    {{- end }}
+    {{- if regexMatch "grafana-worldmap-panel" (toString $bytes) }}
+    - name: grafana-worldmap-panel
+      version: 1.0.6
+    {{- end }}
+  {{- end }}
+  json: |-
+    {{- toString $bytes | nindent 4 }}
+{{- end }}

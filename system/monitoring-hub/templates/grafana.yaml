@@ -1,0 +1,91 @@
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: grafana
+  labels:
+    dashboards: "grafana"
+spec:
+  config:
+    log:
+      mode: "console"
+    auth:
+      disable_login_form: "false"
+    auth.gitlab:
+        name: Gitlab
+        enabled: "true"
+        allow_sign_up: "true"
+        auto_login: "false"
+        client_id: c1286be57609c1456cb92703e8fecade823c7f0c35d866c5d3d7065ee326402a
+        client_secret: eb4ebd228ba34a028aa6811d0882db8b8f13235353ad782f5c4a59b46cee6eba
+        scopes: api
+        auth_url: "https://git.example.org/oauth/authorize"
+        token_url: "https://git.example.org/oauth/token"
+        api_url: "https://git.example.org/api/v4"
+        #allowed_domains: 173.0.146.94.nip.io
+        #allowed_groups: '["aemedia/auth/infra-admins"]'
+        #role_attribute_path: "contains(info.groups_direct[*], 'aemedia/') && 'Admin' || contains(info.groups_direct[*], 'aemedia/auth/infra-admins') && 'Editor' || 'Viewer'"
+        role_attribute_path: "is_admin && 'Admin' || 'Viewer'"
+        #tls_skip_verify_insecure: "false"
+        #use_pkce: "true"
+        #use_refresh_token: "true"
+    database:
+      type: postgres
+      name: ${GF_DATABASE_NAME}
+      host: ${GF_DATABASE_HOST}
+      user: ${GF_DATABASE_USER}
+      password: ${GF_DATABASE_PASSWORD}
+      #ssl_mode: require
+    server:
+      root_url: https://grafana.example.org
+    security:
+      admin_user: root
+      admin_password: {{ .Values.adminPassword }}
+  deployment:
+    spec:
+      replicas: 2
+      template:
+        spec:
+          containers:
+            - name: grafana
+              image: grafana/grafana:10.1.0
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+              readinessProbe:
+                failureThreshold: 3
+              env:
+              - name: GF_INSTALL_PLUGINS
+                value: grafana-worldmap-panel,flant-statusmap-panel,grafana-oncall-app,natel-discrete-panel
+              - name: ONCALL_API_URL
+                value: http://grafana-oncall-engine:8080
+              - name: GF_DATABASE_HOST
+                value: "grafana-db-rw:5432"
+              - name: GF_DATABASE_PASSWORD
+                valueFrom: { secretKeyRef: { name: grafana-db-app, key: password } }
+              - name: GF_DATABASE_NAME
+                value: "app"
+              - name: GF_DATABASE_USER
+                value: "app"
+  ingress:
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: grafana.example.org
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: grafana-service
+                    port:
+                      number: 3000
+                path: /
+                pathType: Prefix
+      tls:
+      - hosts:
+        - grafana.example.org
+        secretName: grafana-ingressmyingress-tls

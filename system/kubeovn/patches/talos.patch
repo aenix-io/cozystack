@@ -1,6 +1,8 @@
---- a/install.sh	2023-12-08 11:35:47.047963122 +0100
-+++ b/install.sh	2023-12-10 16:49:32.081266054 +0100
-@@ -49,9 +49,9 @@
+diff --git a/system/kubeovn/install.sh b/system/kubeovn/install.sh
+index 6120c35..29a3146 100644
+--- a/system/kubeovn/install.sh
++++ b/system/kubeovn/install.sh
+@@ -49,9 +49,9 @@ REGISTRY="docker.io/kubeovn"
  VPC_NAT_IMAGE="vpc-nat-gateway"
  VERSION="v1.12.3"
  IMAGE_PULL_POLICY="IfNotPresent"
@@ -8,12 +10,12 @@
 -POD_GATEWAY="10.16.0.1"
 -SVC_CIDR="10.96.0.0/12"                # Do NOT overlap with NODE/POD/JOIN CIDR
 +POD_CIDR="10.244.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
-+POD_GATEWAY="10.224.0.1"
++POD_GATEWAY="10.244.0.1"
 +SVC_CIDR="10.96.0.0/16"                # Do NOT overlap with NODE/POD/JOIN CIDR
  JOIN_CIDR="100.64.0.0/16"              # Do NOT overlap with NODE/POD/SVC CIDR
  PINGER_EXTERNAL_ADDRESS="114.114.114.114"  # Pinger check external ip probe
  PINGER_EXTERNAL_DOMAIN="alauda.cn."         # Pinger check external domain probe
-@@ -3573,7 +3573,12 @@
+@@ -3557,7 +3557,12 @@ spec:
            image: "$REGISTRY/kube-ovn:$VERSION"
            imagePullPolicy: $IMAGE_PULL_POLICY
            command: 
@@ -27,4 +29,11 @@
            securityContext:
              runAsUser: 0
              privileged: true
-             path: $LOG_DIR/openvswitch
+@@ -4263,6 +4268,7 @@ spec:
+           args:
+           - --external-address=$PINGER_EXTERNAL_ADDRESS
+           - --external-dns=$PINGER_EXTERNAL_DOMAIN
++          - --ds-namespace=cozy-kubeovn
+           - --logtostderr=false
+           - --alsologtostderr=true
+           - --log_file=/var/log/kube-ovn/kube-ovn-pinger.log

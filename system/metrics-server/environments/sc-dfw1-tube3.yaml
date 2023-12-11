@@ -1,6 +1,0 @@
-_helm:
-  context: sc-dfw1-tube3
-
-metrics-server:
-  serviceMonitor:
-    enabled: false
