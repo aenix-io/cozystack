@@ -8,6 +8,17 @@ _helm:
   - name: redis-operator
 
 kubeapps:
+
+  #kubeappsapis:
+  #  image: ghcr.io/aenix-io/cozystack/kubeapps-apis:latest
+  dashboard:
+  #  image: ghcr.io/aenix-io/cozystack/dashboard:latest
+    customStyle: |-
+     .header.header-7 {
+       background-color: #202124;
+       background-color: var(--clr-header-7-bg-color, hsl(225, 6%, 13%));
+     }
+
   postgresql:
     enabled: false
 

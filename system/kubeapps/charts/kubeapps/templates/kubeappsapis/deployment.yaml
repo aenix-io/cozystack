@@ -71,7 +71,7 @@ spec:
       {{- end }}
       containers:
         - name: kubeappsapis
-          image: ghcr.io/kvaps/test:12
+          image: ghcr.io/aenix-io/cozystack/kubeapps-apis:latest
           imagePullPolicy: {{ .Values.kubeappsapis.image.pullPolicy | quote }}
           {{- if .Values.kubeappsapis.containerSecurityContext.enabled }}
           securityContext: {{- omit .Values.kubeappsapis.containerSecurityContext "enabled" | toYaml | nindent 12 }}
