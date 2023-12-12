@@ -12,3 +12,4 @@ rename vm, vm-longterm
 talos setup via tcp-proxy
 migrate kubeapps redis to operator
 kubeapps patch helm chart and dockerfiles
+flux policies
