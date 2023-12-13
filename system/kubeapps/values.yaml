@@ -9,10 +9,6 @@ _helm:
 
 kubeapps:
 
-  #kubeappsapis:
-  #  image: ghcr.io/aenix-io/cozystack/kubeapps-apis:latest
-  dashboard:
-  #  image: ghcr.io/aenix-io/cozystack/dashboard:latest
   postgresql:
     enabled: false
 
@@ -21,3 +17,4 @@ kubeapps:
       enabled: false
     flux:
       enabled: true
+

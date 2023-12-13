@@ -1,15 +1,24 @@
 include ../../hack/app-helm.mk
 
-update:
-	#rm -rf charts
-	#helm repo add bitnami https://charts.bitnami.com/bitnami
-	#helm repo update bitnami
-	#helm pull bitnami/kubeapps --untar --untardir charts
-	#rm -rf charts/kubeapps/charts/postgresql/
+update: update-chart update-dockerfiles
+
+update-chart:
+	rm -rf charts
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo update bitnami
+	helm pull bitnami/kubeapps --untar --untardir charts
+	rm -rf charts/kubeapps/charts/postgresql/
+	sed -i 's|{{ include "kubeapps.dashboard.image" . }}|ghcr.io/aenix-io/cozystack/dashboard:latest|g' charts/kubeapps/templates/dashboard/deployment.yaml
+	sed -i 's|{{ include "kubeapps.kubeappsapis.image" . }}|ghcr.io/aenix-io/cozystack/kubeapps-apis:latest|g' charts/kubeapps/templates/kubeappsapis/deployment.yaml
+
+update-dockerfiles:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/vmware-tanzu/kubeapps  | awk -F'[/^]' 'END{print $$3}') && \
-	wget https://github.com/vmware-tanzu/kubeapps/raw/$${tag}/dashboard/Dockerfile -O images/dashboard/Dockerfile && \
 	wget https://github.com/vmware-tanzu/kubeapps/raw/$${tag}/cmd/kubeapps-apis/Dockerfile -O images/kubeapps-apis/Dockerfile && \
-	patch images/kubeapps-apis/Dockerfile < images/kubeapps-apis/dockerfile.diff
+	patch images/kubeapps-apis/Dockerfile < images/kubeapps-apis/dockerfile.diff && \
+	node_image=$$(wget -O- https://github.com/vmware-tanzu/kubeapps/raw/main/dashboard/Dockerfile | awk '/FROM bitnami\/node/ {print $$2}') && \
+	sed -i "s|FROM .* AS build|FROM $${node_image} AS build|" images/dashboard/Dockerfile && \
+	version=$$(echo "$$tag" | sed 's/^v//') && \
+	sed -i "s/ARG VERSION=.*/ARG VERSION=$${version}/" images/dashboard/Dockerfile
 
 
 image-dashboard:
