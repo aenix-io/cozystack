@@ -1,18 +1,18 @@
 #!/bin/sh
 
-default_scan_networks=$(ip -o route | awk '$3 !~ /^(docker|cni)/ && $2 == "dev" {print $1}' | paste -d ' ' -s)
+default_scan_networks=$(ip -o route | awk '$3 !~ /^(docker|cni)/ && $2 == "dev" {print $1}' | awk '$1=$1' RS=" " OFS=" ")
 scan_networks=$(dialog --inputbox "Enter networks to scan:" 8 80 "$default_scan_networks" 3>&1 1>&2 2>&3) || exit 0
-scan_networks=$(echo "$scan_networks" | tr , " ")
+scan_networks=$(echo "$scan_networks" | awk -F, '{$1=$1}1' OFS=' ')
 
 node_list_file=$(mktemp)
 {
-  printf "%s\nXXX\n%s\n%s\nXXX\n" "20" "Searching talos nodes in $scan_networks..."
+  printf "%s\nXXX\n%s\n%s\nXXX\n" "10" "Searching talos nodes in $scan_networks..."
   CANDIDATE_NODES=$(nmap -Pn -n -p 50000 $scan_networks -vv | awk '/Discovered open port/ {print $NF}')
 
   #echo found:
   #printf "  - %s\n" $CANDIDATE_NODES
 
-  printf "%s\nXXX\n%s\n%s\nXXX\n" "50" "Filtering nodes in maintenance mode..."
+  printf "%s\nXXX\n%s\n%s\nXXX\n" "40" "Filtering nodes in maintenance mode..."
   NODES=
   for node in $CANDIDATE_NODES; do
     if talosctl -n "$node" get info -i >/dev/null 2>/dev/null; then
@@ -23,7 +23,7 @@ node_list_file=$(mktemp)
   #echo filtered:
   #printf "  - %s\n" $NODES
 
-  printf "%s\nXXX\n%s\n%s\nXXX\n" "70" "Collecting information about the nodes..."
+  printf "%s\nXXX\n%s\n%s\nXXX\n" "60" "Collecting information about the nodes..."
   node_list=$(
     seen=
     for node in $NODES; do
@@ -38,13 +38,13 @@ node_list_file=$(mktemp)
       manufacturer=$(talosctl -n "$node" get cpu -i -o jsonpath={.spec.manufacturer} | head -n1)
       cpu=$(talosctl -n "$node" get cpu -i -o jsonpath={.spec.threadCount} -i | awk '{sum+=$1;} END{print sum "-core";}')
       ram=$(talosctl -n "$node" get ram -o jsonpath={.spec.sizeMiB} -i | awk '{sum+=$1;} END{print sum/1024 "GB";}')
-      disks=$(talosctl -n "$node" disks -i | awk -F'  +' 'NR>1 {print $1 ":" $9}' | sed 's|^/dev/||' | tr -d ' ' | paste -d, -s)
+      disks=$(talosctl -n "$node" disks -i | awk -F'  +' 'NR>1 {print $1 ":" $9}' | awk -F/ '$2 == "dev" {print $3}' | awk 'gsub(" ", "", $0)' | awk '$1=$1' RS="," OFS=",")
       echo "\"$name\"" "\"$mac, $cpu ${manufacturer:-CPU}, RAM: $ram, Disks: [$disks]\""
     done
   )
 
   echo "$node_list" > "$node_list_file"
-} | dialog --gauge "Please wait" 10 70 0 3>&1 1>&2 2>&3
+} | dialog --gauge "Please wait" 10 70 0 3>&1 1>&2 2>&3 || exit 0
 
 node_list=$(cat "$node_list_file")
 
@@ -76,7 +76,7 @@ interface_list=$(
   for link_mac in $link_list; do
     link="${link_mac%%|*}"
     mac="${link_mac#*|}"
-    ips=$(set -x; echo "$address_list" | awk "\$1 == \"$link\" {print \$2}" | paste -d, -s)
+    ips=$(echo "$address_list" | awk "\$1 == \"$link\" {print \$2}" | awk '$1=$1' RS=, OFS=,)
     details="$mac"
     if [ -n "$ips" ]; then
       details="$mac ($ips)"
@@ -91,9 +91,9 @@ default_interface=$(echo "$link_list" | awk -F'|' "\$2 == \"$default_mac\" {prin
 interface=$(echo "$interface_list" | dialog --default-item "$default_interface" --menu "choose interface:" 0 0 0 --file /dev/stdin 3>&1 1>&2 2>&3)
 
 # Screen 5: configure networks
-default_addresses=$(talosctl -n "$node" get nodeaddress default -i -o jsonpath={.spec.addresses[*]} | paste -d, -)
+default_addresses=$(talosctl -n "$node" get nodeaddress default -i -o jsonpath={.spec.addresses[*]} | awk '$1=$1' RS=, OFS=,)
 addresses=$(dialog --inputbox "Enter addresses:" 8 40 "$default_addresses" 3>&1 1>&2 2>&3) || exit 0
-addresses=$(echo "$dns_servers" | paste -d, -s)
+addresses=$(echo "$addresses" | awk '{$1=$1}1' OFS=",")
 address=$(echo "$addresses" | awk -F/ '{print $1}')
 
 # Screen 6: configure default gateway
@@ -101,9 +101,9 @@ default_gateway=$(talosctl -n "$node" get routes -i -o jsonpath={.spec.gateway} 
 gateway=$(dialog --inputbox "Enter gateway:" 8 40 "$default_gateway" 3>&1 1>&2 2>&3) || exit 0
 
 # Screen 7: configure dns servers
-default_dns_servers=$(talosctl -n 192.168.100.127 get resolvers resolvers -i -o jsonpath='{.spec.dnsServers[*]}' | paste -d, -s)
+default_dns_servers=$(talosctl -n "$node" get resolvers resolvers -i -o jsonpath='{.spec.dnsServers[*]}' | awk '$1=$1' RS=" " OFS=" ")
 dns_servers=$(dialog --inputbox "Enter dns servers:" 8 80 "$default_dns_servers" 3>&1 1>&2 2>&3) || exit 0
-dns_servers=$(echo "$dns_servers" | paste -d, -s)
+dns_servers=$(echo "$dns_servers" | awk '{$1=$1}1' OFS=",")
 
 # Screen 9: Confirm configuration
 machine_config=$(cat <<EOT
