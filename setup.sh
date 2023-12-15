@@ -1,22 +1,32 @@
 #!/bin/sh
+#
+# Copyright 2023 Andrei Kvapil. All rights reserved.
+# SPDX-License-Identifier: Apache2.0
+#
+# This code should (try to) follow Google's Shell Style Guide
+# - https://google.github.io/styleguide/shell.xml
+#
 
+# Screen: Enter networks to scan
 default_scan_networks=$(ip -o route | awk '$3 !~ /^(docker|cni)/ && $2 == "dev" {print $1}' | awk '$1=$1' RS=" " OFS=" ")
 scan_networks=$(dialog --inputbox "Enter networks to scan:" 8 80 "$default_scan_networks" 3>&1 1>&2 2>&3) || exit 0
 scan_networks=$(echo "$scan_networks" | awk -F, '{$1=$1}1' OFS=' ')
 
 node_list_file=$(mktemp)
+
+# Screen: Seatching Talos nodes
 {
-  printf "%s\nXXX\n%s\n%s\nXXX\n" "10" "Searching talos nodes in $scan_networks..."
-  CANDIDATE_NODES=$(nmap -Pn -n -p 50000 $scan_networks -vv | awk '/Discovered open port/ {print $NF}')
+  printf "%s\nXXX\n%s\n%s\nXXX\n" "10" "Searching Talos nodes in $scan_networks..."
+  candidate_nodes=$(nmap -Pn -n -p 50000 $scan_networks -vv | awk '/Discovered open port/ {print $NF}')
 
   #echo found:
-  #printf "  - %s\n" $CANDIDATE_NODES
+  #printf "  - %s\n" $candidate_nodes
 
   printf "%s\nXXX\n%s\n%s\nXXX\n" "40" "Filtering nodes in maintenance mode..."
-  NODES=
-  for node in $CANDIDATE_NODES; do
+  nodes=
+  for node in $candidate_nodes; do
     if talosctl -n "$node" get info -i >/dev/null 2>/dev/null; then
-      NODES="$NODES $node"
+      nodes="$nodes $node"
     fi
   done
   
@@ -49,26 +59,26 @@ node_list_file=$(mktemp)
 node_list=$(cat "$node_list_file")
 
 if [ -z "$node_list" ]; then
-  dialog --msgbox "No talos nodes in maintenance mode found!
+  dialog --msgbox "No Talos nodes in maintenance mode found!
 
 Searched networks: $scan_networks" 10 60
   exit 1
 fi
 
-# Screen 1: node list
-node=$(echo "$node_list" | dialog --menu "choose node to bootstrap" 0 0 0 --file /dev/stdin 3>&1 1>&2 2>&3) || exit 0
+# Screen: Node list
+node=$(echo "$node_list" | dialog --menu "Choose node to bootstrap" 0 0 0 --file /dev/stdin 3>&1 1>&2 2>&3) || exit 0
 # cut hostname
 node=$(echo "$node" | awk '{print $1}')
 
-# Screen 2: Choose hostname
+# Screen: Choose hostname
 default_hostname=$(talosctl -n "$node" get hostname -i -o jsonpath='{.spec.hostname}')
 hostname=$(dialog --inputbox "Enter hostname:" 8 40 "$default_hostname" 3>&1 1>&2 2>&3) || exit 0
 
-# Screen 3: Choose disk to install
+# Screen: Choose disk to install
 disks_list=$(talosctl -n "$node" disks -i | awk 'NR>1 {printf "\"" $1 "\""; $1=""; print " \"" $0 "\""}')
-disk=$(echo "$disks_list" | dialog --menu "choose disk to install" 0 0 0 --file /dev/stdin 3>&1 1>&2 2>&3)
+disk=$(echo "$disks_list" | dialog --menu "Choose disk to install" 0 0 0 --file /dev/stdin 3>&1 1>&2 2>&3) || exit 0
 
-# Screen 4: Choose interface
+# Screen: Choose interface
 link_list=$(talosctl -n "$node" get link -i | awk -F'  +' 'NR>1 && $4 ~ /^(ID|eno|eth|enp|enx)/ {print $4 "|" $(NF-2)}')
 address_list=$(talosctl -n "$node" get addresses -i | awk 'NR>1 {print $NF " " $(NF-1)}') || exit 0
 
@@ -88,24 +98,24 @@ interface_list=$(
 default_mac=$(talosctl -n "$node" get hardwareaddresses.net.talos.dev first -i -o jsonpath={.spec.hardwareAddr})
 default_interface=$(echo "$link_list" | awk -F'|' "\$2 == \"$default_mac\" {print \$1}")
 
-interface=$(echo "$interface_list" | dialog --default-item "$default_interface" --menu "choose interface:" 0 0 0 --file /dev/stdin 3>&1 1>&2 2>&3)
+interface=$(echo "$interface_list" | dialog --default-item "$default_interface" --menu "Choose interface:" 0 0 0 --file /dev/stdin 3>&1 1>&2 2>&3) || exit 0
 
-# Screen 5: configure networks
+# Screen: Configure networks
 default_addresses=$(talosctl -n "$node" get nodeaddress default -i -o jsonpath={.spec.addresses[*]} | awk '$1=$1' RS=, OFS=,)
 addresses=$(dialog --inputbox "Enter addresses:" 8 40 "$default_addresses" 3>&1 1>&2 2>&3) || exit 0
 addresses=$(echo "$addresses" | awk '{$1=$1}1' OFS=",")
 address=$(echo "$addresses" | awk -F/ '{print $1}')
 
-# Screen 6: configure default gateway
+# Screen: Configure default gateway
 default_gateway=$(talosctl -n "$node" get routes -i -o jsonpath={.spec.gateway} | grep -v '^$' -m1)
 gateway=$(dialog --inputbox "Enter gateway:" 8 40 "$default_gateway" 3>&1 1>&2 2>&3) || exit 0
 
-# Screen 7: configure dns servers
+# Screen: Configure DNS servers
 default_dns_servers=$(talosctl -n "$node" get resolvers resolvers -i -o jsonpath='{.spec.dnsServers[*]}' | awk '$1=$1' RS=" " OFS=" ")
-dns_servers=$(dialog --inputbox "Enter dns servers:" 8 80 "$default_dns_servers" 3>&1 1>&2 2>&3) || exit 0
+dns_servers=$(dialog --inputbox "Enter DNS servers:" 8 80 "$default_dns_servers" 3>&1 1>&2 2>&3) || exit 0
 dns_servers=$(echo "$dns_servers" | awk '{$1=$1}1' OFS=",")
 
-# Screen 9: Confirm configuration
+# Screen: Confirm configuration
 machine_config=$(cat <<EOT
 machine:
   type: controlplane
@@ -133,7 +143,7 @@ dialog --ok-label "Install" --extra-button --extra-label "Cancel" --textbox "$fi
 rm -f "$file"
 trap '' EXIT
 
-# Screen 10: Installation process
+# Screen: Installation process
 
 { 
   printf "%s\nXXX\n%s\n%s\nXXX\n" "0" "Generating configuration..."
@@ -151,7 +161,7 @@ trap '' EXIT
   new_is_pingable=0
   new_is_up=0
   until [ "$new_is_up" = 1 ] ; do
-
+    sleep 0.1
     if [ "$new_is_pingable" = 0 ]; then
       if [ "$old_is_up" = 1 ]; then
         timeout 1 talosctl --talosconfig=talosconfig -e "$node" -n "$node" get info -i >/dev/null 2>&1
@@ -176,7 +186,7 @@ trap '' EXIT
     fi
 
     case $old_is_up$old_is_pingable$new_is_pingable in
-      110) printf "%s\nXXX\n%s\n%s\nXXX\n" "20" "Installing... (socket is up at $node)" ;;
+      110) printf "%s\nXXX\n%s\n%s\nXXX\n" "20" "Installing... (port is open at $node)" ;;
       010) printf "%s\nXXX\n%s\n%s\nXXX\n" "50" "Rebooting... (node is pingable at $node)" ;;
       000) printf "%s\nXXX\n%s\n%s\nXXX\n" "70" "Rebooting... (node is not pingable)" ;;
       001) printf "%s\nXXX\n%s\n%s\nXXX\n" "80" "Rebooting... (node is pingable again at $address)" ;;
@@ -184,10 +194,11 @@ trap '' EXIT
   done
 } | dialog --gauge "Please wait" 10 70 0 3>&1 1>&2 2>&3
 
-# Screen 11: Complete installation
-
+# Screen: Complete installation
 dialog --msgbox "Installation finished!
 
 You will now be directed to the dashboard" 0 0
+
+# Screen: Talos dashboard
 talosctl --talosconfig=talosconfig -e "$address" -n "$address" dashboard
 clear
