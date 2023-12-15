@@ -80,6 +80,7 @@ interface=$(echo "$interface_list" | dialog --default-item "$default_interface" 
 # Screen 5: configure networks
 default_addresses=$(talosctl -n "$node" get nodeaddress default -i -o jsonpath={.spec.addresses[*]} | paste -d, -)
 addresses=$(dialog --inputbox "Enter addresses:" 8 40 "$default_addresses" 3>&1 1>&2 2>&3) || exit 0
+address=$(echo "$addresses" | awk -F/ '{print $1}')
 
 # Screen 6: configure default gateway
 default_gateway=$(talosctl -n "$node" get routes -i -o jsonpath={.spec.gateway} | grep -v '^$' -m1)
@@ -117,10 +118,61 @@ dialog --ok-label "Install" --extra-button --extra-label "Cancel" --textbox "$fi
 rm -f "$file"
 trap '' EXIT
 
-## TODO
-#talosctl gen secrets
-#talosctl gen config foo https://192.168.100.111:6443 --config-patch="$machine_config" --force
-#talosctl --talosconfig=talosconfig apply -e "$node" -n "$node" -f controlplane.yaml -i
-#node=$(echo "${addresses%/*}")
-#talosctl --talosconfig=talosconfig -e "$node" -n "$node" dashboard
-#talosctl --talosconfig=talosconfig -e "$node" -n "$node" bootstrap
+# Screen 10: Installation process
+
+{ 
+  printf "%s\nXXX\n%s\n%s\nXXX\n" "0" "Generating configuration..."
+  if [ ! -f secrets.yaml ]; then
+    talosctl gen secrets >/dev/null 2>&1
+  fi
+  talosctl gen config foo --with-secrets=secrets.yaml https://192.168.100.111:6443 --config-patch="$machine_config" --force >/dev/null 2>&1
+  printf "%s\nXXX\n%s\n%s\nXXX\n" "1" "Applying configuration..."
+  talosctl --talosconfig=talosconfig apply -e "$node" -n "$node" -f controlplane.yaml -i >/dev/null 2>&1
+
+  printf "%s\nXXX\n%s\n%s\nXXX\n" "10" "Installing..."
+
+  old_is_up=1
+  old_is_pingable=1
+  new_is_pingable=0
+  new_is_up=0
+  until [ "$new_is_up" = 1 ] ; do
+
+    if [ "$new_is_pingable" = 0 ]; then
+      if [ "$old_is_up" = 1 ]; then
+        timeout 1 talosctl --talosconfig=talosconfig -e "$node" -n "$node" get info -i >/dev/null 2>&1
+        if [ $? = 124 ]; then
+          old_is_up=0
+        fi
+      else
+        if ! ping -W1 -c1 "$node" >/dev/null 2>&1; then
+          old_is_pingable=0
+        fi
+      fi
+    fi
+
+    if [ "$old_is_pingable" = 0 ]; then
+      if ping -W1 -c1 "$address" >/dev/null 2>&1; then
+        new_is_pingable=1
+      fi
+    fi
+
+    if timeout 1 talosctl --talosconfig=talosconfig -e "$address" -n "$address" get info >/dev/null 2>&1; then
+      new_is_up=1
+    fi
+
+    case $old_is_up$old_is_pingable$new_is_pingable in
+      110) printf "%s\nXXX\n%s\n%s\nXXX\n" "20" "Installing... (socket is up at $node)" ;;
+      010) printf "%s\nXXX\n%s\n%s\nXXX\n" "50" "Rebooting... (node is pingable at $node)" ;;
+      000) printf "%s\nXXX\n%s\n%s\nXXX\n" "70" "Rebooting... (node is not pingable)" ;;
+      001) printf "%s\nXXX\n%s\n%s\nXXX\n" "80" "Rebooting... (node is pingable again at $address)" ;;
+    esac
+  done
+} | dialog --gauge "Please wait" 10 70 0 3>&1 1>&2 2>&3
+
+# Screen 11: Complete installation
+
+dialog --msgbox "Installation finished!
+
+You will now be directed to the dashboard" 0 0
+talosctl --talosconfig=talosconfig -e "$address" -n "$address" dashboard
+clear
