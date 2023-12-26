@@ -47,7 +47,7 @@ CNI_BIN_DIR="/opt/cni/bin"
 
 REGISTRY="docker.io/kubeovn"
 VPC_NAT_IMAGE="vpc-nat-gateway"
-VERSION="v1.12.3"
+VERSION="v1.12.4"
 IMAGE_PULL_POLICY="IfNotPresent"
 POD_CIDR="10.244.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
 POD_GATEWAY="10.244.0.1"
@@ -2254,6 +2254,10 @@ spec:
                       - 253 # default
                       - 254 # main
                       - 255 # local
+                mtu:
+                  type: integer
+                  minimum: 68
+                  maximum: 65535
                 private:
                   type: boolean
                 vlan:
@@ -3922,6 +3926,15 @@ spec:
         - key: CriticalAddonsOnly
           operator: Exists
       affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - preference:
+              matchExpressions:
+              - key: "ovn.kubernetes.io/ic-gw"
+                operator: NotIn
+                values:
+                - "true"
+            weight: 100
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
@@ -4022,6 +4035,7 @@ spec:
               memory: 1Gi
       nodeSelector:
         kubernetes.io/os: "linux"
+        kube-ovn/role: master
       volumes:
         - name: localtime
           hostPath:
@@ -4444,22 +4458,22 @@ spec:
               name: kube-ovn-tls
             - mountPath: /var/log/kube-ovn
               name: kube-ovn-log
-          readinessProbe:
-            exec:
-              command:
-              - cat
-              - /var/run/ovn/ovn-controller.pid
-            periodSeconds: 10
-            timeoutSeconds: 45
           livenessProbe:
-            exec:
-              command:
-              - cat
-              - /var/run/ovn/ovn-controller.pid
+            failureThreshold: 3
             initialDelaySeconds: 30
-            periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 45
+            periodSeconds: 7
+            successThreshold: 1
+            tcpSocket:
+              port: 10661
+            timeoutSeconds: 3
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 7
+            successThreshold: 1
+            tcpSocket:
+              port: 10661
+            timeoutSeconds: 3
       nodeSelector:
         kubernetes.io/os: "linux"
         kube-ovn/role: "master"
@@ -4567,54 +4581,3 @@ for ns in $(kubectl get ns --no-headers -o custom-columns=NAME:.metadata.name); 
 done
 
 kubectl rollout status daemonset/kube-ovn-pinger -n cozy-kubeovn --timeout 300s
-kubectl rollout status deployment/coredns -n cozy-kubeovn --timeout 600s
-echo "-------------------------------"
-echo ""
-
-echo "[Step 5/6] Add kubectl plugin PATH"
-
-if ! sh -c "echo \":$PATH:\" | grep -q \":/usr/local/bin:\""; then
-  echo "Tips:Please join the /usr/local/bin to your PATH. Temporarily, we do it for this execution."
-  export PATH=/usr/local/bin:$PATH
-  echo "-------------------------------"
-  echo ""
-fi
-
-echo "[Step 6/6] Run network diagnose"
-kubectl cp cozy-kubeovn/"$(kubectl  -n cozy-kubeovn get pods -o wide | grep cni | awk '{print $1}' | awk 'NR==1{print}')":/kube-ovn/kubectl-ko /usr/local/bin/kubectl-ko
-chmod +x /usr/local/bin/kubectl-ko
-kubectl ko diagnose all
-
-echo "-------------------------------"
-echo "
-                    ,,,,
-                    ,::,
-                   ,,::,,,,
-            ,,,,,::::::::::::,,,,,
-         ,,,::::::::::::::::::::::,,,
-       ,,::::::::::::::::::::::::::::,,
-     ,,::::::::::::::::::::::::::::::::,,
-    ,::::::::::::::::::::::::::::::::::::,
-   ,:::::::::::::,,   ,,:::::,,,::::::::::,
- ,,:::::::::::::,       ,::,     ,:::::::::,
- ,:::::::::::::,   :x,  ,::  :,   ,:::::::::,
-,:::::::::::::::,  ,,,  ,::, ,,  ,::::::::::,
-,:::::::::::::::::,,,,,,:::::,,,,::::::::::::,    ,:,   ,:,            ,xx,                            ,:::::,   ,:,     ,:: :::,    ,x
-,::::::::::::::::::::::::::::::::::::::::::::,    :x: ,:xx:        ,   :xx,                          :xxxxxxxxx, :xx,   ,xx:,xxxx,   :x
-,::::::::::::::::::::::::::::::::::::::::::::,    :xxxxx:,  ,xx,  :x:  :xxx:x::,  ::xxxx:           :xx:,  ,:xxx  :xx, ,xx: ,xxxxx:, :x
-,::::::::::::::::::::::::::::::::::::::::::::,    :xxxxx,   :xx,  :x:  :xxx,,:xx,:xx:,:xx, ,,,,,,,,,xxx,    ,xx:   :xx:xx:  ,xxx,:xx::x
-,::::::,,::::::::,,::::::::,,:::::::,,,::::::,    :x:,xxx:  ,xx,  :xx  :xx:  ,xx,xxxxxx:, ,xxxxxxx:,xxx:,  ,xxx,    :xxx:   ,xxx, :xxxx
-,::::,    ,::::,   ,:::::,   ,,::::,    ,::::,    :x:  ,:xx,,:xx::xxxx,,xxx::xx: :xx::::x: ,,,,,,   ,xxxxxxxxx,     ,xx:    ,xxx,  :xxx
-,::::,    ,::::,    ,::::,    ,::::,    ,::::,    ,:,    ,:,  ,,::,,:,  ,::::,,   ,:::::,            ,,:::::,        ,,      :x:    ,::
-,::::,    ,::::,    ,::::,    ,::::,    ,::::,
- ,,,,,    ,::::,    ,::::,    ,::::,    ,:::,             ,,,,,,,,,,,,,
-          ,::::,    ,::::,    ,::::,    ,:::,        ,,,:::::::::::::::,
-          ,::::,    ,::::,    ,::::,    ,::::,  ,,,,:::::::::,,,,,,,:::,
-          ,::::,    ,::::,    ,::::,     ,::::::::::::,,,,,
-           ,,,,     ,::::,     ,,,,       ,,,::::,,,,
-                    ,::::,
-                    ,,::,
-"
-echo "Thanks for choosing Kube-OVN!
-For more advanced features, please read https://kubeovn.github.io/docs/stable/en/
-If you have any question, please file an issue https://github.com/kubeovn/kube-ovn/issues/new/choose"

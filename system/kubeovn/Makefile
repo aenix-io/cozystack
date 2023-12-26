@@ -5,6 +5,7 @@ update:
 	sed -i '/path:/ s|/etc/origin/|/var/lib/|' install.sh
 	sed -i '/mountPath:/ s|/usr/local/bin|/opt/bin|' install.sh
 	sed -i 's/kube-system/cozy-kubeovn/g' install.sh
+	sed -i '/deployment\/coredns/,$$d' install.sh
 
 apply:
 	kubectl get ns cozy-kubeovn >/dev/null 2>&1 || kubectl create namespace cozy-kubeovn

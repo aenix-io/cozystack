@@ -1,0 +1,6 @@
+_helm:
+  name: kubevirt
+  namespace: cozy-kubevirt
+  createNamespace: true
+  privilegedNamespace: true
+  crds: CreateReplace
