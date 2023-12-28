@@ -1,5 +1,3 @@
-include ../../hack/app-helm.mk
-
 update:
 	rm -rf templates
 	mkdir templates

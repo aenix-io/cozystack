@@ -1,5 +1,3 @@
-include ../../hack/app-helm.mk
-
 update:
 	rm -rf templates/cluster-operator.yml
 	wget -O templates/cluster-operator.yml https://github.com/rabbitmq/cluster-operator/releases/latest/download/cluster-operator.yml

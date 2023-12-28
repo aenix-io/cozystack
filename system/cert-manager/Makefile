@@ -1,5 +1,3 @@
-include ../../hack/app-helm.mk
-
 update:
 	rm -rf charts
 	helm repo add jetstack https://charts.jetstack.io

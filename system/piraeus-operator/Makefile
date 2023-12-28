@@ -1,5 +1,3 @@
-include ../../hack/app-helm.mk
-
 update:
 	rm -rf charts
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/piraeusdatastore/piraeus-operator  | awk -F'[/^]' 'END{print $$3}') && \

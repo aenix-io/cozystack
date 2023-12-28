@@ -1,5 +1,3 @@
-include ../../hack/app-helm.mk
-
 update:
 	rm -rf charts
 	helm repo add mariadb-operator https://mariadb-operator.github.io/mariadb-operator

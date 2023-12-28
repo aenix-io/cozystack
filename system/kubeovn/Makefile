@@ -1,5 +1,3 @@
-include ../../hack/app-helm.mk
-
 update:
 	rm -rf charts && mkdir -p charts/kube-ovn
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/kubeovn/kube-ovn  | awk -F'[/^]' 'END{print $$3}') && \

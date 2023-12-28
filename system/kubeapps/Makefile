@@ -1,5 +1,3 @@
-include ../../hack/app-helm.mk
-
 update: update-chart update-dockerfiles
 
 update-chart:
