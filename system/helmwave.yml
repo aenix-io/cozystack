@@ -6,10 +6,10 @@ version: "0.0.0"
   wait_for_jobs: true
   force: false
   timeout: 10m
-  atomic: true
+  atomic: false
   max_history: 3
   create_namespace: true
-  offline_kube_version: 1.25.2
+  offline_kube_version: 1.29.0
   pending_release_strategy: rollback
 
 releases:
@@ -26,6 +26,7 @@ releases:
     chart: kubeovn
     namespace: cozy-kubeovn
     <<: *options
+    reuse_values: true
     tags:
       - kubeovn
     values:
@@ -247,3 +248,15 @@ releases:
       - cilium@cozy-cilium
       - kubeovn@cozy-kubeovn
       - cert-manager@cozy-cert-manager
+
+  - name: kubeapps
+    chart: kubeapps
+    namespace: cozy-kubeapps
+    <<: *options
+    tags:
+      - kubeapps
+    values:
+      - kubeapps/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn

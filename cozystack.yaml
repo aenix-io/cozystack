@@ -50,7 +50,7 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: ghcr.io/kvaps/test:cozystack-7
+        image: ghcr.io/kvaps/test:cozystack-10
         command: [ "/cozystack-system/reconcile.sh" ]
         env:
         - name: KUBERNETES_SERVICE_HOST
