@@ -5,7 +5,7 @@ metadata:
   namespace: cozy-monitoring
 spec:
   externalLabels:
-    cluster: sc-dfw1-admin # TODO: {{ .Values._helm.contextName }} 
+    cluster: cozystack
   extraArgs:
     promscrape.streamParse: "true"
   remoteWrite:

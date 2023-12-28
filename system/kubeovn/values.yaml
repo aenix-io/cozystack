@@ -1,8 +1,20 @@
-_helm:
-  name: kubeovn
+kube-ovn:
+  global:
+    registry:
+      address: ghcr.io/kvaps
+    images:
+      kubeovn:
+        repository: test
+        tag: kube-ovn-static-v1.13.0-5
+
   namespace: cozy-kubeovn
-  createNamespace: true
-  privilegedNamespace: true
-  crds: CreateReplace
-  dependsOn:
-  - name: cilium
+  ipv4:
+    POD_CIDR: "10.244.0.0/16"
+    POD_GATEWAY: "10.244.0.1"
+    SVC_CIDR: "10.96.0.0/16"
+
+  func:
+    ENABLE_NP: false
+
+  cni_conf:
+    CNI_CONFIG_PRIORITY: "10"

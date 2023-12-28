@@ -1,12 +1,3 @@
-_helm:
-  name: piraeus-operator
-  namespace: cozy-linstor # must be same namespace as linstor
-  createNamespace: true
-  privilegedNamespace: false
-  crds: CreateReplace
-  dependsOn:
-  - name: cert-manager
-
 piraeus:
   installCRDs: true
   autogenerate: false

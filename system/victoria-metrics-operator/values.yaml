@@ -1,9 +1,3 @@
-_helm:
-  name: victoria-metrics-operator
-  namespace: cozy-victoria-metrics-operator
-  createNamespace: true
-  crds: CreateReplace
-
 victoria-metrics-operator:
   fullnameOverride: victoria-metrics-operator
   admissionWebhooks:

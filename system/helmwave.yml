@@ -1,0 +1,249 @@
+project: cozystack
+version: "0.0.0"
+
+.options: &options
+  wait: true
+  wait_for_jobs: true
+  force: false
+  timeout: 10m
+  atomic: true
+  max_history: 3
+  create_namespace: true
+  offline_kube_version: 1.25.2
+  pending_release_strategy: rollback
+
+releases:
+  - name: cilium
+    chart: cilium
+    namespace: cozy-cilium
+    <<: *options
+    tags:
+      - cilium
+    values:
+      - cilium/values.yaml
+
+  - name: kubeovn
+    chart: kubeovn
+    namespace: cozy-kubeovn
+    <<: *options
+    tags:
+      - kubeovn
+    values:
+      - kubeovn/values.yaml
+      - kubeovn/values-runtime.yaml
+    depends_on:
+      - cilium@cozy-cilium
+
+  - name: fluxcd
+    chart: fluxcd
+    namespace: cozy-fluxcd
+    <<: *options
+    tags:
+      - fluxcd
+    values:
+      - fluxcd/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+
+  - name: cert-manager
+    chart: cert-manager
+    namespace: cozy-cert-manager
+    <<: *options
+    tags:
+      - cert-manager
+    values:
+      - cert-manager/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+
+  - name: cert-manager-issuers
+    chart: cert-manager-issuers
+    namespace: cozy-cert-manager
+    <<: *options
+    tags:
+      - cert-manager
+    values:
+      - cert-manager-issuers/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - cert-manager@cozy-cert-manager
+
+  - name: victoria-metrics-operator
+    chart: victoria-metrics-operator
+    namespace: cozy-victoria-metrics-operator
+    <<: *options
+    tags:
+      - victoria-metrics-operator
+    values:
+      - victoria-metrics-operator/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - cert-manager@cozy-cert-manager
+
+  - name: monitoring
+    chart: monitoring
+    namespace: cozy-monitoring
+    <<: *options
+    tags:
+      - monitoring
+    values:
+      - monitoring/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - victoria-metrics-operator@cozy-victoria-metrics-operator
+
+  - name: kubevirt-operator
+    chart: kubevirt-operator
+    namespace: cozy-kubevirt
+    <<: *options
+    tags:
+      - kubevirt
+    values:
+      - kubevirt-operator/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+
+  - name: kubevirt
+    chart: kubevirt
+    namespace: cozy-kubevirt
+    <<: *options
+    tags:
+      - kubevirt
+    values:
+      - kubevirt/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - kubevirt-operator@cozy-kubevirt
+
+  - name: metallb
+    chart: metallb
+    namespace: cozy-metallb
+    <<: *options
+    tags:
+      - metallb
+    values:
+      - metallb/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+
+  - name: grafana-operator
+    chart: grafana-operator
+    namespace: cozy-grafana-operator
+    <<: *options
+    tags:
+      - grafana-operator
+    values:
+      - grafana-operator/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+
+  - name: mariadb-operator
+    chart: mariadb-operator
+    namespace: cozy-mariadb-operator
+    <<: *options
+    tags:
+      - mariadb-operator
+    values:
+      - mariadb-operator/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - cert-manager@cozy-cert-manager
+      - victoria-metrics-operator@cozy-victoria-metrics-operator
+
+  - name: postgres-operator
+    chart: postgres-operator
+    namespace: cozy-postgres-operator
+    <<: *options
+    tags:
+      - postgres-operator
+    values:
+      - postgres-operator/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - cert-manager@cozy-cert-manager
+
+  - name: rabbitmq-operator
+    chart: rabbitmq-operator
+    namespace: cozy-rabbitmq-operator
+    <<: *options
+    tags:
+      - rabbitmq-operator
+    values:
+      - rabbitmq-operator/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+
+  - name: redis-operator
+    chart: redis-operator
+    namespace: cozy-redis-operator
+    <<: *options
+    tags:
+      - redis-operator
+    values:
+      - redis-operator/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+
+  - name: piraeus-operator
+    chart: piraeus-operator
+    namespace: cozy-linstor
+    <<: *options
+    tags:
+      - piraeus-operator
+    values:
+      - piraeus-operator/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - cert-manager@cozy-cert-manager
+
+  - name: linstor
+    chart: linstor
+    namespace: cozy-linstor
+    <<: *options
+    tags:
+      - linstor
+    values:
+      - linstor/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - piraeus-operator@cozy-linstor
+
+  - name: traffic-manager
+    chart: telepresence
+    namespace: cozy-telepresence
+    <<: *options
+    tags:
+      - telepresence
+    values:
+      - telepresence/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+
+  - name: ingress-nginx
+    chart: ingress-nginx
+    namespace: cozy-ingress-nginx
+    <<: *options
+    tags:
+      - ingress-nginx
+    values:
+      - ingress-nginx/values.yaml
+    depends_on:
+      - cilium@cozy-cilium
+      - kubeovn@cozy-kubeovn
+      - cert-manager@cozy-cert-manager

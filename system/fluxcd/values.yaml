@@ -1,5 +1,0 @@
-_helm:
-  name: kubeapps
-  namespace: cozy-fluxcd
-  createNamespace: true
-  crds: CreateReplace

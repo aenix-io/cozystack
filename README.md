@@ -103,25 +103,29 @@ Write configuration for Cozystack:
 ```yaml
 cat > patch.yaml <<EOT
 machine:
+  kubelet:
+    nodeIP:
+      validSubnets:
+      - 192.168.100.0/24
   kernel:
     modules:
-      - name: drbd
-        parameters:
-          - usermode_helper=disabled
-      - name: openvswitch
+    - name: drbd
+      parameters:
+        - usermode_helper=disabled
+    - name: openvswitch
   install:
     image: ghcr.io/siderolabs/installer:v1.6.0
     extensions:
-      - image: ghcr.io/siderolabs/drbd:9.2.6-v1.6.0
+    - image: ghcr.io/siderolabs/drbd:9.2.6-v1.6.0
 
 cluster:
   network:
     cni:
       name: none
     podSubnets:
-        - 10.244.0.0/16
+    - 10.244.0.0/16
     serviceSubnets:
-        - 10.96.0.0/16
+    - 10.96.0.0/16
 
   allowSchedulingOnControlPlanes: true
   controllerManager:
@@ -134,6 +138,9 @@ cluster:
     disabled: true
   discovery:
     enabled: false
+  etcd:
+    advertisedSubnets:
+    - 192.168.100.0/24
 EOT
 ```
 
@@ -145,50 +152,5 @@ Run [talos-bootstrap](https://github.com/aenix-io/talos-bootstrap/) to deploy cl
 Install cozystack system components:
 
 ```
-export KUBECONFIG=${PWD}/kubeconfig
-for i in \
-  cilium \
-  kubeovn \
-  fluxcd \
-  cert-manager \
-  victoria-metrics-operator \
-  monitoring \
-  kubeapps \
-  kubevirt \
-  metallb \
-  grafana-operator \
-  mariadb-operator \
-  postgres-operator \
-  rabbitmq-operator \
-  piraeus-operator \
-  redis-operator \
-  linstor \
-  telepresence \
-  ingress-nginx \
-do
-  make -C "system/$i" apply
-done
-```
-
-Check status of deployments:
-```
-helm ls -A
-# NAME                            NAMESPACE                       REVISION        UPDATED                                 STATUS          CHART                 APP VERSION
-# cert-manager                    cozy-cert-manager               1               2023-12-26 17:59:53.360566717 +0000 UTC deployed        cozystack-0.0.0
-# cilium                          cozy-cilium                     1               2023-12-26 17:58:13.257363562 +0000 UTC deployed        cozystack-0.0.0
-# grafana-operator                cozy-grafana-operator           1               2023-12-26 18:00:27.040639056 +0000 UTC deployed        cozystack-0.0.0
-# ingress-nginx                   cozy-ingress-nginx              1               2023-12-26 18:00:47.628341874 +0000 UTC deployed        cozystack-0.0.0
-# kubeapps                        cozy-kubeapps                   1               2023-12-26 18:00:17.955946393 +0000 UTC deployed        cozystack-0.0.0
-# kubeapps                        cozy-fluxcd                     1               2023-12-26 17:59:43.916449245 +0000 UTC deployed        cozystack-0.0.0
-# kubevirt                        cozy-kubevirt                   1               2023-12-26 18:00:20.417334537 +0000 UTC deployed        cozystack-0.0.0
-# linstor                         cozy-linstor                    1               2023-12-26 18:00:40.858381945 +0000 UTC deployed        cozystack-0.0.0
-# mariadb-operator                cozy-mariadb-operator           1               2023-12-26 18:00:30.598967718 +0000 UTC deployed        cozystack-0.0.0
-# metallb                         cozy-metallb                    1               2023-12-26 18:00:24.001145931 +0000 UTC deployed        cozystack-0.0.0
-# monitoring                      cozy-monitoring                 1               2023-12-26 18:00:15.97255153 +0000 UTC  deployed        cozystack-0.0.0
-# piraeus-operator                cozy-linstor                    1               2023-12-26 18:00:37.914192412 +0000 UTC deployed        cozystack-0.0.0
-# postgres-operator               cozy-postgres-operator          1               2023-12-26 18:00:33.457111594 +0000 UTC deployed        cozystack-0.0.0
-# rabbitmq-operator               cozy-rabbitmq-operator          1               2023-12-26 18:00:35.830732116 +0000 UTC deployed        cozystack-0.0.0
-# redis-operator                  cozy-redis-operator             1               2023-12-26 18:00:40.151932075 +0000 UTC deployed        cozystack-0.0.0
-# traffic-manager                 cozy-telepresence               1               2023-12-26 18:00:46.364632248 +0000 UTC deployed        cozystack-0.0.0
-# victoria-metrics-operator       cozy-victoria-metrics-operator  1               2023-12-26 18:00:13.636953818 +0000 UTC deployed        cozystack-0.0.0
+kubectl apply -f cozystack.yaml
 ```

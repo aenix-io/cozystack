@@ -1,9 +1,3 @@
-_helm:
-  name: redis-operator
-  namespace: cozy-redis-operator
-  createNamespace: true
-  crds: CreateReplace
-
 redis-operator:
   image:
     tag: v1.3.0-rc1

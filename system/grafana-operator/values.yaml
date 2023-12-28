@@ -1,8 +1,2 @@
-_helm:
-  name: grafana-operator
-  namespace: cozy-grafana-operator
-  createNamespace: true
-  crds: CreateReplace
-
 grafana-operator:
   fullnameOverride: grafana-operator

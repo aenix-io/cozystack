@@ -227,6 +227,9 @@ resources: {}
   #   cpu: 100m
   #   memory: 512Mi
 
+# -- resources & limits for the agent init containers
+initResources: {}
+
 securityContext:
   # -- User to run the pod with
   # runAsUser: 0
@@ -1175,6 +1178,12 @@ hubble:
       rollingUpdate:
         maxUnavailable: 1
 
+    # -- Additional hubble-relay volumes.
+    extraVolumes: []
+
+    # -- Additional hubble-relay volumeMounts.
+    extraVolumeMounts: []
+
     # -- hubble-relay pod security context
     podSecurityContext:
       fsGroup: 65532
@@ -1845,9 +1854,9 @@ envoy:
   image:
     override: ~
     repository: "quay.io/cilium/cilium-envoy"
-    tag: "v1.26.6-ff0d5d3f77d610040e93c7c7a430d61a0c0b90c1"
+    tag: "v1.26.6-ad82c7c56e88989992fd25d8d67747de865c823b"
     pullPolicy: "${PULL_POLICY}"
-    digest: "sha256:6b0f2591fef922bf17a46517d5152ea7d6270524bb0e307c77986986677dbcea"
+    digest: "sha256:992998398dadfff7117bfa9fdb7c9474fefab7f0237263f7c8114e106c67baca"
     useDigest: true
 
   # -- Additional containers added to the cilium Envoy DaemonSet.
@@ -3132,6 +3141,19 @@ authentication:
           # -- SPIRE agent tolerations configuration
           # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
           tolerations: []
+          # -- SPIRE agent affinity configuration
+          affinity: {}
+          # -- SPIRE agent nodeSelector configuration
+          # ref: ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+          nodeSelector: {}
+          # -- Security context to be added to spire agent pods.
+          # SecurityContext holds pod-level security attributes and common container settings.
+          # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+          podSecurityContext: {}
+          # -- Security context to be added to spire agent containers.
+          # SecurityContext holds pod-level security attributes and common container settings.
+          # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+          securityContext: {}
         server:
           # -- SPIRE server image
           image: ghcr.io/spiffe/spire-server:1.6.3@sha256:f4bc49fb0bd1d817a6c46204cc7ce943c73fb0a5496a78e0e4dc20c9a816ad7f
