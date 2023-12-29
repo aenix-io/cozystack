@@ -1,0 +1,13 @@
+{{- range $ns := .Values.namespaces }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
+  {{- if $ns.privileged }}
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+  {{- end }}
+  name: {{ $ns.name }}
+{{- end }}

@@ -1,0 +1,26 @@
+namespaces:
+- name: cozy-system
+  privileged: true
+- name: cozy-cert-manager
+- name: cozy-cilium
+  privileged: true
+- name: cozy-fluxcd
+- name: cozy-grafana-operator
+- name: cozy-ingress-nginx
+- name: cozy-kubeapps
+- name: cozy-kubeovn
+  privileged: true
+- name: cozy-kubevirt
+  privileged: true
+- name: cozy-linstor
+  privileged: true
+- name: cozy-mariadb-operator
+- name: cozy-metallb
+  privileged: true
+- name: cozy-monitoring
+  privileged: true
+- name: cozy-postgres-operator
+- name: cozy-rabbitmq-operator
+- name: cozy-redis-operator
+- name: cozy-telepresence
+- name: cozy-victoria-metrics-operator

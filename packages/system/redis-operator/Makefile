@@ -1,3 +1,15 @@
+NAME=redis-operator
+NAMESPACE=cozy-redis-operator
+
+show:
+	helm template -n $(NAMESPACE) $(NAME) .
+
+apply:
+	helm upgrade -i -n $(NAMESPACE) $(NAME) .
+
+diff:
+	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .
+
 update:
 	rm -rf charts
 	helm repo add redis-operator https://spotahome.github.io/redis-operator

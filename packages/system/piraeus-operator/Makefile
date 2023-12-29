@@ -1,3 +1,15 @@
+NAME=piraeus-operator
+NAMESPACE=cozy-linstor
+
+show:
+	helm template -n $(NAMESPACE) $(NAME) .
+
+apply:
+	helm upgrade -i -n $(NAMESPACE) $(NAME) .
+
+diff:
+	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .
+
 update:
 	rm -rf charts
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/piraeusdatastore/piraeus-operator  | awk -F'[/^]' 'END{print $$3}') && \

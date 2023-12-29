@@ -1,3 +1,15 @@
+NAME=victoria-metrics-operator
+NAMESPACE=cozy-victoria-metrics-operator
+
+show:
+	helm template -n $(NAMESPACE) $(NAME) .
+
+apply:
+	helm upgrade -i -n $(NAMESPACE) $(NAME) .
+
+diff:
+	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .
+
 update:
 	rm -rf charts
 	# VictoriaMetrics operator

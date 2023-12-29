@@ -1,3 +1,15 @@
+NAME=monitoring
+NAMESPACE=cozy-monitoring
+
+show:
+	helm template -n $(NAMESPACE) $(NAME) .
+
+apply:
+	helm upgrade -i -n $(NAMESPACE) $(NAME) .
+
+diff:
+	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .
+
 update:
 	rm -rf charts
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts

@@ -1,8 +1,11 @@
+NAMESPACE=cozy-system
+NAME=namespaces
+
 show:
-	cat namespaces.yaml
+	helm template -n $(NAMESPACE) $(NAME) .
 
 apply:
-	kubectl apply -f namespaces.yaml
+	helm template -n $(NAMESPACE) $(NAME) . | kubectl apply -f-
 
 diff:
-	kubectl diff -f namespaces.yaml
+	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .

@@ -1,3 +1,15 @@
+NAME=kubevirt-operator
+NAMESPACE=cozy-kubevirt
+
+show:
+	helm template -n $(NAMESPACE) $(NAME) .
+
+apply:
+	helm upgrade -i -n $(NAMESPACE) $(NAME) .
+
+diff:
+	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .
+
 update:
 	rm -rf templates
 	mkdir templates

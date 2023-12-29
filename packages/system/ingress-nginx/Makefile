@@ -1,3 +1,15 @@
+NAME=ingress-nginx
+NAMESPACE=cozy-ingress-nginx
+
+show:
+	helm template -n $(NAMESPACE) $(NAME) .
+
+apply:
+	helm upgrade -i -n $(NAMESPACE) $(NAME) .
+
+diff:
+	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .
+
 update:
 	rm -rf charts
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
