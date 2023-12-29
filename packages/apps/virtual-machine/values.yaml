@@ -1,0 +1,5 @@
+image: fedora
+disk: 10Gi
+resources:
+  cpu: 2
+  memory: 1024M

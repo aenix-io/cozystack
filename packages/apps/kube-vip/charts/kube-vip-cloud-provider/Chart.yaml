@@ -1,0 +1,9 @@
+apiVersion: v2
+appVersion: v0.0.4
+description: A Helm chart for kube-vip cloud provider
+icon: https://github.com/kube-vip/kube-vip/raw/main/kube-vip.png
+maintainers:
+- name: kube-vip
+name: kube-vip-cloud-provider
+type: application
+version: 0.2.2

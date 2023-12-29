@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "kube-vip.name" . }}
+  namespace: {{ .Release.Namespace | default "kube-system" }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kube-vip.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kube-vip.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - args:
+          - manager
+        env:
+          {{- if eq .Values.env.cp_enable "true" }}
+          - name: vip_address
+            value: {{ required "A valid config.address required!" .Values.config.address}}
+          {{- end }}
+        {{- with .Values.env }}
+          {{- range $k, $v := . }}
+            {{- $name := $k }}
+            {{- $value := $v }}
+          - name: {{ quote $name }}
+            value: {{ quote $value }}
+          {{- end }}
+        {{- end }}
+        {{- with .Values.envValueFrom }}
+          {{- range $k, $v := . }}
+            {{- $name := $k }}
+            {{- $value := $v }}
+          - name: {{ quote $name }}
+            valueFrom:
+              {{- toYaml $value | nindent 14 }}
+          {{- end }}
+        {{- end }}
+      {{- with .Values.envFrom }}
+        envFrom:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: kube-vip
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+      hostNetwork: true
+      serviceAccountName: {{ include "kube-vip.name" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

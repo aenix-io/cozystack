@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "kube-vip-cloud-provider.name" . }}
+  namespace: {{ .Release.Namespace | default "kube-system" }}
+  labels:
+  {{- include "kube-vip-cloud-provider.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kube-vip-cloud-provider.name" . }}
+rules:
+  - apiGroups: [ "coordination.k8s.io" ]
+    resources: [ "leases" ]
+    verbs: [ "get", "create", "update", "list", "put" ]
+  - apiGroups: [ "" ]
+    resources: [ "configmaps", "endpoints","events","services/status", "leases" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "" ]
+    resources: [ "nodes", "services" ]
+    verbs: [ "list","get","watch","update" ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "kube-vip-cloud-provider.name" . }}
+  labels:
+  {{- include "kube-vip-cloud-provider.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "kube-vip-cloud-provider.name" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kube-vip-cloud-provider.name" . }}
+    namespace: {{ .Release.Namespace }}

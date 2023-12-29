@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kube-vip-cloud-provider.name" . }}
+  namespace: {{ .Release.Namespace | default "kube-system" }}
+spec:
+  replicas: {{ .Values.replicasCount }}
+  selector:
+    matchLabels:
+      {{- include "kube-vip-cloud-provider.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kube-vip-cloud-provider.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - command:
+            - /kube-vip-cloud-provider
+            - --leader-elect-resource-name=kube-vip-cloud-controller
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          name: {{ include "kube-vip-cloud-provider.name" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      serviceAccountName: {{ include "kube-vip-cloud-provider.name" . }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

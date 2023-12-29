@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "running": {
+      "type": "boolean",
+      "title": "Running",
+      "form": "useSelfHostedDatabase"
+    },
+    "image": {
+      "type": "string",
+      "form": true,
+      "enum": ["ubuntu", "centos", "alpine", "fedora"],
+      "title": "Database Type",
+      "description": "Choose image"
+    },
+    "disk": {
+      "type": "string",
+      "title": "Disk Size",
+      "x-display": "slider",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "memory": {
+          "type": "string",
+          "x-display": "slider",
+          "title": "Memory",
+          "minimum": 10,
+          "maximum": 2048
+        },
+        "cpu": {
+          "type": "integer",
+          "title": "CPU",
+          "minimum": 1,
+          "maximum": 4
+        }
+      }
+    }
+  }
+}

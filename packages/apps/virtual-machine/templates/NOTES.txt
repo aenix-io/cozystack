@@ -1,0 +1,2 @@
+IP: 10.66.0.23
+login: fedora
