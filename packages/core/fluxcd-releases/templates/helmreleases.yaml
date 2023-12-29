@@ -1,0 +1,76 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: cozy-cilium
+spec:
+  interval: 1m
+  releaseName: cilium
+  chart:
+    spec:
+      chart: cozy-cilium
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-core
+        namespace: cozy-system
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kubeovn
+  namespace: cozy-kubeovn
+spec:
+  interval: 1m
+  releaseName: kubeovn
+  chart:
+    spec:
+      chart: cozy-kubeovn
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-core
+        namespace: cozy-system
+  dependsOn:
+  - name: cilium
+    namespace: cozy-cilium
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cozy-fluxcd
+  namespace: cozy-fluxcd
+spec:
+  interval: 1m
+  releaseName: fluxcd
+  chart:
+    spec:
+      chart: cozy-fluxcd
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-core
+        namespace: cozy-system
+  dependsOn:
+  - name: cilium
+    namespace: cozy-cilium
+  - name: kubeovn
+    namespace: cozy-kubeovn
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cozy-telepresence
+  namespace: cozy-telepresence
+spec:
+  interval: 1m
+  releaseName: traffic-manager
+  chart:
+    spec:
+      chart: cozy-telepresence
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-system
+        namespace: cozy-system
+  dependsOn:
+  - name: cilium
+    namespace: cozy-cilium
+  - name: kubeovn
+    namespace: cozy-kubeovn

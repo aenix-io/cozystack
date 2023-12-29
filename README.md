@@ -152,5 +152,17 @@ Run [talos-bootstrap](https://github.com/aenix-io/talos-bootstrap/) to deploy cl
 Install cozystack system components:
 
 ```
-kubectl apply -f cozystack.yaml
+kubectl apply -f cozystack-installer.yaml
 ```
+
+### Dependencies chart
+
+- **core/installer**
+  - core/cilium
+  - core/kubeovn
+  - core/fluxcd
+  - **core/fluxcd-release**
+    - core/cilium
+    - core/kubeovn
+    - core/fluxcd
+    - system/*
