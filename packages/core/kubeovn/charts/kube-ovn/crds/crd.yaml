@@ -1490,6 +1490,10 @@ spec:
                   type: string
                 pmac:
                   type: string
+                selector:
+                  type: array
+                  items:
+                    type: string
                 conditions:
                   type: array
                   items:
@@ -1532,6 +1536,10 @@ spec:
                   type: string
                 parentV6ip:
                   type: string
+                selector:
+                  type: array
+                  items:
+                    type: string
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -1738,6 +1746,8 @@ spec:
                   type: boolean
                 ipv6RAConfigs:
                   type: string
+                allowEWTraffic:
+                  type: boolean
                 acls:
                   type: array
                   items:
@@ -1786,6 +1796,8 @@ spec:
                 enableLb:
                   type: boolean
                 enableEcmp:
+                  type: boolean
+                enableMulticastSnoop:
                   type: boolean
                 routeTable:
                   type: string

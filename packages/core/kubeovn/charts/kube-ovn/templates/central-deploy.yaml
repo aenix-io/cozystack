@@ -7,7 +7,7 @@ metadata:
     kubernetes.io/description: |
       OVN components: northd, nb and sb.
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ include "kubeovn.nodeCount" . }}
   strategy:
     rollingUpdate:
       maxSurge: 0
@@ -53,7 +53,7 @@ spec:
             - name: ENABLE_SSL
               value: "{{ .Values.networking.ENABLE_SSL }}"
             - name: NODE_IPS
-              value: "{{ .Values.MASTER_NODES }}"
+              value: "{{ .Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .) }}"
             - name: POD_IP
               valueFrom:
                 fieldRef:
@@ -82,21 +82,11 @@ spec:
               value: "{{ .Values.networking.ENABLE_COMPACT }}"
           resources:
             requests:
-            {{- if .Release.IsUpgrade }}
-              cpu: {{ (index (lookup "apps/v1" "Deployment" "cozy-kubeovn" "ovn-central").spec.template.spec.containers 0).resources.requests.cpu | quote }}
-              memory: {{ (index (lookup "apps/v1" "Deployment" "cozy-kubeovn" "ovn-central").spec.template.spec.containers 0).resources.requests.memory | quote }}
-            {{- else }}
               cpu: {{ index .Values "ovn-central" "requests" "cpu" }}
               memory: {{ index .Values "ovn-central" "requests" "memory" }}
-            {{- end }}
             limits:
-            {{- if .Release.IsUpgrade }}
-              cpu: {{ (index (lookup "apps/v1" "Deployment" "cozy-kubeovn" "ovn-central").spec.template.spec.containers 0).resources.limits.cpu | quote }}
-              memory: {{ (index (lookup "apps/v1" "Deployment" "cozy-kubeovn" "ovn-central").spec.template.spec.containers 0).resources.limits.memory | quote }}
-            {{- else }}
               cpu: {{ index .Values "ovn-central" "limits" "cpu" }}
               memory: {{ index .Values "ovn-central" "limits" "memory" }}
-            {{- end }}
           volumeMounts:
             - mountPath: /var/run/openvswitch
               name: host-run-ovs
@@ -149,10 +139,10 @@ spec:
             path: /sys
         - name: host-config-openvswitch
           hostPath:
-            path: /var/lib/openvswitch
+            path: {{ .Values.OPENVSWITCH_DIR }}
         - name: host-config-ovn
           hostPath:
-            path: /var/lib/ovn
+            path: {{ .Values.OVN_DIR }}
         - name: host-log-ovs
           hostPath:
             path: {{ .Values.log_conf.LOG_DIR }}/openvswitch

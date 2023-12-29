@@ -5,9 +5,10 @@ kube-ovn:
     images:
       kubeovn:
         repository: test
-        tag: kube-ovn-static-v1.13.0-5
+        tag: kube-ovn-static-v1.13.0-cozystack2
 
   namespace: cozy-kubeovn
+
   ipv4:
     POD_CIDR: "10.244.0.0/16"
     POD_GATEWAY: "10.244.0.1"
@@ -18,3 +19,8 @@ kube-ovn:
 
   cni_conf:
     CNI_CONFIG_PRIORITY: "10"
+    MOUNT_LOCAL_BIN_DIR: false
+
+  OPENVSWITCH_DIR: "/var/lib/openvswitch"
+  OVN_DIR: "/var/lib/ovn"
+  DISABLE_MODULES_MANAGEMENT: true

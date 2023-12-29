@@ -3,7 +3,7 @@ kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: ovs-ovn-dpdk
-  namespace: cozy-kubeovn
+  namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/description: |
       This daemon set launches the openvswitch daemon.
@@ -55,7 +55,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: OVN_DB_IPS
-              value: "{{ .Values.MASTER_NODES }}"
+              value: "{{ .Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .) }}"
             - name: OVN_REMOTE_PROBE_INTERVAL
               value: "{{ .Values.networking.OVN_REMOTE_PROBE_INTERVAL }}"
             - name: OVN_REMOTE_OPENFLOW_INTERVAL
@@ -144,10 +144,10 @@ spec:
             path: /sys
         - name: host-config-openvswitch
           hostPath:
-            path: /var/lib/openvswitch
+            path: {{ .Values.OPENVSWITCH_DIR }}
         - name: host-config-ovn
           hostPath:
-            path: /var/lib/ovn
+            path: {{ .Values.OVN_DIR }}
         - name: host-log-ovs
           hostPath:
             path: {{ .Values.log_conf.LOG_DIR }}/openvswitch

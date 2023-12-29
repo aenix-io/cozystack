@@ -20,6 +20,13 @@ spec:
         type: infra
     spec:
       priorityClassName: system-node-critical
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+        - key: CriticalAddonsOnly
+          operator: Exists
       serviceAccountName: kube-ovn-app
       hostPID: true
       containers:
@@ -44,7 +51,7 @@ spec:
           {{- else if eq .Values.networking.NET_STACK "ipv6" -}}
           {{ .Values.ipv6.PINGER_EXTERNAL_DOMAIN }}
           {{- end }}
-          - --ds-namespace=cozy-kubeovn
+          - --ds-namespace={{ .Values.namespace }}
           - --logtostderr=false
           - --alsologtostderr=true
           - --log_file=/var/log/kube-ovn/kube-ovn-pinger.log
@@ -111,7 +118,7 @@ spec:
             path: /run/ovn
         - name: host-config-openvswitch
           hostPath:
-            path: /var/lib/openvswitch
+            path: {{ .Values.OPENVSWITCH_DIR }}
         - name: host-log-ovs
           hostPath:
             path: {{ .Values.log_conf.LOG_DIR }}/openvswitch

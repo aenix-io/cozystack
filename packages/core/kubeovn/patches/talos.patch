@@ -1,39 +1,551 @@
-diff --git a/system/kubeovn/install.sh b/system/kubeovn/install.sh
-index 6120c35..29a3146 100644
---- a/system/kubeovn/install.sh
-+++ b/system/kubeovn/install.sh
-@@ -49,9 +49,9 @@ REGISTRY="docker.io/kubeovn"
- VPC_NAT_IMAGE="vpc-nat-gateway"
- VERSION="v1.12.3"
- IMAGE_PULL_POLICY="IfNotPresent"
--POD_CIDR="10.16.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
--POD_GATEWAY="10.16.0.1"
--SVC_CIDR="10.96.0.0/12"                # Do NOT overlap with NODE/POD/JOIN CIDR
-+POD_CIDR="10.244.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
-+POD_GATEWAY="10.244.0.1"
-+SVC_CIDR="10.96.0.0/16"                # Do NOT overlap with NODE/POD/JOIN CIDR
- JOIN_CIDR="100.64.0.0/16"              # Do NOT overlap with NODE/POD/SVC CIDR
- PINGER_EXTERNAL_ADDRESS="114.114.114.114"  # Pinger check external ip probe
- PINGER_EXTERNAL_DOMAIN="alauda.cn."         # Pinger check external domain probe
-@@ -3557,7 +3557,12 @@ spec:
-           image: "$REGISTRY/kube-ovn:$VERSION"
-           imagePullPolicy: $IMAGE_PULL_POLICY
+diff --git a/charts/README.md b/charts/README.md
+index bd0d5c6c..f9295ca9 100644
+--- a/charts/README.md
++++ b/charts/README.md
+@@ -10,11 +10,33 @@ $ kubectl label node -lnode-role.kubernetes.io/control-plane  kube-ovn/role=mast
+ $ kubectl label node -lovn.kubernetes.io/ovs_dp_type!=userspace ovn.kubernetes.io/ovs_dp_type=kernel  --overwrite
+ 
+ # standard install 
+-$ helm install --debug kubeovn ./charts --set MASTER_NODES=${Node0},
++$ helm install --debug kubeovn ./charts --set MASTER_NODES=${Node0}
+ 
+ # high availability install
+-$ helm install --debug kubeovn ./charts --set MASTER_NODES=${Node0},${Node1},${Node2}, --set replicaCount=3
++$ helm install --debug kubeovn ./charts --set MASTER_NODES=${Node0},${Node1},${Node2}
+ 
+ # upgrade to this version
+-$ helm upgrade --debug kubeovn ./charts --set MASTER_NODES=${Node0},${Node1},${Node2}, --set replicaCount=3
++$ helm upgrade --debug kubeovn ./charts --set MASTER_NODES=${Node0},${Node1},${Node2}
++```
++
++If `MASTER_NODES` unspecified Helm will take internal IPs of nodes with `kube-ovn/role=master` label
++
++### Talos Linux
++
++To install Kube-OVN on Talos Linux, declare openvswitch module in machine config:
++
++```
++machine:
++  kernel:
++    modules:
++    - name: openvswitch
++```
++
++and use the following options for install this Helm-chart:
++
++```
++--set cni_conf.MOUNT_LOCAL_BIN_DIR=false
++--set OPENVSWITCH_DIR=/var/lib/openvswitch
++--set OVN_DIR=/var/lib/ovn
++--set DISABLE_MODULES_MANAGEMENT=true
+ ```
+diff --git a/charts/templates/_helpers.tpl b/charts/templates/_helpers.tpl
+new file mode 100644
+index 00000000..1341e99f
+--- /dev/null
++++ b/charts/templates/_helpers.tpl
+@@ -0,0 +1,24 @@
++{{/*
++Get IP-addresses of master nodes
++*/}}
++{{- define "kubeovn.nodeIPs" -}}
++{{- $nodes := lookup "v1" "Node" "" "" -}}
++{{- $ips := list -}}
++{{- range $node := $nodes.items -}}
++  {{- if eq (index $node.metadata.labels "kube-ovn/role") "master" -}}
++    {{- range $address := $node.status.addresses -}}
++      {{- if eq $address.type "InternalIP" -}}
++        {{- $ips = append $ips $address.address -}}
++      {{- end -}}
++    {{- end -}}
++  {{- end -}}
++{{- end -}}
++{{ join "," $ips }}
++{{- end -}}
++
++{{/*
++Number of master nodes
++*/}}
++{{- define "kubeovn.nodeCount" -}}
++  {{- len (split "," (.Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .))) }}
++{{- end -}}
+diff --git a/charts/templates/central-deploy.yaml b/charts/templates/central-deploy.yaml
+index 3a854930..cbdf87b7 100644
+--- a/charts/templates/central-deploy.yaml
++++ b/charts/templates/central-deploy.yaml
+@@ -7,7 +7,7 @@ metadata:
+     kubernetes.io/description: |
+       OVN components: northd, nb and sb.
+ spec:
+-  replicas: {{ .Values.replicaCount }}
++  replicas: {{ include "kubeovn.nodeCount" . }}
+   strategy:
+     rollingUpdate:
+       maxSurge: 0
+@@ -53,7 +53,7 @@ spec:
+             - name: ENABLE_SSL
+               value: "{{ .Values.networking.ENABLE_SSL }}"
+             - name: NODE_IPS
+-              value: "{{ .Values.MASTER_NODES }}"
++              value: "{{ .Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .) }}"
+             - name: POD_IP
+               valueFrom:
+                 fieldRef:
+@@ -139,10 +139,10 @@ spec:
+             path: /sys
+         - name: host-config-openvswitch
+           hostPath:
+-            path: /etc/origin/openvswitch
++            path: {{ .Values.OPENVSWITCH_DIR }}
+         - name: host-config-ovn
+           hostPath:
+-            path: /etc/origin/ovn
++            path: {{ .Values.OVN_DIR }}
+         - name: host-log-ovs
+           hostPath:
+             path: {{ .Values.log_conf.LOG_DIR }}/openvswitch
+diff --git a/charts/templates/controller-deploy.yaml b/charts/templates/controller-deploy.yaml
+index bb18f48b..0e694945 100644
+--- a/charts/templates/controller-deploy.yaml
++++ b/charts/templates/controller-deploy.yaml
+@@ -7,7 +7,7 @@ metadata:
+     kubernetes.io/description: |
+       kube-ovn controller
+ spec:
+-  replicas: {{ .Values.replicaCount }}
++  replicas: {{ include "kubeovn.nodeCount" . }}
+   selector:
+     matchLabels:
+       app: kube-ovn-controller
+@@ -132,7 +132,7 @@ spec:
+                 fieldRef:
+                   fieldPath: spec.nodeName
+             - name: OVN_DB_IPS
+-              value: "{{ .Values.MASTER_NODES }}"
++              value: "{{ .Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .) }}"
+             - name: POD_IPS
+               valueFrom:
+                 fieldRef:
+diff --git a/charts/templates/controller-svc.yaml b/charts/templates/controller-svc.yaml
+index 93e60e53..b4d39619 100644
+--- a/charts/templates/controller-svc.yaml
++++ b/charts/templates/controller-svc.yaml
+@@ -2,7 +2,7 @@ kind: Service
+ apiVersion: v1
+ metadata:
+   name: kube-ovn-controller
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   labels:
+     app: kube-ovn-controller
+ spec:
+diff --git a/charts/templates/monitor-deploy.yaml b/charts/templates/monitor-deploy.yaml
+index cbdecba6..d28999b4 100644
+--- a/charts/templates/monitor-deploy.yaml
++++ b/charts/templates/monitor-deploy.yaml
+@@ -118,10 +118,10 @@ spec:
+             path: /run/ovn
+         - name: host-config-openvswitch
+           hostPath:
+-            path: /etc/origin/openvswitch
++            path: {{ .Values.OPENVSWITCH_DIR }}
+         - name: host-config-ovn
+           hostPath:
+-            path: /etc/origin/ovn
++            path: {{ .Values.OVN_DIR }}
+         - name: host-log-ovn
+           hostPath:
+             path: {{ .Values.log_conf.LOG_DIR }}/ovn
+diff --git a/charts/templates/monitor-svc.yaml b/charts/templates/monitor-svc.yaml
+index fec1fbb3..1ad1800d 100644
+--- a/charts/templates/monitor-svc.yaml
++++ b/charts/templates/monitor-svc.yaml
+@@ -2,7 +2,7 @@ kind: Service
+ apiVersion: v1
+ metadata:
+   name: kube-ovn-monitor
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   labels:
+     app: kube-ovn-monitor
+ spec:
+diff --git a/charts/templates/nb-svc.yaml b/charts/templates/nb-svc.yaml
+index 7ec1595c..43992e91 100644
+--- a/charts/templates/nb-svc.yaml
++++ b/charts/templates/nb-svc.yaml
+@@ -2,7 +2,7 @@ kind: Service
+ apiVersion: v1
+ metadata:
+   name: ovn-nb
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+ spec:
+   ports:
+     - name: ovn-nb
+diff --git a/charts/templates/northd-svc.yaml b/charts/templates/northd-svc.yaml
+index 494f57e2..cec07233 100644
+--- a/charts/templates/northd-svc.yaml
++++ b/charts/templates/northd-svc.yaml
+@@ -2,7 +2,7 @@ kind: Service
+ apiVersion: v1
+ metadata:
+   name: ovn-northd
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+ spec:
+   ports:
+     - name: ovn-northd
+diff --git a/charts/templates/ovn-CRB.yaml b/charts/templates/ovn-CRB.yaml
+index aa84b43f..9230d900 100644
+--- a/charts/templates/ovn-CRB.yaml
++++ b/charts/templates/ovn-CRB.yaml
+@@ -9,7 +9,7 @@ roleRef:
+ subjects:
+   - kind: ServiceAccount
+     name: ovn
+-    namespace: kube-system
++    namespace: {{ .Values.namespace }}
+ 
+ ---
+ apiVersion: rbac.authorization.k8s.io/v1
+@@ -23,7 +23,7 @@ roleRef:
+ subjects:
+   - kind: ServiceAccount
+     name: ovn-ovs
+-    namespace: kube-system
++    namespace: {{ .Values.namespace }}
+ 
+ ---
+ apiVersion: rbac.authorization.k8s.io/v1
+@@ -37,7 +37,7 @@ roleRef:
+ subjects:
+   - kind: ServiceAccount
+     name: kube-ovn-cni
+-    namespace: kube-system
++    namespace: {{ .Values.namespace }}
+ 
+ ---
+ apiVersion: rbac.authorization.k8s.io/v1
+@@ -51,4 +51,4 @@ roleRef:
+ subjects:
+   - kind: ServiceAccount
+     name: kube-ovn-app
+-    namespace: kube-system
++    namespace: {{ .Values.namespace }}
+diff --git a/charts/templates/ovn-dpdk-ds.yaml b/charts/templates/ovn-dpdk-ds.yaml
+index 88865224..1d799899 100644
+--- a/charts/templates/ovn-dpdk-ds.yaml
++++ b/charts/templates/ovn-dpdk-ds.yaml
+@@ -3,7 +3,7 @@ kind: DaemonSet
+ apiVersion: apps/v1
+ metadata:
+   name: ovs-ovn-dpdk
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   annotations:
+     kubernetes.io/description: |
+       This daemon set launches the openvswitch daemon.
+@@ -55,7 +55,7 @@ spec:
+                 fieldRef:
+                   fieldPath: spec.nodeName
+             - name: OVN_DB_IPS
+-              value: "{{ .Values.MASTER_NODES }}"
++              value: "{{ .Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .) }}"
+             - name: OVN_REMOTE_PROBE_INTERVAL
+               value: "{{ .Values.networking.OVN_REMOTE_PROBE_INTERVAL }}"
+             - name: OVN_REMOTE_OPENFLOW_INTERVAL
+@@ -144,10 +144,10 @@ spec:
+             path: /sys
+         - name: host-config-openvswitch
+           hostPath:
+-            path: /etc/origin/openvswitch
++            path: {{ .Values.OPENVSWITCH_DIR }}
+         - name: host-config-ovn
+           hostPath:
+-            path: /etc/origin/ovn
++            path: {{ .Values.OVN_DIR }}
+         - name: host-log-ovs
+           hostPath:
+             path: {{ .Values.log_conf.LOG_DIR }}/openvswitch
+diff --git a/charts/templates/ovn-sa.yaml b/charts/templates/ovn-sa.yaml
+index 0400b90b..17b4a92f 100644
+--- a/charts/templates/ovn-sa.yaml
++++ b/charts/templates/ovn-sa.yaml
+@@ -2,7 +2,7 @@ apiVersion: v1
+ kind: ServiceAccount
+ metadata:
+   name: ovn
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+ {{-  if .Values.global.registry.imagePullSecrets }}
+ imagePullSecrets:
+ {{- range $index, $secret := .Values.global.registry.imagePullSecrets }}
+@@ -17,18 +17,18 @@ apiVersion: v1
+ kind: ServiceAccount
+ metadata:
+   name: ovn-ovs
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+ 
+ ---
+ apiVersion: v1
+ kind: ServiceAccount
+ metadata:
+   name: kube-ovn-cni
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+ 
+ ---
+ apiVersion: v1
+ kind: ServiceAccount
+ metadata:
+   name: kube-ovn-app
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+diff --git a/charts/templates/ovncni-ds.yaml b/charts/templates/ovncni-ds.yaml
+index 3cee0233..d9a9a676 100644
+--- a/charts/templates/ovncni-ds.yaml
++++ b/charts/templates/ovncni-ds.yaml
+@@ -39,8 +39,10 @@ spec:
+         volumeMounts:
+           - mountPath: /opt/cni/bin
+             name: cni-bin
++          {{- if .Values.cni_conf.MOUNT_LOCAL_BIN_DIR }}
+           - mountPath: /usr/local/bin
+             name: local-bin
++          {{- end }}
+       containers:
+       - name: cni-server
+         image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
+@@ -172,7 +174,7 @@ spec:
+             path: {{ .Values.kubelet_conf.KUBELET_DIR }}/pods
+         - name: systemid
+           hostPath:
+-            path: /etc/origin/openvswitch
++            path: {{ .Values.OPENVSWITCH_DIR }}
+         - name: host-run-ovs
+           hostPath:
+             path: /run/openvswitch
+@@ -206,6 +208,8 @@ spec:
+         - name: tmp
+           hostPath:
+             path: /tmp
++        {{- if .Values.cni_conf.MOUNT_LOCAL_BIN_DIR }}
+         - name: local-bin
+           hostPath:
+-            path: /usr/local/bin
++            path: {{ .Values.cni_conf.MOUNT_LOCAL_BIN_DIR }}
++        {{- end }}
+diff --git a/charts/templates/ovncni-svc.yaml b/charts/templates/ovncni-svc.yaml
+index 13b18c4d..e1c47c80 100644
+--- a/charts/templates/ovncni-svc.yaml
++++ b/charts/templates/ovncni-svc.yaml
+@@ -2,7 +2,7 @@ kind: Service
+ apiVersion: v1
+ metadata:
+   name: kube-ovn-cni
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   labels:
+     app: kube-ovn-cni
+ spec:
+diff --git a/charts/templates/ovsovn-ds.yaml b/charts/templates/ovsovn-ds.yaml
+index 61139d23..e30d8aae 100644
+--- a/charts/templates/ovsovn-ds.yaml
++++ b/charts/templates/ovsovn-ds.yaml
+@@ -45,8 +45,18 @@ spec:
+           command: ["/kube-ovn/start-ovs-dpdk.sh"]
+           {{- else }}
            command: 
--          - /kube-ovn/start-ovs.sh
-+          - /bin/bash
++          {{- if .Values.DISABLE_MODULES_MANAGEMENT }}
++          - /bin/sh
 +          - -c
 +          - |
-+              ln -sf /bin/true /usr/sbin/modinfo
 +              ln -sf /bin/true /usr/sbin/modprobe
++              ln -sf /bin/true /usr/sbin/modinfo
++              ln -sf /bin/true /usr/sbin/rmmod
 +              exec /kube-ovn/start-ovs.sh
++          {{- else }}
+           - /kube-ovn/start-ovs.sh
+           {{- end }}
++          {{- end }}
            securityContext:
              runAsUser: 0
              privileged: true
-@@ -4263,6 +4268,7 @@ spec:
-           args:
-           - --external-address=$PINGER_EXTERNAL_ADDRESS
-           - --external-dns=$PINGER_EXTERNAL_DOMAIN
-+          - --ds-namespace=cozy-kubeovn
+@@ -74,7 +84,7 @@ spec:
+                 fieldRef:
+                   fieldPath: spec.nodeName
+             - name: OVN_DB_IPS
+-              value: "{{ .Values.MASTER_NODES }}"
++              value: "{{ .Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .) }}"
+             - name: OVN_REMOTE_PROBE_INTERVAL
+               value: "{{ .Values.networking.OVN_REMOTE_PROBE_INTERVAL }}"
+             - name: OVN_REMOTE_OPENFLOW_INTERVAL
+@@ -180,10 +190,10 @@ spec:
+             path: /sys
+         - name: host-config-openvswitch
+           hostPath:
+-            path: /etc/origin/openvswitch
++            path: {{ .Values.OPENVSWITCH_DIR }}
+         - name: host-config-ovn
+           hostPath:
+-            path: /etc/origin/ovn
++            path: {{ .Values.OVN_DIR }}
+         - name: host-log-ovs
+           hostPath:
+             path: {{ .Values.log_conf.LOG_DIR }}/openvswitch
+diff --git a/charts/templates/pinger-ds.yaml b/charts/templates/pinger-ds.yaml
+index 91df855b..f54b276a 100644
+--- a/charts/templates/pinger-ds.yaml
++++ b/charts/templates/pinger-ds.yaml
+@@ -51,6 +51,7 @@ spec:
+           {{- else if eq .Values.networking.NET_STACK "ipv6" -}}
+           {{ .Values.ipv6.PINGER_EXTERNAL_DOMAIN }}
+           {{- end }}
++          - --ds-namespace={{ .Values.namespace }}
            - --logtostderr=false
            - --alsologtostderr=true
            - --log_file=/var/log/kube-ovn/kube-ovn-pinger.log
+@@ -117,7 +118,7 @@ spec:
+             path: /run/ovn
+         - name: host-config-openvswitch
+           hostPath:
+-            path: /etc/origin/openvswitch
++            path: {{ .Values.OPENVSWITCH_DIR }}
+         - name: host-log-ovs
+           hostPath:
+             path: {{ .Values.log_conf.LOG_DIR }}/openvswitch
+diff --git a/charts/templates/pinger-svc.yaml b/charts/templates/pinger-svc.yaml
+index 0301407e..ef169e8e 100644
+--- a/charts/templates/pinger-svc.yaml
++++ b/charts/templates/pinger-svc.yaml
+@@ -2,7 +2,7 @@ kind: Service
+ apiVersion: v1
+ metadata:
+   name: kube-ovn-pinger
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   labels:
+     app: kube-ovn-pinger
+ spec:
+diff --git a/charts/templates/pre-delete-hook.yaml b/charts/templates/pre-delete-hook.yaml
+index 9fd2a788..d81c5ca2 100644
+--- a/charts/templates/pre-delete-hook.yaml
++++ b/charts/templates/pre-delete-hook.yaml
+@@ -2,7 +2,7 @@ apiVersion: v1
+ kind: ServiceAccount
+ metadata:
+   name: kube-ovn-pre-delete-hook
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   annotations:
+     # This is what defines this resource as a hook. Without this line, the
+     # job is considered part of the release.
+@@ -48,13 +48,13 @@ roleRef:
+ subjects:
+   - kind: ServiceAccount
+     name: kube-ovn-pre-delete-hook
+-    namespace: kube-system
++    namespace: {{ .Values.namespace }}
+ ---
+ apiVersion: batch/v1
+ kind: Job
+ metadata:
+   name: "{{ .Chart.Name }}-pre-delete-hook"
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   labels:
+     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+     app.kubernetes.io/instance: {{ .Release.Name | quote }}
+diff --git a/charts/templates/sb-svc.yaml b/charts/templates/sb-svc.yaml
+index 5f8fcca4..36a4a27a 100644
+--- a/charts/templates/sb-svc.yaml
++++ b/charts/templates/sb-svc.yaml
+@@ -2,7 +2,7 @@ kind: Service
+ apiVersion: v1
+ metadata:
+   name: ovn-sb
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+ spec:
+   ports:
+     - name: ovn-sb
+diff --git a/charts/templates/upgrade-ovs-ovn.yaml b/charts/templates/upgrade-ovs-ovn.yaml
+index 487eb218..980354e6 100644
+--- a/charts/templates/upgrade-ovs-ovn.yaml
++++ b/charts/templates/upgrade-ovs-ovn.yaml
+@@ -1,11 +1,11 @@
+-{{ if (lookup "apps/v1" "DaemonSet" "kube-system" "ovs-ovn") }}
+-{{ if eq (lookup "apps/v1" "DaemonSet" "kube-system" "ovs-ovn").spec.updateStrategy.type "OnDelete" }}
++{{ if (lookup "apps/v1" "DaemonSet" .Values.namespace "ovs-ovn") }}
++{{ if eq (lookup "apps/v1" "DaemonSet" .Values.namespace "ovs-ovn").spec.updateStrategy.type "OnDelete" }}
+ ---
+ apiVersion: v1
+ kind: ServiceAccount
+ metadata:
+   name: ovs-ovn-upgrade
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   annotations:
+     # This is what defines this resource as a hook. Without this line, the
+     # job is considered part of the release.
+@@ -65,13 +65,13 @@ roleRef:
+ subjects:
+   - kind: ServiceAccount
+     name: ovs-ovn-upgrade
+-    namespace: kube-system
++    namespace: {{ .Values.namespace }}
+ ---
+ apiVersion: batch/v1
+ kind: Job
+ metadata:
+   name: "{{ .Chart.Name }}-post-upgrade-hook"
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   labels:
+     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+     app.kubernetes.io/instance: {{ .Release.Name | quote }}
+diff --git a/charts/templates/vpc-nat-config.yaml b/charts/templates/vpc-nat-config.yaml
+index 486ffe32..0f9bd0f5 100755
+--- a/charts/templates/vpc-nat-config.yaml
++++ b/charts/templates/vpc-nat-config.yaml
+@@ -2,7 +2,7 @@ kind: ConfigMap
+ apiVersion: v1
+ metadata:
+   name: ovn-vpc-nat-config
+-  namespace: kube-system
++  namespace: {{ .Values.namespace }}
+   annotations:
+     kubernetes.io/description: |
+       kube-ovn vpc-nat common config
+diff --git a/charts/values.yaml b/charts/values.yaml
+index 69f07c4b..d7ad7da6 100644
+--- a/charts/values.yaml
++++ b/charts/values.yaml
+@@ -18,7 +18,6 @@ image:
+   pullPolicy: IfNotPresent
+ 
+ namespace: kube-system
+-replicaCount: 1
+ MASTER_NODES: ""
+ 
+ networking:
+@@ -109,12 +108,18 @@ cni_conf:
+   CNI_CONF_DIR: "/etc/cni/net.d"
+   CNI_BIN_DIR: "/opt/cni/bin"
+   CNI_CONF_FILE: "/kube-ovn/01-kube-ovn.conflist"
++  LOCAL_BIN_DIR: "/usr/local/bin"
++  MOUNT_LOCAL_BIN_DIR: false
+ 
+ kubelet_conf:
+   KUBELET_DIR: "/var/lib/kubelet"
+ 
+ log_conf:
+   LOG_DIR: "/var/log"
++
++OPENVSWITCH_DIR: "/etc/origin/openvswitch"
++OVN_DIR: "/etc/origin/ovn"
++DISABLE_MODULES_MANAGEMENT: false
+   
+ imagePullSecrets: []
+ nameOverride: ""
