@@ -15,3 +15,4 @@ kubeapps patch helm chart to use custom images
 flux policies
 talos linux firmware
 replace reconcile.sh
+trigger reinstall when more nodes added
