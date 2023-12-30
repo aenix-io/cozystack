@@ -5,7 +5,7 @@ Get IP-addresses of master nodes
 {{- $nodes := lookup "v1" "Node" "" "" -}}
 {{- $ips := list -}}
 {{- range $node := $nodes.items -}}
-  {{- if eq (index $node.metadata.labels "kube-ovn/role") "master" -}}
+  {{- if eq (index $node.metadata.labels "node-role.kubernetes.io/control-plane") "" -}}
     {{- range $address := $node.status.addresses -}}
       {{- if eq $address.type "InternalIP" -}}
         {{- $ips = append $ips $address.address -}}

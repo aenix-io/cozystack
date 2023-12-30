@@ -108,7 +108,7 @@ spec:
             timeoutSeconds: 3
       nodeSelector:
         kubernetes.io/os: "linux"
-        kube-ovn/role: "master"
+        node-role.kubernetes.io/control-plane: ""
       volumes:
         - name: host-run-ovs
           hostPath:
