@@ -12,12 +12,15 @@ watchNamespaces: ""
 
 # -- Additional environment variables
 env: []
+  # -- grafana image, e.g. docker.io/grafana/grafana:9.1.6, overwrites the default grafana image defined in the operator
+  # - name: RELATED_IMAGE_GRAFANA
+  #   value: "docker.io/grafana/grafana:9.1.6"
   # - name: MY_VAR
   #   value: "myvalue"
 
 image:
   # -- grafana operator image repository
-  repository: ghcr.io/grafana-operator/grafana-operator
+  repository: ghcr.io/grafana/grafana-operator
   # -- The image pull policy to use in grafana operator container
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.

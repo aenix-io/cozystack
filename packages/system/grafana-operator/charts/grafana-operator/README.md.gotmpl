@@ -5,7 +5,7 @@ linkTitle: "Helm installation"
 
 {{ template "chart.header" . }}
 
-[grafana-operator](https://github.com/grafana-operator/grafana-operator) for Kubernetes to manage Grafana instances and grafana resources.
+[grafana-operator](https://github.com/grafana/grafana-operator) for Kubernetes to manage Grafana instances and grafana resources.
 
 {{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
 
@@ -14,7 +14,7 @@ linkTitle: "Helm installation"
 This is a OCI helm chart, helm started support OCI in version 3.8.0.
 
 ```shell
-helm upgrade -i grafana-operator oci://ghcr.io/grafana-operator/helm-charts/grafana-operator --version {{ template "chart.appVersion" . }}
+helm upgrade -i grafana-operator oci://ghcr.io/grafana/helm-charts/grafana-operator --version {{ template "chart.appVersion" . }}
 ```
 
 Sadly helm OCI charts currently don't support searching for available versions of a helm [oci registry](https://github.com/helm/helm/issues/11000).
