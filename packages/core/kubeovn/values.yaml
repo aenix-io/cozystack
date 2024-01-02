@@ -17,6 +17,10 @@ kube-ovn:
   func:
     ENABLE_NP: false
 
+  MASTER_NODES_LABEL: "node-role.kubernetes.io/control-plane"
+  networking:
+    ENABLE_SSL: true
+
   cni_conf:
     CNI_CONFIG_PRIORITY: "10"
     MOUNT_LOCAL_BIN_DIR: false
