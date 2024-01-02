@@ -5,7 +5,13 @@ show:
 	helm template -n $(NAMESPACE) $(NAME) .
 
 apply:
-	helm upgrade -i -n $(NAMESPACE) $(NAME) .
+	helm template -n $(NAMESPACE) $(NAME) . --dry-run=server | kubectl apply -f-
+
+namespaces-show:
+	helm template -n $(NAMESPACE) $(NAME) . -s templates/namespaces.yaml
+
+namespaces-apply:
+	helm template -n $(NAMESPACE) $(NAME) . -s templates/namespaces.yaml | kubectl apply -f-
 
 diff:
 	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .

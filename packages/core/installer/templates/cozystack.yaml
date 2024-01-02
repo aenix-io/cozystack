@@ -50,14 +50,14 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: ghcr.io/kvaps/test:cozystack-installer-0
+        image: ghcr.io/kvaps/test:cozystack-installer-3
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
       - name: darkhttpd
-        image: ghcr.io/kvaps/test:cozystack-installer-0
+        image: ghcr.io/kvaps/test:cozystack-installer-3
         command:
         - /usr/bin/darkhttpd
         - /cozystack/packages/repos

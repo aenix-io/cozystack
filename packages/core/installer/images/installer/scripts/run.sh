@@ -10,20 +10,28 @@ flux_is_ok() {
   kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=10s 
 }
 
-
-install_core_charts() {
-  make -C /cozystack/packages/core/namespaces apply
-  make -C /cozystack/packages/core/cilium apply
-  make -C /cozystack/packages/core/kubeovn apply
-  make -C /cozystack/packages/core/fluxcd apply
+install_basic_charts() {
+  make -C /cozystack/packages/system/cilium apply
+  make -C /cozystack/packages/system/kubeovn apply
+  make -C /cozystack/packages/system/fluxcd apply
 }
 
+# Install namespaces
+make -C /cozystack/packages/core/platform namespaces-apply
+
+# Install basic system charts
 if ! flux_is_ok; then
-  install_core_charts
+  install_basic_charts
 fi
 
+# Run migrations
 run_migrations
-make -C /cozystack/packages/core/fluxcd-releases apply
 
-tail -f /dev/null &
-wait
+# Install platform chart
+make -C /cozystack/packages/core/platform apply
+
+# Reconcile platform chart
+while true; do
+  sleep 60 & wait
+  make -C /cozystack/packages/core/platform apply
+done

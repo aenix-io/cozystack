@@ -1,12 +1,12 @@
 diff --git a/charts/templates/ovn-tls-secret.yaml b/charts/templates/ovn-tls-secret.yaml
 new file mode 100644
-index 0000000000..041f056bd4
+index 0000000000..dde402039d
 --- /dev/null
 +++ b/charts/templates/ovn-tls-secret.yaml
 @@ -0,0 +1,23 @@
 +{{- if .Values.networking.ENABLE_SSL }}
 +{{- $cn := "ovn" -}}
-+{{- $ca := genCA "ovn" 3650 -}}
++{{- $ca := genCA "ovn-ca" 3650 -}}
 +---
 +apiVersion: v1
 +kind: Secret

@@ -155,14 +155,13 @@ Install cozystack system components:
 kubectl apply -f cozystack-installer.yaml
 ```
 
-### Dependencies chart
+### Chart Install Responsibilities
 
-- **core/installer**
-  - core/cilium
-  - core/kubeovn
-  - core/fluxcd
-  - **core/fluxcd-release**
-    - core/cilium
-    - core/kubeovn
-    - core/fluxcd
-    - system/*
+#### core/installer:
+  - **system/cilium** [helm]
+  - **system/kubeovn** [helm]
+  - **system/fluxcd** [helm]
+  - **core/platform** [kubectl]
+
+#### core/platform:
+  - **system/\*** [fluxcd]

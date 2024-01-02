@@ -2,15 +2,6 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: cozystack-core
-  namespace: cozy-system
-spec:
-  interval: 5m0s
-  url: http://cozystack.cozy-system.svc/core
----
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: HelmRepository
-metadata:
   name: cozystack-system
   namespace: cozy-system
 spec:
