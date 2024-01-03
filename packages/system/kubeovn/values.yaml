@@ -9,11 +9,6 @@ kube-ovn:
 
   namespace: cozy-kubeovn
 
-  ipv4:
-    POD_CIDR: "10.244.0.0/16"
-    POD_GATEWAY: "10.244.0.1"
-    SVC_CIDR: "10.96.0.0/16"
-
   func:
     ENABLE_NP: false
 
