@@ -20,3 +20,6 @@ metallb-configuration
 docs: each chart should be self sufficient
 docs: core charts must be accessible via helm template | kubectl apply -f
 docs: system charts must be accessible via helm install & flux
+docs: how to get first token to access cluster
+docs: where to store talosconfig
+how to version helm charts
