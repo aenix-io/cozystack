@@ -189,6 +189,8 @@ spec:
     namespace: cozy-cilium
   - name: kubeovn
     namespace: cozy-kubeovn
+  - name: kubevirt-operator
+    namespace: cozy-kubevirt
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease

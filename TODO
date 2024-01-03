@@ -18,3 +18,5 @@ replace reconcile.sh
 trigger reinstall when more nodes added
 metallb-configuration
 docs: each chart should be self sufficient
+docs: core charts must be accessible via helm template | kubectl apply -f
+docs: system charts must be accessible via helm install & flux
