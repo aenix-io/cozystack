@@ -141,6 +141,20 @@ cluster:
   etcd:
     advertisedSubnets:
     - 192.168.100.0/24
+
+  inlineManifests:
+  - name: cozystack
+    contents: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: cozystack
+        namespace: cozy-system
+      data:
+        ipv4-pod-cidr: "10.244.0.0/16"
+        ipv4-pod-gateway: "10.244.0.1"
+        ipv4-svc-cidr: "10.96.0.0/16"
+        ipv4-join-cidr: "100.64.0.0/16"
 EOT
 ```
 

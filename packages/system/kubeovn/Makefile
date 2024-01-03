@@ -8,7 +8,7 @@ apply:
 	helm upgrade -i -n $(NAMESPACE) $(NAME) .
 
 diff:
-	helm diff upgrade --dry-run --allow-unreleased -n $(NAMESPACE) $(NAME) .
+	helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) .
 
 update:
 	rm -rf charts && mkdir -p charts/kube-ovn

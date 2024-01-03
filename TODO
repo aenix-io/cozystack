@@ -16,3 +16,5 @@ flux policies
 talos linux firmware
 replace reconcile.sh
 trigger reinstall when more nodes added
+metallb-configuration
+docs: each chart should be self sufficient

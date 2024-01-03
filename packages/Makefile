@@ -1,3 +1,2 @@
-apply show diff repo:
-	make -C core $@
+repo:
 	make -C system $@

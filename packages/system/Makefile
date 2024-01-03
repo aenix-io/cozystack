@@ -1,24 +1,5 @@
 REPO=system
 
-apply show diff:
-	make -C cert-manager $@
-	make -C cert-manager-issuers $@
-	make -C victoria-metrics-operator $@
-	make -C monitoring $@
-	make -C kubevirt-operator $@
-	make -C kubevirt $@
-	make -C metallb $@
-	make -C grafana-operator $@
-	make -C mariadb-operator $@
-	make -C postgres-operator $@
-	make -C rabbitmq-operator $@
-	make -C redis-operator $@
-	make -C piraeus-operator $@
-	make -C linstor $@
-	make -C telepresence $@
-	make -C ingress-nginx $@
-	make -C kubeapps $@
-
 repo: fix-chartnames
 	rm -rf ../repos/$(REPO)
 	mkdir -p ../repos/$(REPO)

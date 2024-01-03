@@ -2,13 +2,13 @@ NAME=ingress-nginx
 NAMESPACE=cozy-ingress-nginx
 
 show:
-	helm template -n $(NAMESPACE) $(NAME) .
+	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
 
 apply:
 	helm upgrade -i -n $(NAMESPACE) $(NAME) .
 
 diff:
-	helm diff upgrade --allow-unreleased -n $(NAMESPACE) $(NAME) .
+	helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) .
 
 update:
 	rm -rf charts
