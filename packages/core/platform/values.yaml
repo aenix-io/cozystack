@@ -1,4 +1,5 @@
 namespaces:
+- name: cozy-public
 - name: cozy-system
   privileged: true
 - name: cozy-cert-manager

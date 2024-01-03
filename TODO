@@ -23,3 +23,4 @@ docs: system charts must be accessible via helm install & flux
 docs: how to get first token to access cluster
 docs: where to store talosconfig
 how to version helm charts
+autombump chart versions for system charts

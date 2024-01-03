@@ -5,6 +5,8 @@ metadata:
   name: {{ include "virtual-machine.fullname" . }}
   labels:
     {{- include "virtual-machine.labels" . | nindent 4 }}
+  annotations:
+    a: b
 spec:
   running: true
   template:

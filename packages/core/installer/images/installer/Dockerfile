@@ -5,6 +5,7 @@ RUN apk add helm kubectl --repository=https://dl-cdn.alpinelinux.org/alpine/edge
 
 COPY packages /cozystack/packages
 RUN make -C /cozystack/packages/system repo
+RUN make -C /cozystack/packages/apps repo
 
 RUN ln -s /cozystack/packages/core/installer/images/installer/scripts /scripts
 

@@ -1,5 +1,0 @@
-_helm:
-  name: kube-vip
-  namespace: kube-vip
-  createNamespace: true
-  crds: CreateReplace

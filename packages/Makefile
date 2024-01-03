@@ -1,2 +1,0 @@
-repo:
-	make -C system $@

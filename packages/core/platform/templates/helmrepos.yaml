@@ -7,3 +7,12 @@ metadata:
 spec:
   interval: 5m0s
   url: http://cozystack.cozy-system.svc/system
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: cozystack-apps
+  namespace: cozy-public
+spec:
+  interval: 5m0s
+  url: http://cozystack.cozy-system.svc/apps
