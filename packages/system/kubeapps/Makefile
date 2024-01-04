@@ -1,5 +1,7 @@
 NAME=kubeapps
 NAMESPACE=cozy-kubeapps
+PUSH=1
+LOAD=0
 
 show:
 	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .

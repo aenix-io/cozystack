@@ -1,0 +1,11 @@
+http-balancer 0.1.0 HEAD
+kubernetes 0.1.0 HEAD
+monitoring-hub 0.0.0 HEAD
+mysql 0.1.0 HEAD
+postgres 0.1.0 HEAD
+rabbitmq 0.1.0 HEAD
+redis 0.1.0 HEAD
+tcp-balancer 0.1.0 HEAD
+virtual-machine 0.1.3 be43e42
+virtual-machine 0.1.4 HEAD
+vpn 0.1.0 HEAD

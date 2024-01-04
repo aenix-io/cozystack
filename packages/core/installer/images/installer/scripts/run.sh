@@ -11,13 +11,13 @@ flux_is_ok() {
 }
 
 install_basic_charts() {
-  make -C /cozystack/packages/system/cilium apply
-  make -C /cozystack/packages/system/kubeovn apply
-  make -C /cozystack/packages/system/fluxcd apply
+  make -C packages/system/cilium apply
+  make -C packages/system/kubeovn apply
+  make -C packages/system/fluxcd apply
 }
 
 # Install namespaces
-make -C /cozystack/packages/core/platform namespaces-apply
+make -C packages/core/platform namespaces-apply
 
 # Install basic system charts
 if ! flux_is_ok; then
@@ -28,10 +28,12 @@ fi
 run_migrations
 
 # Install platform chart
-make -C /cozystack/packages/core/platform apply
+make -C packages/core/platform apply
+
+trap 'exit' INT TERM
 
 # Reconcile platform chart
 while true; do
   sleep 60 & wait
-  make -C /cozystack/packages/core/platform apply
+  make -C packages/core/platform apply
 done

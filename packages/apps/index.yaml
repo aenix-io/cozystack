@@ -1,0 +1,247 @@
+apiVersion: v1
+entries:
+  http-balancer:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.389746+01:00"
+    description: Layer7 load balacner and caching service
+    digest: e32d7f84ad89888473a3f64d113fc6271b83b935cc8f2ad176eb02f715eaa531
+    icon: https://www.svgrepo.com/show/373924/nginx.svg
+    name: http-balancer
+    type: application
+    urls:
+    - http-balancer-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.405121+01:00"
+    description: Layer7 load balacner and caching service
+    digest: 57b3eb78ebd3a588d28411767b8e943be67480297a7fce3ba687c89d5f34383c
+    icon: https://www.svgrepo.com/show/373924/nginx.svg
+    name: http-balancer
+    type: application
+    urls:
+    - _out/http-balancer-0.1.0.tgz
+    version: 0.1.0
+  kubernetes:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.389987+01:00"
+    description: Managed Kubernetes service
+    digest: bcd65b7c84497e23cf9bac12cde8a8f09b397b8319bc0955846123b715fb7584
+    icon: https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Kubernetes_logo_without_workmark.svg/723px-Kubernetes_logo_without_workmark.svg.png
+    name: kubernetes
+    type: application
+    urls:
+    - kubernetes-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.405429+01:00"
+    description: Managed Kubernetes service
+    digest: 49eeedef417ab9fcd1c571fe44dde09fee6aea465a7cfbe0b6bddbdaf11c34c3
+    icon: https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Kubernetes_logo_without_workmark.svg/723px-Kubernetes_logo_without_workmark.svg.png
+    name: kubernetes
+    type: application
+    urls:
+    - _out/kubernetes-0.1.0.tgz
+    version: 0.1.0
+  monitoring-hub:
+  - apiVersion: v1
+    created: "2024-01-04T13:40:01.403315+01:00"
+    digest: 982979e27ced053dcd0b28c69611d62c8ce5f6a59c0f93ea3aa21f1cc31928a4
+    name: monitoring-hub
+    urls:
+    - monitoring-hub-0.0.0.tgz
+    version: 0.0.0
+  - apiVersion: v1
+    created: "2024-01-04T13:40:01.407014+01:00"
+    digest: 3bcd1bcadfdd5afe41ce05ea15355705e86ca3ed6bbd860490614d3241192301
+    name: monitoring-hub
+    urls:
+    - _out/monitoring-hub-0.0.0.tgz
+    version: 0.0.0
+  mysql:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.403522+01:00"
+    description: Managed MariaDB service
+    digest: 382eff482300afadfff849aea6b0f701b769d8d8ce11fc0b5a64dc96e2ff7c74
+    icon: https://static-00.iconduck.com/assets.00/mariadb-icon-512x340-txozryr2.png
+    name: mysql
+    type: application
+    urls:
+    - mysql-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.407297+01:00"
+    description: Managed MariaDB service
+    digest: 8cede12978ba19517442c2d9120e96b9d16faf0548f8d5048d8c9083fa1bc74a
+    icon: https://static-00.iconduck.com/assets.00/mariadb-icon-512x340-txozryr2.png
+    name: mysql
+    type: application
+    urls:
+    - _out/mysql-0.1.0.tgz
+    version: 0.1.0
+  postgres:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.40371+01:00"
+    description: Managed PostgreSQL service
+    digest: 5bab72e61ad4c0eea56d83c189be6f4aba9beefccc6c6563823575e8f66b423a
+    icon: https://cdn-icons-png.flaticon.com/512/5968/5968342.png
+    name: postgres
+    type: application
+    urls:
+    - postgres-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.407627+01:00"
+    description: Managed PostgreSQL service
+    digest: 365daa1cf207fcaf690f7987406d29ff27d3599f1ddf8391e1d26b184d737946
+    icon: https://cdn-icons-png.flaticon.com/512/5968/5968342.png
+    name: postgres
+    type: application
+    urls:
+    - _out/postgres-0.1.0.tgz
+    version: 0.1.0
+  rabbitmq:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.403904+01:00"
+    description: Managed RabbitMQ service
+    digest: 1167d0a1ef77749a47d8d1bd26f87c78b7de4f0ba1516d07623715903f86ea09
+    icon: https://static-00.iconduck.com/assets.00/rabbitmq-icon-484x512-s9lfaapn.png
+    name: rabbitmq
+    type: application
+    urls:
+    - rabbitmq-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.40787+01:00"
+    description: Managed RabbitMQ service
+    digest: 5ded32dc9bcdd71b631df56c6c60ae22c251d458935a665328357f3992e6e7c6
+    icon: https://static-00.iconduck.com/assets.00/rabbitmq-icon-484x512-s9lfaapn.png
+    name: rabbitmq
+    type: application
+    urls:
+    - _out/rabbitmq-0.1.0.tgz
+    version: 0.1.0
+  redis:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.404092+01:00"
+    description: Managed Redis service
+    digest: f3367044ad045e7898b4241c7a9753d7f68b577ded2e065bc15945b0d4c578c8
+    icon: https://cdn4.iconfinder.com/data/icons/redis-2/1451/Untitled-2-512.png
+    name: redis
+    type: application
+    urls:
+    - redis-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.408108+01:00"
+    description: Managed Redis service
+    digest: d1c0a3bd7985d47770de607307edc28b16d0c3127d11a925d7210cbe54d6e74a
+    icon: https://cdn4.iconfinder.com/data/icons/redis-2/1451/Untitled-2-512.png
+    name: redis
+    type: application
+    urls:
+    - _out/redis-0.1.0.tgz
+    version: 0.1.0
+  tcp-balancer:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.404271+01:00"
+    description: Layer4 load balancer service
+    digest: a71b137f7c9ba5507b2efd50308c5ff403e3f967600897dc357e6fb96622a859
+    icon: https://cdn.icon-icons.com/icons2/2699/PNG/512/haproxy_logo_icon_171017.png
+    name: tcp-balancer
+    type: application
+    urls:
+    - tcp-balancer-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.408342+01:00"
+    description: Layer4 load balancer service
+    digest: 66429a4a8f6a1b74280c7abbfffb5a613dc609f160c5d46bceaf6cf013c18e54
+    icon: https://cdn.icon-icons.com/icons2/2699/PNG/512/haproxy_logo_icon_171017.png
+    name: tcp-balancer
+    type: application
+    urls:
+    - _out/tcp-balancer-0.1.0.tgz
+    version: 0.1.0
+  virtual-machine:
+  - apiVersion: v2
+    appVersion: 1.16.1
+    created: "2024-01-04T13:40:01.404549+01:00"
+    description: Virtual machine instance
+    digest: 6853ca5c09bf8cf47b8a298b376f45a54e046bf89446188eb6eeff74134c1dae
+    icon: https://www.svgrepo.com/show/448273/azure-vms.svg
+    name: virtual-machine
+    type: application
+    urls:
+    - virtual-machine-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: 1.16.1
+    created: "2024-01-04T13:40:01.408747+01:00"
+    description: Virtual machine instance
+    digest: 7f3d766938bb31ecc0de40e3a642f478cec2c06ccdd25654a8a80c87924ad1c1
+    icon: https://www.svgrepo.com/show/448273/azure-vms.svg
+    name: virtual-machine
+    type: application
+    urls:
+    - _out/virtual-machine-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: 1.16.1
+    created: "2024-01-04T13:40:01.404417+01:00"
+    description: Virtual machine instance
+    digest: 1cb6b31fe0afcfb7634b0467ff1d4aa6250feea09ea9f4e99acfcfc405c92751
+    icon: https://www.svgrepo.com/show/448273/azure-vms.svg
+    name: virtual-machine
+    type: application
+    urls:
+    - virtual-machine-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: 1.16.1
+    created: "2024-01-04T13:40:01.408567+01:00"
+    description: Virtual machine instance
+    digest: 9beea9abe8f73abb8730e46493f7a58630ae8ae8bcc3a84dc0d0ad7b3a27139d
+    icon: https://www.svgrepo.com/show/448273/azure-vms.svg
+    name: virtual-machine
+    type: application
+    urls:
+    - _out/virtual-machine-0.1.3.tgz
+    version: 0.1.3
+  vpn:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.404736+01:00"
+    description: Establish a connection from your computer
+    digest: dfbe42216e419ac276a29a2bf8c30fae4b3af69c78af812e41f9d497badbd9b8
+    icon: https://www.telepresence.io/static/telepresence-edgy-3cf14d0402757769e6aff3f0ea4067d5.svg
+    name: vpn
+    type: application
+    urls:
+    - vpn-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-04T13:40:01.408973+01:00"
+    description: Establish a connection from your computer
+    digest: ec3265090171a4c1009d313c59320c725168656c6f92b5a32569f40f45f08521
+    icon: https://www.telepresence.io/static/telepresence-edgy-3cf14d0402757769e6aff3f0ea4067d5.svg
+    name: vpn
+    type: application
+    urls:
+    - _out/vpn-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-01-04T13:40:01.389297+01:00"

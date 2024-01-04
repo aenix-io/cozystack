@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-file=$1
+file=versions_map
 charts=$(find . -mindepth 2 -maxdepth 2 -name Chart.yaml | awk 'sub("/Chart.yaml", "")')
 
 # <chart> <version> <commit> 
@@ -28,4 +28,4 @@ resolved_miss_map=$(
   done
 )
 
-printf "%s\n" "$new_map" "$resolved_miss_map" | sort -k1,1 -k2,2 -V > "$file"
+printf "%s\n" "$new_map" "$resolved_miss_map" | sort -k1,1 -k2,2 -V | awk '$1' > "$file"
