@@ -20,8 +20,8 @@ miss_map=$(echo "$new_map" | awk 'NR==FNR { new_map[$1 " " $2] = $3; next } { if
 resolved_miss_map=$(
   echo "$miss_map" | while read chart version commit; do
     if [ "$commit" = HEAD ]; then
-      line=$(awk '/^version:/ {print NR; exit}' "$chart/Chart.yaml")
-      change_commit=$(git --no-pager blame -L20,+1 "$chart/Chart.yaml" | awk '{print $1}')
+      line=$(git show HEAD:"$chart/Chart.yaml" | awk '/^version:/ {print NR; exit}')
+      change_commit=$(git --no-pager blame -L20,+1 HEAD -- "$chart/Chart.yaml" | awk '{print $1}')
       commit=$(git describe --always "$change_commit~1")
     fi
     echo "$chart $version $commit"
