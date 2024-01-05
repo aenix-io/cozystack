@@ -13,7 +13,6 @@ diff:
 	helm template -n $(NAMESPACE) $(NAME) . | kubectl diff -f -
 
 image:
-	#docker build -f images/installer/Dockerfile ../../..
 	docker buildx build -f images/installer/Dockerfile ../../.. \
 		--provenance false \
 		--tag ghcr.io/aenix-io/cozystack/installer:latest \
