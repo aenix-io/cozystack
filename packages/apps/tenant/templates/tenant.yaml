@@ -1,3 +1,6 @@
+{{- if ne (len (splitList "-" .Release.Name)) 1 }}
+{{- fail (printf "Release name should not contain dashes: %s" .Release.Name) }}
+{{- end }}
 {{- $tenantName := (printf "tenant-%s" .Release.Name) }}
 {{- if hasPrefix "tenant-" .Release.Namespace }}
 {{- $tenantName = (printf "%s-%s" .Release.Namespace .Release.Name) }}
