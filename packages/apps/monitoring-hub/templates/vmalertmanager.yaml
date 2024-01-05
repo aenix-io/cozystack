@@ -18,7 +18,7 @@ stringData:
     receivers:
       - name: 'webhook'
         webhook_configs:
-          - url: http://grafana-oncall-engine.cozy-monitoring-hub.svc:8080/integrations/v1/alertmanager/Kjb2NWxxSlgGtxz9F4ihovQBB/
+          - url: http://grafana-oncall-engine.{{ .Release.Namespace }}.svc:8080/integrations/v1/alertmanager/Kjb2NWxxSlgGtxz9F4ihovQBB/
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlertmanager

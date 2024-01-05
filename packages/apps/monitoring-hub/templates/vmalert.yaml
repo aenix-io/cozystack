@@ -2,18 +2,18 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlert
 metadata:
   name: vmalert
-  namespace: cozy-monitoring-hub
+  namespace: {{ .Release.Namespace }}
 spec:
   datasource:
-    url: http://vmselect-vmcluster.cozy-monitoring-hub.svc:8481/select/0/prometheus
+    url: http://vmselect-vmcluster.{{ .Release.Namespace }}.svc:8481/select/0/prometheus
   evaluationInterval: 15s
   extraArgs:
     remoteWrite.disablePathAppend: "true"
   notifiers:
-  - url: http://vmalertmanager-alertmanager.cozy-monitoring-hub.svc:9093
+  - url: http://vmalertmanager-alertmanager.{{ .Release.Namespace }}.svc:9093
   remoteRead:
-    url: http://vmselect-vmcluster.cozy-monitoring-hub.svc:8481/select/0/prometheus
+    url: http://vmselect-vmcluster.{{ .Release.Namespace }}.svc:8481/select/0/prometheus
   remoteWrite:
-    url: http://vminsert-vmcluster.cozy-monitoring-hub.svc:8480/insert/0/prometheus/api/v1/write
+    url: http://vminsert-vmcluster.{{ .Release.Namespace }}.svc:8480/insert/0/prometheus/api/v1/write
   resources: {}
   selectAllByDefault: true

@@ -3,7 +3,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
   name: vmstorage-vmcluster-longterm
-  namespace: cozy-monitoring-hub
+  namespace: {{ .Release.Namespace }}
 spec:
   endpoints:
   - path: /metrics

@@ -11,7 +11,7 @@ spec:
     name: vm
     type: prometheus
     access: proxy
-    url: http://vmselect-vmcluster.cozy-monitoring-hub.svc:8481/select/0/prometheus/
+    url: http://vmselect-vmcluster.{{ .Release.Namespace }}.svc:8481/select/0/prometheus/
     isDefault: true
     jsonData:
       'tlsSkipVerify': true

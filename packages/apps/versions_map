@@ -1,6 +1,7 @@
 http-balancer 0.1.0 HEAD
 kubernetes 0.1.0 HEAD
-monitoring-hub 0.0.0 HEAD
+monitoring-hub 0.0.0 44a755d
+monitoring-hub 0.1.1 HEAD
 mysql 0.1.0 HEAD
 postgres 0.1.0 HEAD
 rabbitmq 0.1.0 HEAD

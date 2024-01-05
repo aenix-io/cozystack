@@ -11,7 +11,7 @@ spec:
     name: vm-longterm
     type: prometheus
     access: proxy
-    url: http://vmselect-vmcluster-longterm.cozy-monitoring-hub.svc:8481/longterm/select/0/prometheus/
+    url: http://vmselect-vmcluster-longterm.{{ .Release.Namespace }}.svc:8481/longterm/select/0/prometheus/
     isDefault: false
     jsonData:
       'tlsSkipVerify': true

@@ -1,11 +1,3 @@
-_helm:
-  name: monitoring-hub
-  namespace: cozy-monitoring-hub
-  createNamespace: true
-  dependsOn:
-  - name: grafana-operator
-  - name: postgres-operator
-
 adminPassword: Moh4ooN9phaech6Sai9aoGiezu4doh2i # TODO
 
 oncall:

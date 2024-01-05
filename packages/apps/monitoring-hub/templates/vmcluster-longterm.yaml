@@ -2,7 +2,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMCluster
 metadata:
   name: vmcluster-longterm
-  namespace: cozy-monitoring-hub
+  namespace: {{ .Release.Namespace }}
 spec:
   replicationFactor: 2
   retentionPeriod: "14"
