@@ -21,7 +21,7 @@ resolved_miss_map=$(
   echo "$miss_map" | while read chart version commit; do
     if [ "$commit" = HEAD ]; then
       line=$(git show HEAD:"./$chart/Chart.yaml" | awk '/^version:/ {print NR; exit}')
-      change_commit=$(git --no-pager blame -L20,+1 HEAD -- "$chart/Chart.yaml" | awk '{print $1}')
+      change_commit=$(git --no-pager blame -L"$line",+1 HEAD -- "$chart/Chart.yaml" | awk '{print $1}')
       commit=$(git describe --always "$change_commit~1")
     fi
     echo "$chart $version $commit"

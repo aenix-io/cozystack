@@ -1,28 +1,33 @@
+{{- $tenantName := (printf "tenant-%s" .Release.Name) }}
+{{- if hasPrefix "tenant-" .Release.Namespace }}
+{{- $tenantName = (printf "%s-%s" .Release.Namespace .Release.Name) }}
+{{- end }}
+---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: tenant-{{ .Release.Name }}
-  namespace: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
+  namespace: {{ $tenantName }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: tenant-{{ .Release.Name }}
-  namespace: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
+  namespace: {{ $tenantName }}
   annotations:
-    kubernetes.io/service-account.name: tenant-{{ .Release.Name }}
+    kubernetes.io/service-account.name: {{ $tenantName }}
 type: kubernetes.io/service-account-token
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: tenant-{{ .Release.Name }}
-  namespace: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
+  namespace: {{ $tenantName }}
 rules:
 - apiGroups: [""]
   resources: ["*"]
@@ -34,37 +39,31 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tenant-{{ .Release.Name }}
-  namespace: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
+  namespace: {{ $tenantName }}
 subjects:
+{{- if hasPrefix "tenant-" .Release.Namespace }}
+{{- $parts := splitList "-" .Release.Namespace }}
+{{- range $i, $v := $parts }}
+{{- if ne $i 0 }}
 - kind: ServiceAccount
-  name: tenant-{{ .Release.Name }}
-  namespace: tenant-{{ .Release.Name }}
-roleRef:
-  kind: Role
-  name: tenant-{{ .Release.Name }}
-  apiGroup: rbac.authorization.k8s.io
-{{ if hasPrefix .Release.Namespace "tenant-" }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: {{ .Release.Namespace }}
-  namespace: tenant-{{ .Release.Name }}
-subjects:
-- kind: ServiceAccount
-  name: {{ .Release.Namespace }}
-  namespace: {{ .Release.Namespace }}
-roleRef:
-  kind: Role
-  name: tenant-{{ .Release.Name }}
-  apiGroup: rbac.authorization.k8s.io
+  name: {{ join "-" (slice $parts 0 (add $i 1)) }}
+  namespace: {{ join "-" (slice $parts 0 (add $i 1)) }}
 {{- end }}
+{{- end }}
+{{- end }}
+- kind: ServiceAccount
+  name: {{ $tenantName }}
+  namespace: {{ $tenantName }}
+roleRef:
+  kind: Role
+  name: {{ $tenantName }}
+  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
   namespace: cozy-public
 rules:
 - apiGroups: ["source.toolkit.fluxcd.io"]
@@ -77,13 +76,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
   namespace: cozy-public
 subjects:
 - kind: ServiceAccount
-  name: tenant-{{ .Release.Name }}
-  namespace: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
+  namespace: {{ $tenantName }}
 roleRef:
   kind: Role
-  name: tenant-{{ .Release.Name }}
+  name: {{ $tenantName }}
   apiGroup: rbac.authorization.k8s.io
