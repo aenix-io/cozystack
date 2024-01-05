@@ -2,7 +2,7 @@
 {{- fail (printf "Release name should not contain dashes: %s" .Release.Name) }}
 {{- end }}
 {{- $tenantName := (printf "tenant-%s" .Release.Name) }}
-{{- if hasPrefix "tenant-" .Release.Namespace }}
+{{- if and (ne .Release.Namespace "tenant-root") (hasPrefix "tenant-" .Release.Namespace) }}
 {{- $tenantName = (printf "%s-%s" .Release.Namespace .Release.Name) }}
 {{- end }}
 ---
@@ -45,6 +45,11 @@ metadata:
   name: {{ $tenantName }}
   namespace: {{ $tenantName }}
 subjects:
+{{- if ne .Release.Namespace "tenant-root" }}
+- kind: ServiceAccount
+  name: tenant-root
+  namespace: tenant-root
+{{- end }}
 {{- if hasPrefix "tenant-" .Release.Namespace }}
 {{- $parts := splitList "-" .Release.Namespace }}
 {{- range $i, $v := $parts }}
