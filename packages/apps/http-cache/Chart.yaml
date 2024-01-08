@@ -1,5 +1,5 @@
 apiVersion: v2
-name: http-balancer
+name: http-cache
 description: Layer7 load balacner and caching service
 icon: https://www.svgrepo.com/show/373924/nginx.svg
 

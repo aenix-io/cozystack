@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-haproxy
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  # TODO
+  # There is an issue with 'externalTraficPolicy: Local' and VMs accessing externalIP services from
+  # internal network, trafic is not routed due to fact their hipervisor have no local workload running
+  # Current workaround that all the nodes of parnet cluster must have at least one replica per node
+  # which are running the virtual machnes of child cluster.
+  # Consider moving to KubeVirt so all local VMs will get local identities, so internalTrafficPolicy will
+  # considered for them instead of externalTraficPolicy
+  replicas: 3
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-haproxy
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-haproxy
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Release.Name }}-haproxy
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - image: haproxy:latest
+        name: haproxy
+        ports:
+        {{- with .Values.httpAndHttps }}
+        - containerPort: 8080
+          name: http
+        - containerPort: 8443
+          name: https
+        {{- end }}
+        {{- with .Values.kubernetesAndTalos }}
+        - containerPort: 6443
+          name: kubernetes
+        - containerPort: 50000
+          name: talos
+        {{- end }}
+        volumeMounts:
+        - mountPath: /usr/local/etc/haproxy
+          name: config
+      volumes:
+      - configMap:
+          name: {{ .Release.Name }}-haproxy
+        name: config

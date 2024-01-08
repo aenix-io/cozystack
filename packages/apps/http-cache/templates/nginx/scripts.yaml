@@ -1,0 +1,74 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-scripts
+stringData:
+  init.sh: |
+    #!/bin/sh
+    set -o pipefail
+    set -e
+
+    while sh $(dirname $0)/download.sh; do
+      sleep 60m
+    done
+
+  download.sh: |
+    #!/bin/sh
+    set -o pipefail
+    set -e
+    
+    ensure_file() {
+      local method=$1
+      local src=$2
+      local dst=$3
+    
+      # split src/file to src and file
+      local src1="${src%%/*}"
+      local src2="${src#*/}"
+    
+      local oldhash=$(cat $dst.hash 2>/dev/null || true)
+      local newhash=$(echo "$HASHES" | awk "\$2 == \"$src1\" {print \$1}")
+    
+      if [ -e "$dst" ] && [ ! -f "$dst" ]; then
+        echo "error: $dst exists and not file" >&2
+        exit 1
+      fi
+      if [ ! -f "$dst" ] || [ "$oldhash" != "$newhash" ]; then
+        echo "downloading: $src to $dst with method $method"
+    
+        case $method in
+          zip)
+            mkdir -p "$dst.tmp"
+            wget -O- "${SERVER}/${src1}" | unzip -d "$dst.tmp" -o - "$src2"
+            if [ ! -f "$dst.tmp/$src2" ]; then
+              echo "$src2 not found in archive $src1" >&2
+              exit 1
+            fi
+            mv "$dst.tmp/$src2" "$dst"
+            rm -rf "$dst.tmp"
+            echo "$newhash" > "$dst.hash"
+            ;;
+          gz)
+            wget -O- "${SERVER}/${src}" | zcat > "$dst.tmp"
+            mv "$dst.tmp" "$dst"
+            echo "$newhash" > "$dst.hash"
+            ;;
+          *)
+            echo "method $method is not supported!" >&2
+            exit 1
+            ;;
+          esac
+          touch "$NGINX_SIGNAL_FILE"
+      else
+        echo "$dst is up to date"
+      fi
+    }
+    
+    SERVER={{ .Values.shareDB.url }}
+    HASHES=$(wget -q -O- "$SERVER/MD5SUM")
+    NGINX_SIGNAL_FILE=/data/reload
+    
+    ensure_file zip DB19-IPV6.BIN.ZIP/IPV6-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ISP-DOMAIN-MOBILE.BIN /data/dbs/ip2location.bin
+    ensure_file zip PX2-BIN-PROXYTYPE-COUNTRY.ZIP/IP2PROXY-IP-PROXYTYPE-COUNTRY.BIN /data/dbs/ip2proxy.bin
+    ensure_file gz 51Degrees-EnterpriseV3.4.trie.gz /data/dbs/51degrees.trie

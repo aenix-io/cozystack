@@ -1,0 +1,191 @@
+{{ $imageNginx := .Files.Get "images/nginx.json" | fromJson }}
+{{ $imageDBUpdater := .Files.Get "images/db-updater.json" | fromJson }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $.Release.Name }}-nginx-cache
+  labels:
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ $.Release.Name }}-nginx-cache
+{{- range $i := until (int $.Values.replicas) }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Release.Name }}-nginx-cache-{{ $i }}
+  labels:
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ $.Release.Name }}-nginx-cache
+      instance: "{{ $i }}"
+  template:
+    metadata:
+      labels:
+        app: {{ $.Release.Name }}-nginx-cache
+        instance: "{{ $i }}"
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/nginx/configmap.yaml") $ | sha256sum }}
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Release.Name }}-regsecret
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ $.Release.Name }}-nginx-cache
+              - key: instance
+                operator: NotIn
+                values:
+                - "{{ $i }}"
+            topologyKey: kubernetes.io/hostname
+      shareProcessNamespace: true
+      containers:
+      - name: nginx
+        image: "{{ index $imageNginx "image.name" }}@{{ index $imageNginx "containerimage.digest" }}"
+{{ index ($imageNginx := .Files.Get "images/nginx.json" | fromJson) "containerimage.digest" }}
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: metrics
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: metrics
+          failureThreshold: 1
+          periodSeconds: 10
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 8087
+          name: cache
+        - containerPort: 10253
+          name: metrics
+        volumeMounts:
+        - mountPath: /etc/nginx/nginx.conf
+          name: config
+          subPath: nginx.conf
+        - mountPath: /data
+          name: data
+        - mountPath: /run
+          name: run
+      - name: reloader
+        image: "{{ index $imageNginx "image.name" }}@{{ index $imageNginx "containerimage.digest" }}"
+        command: ["/usr/bin/nginx-reloader.sh"]
+        #command: ["sleep", "infinity"]
+        volumeMounts:
+        - mountPath: /etc/nginx/nginx.conf
+          name: config
+          subPath: nginx.conf
+        - mountPath: /data
+          name: data
+        - mountPath: /run
+          name: run
+      volumes:
+      - name: config
+        configMap:
+          name: {{ $.Release.Name }}-nginx-cache
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ $.Release.Name }}-nginx-cache-{{ $i }}
+      - name: run
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Release.Name }}-nginx-db-updater-{{ $i }}
+  labels:
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ $.Release.Name }}-nginx-db-updater
+      instance: "{{ $i }}"
+  template:
+    metadata:
+      labels:
+        app: {{ $.Release.Name }}-nginx-db-updater
+        instance: "{{ $i }}"
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/nginx/configmap.yaml") $ | sha256sum }}
+        checksum/scripts: {{ include (print $.Template.BasePath "/nginx/scripts.yaml") $ | sha256sum }}
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Release.Name }}-regsecret
+      containers:
+      - name: db-updater
+        image: "{{ index $imageDBUpdater "image.name" }}@{{ index $imageDBUpdater "containerimage.digest" }}"
+        command:
+        - /sbin/tini
+        - -g
+        - /bin/sh
+        - /scripts/init.sh
+        volumeMounts:
+        - mountPath: /scripts
+          name: scripts
+        - mountPath: /data
+          name: data
+      volumes:
+      - name: scripts
+        secret:
+          secretName: {{ $.Release.Name }}-scripts
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ $.Release.Name }}-nginx-cache-{{ $i }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $.Release.Name }}-nginx-cache-{{ $i }}
+  labels:
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: linstor-lvm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Release.Name }}-nginx-cache-{{ $i }}
+  labels:
+    app: {{ $.Release.Name }}-nginx-cache
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ $.Release.Name }}-nginx-cache
+    instance: "{{ $i }}"
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+    - name: metrics
+      protocol: TCP
+      port: 10253
+      targetPort: metrics
+{{- end }}

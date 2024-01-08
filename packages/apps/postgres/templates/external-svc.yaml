@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+      metallb.universe.tf/address-pool: {{ .Values.secondaryService.ipPool }}
+      metallb.universe.tf/ip-allocated-from-pool: {{ .Values.secondaryService.ipPool }}
+      metallb.universe.tf/loadBalancerIPs: {{ .Values.secondaryService.ipAddress }}
+  name: {{ .Release.Name }}-external-read
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  allocateLoadBalancerNodePorts: false
+  ports:
+  - name: postgres
+    port: 5432
+  selector:
+    cnpg.io/cluster: {{ .Release.Name }}
+    role: replica
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+      metallb.universe.tf/address-pool: {{ .Values.primaryService.ipPool }}
+      metallb.universe.tf/ip-allocated-from-pool: {{ .Values.primaryService.ipPool }}
+      metallb.universe.tf/loadBalancerIPs: {{ .Values.primaryService.ipAddress }}
+  name: {{ .Release.Name }}-external-write
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  allocateLoadBalancerNodePorts: false
+  ports:
+  - name: postgres
+    port: 5432
+  selector:
+    cnpg.io/cluster: {{ .Release.Name }}
+    role: primary
+    

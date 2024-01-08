@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-haproxy
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- with .Values.loadBalancerIP }}
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: {{ . }}
+  {{- end }}
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  allocateLoadBalancerNodePorts: false
+  selector:
+    app: {{ .Release.Name }}-haproxy
+  ports:
+  {{- with .Values.httpAndHttps }}
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: https
+  {{- end }}
+  {{- with .Values.httpAndHttps }}
+  - name: kubernetes
+    protocol: TCP
+    port: 6443
+    targetPort: kubernetes
+  - name: talos
+    protocol: TCP
+    port: 50000
+    targetPort: talos
+  {{- end }}

@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-my-cnf
+data:
+  config: |
+    [mysqld]
+    sql-mode=NO_ENGINE_SUBSTITUTION
+    max_connections=4096
+    default_authentication_plugin=mysql_native_password
+    #innodb_buffer_pool_dump_at_shutdown=1
+    innodb_buffer_pool_instances=48
+    innodb_buffer_pool_size=60G
+    innodb_fast_shutdown=0
+    innodb_flush_method=O_DIRECT_NO_FSYNC
+    innodb_flush_log_at_trx_commit=2
+    innodb_io_capacity=10000
+    innodb_io_capacity_max=50000
+    #innodb_log_buffer_size=128M
+    innodb_log_file_size=4096M
+    #innodb_log_files_in_group=6
+    innodb_thread_concurrency=24
+    join_buffer_size=2M
+    key_buffer_size=1024M
+    read_rnd_buffer_size=16M
+    #sync_binlog=0
+    table_open_cache=40714
+    table_definition_cache=4000
+    thread_pool_size=24
+    tmp_table_size=512M
+    master_info_repository=TABLE
+    relay_log_info_repository=TABLE
+    innodb_read_io_threads=12
+    innodb_write_io_threads=12

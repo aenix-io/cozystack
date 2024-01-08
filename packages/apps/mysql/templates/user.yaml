@@ -1,0 +1,31 @@
+{{- range $name, $u := .Values.users }}
+{{ if not (eq $name "root") }}
+{{ $dnsName := replace "_" "-" $name }}
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: User
+metadata:
+  name: {{ $.Release.Name }}-{{ $dnsName }}
+spec:
+  name: {{ $name }}
+  mariaDbRef:
+    name: {{ $.Release.Name }}
+  passwordSecretKeyRef:
+    name: {{ $.Release.Name }}
+    key: {{ $name }}-password
+  maxUserConnections: {{ $u.maxUserConnections }}
+---
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: Grant
+metadata:
+  name: {{ $.Release.Name }}-{{ $dnsName }}
+spec:
+  mariaDbRef:
+    name: {{ $.Release.Name }}
+  privileges: {{ $u.privileges | toJson }}
+  database: "*"
+  table: "*"
+  username: {{ $name }}
+  grantOption: true
+{{- end }}
+{{- end }}

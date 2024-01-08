@@ -1,0 +1,18 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  instances: 2
+
+  postgresql:
+    parameters:
+      max_wal_senders: "30"
+
+  monitoring:
+    enablePodMonitor: true
+
+  storage:
+    storageClass: {{ required ".storage.size is required" .Values.storage.storageClass }}
+    size: {{ required ".storage.size is required" .Values.storage.size }}

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: vpn
 description: Establish a connection from your computer
-icon: https://www.telepresence.io/static/telepresence-edgy-3cf14d0402757769e6aff3f0ea4067d5.svg
+icon: https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Outline_VPN_icon.png/600px-Outline_VPN_icon.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #

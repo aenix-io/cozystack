@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-secondary-haproxy
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  haproxy.cfg: |
+    global
+      maxconn 2048
+    defaults
+        mode    tcp
+        option  dontlognull
+        timeout queue           20s
+        timeout connect         1s
+        timeout client          3s
+        timeout server          10s
+        timeout check           2s
+
+    frontend mysql
+        bind :::3306 v4v6
+        default_backend mysql_backend
+
+    backend mysql_backend
+        balance roundrobin
+        default-server observe layer4 error-limit 3 on-error mark-down
+        server secondary {{ .Release.Name }}-secondary:3306 check
+        server backup {{ .Release.Name }}:3306 backup
