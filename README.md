@@ -164,10 +164,25 @@ Run [talos-bootstrap](https://github.com/aenix-io/talos-bootstrap/) to deploy cl
 ### Install Cozystack
 
 Install cozystack system components:
-
 ```
 kubectl apply -f cozystack-installer.yaml
 ```
+
+Check the status of installation:
+```
+kubectl get hr -A
+```
+
+Get token from `tenant-root`:
+```
+kubectl get secret -n tenant-root tenant-root -o go-template='{{ printf "%s\n" (index .data "token" | base64decode) }}'
+```
+
+```
+kubectl port-forward -n cozy-kubeapps svc/kubeapps 8080:80
+```
+
+Open: http://localhost:8080/
 
 ### Chart Install Responsibilities
 
