@@ -5,7 +5,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
   name: {{ $parts._0 }}-{{ $parts._1 }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ $.Release.Namespace }}
 spec:
   folder: {{ $parts._0 }}
   instanceSelector:

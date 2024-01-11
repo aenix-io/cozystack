@@ -1,7 +1,7 @@
 adminPassword: Moh4ooN9phaech6Sai9aoGiezu4doh2i # TODO
 
 oncall:
-  fullnameOverride: grafana-oncall
+  #fullnameOverride: grafana-oncall
   #base_url: oncall.grafana.example.org
   database:
     type: postgresql

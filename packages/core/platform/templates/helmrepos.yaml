@@ -6,7 +6,7 @@ metadata:
   namespace: cozy-system
 spec:
   interval: 5m0s
-  url: http://cozystack.cozy-system.svc/system
+  url: http://cozystack.cozy-system.svc/repos/system
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
@@ -15,4 +15,4 @@ metadata:
   namespace: cozy-public
 spec:
   interval: 5m0s
-  url: http://cozystack.cozy-system.svc/apps
+  url: http://cozystack.cozy-system.svc/repos/apps

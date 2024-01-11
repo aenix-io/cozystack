@@ -1,0 +1,85 @@
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: {{ .Release.Name }}-grafana
+  labels:
+    dashboards: {{ .Release.Name }}-grafana
+spec:
+  config:
+    log:
+      mode: "console"
+    auth:
+      disable_login_form: "false"
+    database:
+      type: postgres
+      name: ${GF_DATABASE_NAME}
+      host: ${GF_DATABASE_HOST}
+      user: ${GF_DATABASE_USER}
+      password: ${GF_DATABASE_PASSWORD}
+      #ssl_mode: require
+    server:
+      root_url: https://grafana.example.org
+    security:
+      admin_user: user
+      admin_password: ${GF_PASSWORD}
+  deployment:
+    spec:
+      replicas: 2
+      template:
+        spec:
+          containers:
+            - name: grafana
+              image: grafana/grafana:10.1.0
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+              readinessProbe:
+                failureThreshold: 3
+              env:
+              - name: GF_INSTALL_PLUGINS
+                value: grafana-worldmap-panel,flant-statusmap-panel,grafana-oncall-app,natel-discrete-panel
+              - name: ONCALL_API_URL
+                value: http://{{ .Release.Name }}-grafana-oncall-engine:8080
+              - name: GF_DATABASE_HOST
+                value: "{{ .Release.Name }}-grafana-db-rw:5432"
+              - name: GF_DATABASE_PASSWORD
+                valueFrom: { secretKeyRef: { name: {{ .Release.Name }}-grafana-db-app, key: password } }
+              - name: GF_DATABASE_NAME
+                value: "app"
+              - name: GF_DATABASE_USER
+                value: "app"
+              - name: GF_PASSWORD
+                valueFrom: { secretKeyRef: { name: {{ .Release.Name }}-grafana-admin-password, key: password } }
+              - name: GF_SECURITY_ADMIN_USER
+                valueFrom:
+                  secretKeyRef:
+                    key: user
+                    name: {{ .Release.Name }}-grafana-admin-password
+              - name: GF_SECURITY_ADMIN_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    key: password
+                    name: {{ .Release.Name }}-grafana-admin-password
+  ingress:
+    metadata:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: grafana.example.org
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: grafana-service
+                    port:
+                      number: 3000
+                path: /
+                pathType: Prefix
+      tls:
+      - hosts:
+        - grafana.example.org
+        secretName: {{ .Release.Name }}-grafana-ingress-tls

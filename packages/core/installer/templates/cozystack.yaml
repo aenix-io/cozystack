@@ -63,7 +63,7 @@ spec:
         image: "{{ index $image "image.name" }}@{{ index $image "containerimage.digest" }}"
         command:
         - /usr/bin/darkhttpd
-        - /cozystack/repos
+        - /cozystack/assets
         - --port
         - "8123"
         ports:

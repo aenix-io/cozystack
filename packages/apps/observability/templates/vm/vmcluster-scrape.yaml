@@ -1,0 +1,53 @@
+{{- range .Values.storages }}
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: vminsert-{{ $.Release.Name }}-{{ .name }}
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+    relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      targetLabel: node
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: monitoring
+      app.kubernetes.io/instance: vmcluster
+      app.kubernetes.io/name: vminsert
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: vmselect-{{ $.Release.Name }}-{{ .name }}
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+    relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      targetLabel: node
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: monitoring
+      app.kubernetes.io/instance: vmcluster
+      app.kubernetes.io/name: vmselect
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: vmstorage-{{ $.Release.Name }}-{{ .name }}
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+    relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      targetLabel: node
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: monitoring
+      app.kubernetes.io/instance: vmcluster
+      app.kubernetes.io/name: vmstorage
+{{- end }}
