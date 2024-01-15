@@ -14,7 +14,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: monitoring
-      app.kubernetes.io/instance: vmcluster
+      app.kubernetes.io/instance: {{ $.Release.Name }}-{{ .name }}
       app.kubernetes.io/name: vminsert
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
@@ -31,7 +31,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: monitoring
-      app.kubernetes.io/instance: vmcluster
+      app.kubernetes.io/instance: {{ $.Release.Name }}-{{ .name }}
       app.kubernetes.io/name: vmselect
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
@@ -48,6 +48,6 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: monitoring
-      app.kubernetes.io/instance: vmcluster
+      app.kubernetes.io/instance: {{ $.Release.Name }}-{{ .name }}
       app.kubernetes.io/name: vmstorage
 {{- end }}

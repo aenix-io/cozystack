@@ -13,7 +13,7 @@ spec:
     name: {{ .name }}
     type: prometheus
     access: proxy
-    url: http://vmselect-vmcluster.{{ $.Release.Namespace }}.svc:8481/select/0/prometheus/
+    url: http://vmselect-{{ $.Release.Name }}-{{ .name }}.{{ $.Release.Namespace }}.svc:8481/select/0/prometheus/
     isDefault: {{ if $first }}true{{ $first = false }}{{ else }}false{{ end }}
     jsonData:
       'tlsSkipVerify': true

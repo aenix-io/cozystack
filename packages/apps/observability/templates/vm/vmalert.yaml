@@ -9,10 +9,10 @@ spec:
   extraArgs:
     remoteWrite.disablePathAppend: "true"
   notifiers:
-  - url: http://vmalertmanager-alertmanager.{{ .Release.Namespace }}.svc:9093
+  - url: http://vmalertmanager-{{ $.Release.Name }}.{{ .Release.Namespace }}.svc:9093
   remoteRead:
-    url: http://vmselect-vmcluster.{{ .Release.Namespace }}.svc:8481/select/0/prometheus
+    url: http://vmselect-{{ $.Release.Name }}-shortterm.{{ .Release.Namespace }}.svc:8481/select/0/prometheus
   remoteWrite:
-    url: http://vminsert-vmcluster.{{ .Release.Namespace }}.svc:8480/insert/0/prometheus/api/v1/write
+    url: http://vminsert-{{ $.Release.Name }}-shortterm.{{ .Release.Namespace }}.svc:8480/insert/0/prometheus/api/v1/write
   resources: {}
   selectAllByDefault: true

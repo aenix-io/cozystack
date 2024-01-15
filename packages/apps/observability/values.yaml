@@ -29,8 +29,8 @@ oncall:
   externalRedis:
     host: rfrm-grafana-oncall
     password: ""
-    #existingSecret: grafana-oncall-keydb
-    #passwordKey: password
+    existingSecret: grafana-oncall-keydb
+    passwordKey: password
 
   mariadb:
     enabled: false

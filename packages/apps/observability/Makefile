@@ -4,4 +4,6 @@ update:
 	helm repo update grafana
 	helm pull grafana/oncall --untar --untardir charts
 	rm -rf charts/oncall/charts
-	hack/download-dashboards.sh
+
+dashboards-list:
+	find ../../../dashboards -name '*.json' | awk -F/ '{sub(".json", ""); printf "%s/%s\n", $$(NF-1), $$NF}' > dashboards.list

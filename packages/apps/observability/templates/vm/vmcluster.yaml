@@ -14,7 +14,7 @@ spec:
     replicaCount: 2
     extraArgs:
       search.maxUniqueTimeseries: "600000"
-      vmalert.proxyURL: http://vmalert.cozy-monitoring.svc:8080
+      vmalert.proxyURL: http://vmalert-{{ $.Release.Name }}.{{ $.Release.Namespace }}.svc:8080
       dedup.minScrapeInterval: "15s"
     cacheMountPath: /select-cache
     storage:
