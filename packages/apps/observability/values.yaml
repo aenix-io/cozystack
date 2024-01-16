@@ -1,37 +1,23 @@
-adminPassword: Moh4ooN9phaech6Sai9aoGiezu4doh2i # TODO
+url: "https://grafana.example.org/"
 
+storages:
+- name: shortterm
+  retentionPeriod: "3d"
+  deduplicationInterval: "5m"
+- name: longterm
+  retentionPeriod: "14d"
+  deduplicationInterval: "15s"
+
+# -- TODO, remove:
 oncall:
-  #fullnameOverride: grafana-oncall
-  #base_url: oncall.grafana.example.org
   database:
     type: postgresql
-
   ingress:
     enabled: false
-
-  externalGrafana:
-    url: "https://grafana.example.org/"
-
   broker:
     type: redis
-
   cert-manager:
     enabled: false
-
-  externalPostgresql:
-    host: grafana-oncall-db-rw
-    port: 5432
-    db_name: app
-    user: app
-    existingSecret: grafana-oncall-db-app
-    passwordKey: password
-
-  externalRedis:
-    host: rfrm-grafana-oncall
-    password: ""
-    existingSecret: grafana-oncall-keydb
-    passwordKey: password
-
   mariadb:
     enabled: false
   postgresql:

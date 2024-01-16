@@ -1,3 +1,4 @@
+---
 apiVersion: databases.spotahome.com/v1
 kind: RedisFailover
 metadata:
@@ -44,3 +45,20 @@ spec:
     customConfig:
       - tcp-keepalive 0
       - loglevel notice
+  auth:
+    secretPath: {{ .Release.Name }}-grafana-oncall-redis-password
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-grafana-oncall-redis-password
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace (printf "%s-grafana-oncall-redis-password" .Release.Name) }}
+  {{- if $existingSecret }}
+  password: {{ index $existingSecret.data "password" }}
+  {{- else }}
+  password: {{ randAlphaNum 32 | b64enc }}
+  {{- end }}
