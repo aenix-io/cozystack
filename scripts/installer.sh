@@ -35,9 +35,13 @@ kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A --all reconcile.fl
 # Install platform chart
 make -C packages/core/platform apply
 
-trap 'exit' INT TERM
+# Flush kubeapps cache
+if kubectl wait --for=condition=ready -n cozy-kubeapps pod/kubeapps-redis-master-0 --timeout=1s; then
+  kubectl exec -ti -n cozy-kubeapps kubeapps-redis-master-0 -- sh -c 'redis-cli -a "$REDIS_PASSWORD" flushdb'
+fi
 
 # Reconcile platform chart
+trap 'exit' INT TERM
 while true; do
   sleep 60 & wait
   make -C packages/core/platform apply

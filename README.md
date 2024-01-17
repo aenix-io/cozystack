@@ -155,6 +155,9 @@ cluster:
         ipv4-pod-gateway: "10.244.0.1"
         ipv4-svc-cidr: "10.96.0.0/16"
         ipv4-join-cidr: "100.64.0.0/16"
+        cluster-name: "cozystack"
+        monitoring-remote-write-url-1: "http://vminsert-monitoring-system-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
+        monitoring-remote-write-url-2: "http://vminsert-monitoring-system-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
 EOT
 ```
 
@@ -165,7 +168,7 @@ Run [talos-bootstrap](https://github.com/aenix-io/talos-bootstrap/) to deploy cl
 
 Install cozystack system components:
 ```
-kubectl apply -f cozystack-installer.yaml
+kubectl apply -f manifests/cozystack-installer.yaml
 ```
 
 Check the status of installation:

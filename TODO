@@ -26,3 +26,5 @@ how to version helm charts
 autombump chart versions for system charts
 recursive namespace deletion
 move icons to repo
+install 'monitoring-system' app
+reconcile system helm releases

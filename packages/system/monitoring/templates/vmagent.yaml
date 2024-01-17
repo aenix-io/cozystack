@@ -1,3 +1,4 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
 metadata:
@@ -9,8 +10,11 @@ spec:
   extraArgs:
     promscrape.streamParse: "true"
   remoteWrite:
-  - url: http://vminsert-monitoring-system-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write
-  - url: http://vminsert-monitoring-system-longterm.tenant-root.svc:8480/longterm/insert/0/prometheus/api/v1/write
+  {{- range $k, $v := $cozyConfig.data }}
+  {{- if hasPrefix "monitoring-remote-write-url" $k }}
+  - url: "{{ $v }}"
+  {{- end }}
+  {{- end }}
   scrapeInterval: 30s
   selectAllByDefault: true
   additionalScrapeConfigs:

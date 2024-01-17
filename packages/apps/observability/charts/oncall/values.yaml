@@ -4,7 +4,6 @@
 # If you want to install grafana as a part of this release make sure to configure grafana.grafana.ini.server.domain too
 base_url: example.com
 base_url_protocol: https
-
 ## Optionally specify an array of imagePullSecrets.
 ## Secrets must be manually created in the namespace.
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -12,13 +11,11 @@ base_url_protocol: https
 ## imagePullSecrets:
 ##   - name: myRegistryKeySecretName
 imagePullSecrets: []
-
 image:
   # Grafana OnCall docker image repository
   repository: grafana/oncall
   tag:
   pullPolicy: Always
-
 # Whether to create additional service for external connections
 # ClusterIP service is always created
 service:
@@ -26,22 +23,19 @@ service:
   type: LoadBalancer
   port: 8080
   annotations: {}
-
 # Engine pods configuration
 engine:
   replicaCount: 1
-  resources:
-    {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
   # Labels for engine pods
   podLabels: {}
-
   ## Deployment update strategy
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy:
@@ -49,27 +43,21 @@ engine:
       maxSurge: 25%
       maxUnavailable: 0
     type: RollingUpdate
-
   ## Affinity for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
-
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
-
   ## Tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
-
   ## Topology spread constraints for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
   topologySpreadConstraints: []
-
   ## Priority class for the pods
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
   priorityClassName: ""
-
   # Extra containers which runs as sidecar
   extraContainers: ""
   # extraContainers: |
@@ -97,25 +85,22 @@ engine:
   #   configMap:
   #     name: my-redis-tls
   #     defaultMode: 0640
-
 detached_integrations_service:
   enabled: false
   type: LoadBalancer
   port: 8080
   annotations: {}
-
 # Integrations pods configuration
 detached_integrations:
   enabled: false
   replicaCount: 1
-  resources:
-    {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
   ## Deployment update strategy
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
@@ -124,27 +109,21 @@ detached_integrations:
       maxSurge: 25%
       maxUnavailable: 0
     type: RollingUpdate
-
   ## Affinity for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
-
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
-
   ## Tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
-
   ## Topology spread constraints for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
   topologySpreadConstraints: []
-
   ## Priority class for the pods
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
   priorityClassName: ""
-
   # Extra containers which runs as sidecar
   extraContainers: ""
   # extraContainers: |
@@ -172,7 +151,6 @@ detached_integrations:
   #   configMap:
   #     name: my-redis-tls
   #     defaultMode: 0640
-
 # Celery workers pods configuration
 celery:
   replicaCount: 1
@@ -191,38 +169,31 @@ celery:
     initialDelaySeconds: 30
     periodSeconds: 300
     timeoutSeconds: 10
-  resources:
-    {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
   # Labels for celery pods
   podLabels: {}
-
   ## Affinity for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
-
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
-
   ## Tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
-
   ## Topology spread constraints for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
   topologySpreadConstraints: []
-
   ## Priority class for the pods
   ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
   priorityClassName: ""
-
   # Extra containers which runs as sidecar
   extraContainers: ""
   # extraContainers: |
@@ -250,22 +221,19 @@ celery:
   #   configMap:
   #     name: my-redis-tls
   #     defaultMode: 0640
-
 # Telegram polling pod configuration
 telegramPolling:
   enabled: false
-  resources:
-    {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
   # Labels for telegram-polling pods
   podLabels: {}
-
   # Extra volume mounts for the main container
   extraVolumeMounts: []
   # - mountPath: /mnt/postgres-tls
@@ -283,13 +251,11 @@ telegramPolling:
   #   configMap:
   #     name: my-redis-tls
   #     defaultMode: 0640
-
 oncall:
   # this is intended to be used for local development. In short, it will mount the ./engine dir into
   # any backend related containers, to allow hot-reloading + also run the containers with slightly modified
   # startup commands (which configures the hot-reloading)
   devMode: false
-
   # Override default MIRAGE_CIPHER_IV (must be 16 bytes long)
   # For existing installation, this should not be changed.
   # mirageCipherIV: 1234567890abcdef
@@ -378,7 +344,6 @@ oncall:
     # Phone notifications limit (the only non-secret value).
     # TODO: rename to phoneNotificationLimit
     limitPhone:
-
 # Whether to run django database migrations automatically
 migrate:
   enabled: true
@@ -387,19 +352,15 @@ migrate:
   # use a helm hook to manage the migration job
   useHook: false
   annotations: {}
-
   ## Affinity for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
-
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
-
   ## Tolerations for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
-
   # Extra containers which runs as sidecar
   extraContainers: ""
   # extraContainers: |
@@ -409,14 +370,13 @@ migrate:
   #     - --private-ip
   #     - --port=5432
   #     - example:europe-west3:grafana-oncall-db
-  resources:
-    {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
   # Extra volume mounts for the main container
   extraVolumeMounts: []
@@ -435,20 +395,17 @@ migrate:
   #   configMap:
   #     name: my-redis-tls
   #     defaultMode: 0640
-
 # Sets environment variables with name capitalized and prefixed with UWSGI_,
 # and dashes are substituted with underscores.
 # see more: https://uwsgi-docs.readthedocs.io/en/latest/Configuration.html#environment-variables
 # Set null to disable all UWSGI environment variables
 uwsgi:
   listen: 1024
-
 # Additional env variables to add to deployments
 env: {}
-
 # Enable ingress object for external access to the resources
 ingress:
-  enabled: true
+  enabled: false
   #  className: ""
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -472,14 +429,12 @@ ingress:
   #       name: ssl-redirect
   #       port:
   #         name: use-annotation
-
 # Whether to install ingress controller
 ingress-nginx:
   enabled: true
-
 # Install cert-manager as a part of the release
 cert-manager:
-  enabled: true
+  enabled: false
   # Instal CRD resources
   installCRDs: true
   webhook:
@@ -494,16 +449,14 @@ cert-manager:
     nameservers:
       - 8.8.8.8
       - 1.1.1.1
-
 database:
   # can be either mysql or postgresql
-  type: mysql
-
+  type: postgresql
 # MySQL is included into this release for the convenience.
 # It is recommended to host it separately from this release
 # Set mariadb.enabled = false and configure externalMysql
 mariadb:
-  enabled: true
+  enabled: false
   auth:
     database: oncall
     existingSecret:
@@ -519,7 +472,6 @@ mariadb:
         value: utf8mb4_unicode_ci
       - name: MARIADB_CHARACTER_SET
         value: utf8mb4
-
 # Make sure to create the database with the following parameters:
 # CREATE DATABASE oncall CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 externalMysql:
@@ -543,7 +495,6 @@ externalMysql:
   #   ssl_ca=/mnt/mysql-tls/ca.crt
   #   ssl_cert=/mnt/mysql-tls/client.crt
   #   ssl_key=/mnt/mysql-tls/client.key
-
 # PostgreSQL is included into this release for the convenience.
 # It is recommended to host it separately from this release
 # Set postgresql.enabled = false and configure externalPostgresql
@@ -552,7 +503,6 @@ postgresql:
   auth:
     database: oncall
     existingSecret:
-
 # Make sure to create the database with the following parameters:
 # CREATE DATABASE oncall WITH ENCODING UTF8;
 externalPostgresql:
@@ -573,18 +523,15 @@ externalPostgresql:
   #   sslrootcert=/mnt/postgres-tls/ca.crt
   #   sslcert=/mnt/postgres-tls/client.crt
   #   sslkey=/mnt/postgres-tls/client.key
-
 # RabbitMQ is included into this release for the convenience.
 # It is recommended to host it separately from this release
 # Set rabbitmq.enabled = false and configure externalRabbitmq
 rabbitmq:
-  enabled: true
+  enabled: false
   auth:
     existingPasswordSecret:
-
 broker:
-  type: rabbitmq
-
+  type: redis
 externalRabbitmq:
   host:
   port:
@@ -598,14 +545,12 @@ externalRabbitmq:
   passwordKey: ""
   # The key in the secret containing the rabbitmq username
   usernameKey: username
-
 # Redis is included into this release for the convenience.
 # It is recommended to host it separately from this release
 redis:
-  enabled: true
+  enabled: false
   auth:
     existingSecret:
-
 externalRedis:
   protocol:
   host:
@@ -617,7 +562,6 @@ externalRedis:
   existingSecret:
   # The key in the secret containing the redis password
   passwordKey:
-
   # SSL options
   ssl_options:
     enabled: false
@@ -628,11 +572,10 @@ externalRedis:
     keyfile:
     # SSL verification mode: "cert_none" | "cert_optional" | "cert_required"
     cert_reqs:
-
 # Grafana is included into this release for the convenience.
 # It is recommended to host it separately from this release
 grafana:
-  enabled: true
+  enabled: false
   grafana.ini:
     server:
       domain: example.com
@@ -645,14 +588,11 @@ grafana:
     pspEnabled: false
   plugins:
     - grafana-oncall-app
-
 externalGrafana:
   # Example: https://grafana.mydomain.com
   url:
-
 nameOverride: ""
 fullnameOverride: ""
-
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -661,44 +601,37 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
 podAnnotations: {}
+podSecurityContext: {}
+# fsGroup: 2000
 
-podSecurityContext:
-  {}
-  # fsGroup: 2000
+securityContext: {}
+# capabilities:
+#   drop:
+#   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsGroup: 2000
+# runAsUser: 1000
 
-securityContext:
-  {}
+init:
+  securityContext: {}
+  # allowPrivilegeEscalation: false
   # capabilities:
   #   drop:
   #   - ALL
+  # privileged: false
   # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
   # runAsGroup: 2000
+  # runAsNonRoot: true
   # runAsUser: 1000
-
-init:
-  securityContext:
-    {}
-    # allowPrivilegeEscalation: false
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # privileged: false
-    # readOnlyRootFilesystem: true
-    # runAsGroup: 2000
-    # runAsNonRoot: true
-    # runAsUser: 1000
-  resources:
-    {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
-
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 ui:
   # this is intended to be used for local development. In short, it will spin up an additional container
   # running the plugin frontend, such that hot reloading can be enabled
@@ -708,7 +641,6 @@ ui:
     tag: dev
   # Additional env vars for the ui container
   env: {}
-
 prometheus:
   enabled: false
   # extraScrapeConfigs: |

@@ -4,27 +4,8 @@ storages:
 - name: shortterm
   retentionPeriod: "3d"
   deduplicationInterval: "5m"
+  storage: 10Gi
 - name: longterm
   retentionPeriod: "14d"
   deduplicationInterval: "15s"
-
-# -- TODO, remove:
-oncall:
-  database:
-    type: postgresql
-  ingress:
-    enabled: false
-  broker:
-    type: redis
-  cert-manager:
-    enabled: false
-  mariadb:
-    enabled: false
-  postgresql:
-    enabled: false
-  rabbitmq:
-    enabled: false
-  redis:
-    enabled: false
-  grafana:
-    enabled: false
+  storage: 10Gi

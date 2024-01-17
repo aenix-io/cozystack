@@ -30,6 +30,6 @@ spec:
         spec:
           resources:
             requests:
-              storage: 10Gi
+              storage: {{ .storage }}
     storageDataPath: /vm-data
 {{- end }}

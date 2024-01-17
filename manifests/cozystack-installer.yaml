@@ -1,0 +1,95 @@
+helm template -n cozy-installer installer .
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cozy-system
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cozystack
+  namespace: cozy-system
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cozystack
+  namespace: cozy-system
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cozystack
+subjects:
+- kind: ServiceAccount
+  name: cozystack
+  namespace: cozy-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cozystack
+  namespace: cozy-system
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8123
+  selector:
+    app: cozystack
+  type: ClusterIP
+---
+# Source: cozy-installer/templates/cozystack.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozystack
+  namespace: cozy-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozystack
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cozystack
+    spec:
+      hostNetwork: true
+      serviceAccountName: cozystack
+      containers:
+      - name: cozystack
+        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:f04925e7d86974a5949546f2b8e32812f95a7f1d33c78945f36bd024556d1c79"
+        env:
+        - name: KUBERNETES_SERVICE_HOST
+          value: localhost
+        - name: KUBERNETES_SERVICE_PORT
+          value: "7445"
+      - name: darkhttpd
+        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:f04925e7d86974a5949546f2b8e32812f95a7f1d33c78945f36bd024556d1c79"
+        command:
+        - /usr/bin/darkhttpd
+        - /cozystack/assets
+        - --port
+        - "8123"
+        ports:
+        - name: http
+          containerPort: 8123
+      tolerations:
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoSchedule"
