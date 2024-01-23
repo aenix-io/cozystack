@@ -126,7 +126,9 @@ cluster:
     - 10.244.0.0/16
     serviceSubnets:
     - 10.96.0.0/16
+EOT
 
+cat > patch-controlplane.yaml <<EOT
   allowSchedulingOnControlPlanes: true
   controllerManager:
     extraArgs:
@@ -151,11 +153,14 @@ cluster:
         name: cozystack
         namespace: cozy-system
       data:
+        cluster-name: "cozystack"
+        cluster-type: "baremetal"
         ipv4-pod-cidr: "10.244.0.0/16"
         ipv4-pod-gateway: "10.244.0.1"
         ipv4-svc-cidr: "10.96.0.0/16"
         ipv4-join-cidr: "100.64.0.0/16"
-        cluster-name: "cozystack"
+        ipv4-external-pool-private: "192.168.100.200-192.168.100.250"
+        ipv4-external-pool-public: "1.2.3.4,1.2.3.5"
         monitoring-remote-write-url-1: "http://vminsert-monitoring-system-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
         monitoring-remote-write-url-2: "http://vminsert-monitoring-system-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
 EOT
