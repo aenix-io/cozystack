@@ -1,32 +1,25 @@
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: public-ips
-  namespace: {{ .Release.namespace }}
-spec:
-  autoAssign: false
-  {{- with .Values.metallb.publicAddresses }}
-  addresses:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- range $k, $v := $cozyConfig.data }}
+{{- if hasPrefix "ipv4-external-pool-" $k }}
+{{- $name := trimPrefix "ipv4-external-pool-" $k }}
 ---
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: private-ips
-  namespace: {{ .Release.namespace }}
+  name: cozy-{{ $name }}
 spec:
-  {{- with .Values.metallb.privateAddresses }}
+  #autoAssign: false
   addresses:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- range (splitList "," $v) }}
+    - {{ . }}
+    {{- end }}
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: l2adv
-  namespace: {{ .Release.namespace }}
+  name: cozy-{{ $name }}
 spec:
   ipAddressPools:
-  - public-ips
-  - private-ips
+  - cozy-{{ $name }}
+{{- end }}
+{{- end }}

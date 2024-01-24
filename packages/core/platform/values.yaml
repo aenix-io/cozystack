@@ -13,6 +13,7 @@ namespaces:
   privileged: true
 - name: cozy-kubevirt
   privileged: true
+- name: cozy-kubevirt-cdi
 - name: cozy-linstor
   privileged: true
 - name: cozy-mariadb-operator
