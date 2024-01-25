@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    {{- $data := . | mustMergeOverwrite (dict "component" "certificate") -}}
+    {{- include "kamaji.labels" $data | nindent 4 }}
+  name: {{ include "kamaji.certificateName" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  dnsNames:
+    - {{ include "kamaji.webhookServiceName" . }}.{{ .Release.Namespace }}.svc
+    - {{ include "kamaji.webhookServiceName" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: kamaji-selfsigned-issuer
+  secretName: {{ include "kamaji.webhookSecretName" . }}

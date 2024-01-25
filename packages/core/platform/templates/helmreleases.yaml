@@ -511,3 +511,68 @@ spec:
     namespace: cozy-cilium
   - name: kubeovn
     namespace: cozy-kubeovn
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kamaji
+  namespace: cozy-kamaji
+spec:
+  interval: 1m
+  releaseName: kamaji
+  chart:
+    spec:
+      chart: cozy-kamaji
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-system
+        namespace: cozy-system
+  dependsOn:
+  - name: cilium
+    namespace: cozy-cilium
+  - name: kubeovn
+    namespace: cozy-kubeovn
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: capi-operator
+  namespace: cozy-cluster-api
+spec:
+  interval: 1m
+  releaseName: capi-operator
+  chart:
+    spec:
+      chart: cozy-capi-operator
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-system
+        namespace: cozy-system
+  dependsOn:
+  - name: cilium
+    namespace: cozy-cilium
+  - name: kubeovn
+    namespace: cozy-kubeovn
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: capi-providers
+  namespace: cozy-cluster-api
+spec:
+  interval: 1m
+  releaseName: capi-providers
+  chart:
+    spec:
+      chart: cozy-capi-providers
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-system
+        namespace: cozy-system
+  dependsOn:
+  - name: capi-operator
+    namespace: cozy-cluster-api
+  - name: cilium
+    namespace: cozy-cilium
+  - name: kubeovn
+    namespace: cozy-kubeovn

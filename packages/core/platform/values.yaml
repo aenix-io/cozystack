@@ -8,6 +8,8 @@ namespaces:
 - name: cozy-fluxcd
 - name: cozy-grafana-operator
 - name: cozy-ingress-nginx
+- name: cozy-kamaji
+- name: cozy-cluster-api
 - name: cozy-kubeapps
 - name: cozy-kubeovn
   privileged: true

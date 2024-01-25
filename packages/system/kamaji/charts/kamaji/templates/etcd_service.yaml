@@ -1,0 +1,18 @@
+{{- if .Values.etcd.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  name: {{ include "etcd.serviceName" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ .Values.etcd.port }}
+      name: client
+    - port: {{ .Values.etcd.peerApiPort }}
+      name: peer
+  selector:
+    {{- include "etcd.selectorLabels" . | nindent 4 }}
+{{- end }}

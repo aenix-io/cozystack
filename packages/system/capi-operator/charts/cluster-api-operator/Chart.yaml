@@ -1,0 +1,11 @@
+apiVersion: v2
+appVersion: 0.8.1
+dependencies:
+- condition: cert-manager.enabled
+  name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.13.2
+description: Cluster API Operator
+name: cluster-api-operator
+type: application
+version: 0.8.1

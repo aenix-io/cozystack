@@ -1,0 +1,98 @@
+{{- if .Values.etcd.deploy }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  name: {{ include "etcd.csrConfigMapName" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
+data:
+  ca-csr.json: |-
+    {
+      "CN": "Clastix CA",
+      "key": {
+        "algo": "rsa",
+        "size": 2048
+      },
+      "names": [
+        {
+          "C": "IT",
+          "ST": "Italy",
+          "L": "Milan"
+        }
+      ]
+    }
+  config.json: |-
+    {
+      "signing": {
+        "default": {
+          "expiry": "8760h"
+        },
+        "profiles": {
+          "server-authentication": {
+            "usages": ["signing", "key encipherment", "server auth"],
+            "expiry": "8760h"
+          },
+          "client-authentication": {
+            "usages": ["signing", "key encipherment", "client auth"],
+            "expiry": "8760h"
+          },
+          "peer-authentication": {
+            "usages": ["signing", "key encipherment", "server auth", "client auth"],
+            "expiry": "8760h"
+          }
+        }
+      }
+    }
+  server-csr.json: |-
+    {
+      "CN": "etcd",
+      "key": {
+        "algo": "rsa",
+        "size": 2048
+      },
+      "hosts": [
+{{- range $count := until 3 -}}
+        {{ printf "\"etcd-%d.%s.%s.svc.cluster.local\"," $count (include "etcd.serviceName" .) $.Release.Namespace }}
+{{- end }}
+        "etcd-server.{{ .Release.Namespace }}.svc.cluster.local",
+        "etcd-server.{{ .Release.Namespace }}.svc",
+        "etcd-server",
+        "127.0.0.1"
+      ]
+    }
+  peer-csr.json: |-
+    {
+      "CN": "etcd",
+      "key": {
+        "algo": "rsa",
+        "size": 2048
+      },
+      "hosts": [
+{{- range $count := until 3 -}}
+        {{ printf "\"etcd-%d\"," $count }}
+        {{ printf "\"etcd-%d.%s\"," $count (include "etcd.serviceName" .) }}
+        {{ printf "\"etcd-%d.%s.%s.svc\"," $count (include "etcd.serviceName" .) $.Release.Namespace }}
+        {{ printf "\"etcd-%d.%s.%s.svc.cluster.local\"," $count (include "etcd.serviceName" .) $.Release.Namespace }}
+{{- end }}
+        "127.0.0.1"
+      ]
+    }
+  root-client-csr.json: |-
+    {
+      "CN": "root",
+      "key": {
+        "algo": "rsa",
+        "size": 2048
+      },
+      "names": [
+        {
+          "O": "system:masters"
+        }
+      ]
+    }
+{{- end }}

@@ -1,0 +1,72 @@
+---
+# Cert Manager options
+# Full list of supported values is available at https://artifacthub.io/packages/helm/cert-manager/cert-manager
+cert-manager:
+  enabled: false
+  fullnameOverride: "cert-manager"
+  namespace: "cert-manager"
+# ---
+# Cluster API provider options
+core: ""
+bootstrap: ""
+controlPlane: ""
+infrastructure: ""
+addon: ""
+# ---
+# Common configuration secret options
+configSecret: {}
+# ---
+# CAPI operator deployment options
+logLevel: 2
+replicaCount: 1
+leaderElection:
+  enabled: true
+image:
+  manager:
+    repository: registry.k8s.io/capi-operator/cluster-api-operator
+    tag: v0.8.1
+    pullPolicy: IfNotPresent
+healthAddr: ":8081"
+metricsBindAddr: "127.0.0.1:8080"
+diagnosticsAddress: "8443"
+insecureDiagnostics: false
+imagePullSecrets: {}
+resources:
+  manager:
+    limits:
+      cpu: 100m
+      memory: 150Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+containerSecurityContext: {}
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/arch
+              operator: In
+              values:
+                - amd64
+                - arm64
+                - ppc64le
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - linux
+tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+volumes:
+  - name: cert
+    secret:
+      defaultMode: 420
+      secretName: capi-operator-webhook-service-cert
+volumeMounts:
+  manager:
+    - mountPath: /tmp/k8s-webhook-server/serving-certs
+      name: cert
+      readOnly: true
