@@ -13,6 +13,27 @@ Install dependicies:
 - `kubectl`
 - `helm`
 
+
+### Preapre Talos image for your infrastructure
+
+TODO: later this will be automated
+
+```
+docker run --rm -t \
+  -v $PWD/_out:/out -v /dev:/dev --privileged ghcr.io/siderolabs/imager:v1.6.2 installer \
+  --system-extension-image=ghcr.io/siderolabs/qlogic-firmware:20240115 \
+  --system-extension-image=ghcr.io/siderolabs/bnx2-bnx2x:20240115 \
+  --system-extension-image=ghcr.io/siderolabs/drbd:9.2.6-v1.6.2 \
+  --system-extension-image=ghcr.io/siderolabs/zfs:2.1.14-v1.6.2
+
+docker load -i _out/installer-amd64.tar
+
+docker tag ghcr.io/siderolabs/installer:v1.6.2 ghcr.io/kvaps/test:cozystack-talos-v1.6.2
+
+docker push ghcr.io/kvaps/test:cozystack-talos-v1.6.2
+```
+
+
 ### Netboot server
 
 Write configuration:
@@ -101,7 +122,7 @@ docker ps
 Write configuration for Cozystack:
 
 ```yaml
-cat > patch.yaml <<EOT
+cat > patch.yaml <<\EOT
 machine:
   kubelet:
     nodeIP:
@@ -109,14 +130,13 @@ machine:
       - 192.168.100.0/24
   kernel:
     modules:
+    - name: openvswitch
     - name: drbd
       parameters:
         - usermode_helper=disabled
-    - name: openvswitch
+    - name: zfs
   install:
-    image: ghcr.io/siderolabs/installer:v1.6.0
-    extensions:
-    - image: ghcr.io/siderolabs/drbd:9.2.6-v1.6.0
+    image: ghcr.io/kvaps/test:cozystack-talos-v1.6.2
 
 cluster:
   network:
@@ -128,7 +148,8 @@ cluster:
     - 10.96.0.0/16
 EOT
 
-cat > patch-controlplane.yaml <<EOT
+cat > patch-controlplane.yaml <<\EOT
+cluster:
   allowSchedulingOnControlPlanes: true
   controllerManager:
     extraArgs:
@@ -143,26 +164,6 @@ cat > patch-controlplane.yaml <<EOT
   etcd:
     advertisedSubnets:
     - 192.168.100.0/24
-
-  inlineManifests:
-  - name: cozystack
-    contents: |
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: cozystack
-        namespace: cozy-system
-      data:
-        cluster-name: "cozystack"
-        cluster-type: "baremetal"
-        ipv4-pod-cidr: "10.244.0.0/16"
-        ipv4-pod-gateway: "10.244.0.1"
-        ipv4-svc-cidr: "10.96.0.0/16"
-        ipv4-join-cidr: "100.64.0.0/16"
-        ipv4-external-pool-private: "192.168.100.200-192.168.100.250"
-        ipv4-external-pool-public: "1.2.3.4,1.2.3.5"
-        monitoring-remote-write-url-1: "http://vminsert-monitoring-system-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
-        monitoring-remote-write-url-2: "http://vminsert-monitoring-system-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
 EOT
 ```
 
@@ -171,8 +172,33 @@ Run [talos-bootstrap](https://github.com/aenix-io/talos-bootstrap/) to deploy cl
 
 ### Install Cozystack
 
+write config for cozystack:
+
+```yaml
+cat > cozystack-config.yaml <<\EOT
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cozystack
+  namespace: cozy-system
+data:
+  cluster-name: "cozystack"
+  cluster-type: "baremetal"
+  ipv4-pod-cidr: "10.244.0.0/16"
+  ipv4-pod-gateway: "10.244.0.1"
+  ipv4-svc-cidr: "10.96.0.0/16"
+  ipv4-join-cidr: "100.64.0.0/16"
+  ipv4-external-pool-private: "192.168.100.200-192.168.100.250"
+  ipv4-external-pool-public: "1.2.3.4,1.2.3.5"
+  monitoring-remote-write-url-1: "http://vminsert-monitoring-system-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
+  monitoring-remote-write-url-2: "http://vminsert-monitoring-system-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
+EOT
+```
+
+
 Install cozystack system components:
 ```
+kubectl apply -f cozystack-config.yaml
 kubectl apply -f manifests/cozystack-installer.yaml
 ```
 
