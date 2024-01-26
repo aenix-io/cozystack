@@ -10,6 +10,7 @@ namespaces:
 - name: cozy-ingress-nginx
 - name: cozy-kamaji
 - name: cozy-cluster-api
+  privileged: true # for capk only
 - name: cozy-kubeapps
 - name: cozy-kubeovn
   privileged: true

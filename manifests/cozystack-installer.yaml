@@ -1,4 +1,3 @@
-helm template -n cozy-installer installer .
 ---
 # Source: cozy-installer/templates/cozystack.yaml
 apiVersion: v1
@@ -73,14 +72,14 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:f04925e7d86974a5949546f2b8e32812f95a7f1d33c78945f36bd024556d1c79"
+        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:48df6dbe544d907b020977627a0f3c7b1397eff74b4aea7c7b3b8dff6db9cf35"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
       - name: darkhttpd
-        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:f04925e7d86974a5949546f2b8e32812f95a7f1d33c78945f36bd024556d1c79"
+        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:48df6dbe544d907b020977627a0f3c7b1397eff74b4aea7c7b3b8dff6db9cf35"
         command:
         - /usr/bin/darkhttpd
         - /cozystack/assets
