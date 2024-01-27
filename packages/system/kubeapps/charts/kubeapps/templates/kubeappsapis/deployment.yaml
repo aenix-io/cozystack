@@ -71,7 +71,7 @@ spec:
       {{- end }}
       containers:
         - name: kubeappsapis
-          image: ghcr.io/aenix-io/cozystack/kubeapps-apis:latest
+          image: ghcr.io/aenix-io/cozystack/kubeapps-apis:latest@sha256:318d655e1d15d6ef2bfcaeb5d2cbec0c76896270ff312115e4aeee4144143d1e
           imagePullPolicy: {{ .Values.kubeappsapis.image.pullPolicy | quote }}
           {{- if .Values.kubeappsapis.containerSecurityContext.enabled }}
           securityContext: {{- omit .Values.kubeappsapis.containerSecurityContext "enabled" | toYaml | nindent 12 }}
