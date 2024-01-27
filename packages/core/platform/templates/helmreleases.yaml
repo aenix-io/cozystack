@@ -4,6 +4,7 @@ metadata:
   name: cilium
   namespace: cozy-cilium
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: cilium
   chart:
@@ -20,6 +21,7 @@ metadata:
   name: kubeovn
   namespace: cozy-kubeovn
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubeovn
   chart:
@@ -43,6 +45,7 @@ metadata:
   name: cozy-fluxcd
   namespace: cozy-fluxcd
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: fluxcd
   chart:
@@ -64,6 +67,7 @@ metadata:
   name: cert-manager
   namespace: cozy-cert-manager
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: cert-manager
   chart:
@@ -85,6 +89,7 @@ metadata:
   name: cert-manager-issuers
   namespace: cozy-cert-manager
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: cert-manager-issuers
   chart:
@@ -108,6 +113,7 @@ metadata:
   name: victoria-metrics-operator
   namespace: cozy-victoria-metrics-operator
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: victoria-metrics-operator
   chart:
@@ -131,6 +137,7 @@ metadata:
   name: monitoring
   namespace: cozy-monitoring
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: monitoring
   chart:
@@ -158,6 +165,7 @@ metadata:
   name: kubevirt-operator
   namespace: cozy-kubevirt
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubevirt-operator
   chart:
@@ -179,6 +187,7 @@ metadata:
   name: kubevirt
   namespace: cozy-kubevirt
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubevirt
   chart:
@@ -202,6 +211,7 @@ metadata:
   name: kubevirt-cdi-operator
   namespace: cozy-kubevirt-cdi
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubevirt-cdi-operator
   chart:
@@ -223,6 +233,7 @@ metadata:
   name: kubevirt-cdi
   namespace: cozy-kubevirt-cdi
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubevirt-cdi
   chart:
@@ -246,6 +257,7 @@ metadata:
   name: metallb
   namespace: cozy-metallb
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: metallb
   chart:
@@ -267,6 +279,7 @@ metadata:
   name: metallb-addresses
   namespace: cozy-metallb
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: metallb-addresses
   chart:
@@ -294,6 +307,7 @@ metadata:
   name: grafana-operator
   namespace: cozy-grafana-operator
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: grafana-operator
   chart:
@@ -315,6 +329,7 @@ metadata:
   name: mariadb-operator
   namespace: cozy-mariadb-operator
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: mariadb-operator
   chart:
@@ -340,6 +355,7 @@ metadata:
   name: postgres-operator
   namespace: cozy-postgres-operator
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: postgres-operator
   chart:
@@ -363,6 +379,7 @@ metadata:
   name: rabbitmq-operator
   namespace: cozy-rabbitmq-operator
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: rabbitmq-operator
   chart:
@@ -384,6 +401,7 @@ metadata:
   name: redis-operator
   namespace: cozy-redis-operator
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: redis-operator
   chart:
@@ -405,6 +423,7 @@ metadata:
   name: piraeus-operator
   namespace: cozy-linstor
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: piraeus-operator
   chart:
@@ -428,6 +447,7 @@ metadata:
   name: linstor
   namespace: cozy-linstor
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: linstor
   chart:
@@ -453,6 +473,7 @@ metadata:
   name: telepresence
   namespace: cozy-telepresence
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: traffic-manager
   chart:
@@ -474,6 +495,7 @@ metadata:
   name: ingress-nginx
   namespace: cozy-ingress-nginx
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: ingress-nginx
   chart:
@@ -497,6 +519,7 @@ metadata:
   name: kubeapps
   namespace: cozy-kubeapps
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubeapps
   chart:
@@ -518,6 +541,7 @@ metadata:
   name: kamaji
   namespace: cozy-kamaji
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: kamaji
   chart:
@@ -539,6 +563,7 @@ metadata:
   name: capi-operator
   namespace: cozy-cluster-api
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: capi-operator
   chart:
@@ -560,6 +585,7 @@ metadata:
   name: capi-providers
   namespace: cozy-cluster-api
 spec:
+  reconcileStrategy: Revision
   interval: 1m
   releaseName: capi-providers
   chart:

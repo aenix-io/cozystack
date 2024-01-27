@@ -142,21 +142,6 @@ cluster:
   network:
     cni:
       name: none
-    podSubnets:
-    - 10.244.0.0/16
-    serviceSubnets:
-    - 10.96.0.0/16
-EOT
-
-cat > patch-controlplane.yaml <<\EOT
-cluster:
-  allowSchedulingOnControlPlanes: true
-  controllerManager:
-    extraArgs:
-      bind-address: 0.0.0.0
-  scheduler:
-    extraArgs:
-      bind-address: 0.0.0.0
   proxy:
     disabled: true
   discovery:
