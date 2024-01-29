@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubevirt-cloud-controller-manager
+  namespace: tenant-foo
+  labels:
+    k8s-app: kubevirt-cloud-controller-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kubevirt-cloud-controller-manager
+  template:
+    metadata:
+      labels:
+        k8s-app: kubevirt-cloud-controller-manager
+    spec:
+      #hostNetwork: true
+      containers:
+      - name: kubevirt-cloud-controller-manager
+        args:
+        - --cloud-provider=kubevirt
+        - --cloud-config=/etc/cloud/cloud-config
+        - --kubeconfig=/etc/kubernetes/kubeconfig/value
+        command:
+        - /bin/kubevirt-cloud-controller-manager
+        image: ghcr.io/kvaps/test:kubevirt-cloud-provider
+        imagePullPolicy: Always
+        #securityContext:
+        #  privileged: true
+        resources:
+          requests:
+            cpu: 100m
+        volumeMounts:
+        - mountPath: /etc/kubernetes/kubeconfig
+          name: kubeconfig
+          readOnly: true
+        - mountPath: /etc/cloud
+          name: cloud-config
+          readOnly: true
+      volumes:
+      - configMap:
+          name: cluster1-cloud-config
+        name: cloud-config
+      - secret:
+          secretName: cluster1-kubeconfig
+        name: kubeconfig
+      tolerations:
+      - operator: Exists
+      serviceAccountName: cloud-controller-manager

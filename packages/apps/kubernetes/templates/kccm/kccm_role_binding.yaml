@@ -1,0 +1,30 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata: 
+    name: kccm
+    namespace: kube-system
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: extension-apiserver-authentication-reader
+  subjects:
+  - kind: ServiceAccount
+    name: cloud-controller-manager
+    namespace: tenant-foo
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata: 
+    name: kccm-sa
+    namespace: tenant-foo
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: kccm
+  subjects:
+  - kind: ServiceAccount
+    name: cloud-controller-manager
+    namespace: test
+kind: List
+metadata: {}
