@@ -1,21 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kubevirt-cloud-controller-manager
-  namespace: tenant-foo
+  name: {{ .Release.Name }}-kccm
   labels:
-    k8s-app: kubevirt-cloud-controller-manager
+    k8s-app: {{ .Release.Name }}-kccm
 spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: kubevirt-cloud-controller-manager
+      k8s-app: {{ .Release.Name }}-kccm
   template:
     metadata:
       labels:
-        k8s-app: kubevirt-cloud-controller-manager
+        k8s-app: {{ .Release.Name }}-kccm
     spec:
-      #hostNetwork: true
       containers:
       - name: kubevirt-cloud-controller-manager
         args:
@@ -40,11 +38,11 @@ spec:
           readOnly: true
       volumes:
       - configMap:
-          name: cluster1-cloud-config
+          name: {{ .Release.Name }}-cloud-config
         name: cloud-config
       - secret:
-          secretName: cluster1-kubeconfig
+          secretName: {{ .Release.Name }}-kubeconfig
         name: kubeconfig
       tolerations:
       - operator: Exists
-      serviceAccountName: cloud-controller-manager
+      serviceAccountName: {{ .Release.Name }}-kccm

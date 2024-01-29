@@ -65,6 +65,9 @@ spec:
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs: {}
+      initConfiguration:
+        skipPhases:
+        - addon/kube-proxy
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: KubevirtMachineTemplate
@@ -107,6 +110,11 @@ kind: MachineDeployment
 metadata:
   name: {{ .Release.Name }}-md-0
   namespace: {{ .Release.Namespace }}
+  annotations:
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "2"
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "0"
+    capacity.cluster-autoscaler.kubernetes.io/memory: "1024Mi"
+    capacity.cluster-autoscaler.kubernetes.io/cpu: "2"
 spec:
   clusterName: {{ .Release.Name }}
   selector:

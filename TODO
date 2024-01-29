@@ -28,3 +28,5 @@ recursive namespace deletion
 move icons to repo
 install 'monitoring-system' app
 reconcile system helm releases
+remove cluster and other namespace resources from apps charts, eg extension-apiserver-authentication-reader
+spawn etcd per tenant / per cluster

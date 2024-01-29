@@ -1,11 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cluster1-cloud-config
-  namespace: tenant-foo
+  name: {{ .Release.Name }}-cloud-config
 data:
   cloud-config: |
     loadBalancer:
       creationPollInterval: 5
       creationPollTimeout: 60
-    namespace: tenant-foo
+    namespace: {{ .Release.Namespace }}
