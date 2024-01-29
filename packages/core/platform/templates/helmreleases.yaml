@@ -3,13 +3,15 @@ kind: HelmRelease
 metadata:
   name: cilium
   namespace: cozy-cilium
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: cilium
   chart:
     spec:
       chart: cozy-cilium
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -20,13 +22,15 @@ kind: HelmRelease
 metadata:
   name: kubeovn
   namespace: cozy-kubeovn
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubeovn
   chart:
     spec:
       chart: cozy-kubeovn
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -44,13 +48,15 @@ kind: HelmRelease
 metadata:
   name: cozy-fluxcd
   namespace: cozy-fluxcd
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: fluxcd
   chart:
     spec:
       chart: cozy-fluxcd
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -66,13 +72,15 @@ kind: HelmRelease
 metadata:
   name: cert-manager
   namespace: cozy-cert-manager
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: cert-manager
   chart:
     spec:
       chart: cozy-cert-manager
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -88,13 +96,15 @@ kind: HelmRelease
 metadata:
   name: cert-manager-issuers
   namespace: cozy-cert-manager
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: cert-manager-issuers
   chart:
     spec:
       chart: cozy-cert-manager-issuers
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -112,13 +122,15 @@ kind: HelmRelease
 metadata:
   name: victoria-metrics-operator
   namespace: cozy-victoria-metrics-operator
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: victoria-metrics-operator
   chart:
     spec:
       chart: cozy-victoria-metrics-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -136,13 +148,15 @@ kind: HelmRelease
 metadata:
   name: monitoring
   namespace: cozy-monitoring
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: monitoring
   chart:
     spec:
       chart: cozy-monitoring
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -164,13 +178,15 @@ kind: HelmRelease
 metadata:
   name: kubevirt-operator
   namespace: cozy-kubevirt
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubevirt-operator
   chart:
     spec:
       chart: cozy-kubevirt-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -186,13 +202,15 @@ kind: HelmRelease
 metadata:
   name: kubevirt
   namespace: cozy-kubevirt
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubevirt
   chart:
     spec:
       chart: cozy-kubevirt
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -210,13 +228,15 @@ kind: HelmRelease
 metadata:
   name: kubevirt-cdi-operator
   namespace: cozy-kubevirt-cdi
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubevirt-cdi-operator
   chart:
     spec:
       chart: cozy-kubevirt-cdi-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -232,13 +252,15 @@ kind: HelmRelease
 metadata:
   name: kubevirt-cdi
   namespace: cozy-kubevirt-cdi
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubevirt-cdi
   chart:
     spec:
       chart: cozy-kubevirt-cdi
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -256,13 +278,15 @@ kind: HelmRelease
 metadata:
   name: metallb
   namespace: cozy-metallb
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: metallb
   chart:
     spec:
       chart: cozy-metallb
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -278,13 +302,15 @@ kind: HelmRelease
 metadata:
   name: metallb-addresses
   namespace: cozy-metallb
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: metallb-addresses
   chart:
     spec:
       chart: cozy-metallb-addresses
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -306,13 +332,15 @@ kind: HelmRelease
 metadata:
   name: grafana-operator
   namespace: cozy-grafana-operator
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: grafana-operator
   chart:
     spec:
       chart: cozy-grafana-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -328,13 +356,15 @@ kind: HelmRelease
 metadata:
   name: mariadb-operator
   namespace: cozy-mariadb-operator
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: mariadb-operator
   chart:
     spec:
       chart: cozy-mariadb-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -354,13 +384,15 @@ kind: HelmRelease
 metadata:
   name: postgres-operator
   namespace: cozy-postgres-operator
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: postgres-operator
   chart:
     spec:
       chart: cozy-postgres-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -378,13 +410,15 @@ kind: HelmRelease
 metadata:
   name: rabbitmq-operator
   namespace: cozy-rabbitmq-operator
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: rabbitmq-operator
   chart:
     spec:
       chart: cozy-rabbitmq-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -400,13 +434,15 @@ kind: HelmRelease
 metadata:
   name: redis-operator
   namespace: cozy-redis-operator
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: redis-operator
   chart:
     spec:
       chart: cozy-redis-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -422,13 +458,15 @@ kind: HelmRelease
 metadata:
   name: piraeus-operator
   namespace: cozy-linstor
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: piraeus-operator
   chart:
     spec:
       chart: cozy-piraeus-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -446,13 +484,15 @@ kind: HelmRelease
 metadata:
   name: linstor
   namespace: cozy-linstor
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: linstor
   chart:
     spec:
       chart: cozy-linstor
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -472,13 +512,15 @@ kind: HelmRelease
 metadata:
   name: telepresence
   namespace: cozy-telepresence
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: traffic-manager
   chart:
     spec:
       chart: cozy-telepresence
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -494,13 +536,15 @@ kind: HelmRelease
 metadata:
   name: ingress-nginx
   namespace: cozy-ingress-nginx
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: ingress-nginx
   chart:
     spec:
       chart: cozy-ingress-nginx
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -518,13 +562,15 @@ kind: HelmRelease
 metadata:
   name: kubeapps
   namespace: cozy-kubeapps
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: kubeapps
   chart:
     spec:
       chart: cozy-kubeapps
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -540,13 +586,15 @@ kind: HelmRelease
 metadata:
   name: kamaji
   namespace: cozy-kamaji
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: kamaji
   chart:
     spec:
       chart: cozy-kamaji
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -562,13 +610,15 @@ kind: HelmRelease
 metadata:
   name: capi-operator
   namespace: cozy-cluster-api
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: capi-operator
   chart:
     spec:
       chart: cozy-capi-operator
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system
@@ -584,13 +634,15 @@ kind: HelmRelease
 metadata:
   name: capi-providers
   namespace: cozy-cluster-api
+  labels:
+    cozystack.io/repository: system
 spec:
-  reconcileStrategy: Revision
   interval: 1m
   releaseName: capi-providers
   chart:
     spec:
       chart: cozy-capi-providers
+      reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
         name: cozystack-system

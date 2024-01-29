@@ -30,7 +30,7 @@ fi
 run_migrations
 
 # Reconcile Helm repositories
-kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A --all reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
+kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository=system reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
 
 # Install platform chart
 make -C packages/core/platform apply

@@ -72,14 +72,14 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:48df6dbe544d907b020977627a0f3c7b1397eff74b4aea7c7b3b8dff6db9cf35"
+        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:092089b46a3fac5eb389a2ff14553f72ea7665837e62722d23113f8cd772f1e7"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
       - name: darkhttpd
-        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:48df6dbe544d907b020977627a0f3c7b1397eff74b4aea7c7b3b8dff6db9cf35"
+        image: "ghcr.io/aenix-io/cozystack/installer:latest@sha256:092089b46a3fac5eb389a2ff14553f72ea7665837e62722d23113f8cd772f1e7"
         command:
         - /usr/bin/darkhttpd
         - /cozystack/assets

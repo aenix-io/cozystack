@@ -1,4 +1,4 @@
-OUT=../_out/system
+OUT=../../_out/repos/system
 
 gen: fix-chartnames
 

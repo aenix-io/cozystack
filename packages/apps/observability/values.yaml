@@ -1,6 +1,6 @@
 url: "https://grafana.example.org/"
 
-storages:
+metricsStorages:
 - name: shortterm
   retentionPeriod: "3d"
   deduplicationInterval: "5m"
@@ -9,3 +9,6 @@ storages:
   retentionPeriod: "14d"
   deduplicationInterval: "15s"
   storage: 10Gi
+
+oncall:
+  enabled: false

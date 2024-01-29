@@ -1,4 +1,4 @@
-{{- range .Values.storages }}
+{{- range .Values.metricsStorages }}
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMCluster

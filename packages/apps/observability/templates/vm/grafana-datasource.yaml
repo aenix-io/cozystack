@@ -1,5 +1,5 @@
 {{- $first := true }}
-{{- range .Values.storages }}
+{{- range .Values.metricsStorages }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource

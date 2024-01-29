@@ -1,5 +1,5 @@
-OUT=../../_out/repos/apps
-TMP=../../_out/repos/apps/historical
+OUT=../../_out/repos/extra
+TMP=../../_out/repos/extra/historical
 
 repo:
 	rm -rf "$(OUT)"
@@ -11,7 +11,7 @@ repo:
 	rm -rf "$(TMP)"
 
 fix-chartnames:
-	find . -name Chart.yaml -maxdepth 2 | awk -F/ '{print $$2}' | while read i; do sed -i "s/^name: .*/name: $$i/" "$$i/Chart.yaml"; done
+	find . -name Chart.yaml -maxdepth 2 | awk -F/ '{print $$2}' | while read i; do sed -i "s/^name: .*/name: cozy-$$i/" "$$i/Chart.yaml"; done
 
 gen-versions-map: fix-chartnames
 	../../hack/gen_versions_map.sh

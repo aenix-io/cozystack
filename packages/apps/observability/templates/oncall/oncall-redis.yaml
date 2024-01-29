@@ -1,8 +1,9 @@
+{{- if .Values.oncall.enabled }}
 ---
 apiVersion: databases.spotahome.com/v1
 kind: RedisFailover
 metadata:
-  name: {{ .Release.Name }}-grafana-oncall
+  name: {{ .Release.Name }}-oncall
   labels:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -46,19 +47,20 @@ spec:
       - tcp-keepalive 0
       - loglevel notice
   auth:
-    secretPath: {{ .Release.Name }}-grafana-oncall-redis-password
+    secretPath: {{ .Release.Name }}-oncall-redis-password
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-grafana-oncall-redis-password
+  name: {{ .Release.Name }}-oncall-redis-password
   labels:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace (printf "%s-grafana-oncall-redis-password" .Release.Name) }}
+{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace (printf "%s-oncall-redis-password" .Release.Name) }}
   {{- if $existingSecret }}
   password: {{ index $existingSecret.data "password" }}
   {{- else }}
   password: {{ randAlphaNum 32 | b64enc }}
   {{- end }}
+{{- end }}

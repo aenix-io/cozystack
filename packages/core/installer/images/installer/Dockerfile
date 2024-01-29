@@ -7,10 +7,7 @@ COPY . /src/
 WORKDIR /src
 
 # Check that versions_map is not changed
-RUN make -C packages/apps check-version-map
-
-RUN make -C packages/system repo \
- && make -C packages/apps repo
+RUN make repos
 
 FROM alpine:3.19
 
@@ -20,7 +17,7 @@ RUN apk add helm kubectl --repository=https://dl-cdn.alpinelinux.org/alpine/edge
 COPY scripts /cozystack/scripts
 COPY --from=builder /src/packages/core /cozystack/packages/core
 COPY --from=builder /src/packages/system /cozystack/packages/system
-COPY --from=builder /src/packages/_out /cozystack/assets/repos
+COPY --from=builder /src/_out/repos /cozystack/assets/repos
 COPY dashboards /cozystack/assets/dashboards
 
 WORKDIR /cozystack
