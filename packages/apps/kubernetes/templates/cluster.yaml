@@ -40,11 +40,13 @@ spec:
     preferredAddressTypes:
     - InternalIP
     - ExternalIP
+  #network:
+  #  serviceType: LoadBalancer
   network:
-    serviceType: LoadBalancer
+    serviceType: ClusterIP
   deployment:
   replicas: 2
-  version: 1.26.0
+  version: 1.29.0
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: KubevirtCluster
@@ -102,7 +104,7 @@ spec:
               evictionStrategy: External
               volumes:
               - containerDisk:
-                  image: quay.io/capk/ubuntu-2004-container-disk:v1.26.0
+                  image: ghcr.io/kvaps/test:ubuntu-2204-container-disk-v1.29.1-2
                 name: containervolume
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
