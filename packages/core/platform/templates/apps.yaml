@@ -2,8 +2,10 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: tenant-root
+  name: root
   namespace: tenant-root
+  labels:
+    cozystack.io/ui: "true"
 spec:
   interval: 1m
   releaseName: root

@@ -1,4 +1,0 @@
-
-kamaji-etcd:
-  datastore:
-    enabled: true

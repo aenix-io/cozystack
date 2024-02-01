@@ -20,38 +20,4 @@ spec:
       version: 1.0.0
   interval: 1m0s
   timeout: 5m0s
----
-apiVersion: kamaji.clastix.io/v1alpha1
-kind: DataStore
-metadata:
-  name: {{ include "tenant.name" . }}
-spec:
-  driver: etcd
-  endpoints:
-  - etcd-0.etcd.{{ include "tenant.name" . }}.svc:2379
-  - etcd-1.etcd.{{ include "tenant.name" . }}.svc:2379
-  - etcd-2.etcd.{{ include "tenant.name" . }}.svc:2379
-  tlsConfig:
-    certificateAuthority:
-      certificate:
-        secretReference:
-          keyPath: ca.crt
-          name: etcd-certs
-          namespace: tenant-test2
-      privateKey:
-        secretReference:
-          keyPath: ca.key
-          name: etcd-certs
-          namespace: tenant-test2
-    clientCertificate:
-      certificate:
-        secretReference:
-          keyPath: tls.crt
-          name: etcd-client-certs
-          namespace: tenant-test2
-      privateKey:
-        secretReference:
-          keyPath: tls.key
-          name: etcd-client-certs
-          namespace: tenant-test2
 {{- end }}

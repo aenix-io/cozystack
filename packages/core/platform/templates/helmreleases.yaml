@@ -534,32 +534,6 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: ingress-nginx
-  namespace: cozy-ingress-nginx
-  labels:
-    cozystack.io/repository: system
-spec:
-  interval: 1m
-  releaseName: ingress-nginx
-  chart:
-    spec:
-      chart: cozy-ingress-nginx
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: HelmRepository
-        name: cozystack-system
-        namespace: cozy-system
-  dependsOn:
-  - name: cilium
-    namespace: cozy-cilium
-  - name: kubeovn
-    namespace: cozy-kubeovn
-  - name: cert-manager
-    namespace: cozy-cert-manager
----
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
-metadata:
   name: kubeapps
   namespace: cozy-kubeapps
   labels:
