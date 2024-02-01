@@ -71,7 +71,7 @@ spec:
           args:
             - "--csi-address=$(ADDRESS)"
             - "--default-fstype=ext4"
-            - "--kubeconfig=/etc/kubernetes/kubeconfig/value"
+            - "--kubeconfig=/etc/kubernetes/kubeconfig/super-admin.svc"
             - "--v=5"
             - "--timeout=3m"
             - "--retry-interval-max=1m"
@@ -88,7 +88,7 @@ spec:
           image: quay.io/openshift/origin-csi-external-attacher:latest
           args:
             - "--csi-address=$(ADDRESS)"
-            - "--kubeconfig=/etc/kubernetes/kubeconfig/value"
+            - "--kubeconfig=/etc/kubernetes/kubeconfig/super-admin.svc"
             - "--v=5"
             - "--timeout=3m"
             - "--retry-interval-max=1m"
@@ -122,5 +122,5 @@ spec:
         - name: socket-dir
           emptyDir: {}
         - secret:
-            secretName: {{ .Release.Name }}-kubeconfig
+            secretName: {{ .Release.Name }}-admin-kubeconfig
           name: kubeconfig

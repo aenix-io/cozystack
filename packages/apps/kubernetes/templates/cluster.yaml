@@ -44,6 +44,9 @@ spec:
   #  serviceType: LoadBalancer
   network:
     serviceType: ClusterIP
+    ingress:
+      hostname: {{ .Release.Name }}.{{ .Release.Namespace }}.svc #TODO
+      ingressClassName: nginx
   deployment:
   replicas: 2
   version: 1.29.0
@@ -65,11 +68,22 @@ spec:
   template:
     spec:
       joinConfiguration:
+        localAPIEndpoint:
+          advertiseAddress: {{ .Release.Name }}.{{ .Release.Namespace }}.svc
+          bindPort: 6443
         nodeRegistration:
           kubeletExtraArgs: {}
+        discovery:
+          bootstrapToken:
+            apiServerEndpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc:6443
       initConfiguration:
         skipPhases:
         - addon/kube-proxy
+      users:
+      - name: test
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        groups: users, admin
+        passwd: $6$tgqE6TLb2HVdRg0S$i8aPZ1LQQ/F.SMk1QiGua9SCpJKcccAFKLIKZUqkQUZS1ikaS0JJ/T0gM73coXuul/1khh/xQVQH.NOsHOWXr1
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: KubevirtMachineTemplate

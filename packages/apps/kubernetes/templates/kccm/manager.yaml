@@ -19,7 +19,7 @@ spec:
         args:
         - --cloud-provider=kubevirt
         - --cloud-config=/etc/cloud/cloud-config
-        - --kubeconfig=/etc/kubernetes/kubeconfig/value
+        - --kubeconfig=/etc/kubernetes/kubeconfig/super-admin.svc
         command:
         - /bin/kubevirt-cloud-controller-manager
         image: ghcr.io/kvaps/test:kubevirt-cloud-provider
@@ -41,7 +41,7 @@ spec:
           name: {{ .Release.Name }}-cloud-config
         name: cloud-config
       - secret:
-          secretName: {{ .Release.Name }}-kubeconfig
+          secretName: {{ .Release.Name }}-admin-kubeconfig
         name: kubeconfig
       tolerations:
       - operator: Exists
