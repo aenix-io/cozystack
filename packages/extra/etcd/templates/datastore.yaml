@@ -24,10 +24,10 @@ spec:
       certificate:
         secretReference:
           keyPath: tls.crt
-          name: etcd-client-certs
+          name: etcd-root-client-certs
           namespace: {{ .Release.Namespace }}
       privateKey:
         secretReference:
           keyPath: tls.key
-          name: etcd-client-certs
+          name: etcd-root-client-certs
           namespace: {{ .Release.Namespace }}

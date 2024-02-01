@@ -6,7 +6,7 @@ metadata:
   annotations:
     "helm.sh/hook": pre-delete
     "helm.sh/hook-weight": "10"
-    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation,hook-failed"
   name: "{{ .Release.Name }}-etcd-teardown"
   namespace: {{ .Release.Namespace }}
 spec:

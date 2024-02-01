@@ -8,7 +8,7 @@ metadata:
   annotations:
     "helm.sh/hook": post-install,post-upgrade,post-rollback
     "helm.sh/hook-weight": "5"
-    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation,hook-failed"
   name: "{{ .Release.Name }}-s3-retention"
   namespace: {{ .Release.Namespace }}
 spec:
