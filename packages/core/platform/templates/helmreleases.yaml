@@ -534,16 +534,16 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: kubeapps
-  namespace: cozy-kubeapps
+  name: dashboard
+  namespace: cozy-dashboard
   labels:
     cozystack.io/repository: system
 spec:
   interval: 1m
-  releaseName: kubeapps
+  releaseName: dashboard
   chart:
     spec:
-      chart: cozy-kubeapps
+      chart: cozy-dashboard
       reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository

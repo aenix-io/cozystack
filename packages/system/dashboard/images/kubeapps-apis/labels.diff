@@ -27,7 +27,7 @@ index fe7ca772d..3b46afbd1 100644
  		return relList.Items, nil
 @@ -511,6 +516,9 @@ func (s *Server) newFluxHelmRelease(chart *models.Chart, targetName types.Namesp
  		ObjectMeta: metav1.ObjectMeta{
- 			Name:      targetName.Name,
+ 			Name:      chart.Name + "-" + targetName.Name,
  			Namespace: targetName.Namespace,
 +			Labels: map[string]string{
 +				"cozystack.io/ui": "true",

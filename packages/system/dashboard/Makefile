@@ -1,5 +1,5 @@
-NAME=kubeapps
-NAMESPACE=cozy-kubeapps
+NAME=dashboard
+NAMESPACE=cozy-dashboard
 PUSH=1
 LOAD=0
 

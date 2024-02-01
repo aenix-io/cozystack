@@ -216,7 +216,7 @@ kubectl get secret -n tenant-root tenant-root -o go-template='{{ printf "%s\n" (
 ```
 
 ```
-kubectl port-forward -n cozy-kubeapps svc/kubeapps 8080:80
+kubectl port-forward -n cozy-dashboard svc/dashboard 8080:80
 ```
 
 Open: http://localhost:8080/

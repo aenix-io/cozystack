@@ -1,4 +1,5 @@
 kubeapps:
+  fullnameOverride: dashboard
 
   postgresql:
     enabled: false

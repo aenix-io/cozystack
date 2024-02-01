@@ -11,7 +11,7 @@ namespaces:
 - name: cozy-kamaji
 - name: cozy-cluster-api
   privileged: true # for capk only
-- name: cozy-kubeapps
+- name: cozy-dashboard
 - name: cozy-kubeovn
   privileged: true
 - name: cozy-kubevirt
