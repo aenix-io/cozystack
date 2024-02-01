@@ -1,7 +1,6 @@
 ownEtcd: false
 ownMonitoring: false
 ownIngress: false
-ownAddresses: false
 
-domain: example.org
-storageClass: linstor-lvm
+#domain: example.org
+#storageClass: linstor-lvm

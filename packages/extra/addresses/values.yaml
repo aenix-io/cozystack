@@ -1,4 +1,7 @@
-pools:
-- name: local
-  addresses:
-  - 192.168.100.200-192.168.100.250
+# Specify IP address pools for use by other applicaions:
+#
+#   pools:
+#   - 192.168.101.200-192.168.101.250
+#   - 192.168.102.0/24
+
+pools: []

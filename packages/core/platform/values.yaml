@@ -29,3 +29,4 @@ namespaces:
 - name: cozy-redis-operator
 - name: cozy-telepresence
 - name: cozy-victoria-metrics-operator
+- name: tenant-root

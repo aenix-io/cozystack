@@ -1,0 +1,15 @@
+apiVersion: v2
+appVersion: 3.5.6
+description: Helm chart for deploying a multi-tenant `etcd` cluster.
+home: https://github.com/clastix/kamaji-etcd
+kubeVersion: '>=1.22.0-0'
+maintainers:
+- email: me@bsctl.io
+  name: Adriano Pezzuto
+- email: dario@tranchitella.eu
+  name: Dario Tranchitella
+name: kamaji-etcd
+sources:
+- https://github.com/clastix/kamaji-etcd
+type: application
+version: 0.5.1

@@ -1,0 +1,59 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+[Kamaji](https://github.com/clastix/kamaji) turns any Kubernetes cluster into an _admin cluster_ to orchestrate other Kubernetes clusters called _tenant clusters_.
+The Control Plane of a _tenant cluster_ is made of regular pods running in a namespace of the _admin cluster_ instead of a dedicated set of Virtual Machines.
+This solution makes running control planes at scale cheaper and easier to deploy and operate.
+
+As of any Kubernetes cluster, a _tenant cluster_ needs a datastore where to save the state and be able to retrieve data.
+This chart provides a multi-tenant `etcd` as datastore for Kamaji as well as a standalone multi-tenant `etcd` cluster.
+
+## Install kamaji-etcd
+
+To install the Chart with the release name `kamaji-etcd`:
+
+        helm repo add clastix https://clastix.github.io/charts
+        helm repo update
+        helm install kamaji-etcd clastix/kamaji-etcd -n kamaji-etcd --create-namespace
+
+Show the status:
+
+        helm status kamaji-etcd -n kamaji-etcd
+
+Upgrade the Chart
+
+        helm upgrade kamaji-etcd -n kamaji-etcd clastix/kamaji-etcd
+
+Uninstall the Chart
+
+        helm uninstall kamaji-etcd -n kamaji-etcd
+
+## Customize the installation
+
+There are two methods for specifying overrides of values during Chart installation: `--values` and `--set`.
+
+The `--values` option is the preferred method because it allows you to keep your overrides in a YAML file, rather than specifying them all on the command line.
+Create a copy of the YAML file `values.yaml` and add your overrides to it.
+
+Specify your overrides file when you install the Chart:
+
+        helm upgrade kamaji-etcd --install --namespace kamaji-etcd --create-namespacekamaji-etcd --values myvalues.yaml
+
+The values in your overrides file `myvalues.yaml` will override their counterparts in the Chart's values.yaml file.
+Any values in `values.yaml` that weren't overridden will keep their defaults.
+
+If you only need to make minor customizations, you can specify them on the command line by using the `--set` option. For example:
+
+        helm upgrade kamaji-etcd --install --namespace kamaji-etcd --create-namespace kamaji-etcd --set replicas=5
+
+Here the values you can override:
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}

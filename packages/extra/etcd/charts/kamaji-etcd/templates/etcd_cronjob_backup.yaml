@@ -1,0 +1,115 @@
+{{- if .Values.backup.enabled -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  name: "{{ .Release.Name }}-backup"
+  namespace: {{ .Release.Namespace }}
+spec:
+  schedule: "{{ .Values.backup.schedule }}"
+  successfulJobsHistoryLimit: 7
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ include "etcd.serviceAccountName" . }}
+          restartPolicy: OnFailure
+          initContainers:
+          - name: etcd-client
+            image: {{ include "etcd.fullyQualifiedDockerImage" . }}
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command:
+              - bash
+              - -c
+              - |-
+                cd /opt/etcd-dump;
+                for ENDPOINT in {{ include "etcd.endpoints" . }}; do
+                  isLeader=$(etcdctl --endpoints=${ENDPOINT} endpoint status | awk '{ print $6 }' | tr -d ',' )
+                  if ! {{ .Values.backup.all }} && ! ${isLeader} ; then
+                    continue
+                  elif ! {{ .Values.backup.all }} && ${isLeader} ; then
+                    POD="etcd-leader"
+                  else
+                    POD=${ENDPOINT#*//}
+                    POD=${POD%.{{ include "etcd.serviceName" . }}*}
+                  fi
+                  SNAPSHOT={{ .Values.backup.snapshotNamePrefix }}_${POD}_{{ .Values.backup.snapshotDateFormat }}.db
+                  etcdctl --endpoints=${ENDPOINT} snapshot save ${SNAPSHOT}
+                  etcdutl --write-out=table snapshot status ${SNAPSHOT}
+                  md5sum ${SNAPSHOT};
+                done;
+            env:
+            - name: ETCDCTL_CACERT
+              value: /opt/certs/ca/ca.crt
+            - name: ETCDCTL_CERT
+              value: /opt/certs/root-client-certs/tls.crt
+            - name: ETCDCTL_KEY
+              value: /opt/certs/root-client-certs/tls.key
+            volumeMounts:
+            - name: root-client-certs
+              mountPath: /opt/certs/root-client-certs
+            - name: certs
+              mountPath: /opt/certs/ca
+            - name: shared-data
+              mountPath: /opt/etcd-dump
+          containers:
+          - name: minio-client
+            image: {{ include "minio-client.fullyQualifiedDockerImage" . }}
+            imagePullPolicy: {{ .Values.backup.s3.image.pullPolicy }}
+            command:
+              - bash
+              - -c
+              - |-
+                cd /opt/etcd-dump
+                if $MC alias set myminio ${S3_URL} ${S3_ACCESS_KEY} ${S3_SECRET_KEY} \
+                && $MC ping myminio -c 3 -e 3 ; then
+                  echo -e "\nUploading snapshot(s):"
+                  $MC cp {{ .Values.backup.snapshotNamePrefix }}_*.db myminio/{{ .Values.backup.s3.bucket }}
+                else
+                  echo -e "\nERROR: S3 storage could not be configured;\nCheck your S3 URL/Credentials or network connectivity"
+                  exit 1
+                fi
+            env:
+            - name: S3_URL
+              value: {{ .Values.backup.s3.url | quote }}
+            - name: S3_ACCESS_KEY
+          {{- if .Values.backup.s3.accessKey.value }}
+              value: {{ .Values.backup.s3.accessKey.value | quote }}
+          {{- else }}
+              valueFrom:
+                {{- toYaml .Values.backup.s3.accessKey.valueFrom | nindent 16 }}
+          {{- end }}
+            - name: S3_SECRET_KEY
+          {{- if .Values.backup.s3.secretKey.value }}
+              value: {{ .Values.backup.s3.secretKey.value | quote }}
+          {{- else }}
+              valueFrom:
+                {{- toYaml .Values.backup.s3.secretKey.valueFrom | nindent 16 }}
+          {{- end }}
+            - name: MC_CONFIG_DIR
+              value: /tmp
+            - name: MC
+              value: "/usr/bin/mc --config-dir ${MC_CONFIG_DIR}"
+            volumeMounts:
+            - name: shared-data
+              mountPath: /opt/etcd-dump
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          {{- with .Values.tolerations }}
+          tolerations: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumes:
+          - name: shared-data
+            emptyDir: {}
+          - name: root-client-certs
+            secret:
+              secretName: {{ include "etcd.clientSecretName" . }}
+              optional: true
+          - name: certs
+            secret:
+              secretName: {{ include "etcd.caSecretName" . }}
+              optional: true
+{{- end }}

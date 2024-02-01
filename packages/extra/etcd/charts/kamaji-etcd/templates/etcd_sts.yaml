@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    {{- include "etcd.labels" . | nindent 4 }}
+  name: {{ include "etcd.stsName" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  serviceName: {{ include "etcd.serviceName" . }}
+  selector:
+    matchLabels:
+      {{- include "etcd.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      name: etcd
+      labels:
+        {{- include "etcd.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}      
+    spec:
+      volumes:
+        - name: certs
+          secret:
+            secretName: {{ include "etcd.caSecretName" . }}
+      containers:
+        - name: etcd
+          image: {{ include "etcd.fullyQualifiedDockerImage" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          ports:
+            - containerPort: {{ .Values.clientPort }}
+              name: client
+            - containerPort: {{ .Values.peerApiPort }}
+              name: peer
+            - containerPort: {{ .Values.metricsPort }}
+              name: metrics
+          volumeMounts:
+            - name: data
+              mountPath: /var/run/etcd
+            - name: certs
+              mountPath: /etc/etcd/pki
+          command:
+            - etcd
+            - --data-dir=/var/run/etcd
+            - --name=$(POD_NAME)
+            - --initial-cluster-state=new
+            - --initial-cluster={{ include "etcd.initialCluster" . }}
+            - --initial-advertise-peer-urls=https://$(POD_NAME).{{ include "etcd.serviceName" . }}.$(POD_NAMESPACE).svc.cluster.local:{{ .Values.peerApiPort }}
+            - --advertise-client-urls=https://$(POD_NAME).{{ include "etcd.serviceName" . }}.$(POD_NAMESPACE).svc.cluster.local:{{ .Values.clientPort }}
+            - --initial-cluster-token=kamaji
+            - --listen-client-urls=https://0.0.0.0:{{ .Values.clientPort }}
+            - --listen-metrics-urls=http://0.0.0.0:{{ .Values.metricsPort }}
+            - --listen-peer-urls=https://0.0.0.0:{{ .Values.peerApiPort }}
+            - --client-cert-auth=true
+            - --peer-client-cert-auth=true
+            - --trusted-ca-file=/etc/etcd/pki/ca.crt
+            - --cert-file=/etc/etcd/pki/server.pem
+            - --key-file=/etc/etcd/pki/server-key.pem
+            - --peer-trusted-ca-file=/etc/etcd/pki/ca.crt
+            - --peer-cert-file=/etc/etcd/pki/peer.pem
+            - --peer-key-file=/etc/etcd/pki/peer-key.pem
+            - --auto-compaction-mode={{ .Values.autoCompactionMode }}
+            - --auto-compaction-retention={{ .Values.autoCompactionRetention }}
+            - --snapshot-count={{ .Values.snapshotCount }}
+            - --quota-backend-bytes={{ .Values.quotaBackendBytes }}
+            {{- with .Values.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      priorityClassName: {{- toYaml .Values.priorityClassName | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        {{- with .Values.persistentVolumeClaim.customAnnotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        storageClassName: {{ .Values.persistentVolumeClaim.storageClassName }}
+        accessModes:
+        {{- range .Values.persistentVolumeClaim.accessModes }}
+        - {{ . | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistentVolumeClaim.size }}

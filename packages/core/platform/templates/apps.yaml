@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: tenant-root
-  namespace: cozy-system
+  namespace: tenant-root
 spec:
   interval: 1m
   releaseName: root

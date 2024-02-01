@@ -1,4 +1,4 @@
-size: 5Gi
-primaryService:
-  ipPool: private-ips
-  ipAddress: 10.100.255.24
+
+kamaji-etcd:
+  datastore:
+    enabled: true

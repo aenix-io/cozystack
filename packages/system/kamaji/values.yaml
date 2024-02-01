@@ -1,0 +1,3 @@
+kamaji:
+  etcd:
+    deploy: false

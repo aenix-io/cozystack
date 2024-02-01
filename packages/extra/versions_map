@@ -1,5 +1,5 @@
 cozy-addresses 1.0.0 HEAD
-cozy-etcd 0.1.1 HEAD
+cozy-etcd 1.0.0 HEAD
 cozy-grafana-oncall 0.1.0 HEAD
 cozy-ingress 1.0.0 HEAD
 cozy-monitoring 0.1.0 HEAD
