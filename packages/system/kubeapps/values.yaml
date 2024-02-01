@@ -9,3 +9,8 @@ kubeapps:
     flux:
       enabled: true
 
+  dashboard:
+    customStyle: |
+      #serviceaccount-selector {
+        display: none;
+      }
