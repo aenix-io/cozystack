@@ -1,5 +1,5 @@
 apiVersion: v2
-name: observability
+name: cozy-monitoring
 description: Monitoring and observability stack
 icon: https://www.svgrepo.com/download/184787/analytics-laptop.svg
 type: application

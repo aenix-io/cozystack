@@ -3,7 +3,7 @@ annotations:
   catalog.cattle.io/display-name: Kamaji
   catalog.cattle.io/release-name: kamaji
 apiVersion: v2
-appVersion: v0.4.0
+appVersion: v0.4.1
 description: Kamaji is a Kubernetes Control Plane Manager.
 home: https://github.com/clastix/kamaji
 icon: https://github.com/clastix/kamaji/raw/master/assets/logo-colored.png
@@ -19,4 +19,4 @@ name: kamaji
 sources:
 - https://github.com/clastix/kamaji
 type: application
-version: 0.14.0
+version: 0.14.1

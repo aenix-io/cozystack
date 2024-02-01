@@ -5,6 +5,7 @@ show:
 	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
 
 apply:
+	flux suspend hr kamaji -n cozy-kamaji || true
 	helm upgrade -i -n $(NAMESPACE) $(NAME) .
 
 diff:
