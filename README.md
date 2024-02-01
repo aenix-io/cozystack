@@ -193,8 +193,8 @@ data:
   ipv4-join-cidr: "100.64.0.0/16"
   ipv4-external-pool-private: "192.168.100.200-192.168.100.250"
   ipv4-external-pool-public: "1.2.3.4/32,1.2.3.5/32"
-  monitoring-remote-write-url-1: "http://vminsert-monitoring-system-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
-  monitoring-remote-write-url-2: "http://vminsert-monitoring-system-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
+  monitoring-remote-write-url-1: "http://vminsert-monitoring-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
+  monitoring-remote-write-url-2: "http://vminsert-monitoring-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
 EOT
 ```
 

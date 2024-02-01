@@ -1,21 +1,15 @@
-remove control-plane taints 
-namespace for kube-ovn and its plugin
 main installation script and uplaod secrets to kubernetes
-talosctl upgrade -i ghcr.io/siderolabs/installer:v1.6.0-beta.1
-turn ubuntu to talos
 kubectl exec -ti -n cozy-linstor srv3 -- vgcreate data /dev/sdb
 grafana admin password
 grafana redis password
 autoconfigure ONCALL_API_URL
 oidc
-rename vm, vm-longterm
 talos setup via tcp-proxy
 migrate kubeapps redis to operator
 kubeapps patch helm chart to use custom images
 flux policies
 talos linux firmware
 replace reconcile.sh
-trigger reinstall when more nodes added
 metallb-configuration
 docs: each chart should be self sufficient
 docs: core charts must be accessible via helm template | kubectl apply -f
@@ -24,11 +18,7 @@ docs: how to get first token to access cluster
 docs: where to store talosconfig
 how to version helm charts
 autombump chart versions for system charts
-recursive namespace deletion
 move icons to repo
-install 'monitoring-system' app
 reconcile system helm releases
 remove cluster and other namespace resources from apps charts, eg extension-apiserver-authentication-reader
-spawn etcd per tenant / per cluster
-add ownerReferences for tenants
 nginx-ingress has no values
