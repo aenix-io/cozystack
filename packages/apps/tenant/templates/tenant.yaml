@@ -1,4 +1,4 @@
-{{- if ne .Release.Namespace "tenant-root" }}
+{{- if ne (include "tenant.name" .) "tenant-root" }}
 ---
 apiVersion: v1
 kind: Namespace

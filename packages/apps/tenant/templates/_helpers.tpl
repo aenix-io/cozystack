@@ -1,9 +1,15 @@
 {{- define "tenant.name" -}}
-{{- if ne (len (splitList "-" .Release.Name)) 1 }}
-{{- fail (printf "Release name should not contain dashes: %s" .Release.Name) }}
+{{- $parts := splitList "-" .Release.Name }}
+{{- if or (ne ($parts|first) "tenant") (ne (len $parts) 2) }}
+{{- fail (printf "The release name should start with \"tenant-\" and should not contain any other dashes: %s" .Release.Name) }}
 {{- end }}
-{{- printf "tenant-%s" .Release.Name }}
-{{- if and (ne .Release.Namespace "tenant-root") (hasPrefix "tenant-" .Release.Namespace) }}
-{{- printf "%s-%s" .Release.Namespace .Release.Name }}
+{{- if not (hasPrefix "tenant-" .Release.Namespace) }}
+{{- fail (printf "The release namespace should start with \"tenant-\": %s" .Release.Namespace) }}
+{{- end }}
+{{- $tenantName := ($parts|last) }}
+{{- if ne .Release.Namespace "tenant-root" }}
+{{- printf "%s-%s" .Release.Namespace $tenantName }}
+{{- else }}
+{{- printf "tenant-%s" $tenantName }}
 {{- end }}
 {{- end }}
