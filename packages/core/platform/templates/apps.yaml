@@ -10,7 +10,6 @@ kind: Namespace
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-  labels:
     namespace.cozystack.io/etcd: tenant-root
     namespace.cozystack.io/monitoring: tenant-root
     namespace.cozystack.io/ingress: tenant-root

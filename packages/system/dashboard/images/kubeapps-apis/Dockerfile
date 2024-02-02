@@ -10,8 +10,10 @@ WORKDIR /source
 RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/${VERSION}.tar.gz | tar xzf - --strip-components=1
 COPY fix-flux.diff /patches/fix-flux.diff
 COPY labels.diff /patches/labels.diff
+COPY reconcile-strategy.diff /patches/reconcile-strategy.diff
 RUN patch -p1 < /patches/fix-flux.diff
 RUN patch -p1 < /patches/labels.diff
+RUN patch -p1 < /patches/reconcile-strategy.diff
 
 FROM bitnami/golang:1.21.1 as builder
 WORKDIR /go/src/github.com/vmware-tanzu/kubeapps

@@ -23,10 +23,8 @@ spec:
   interval: 1m0s
   timeout: 5m0s
   values:
-    {{- if ne .Release.Namespace "tenant-root" }}
-    host: grafana.example.org
-    {{- else }}
-    host: {{ .Release.Namespace }}.grafana.example.org
+    {{- with .Values.host }}
+    host: grafana.{{ . }}
     {{- end }}
     metricsStorages:
     - name: shortterm
