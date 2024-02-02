@@ -30,14 +30,14 @@ fi
 run_migrations
 
 # Reconcile Helm repositories
-kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository=system reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
+kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
 
 # Install platform chart
 make -C packages/core/platform apply
 
 # Flush kubeapps cache
-if kubectl wait --for=condition=ready -n cozy-kubeapps pod/kubeapps-redis-master-0 --timeout=1s; then
-  kubectl exec -ti -n cozy-kubeapps kubeapps-redis-master-0 -- sh -c 'redis-cli -a "$REDIS_PASSWORD" flushdb'
+if kubectl wait --for=condition=ready -n cozy-dashboard pod/dashboard-redis-master-0 --timeout=1s; then
+  kubectl exec -ti -n cozy-dashboard dashboard-redis-master-0 -- sh -c 'redis-cli -a "$REDIS_PASSWORD" flushdb'
 fi
 
 # Reconcile platform chart

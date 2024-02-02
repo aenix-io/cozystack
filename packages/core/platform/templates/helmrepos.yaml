@@ -4,6 +4,8 @@ kind: HelmRepository
 metadata:
   name: cozystack-system
   namespace: cozy-system
+  labels:
+    cozystack.io/repository: system
 spec:
   interval: 5m0s
   url: http://cozystack.cozy-system.svc/repos/system
@@ -15,6 +17,7 @@ metadata:
   namespace: cozy-public
   labels:
     cozystack.io/ui: "true"
+    cozystack.io/repository: apps
 spec:
   interval: 5m0s
   url: http://cozystack.cozy-system.svc/repos/apps
@@ -24,6 +27,9 @@ kind: HelmRepository
 metadata:
   name: cozystack-extra
   namespace: cozy-public
+  labels:
+    cozystack.io/ui: "true"
+    cozystack.io/repository: extra
 spec:
   interval: 5m0s
   url: http://cozystack.cozy-system.svc/repos/extra
