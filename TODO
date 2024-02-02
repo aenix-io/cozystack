@@ -22,3 +22,4 @@ move icons to repo
 reconcile system helm releases
 remove cluster and other namespace resources from apps charts, eg extension-apiserver-authentication-reader
 nginx-ingress has no values
+update all applications to be managed by operators
