@@ -5,9 +5,9 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: Grafana
 metadata:
-  name: {{ .Release.Name }}-grafana
+  name: grafana
   labels:
-    dashboards: {{ .Release.Name }}-grafana
+    dashboards: grafana
 spec:
   config:
     log:
@@ -43,27 +43,27 @@ spec:
               - name: GF_INSTALL_PLUGINS
                 value: grafana-worldmap-panel,flant-statusmap-panel,grafana-oncall-app,natel-discrete-panel
               - name: ONCALL_API_URL
-                value: http://{{ .Release.Name }}-grafana-oncall-engine:8080
+                value: http://grafana-oncall-engine:8080
               - name: GF_DATABASE_HOST
-                value: "{{ .Release.Name }}-grafana-db-rw:5432"
+                value: "grafana-db-rw:5432"
               - name: GF_DATABASE_PASSWORD
-                valueFrom: { secretKeyRef: { name: {{ .Release.Name }}-grafana-db-app, key: password } }
+                valueFrom: { secretKeyRef: { name: grafana-db-app, key: password } }
               - name: GF_DATABASE_NAME
                 value: "app"
               - name: GF_DATABASE_USER
                 value: "app"
               - name: GF_PASSWORD
-                valueFrom: { secretKeyRef: { name: {{ .Release.Name }}-grafana-admin-password, key: password } }
+                valueFrom: { secretKeyRef: { name: grafana-admin-password, key: password } }
               - name: GF_SECURITY_ADMIN_USER
                 valueFrom:
                   secretKeyRef:
                     key: user
-                    name: {{ .Release.Name }}-grafana-admin-password
+                    name: grafana-admin-password
               - name: GF_SECURITY_ADMIN_PASSWORD
                 valueFrom:
                   secretKeyRef:
                     key: password
-                    name: {{ .Release.Name }}-grafana-admin-password
+                    name: grafana-admin-password
   ingress:
     metadata:
       annotations:
@@ -85,4 +85,4 @@ spec:
       tls:
       - hosts:
         - "{{ .Values.host | default (printf "grafana.%s" $host) }}"
-        secretName: {{ .Release.Name }}-grafana-ingress-tls
+        secretName: grafana-ingress-tls

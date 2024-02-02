@@ -9,8 +9,8 @@ spec:
   extraArgs:
     promscrape.streamParse: "true"
   remoteWrite:
-  - url: http://vminsert-monitoring.tenant-root.svc:8480/insert/0/prometheus/api/v1/write
-  - url: http://vminsert-monitoring.tenant-root.svc:8480/insert/0/prometheus/api/v1/write
+  - url: http://vminsert-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write
+  - url: http://vminsert-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write
   scrapeInterval: 30s
   selectAllByDefault: true
   additionalScrapeConfigs:

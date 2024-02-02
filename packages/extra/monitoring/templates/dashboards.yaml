@@ -10,7 +10,7 @@ spec:
   folder: {{ $parts._0 }}
   instanceSelector:
     matchLabels:
-      dashboards: {{ $.Release.Name }}-grafana
+      dashboards: grafana
   url: http://cozystack.cozy-system.svc/dashboards/{{ . }}.json
 {{- end }}
 {{- end }}

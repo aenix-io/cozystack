@@ -3,7 +3,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMCluster
 metadata:
-  name: {{ $.Release.Name }}-{{ .name }}
+  name: {{ .name }}
 spec:
   replicationFactor: 2
   retentionPeriod: "3"
@@ -14,7 +14,7 @@ spec:
     replicaCount: 2
     extraArgs:
       search.maxUniqueTimeseries: "600000"
-      vmalert.proxyURL: http://vmalert-{{ $.Release.Name }}.{{ $.Release.Namespace }}.svc:8080
+      vmalert.proxyURL: http://vmalert.{{ $.Release.Namespace }}.svc:8080
       dedup.minScrapeInterval: "15s"
     cacheMountPath: /select-cache
     storage:

@@ -3,7 +3,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: vminsert-{{ $.Release.Name }}-{{ .name }}
+  name: vminsert-{{ .name }}
 spec:
   endpoints:
   - path: /metrics
@@ -20,7 +20,7 @@ spec:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: vmselect-{{ $.Release.Name }}-{{ .name }}
+  name: vmselect-{{ .name }}
 spec:
   endpoints:
   - path: /metrics
@@ -31,13 +31,13 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: monitoring
-      app.kubernetes.io/instance: {{ $.Release.Name }}-{{ .name }}
+      app.kubernetes.io/instance: {{ .name }}
       app.kubernetes.io/name: vmselect
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: vmstorage-{{ $.Release.Name }}-{{ .name }}
+  name: vmstorage-{{ .name }}
 spec:
   endpoints:
   - path: /metrics
@@ -48,6 +48,6 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: monitoring
-      app.kubernetes.io/instance: {{ $.Release.Name }}-{{ .name }}
+      app.kubernetes.io/instance: {{ .name }}
       app.kubernetes.io/name: vmstorage
 {{- end }}

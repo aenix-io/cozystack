@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-alertmanager
+  name: alertmanager
 type: Opaque
 stringData:
   alertmanager.yaml: |
@@ -23,7 +23,7 @@ stringData:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAlertmanager
 metadata:
-  name: {{ .Release.Name }}
+  name: alertmanager
 spec:
   replicaCount: 2
-  configSecret: {{ .Release.Name }}-alertmanager
+  configSecret: alertmanager

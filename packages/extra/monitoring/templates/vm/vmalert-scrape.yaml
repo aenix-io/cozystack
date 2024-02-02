@@ -2,7 +2,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ .Release.Name }}
+  name: vmalert
 spec:
   endpoints:
   - path: /metrics
@@ -13,5 +13,5 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: monitoring
-      app.kubernetes.io/instance: {{ $.Release.Name }}
+      app.kubernetes.io/instance: vmalertmanager
       app.kubernetes.io/name: vmalert
