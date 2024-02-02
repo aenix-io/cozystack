@@ -186,18 +186,12 @@ metadata:
   namespace: cozy-system
 data:
   cluster-name: "cozystack"
-  cluster-type: "baremetal"
   ipv4-pod-cidr: "10.244.0.0/16"
   ipv4-pod-gateway: "10.244.0.1"
   ipv4-svc-cidr: "10.96.0.0/16"
   ipv4-join-cidr: "100.64.0.0/16"
-  ipv4-external-pool-private: "192.168.100.200-192.168.100.250"
-  ipv4-external-pool-public: "1.2.3.4/32,1.2.3.5/32"
-  monitoring-remote-write-url-1: "http://vminsert-monitoring-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
-  monitoring-remote-write-url-2: "http://vminsert-monitoring-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
 EOT
 ```
-
 
 Install cozystack system components:
 ```
@@ -210,6 +204,16 @@ Check the status of installation:
 kubectl get hr -A
 ```
 
+#### Configure Storage
+
+TODO
+
+#### Configure Networking interconnection
+
+TODO
+
+#### Setup basic applications
+
 Get token from `tenant-root`:
 ```
 kubectl get secret -n tenant-root tenant-root -o go-template='{{ printf "%s\n" (index .data "token" | base64decode) }}'
@@ -220,6 +224,11 @@ kubectl port-forward -n cozy-dashboard svc/dashboard 8080:80
 ```
 
 Open: http://localhost:8080/
+
+- Select `tenant-root`
+- Click Upgrade button
+- Set `etcd`, `monitoring` and `ingress` to enabled position
+- Click Deploy
 
 ### Chart Install Responsibilities
 
