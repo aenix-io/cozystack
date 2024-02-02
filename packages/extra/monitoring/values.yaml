@@ -1,4 +1,4 @@
-url: "https://grafana.example.org/"
+host: ""
 
 metricsStorages:
 - name: shortterm

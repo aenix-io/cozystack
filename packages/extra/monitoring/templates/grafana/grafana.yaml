@@ -1,3 +1,6 @@
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $ingress := index $myNS.metadata.labels "namespace.cozystack.io/ingress" }}
+{{- $host := index $myNS.metadata.labels "namespace.cozystack.io/host" }}
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: Grafana
@@ -19,7 +22,7 @@ spec:
       password: ${GF_DATABASE_PASSWORD}
       #ssl_mode: require
     server:
-      root_url: https://grafana.example.org
+      root_url: "https://{{ .Values.host | default (printf "grafana.%s" $host) }}"
     security:
       admin_user: user
       admin_password: ${GF_PASSWORD}
@@ -64,12 +67,12 @@ spec:
   ingress:
     metadata:
       annotations:
-        kubernetes.io/ingress.class: nginx
+        kubernetes.io/ingress.class: "{{ $ingress }}"
         cert-manager.io/cluster-issuer: letsencrypt-prod
     spec:
-      ingressClassName: nginx
+      ingressClassName: "{{ $ingress }}"
       rules:
-        - host: grafana.example.org
+        - host: "{{ .Values.host | default (printf "grafana.%s" $host) }}"
           http:
             paths:
               - backend:
@@ -81,5 +84,5 @@ spec:
                 pathType: Prefix
       tls:
       - hosts:
-        - grafana.example.org
+        - "{{ .Values.host | default (printf "grafana.%s" $host) }}"
         secretName: {{ .Release.Name }}-grafana-ingress-tls

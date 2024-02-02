@@ -1,3 +1,7 @@
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $etcd := index $myNS.metadata.labels "namespace.cozystack.io/etcd" }}
+{{- $ingress := index $myNS.metadata.labels "namespace.cozystack.io/ingress" }}
+{{- $host := index $myNS.metadata.labels "namespace.cozystack.io/host" }}
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
@@ -31,8 +35,7 @@ metadata:
   labels:
     cluster.x-k8s.io/role: control-plane
 spec:
-  {{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
-  dataStoreName: "{{ index $myNS.metadata.labels "namespace.cozystack.io/etcd" }}"
+  dataStoreName: "{{ $etcd }}"
   addons:
     coreDNS: {}
     kubeProxy: {}
@@ -46,8 +49,8 @@ spec:
   network:
     serviceType: ClusterIP
     ingress:
-      hostname: {{ .Release.Name }}.{{ .Release.Namespace }}.svc #TODO
-      ingressClassName: "{{ index $myNS.metadata.labels "namespace.cozystack.io/ingress" }}"
+      hostname: {{ .Values.host | default (printf "%s.%s" .Release.Name $host) }}
+      ingressClassName: "{{ $ingress }}"
   deployment:
   replicas: 2
   version: 1.29.0

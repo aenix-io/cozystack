@@ -23,6 +23,11 @@ spec:
   interval: 1m0s
   timeout: 5m0s
   values:
+    {{- if ne .Release.Namespace "tenant-root" }}
+    host: grafana.example.org
+    {{- else }}
+    host: {{ .Release.Namespace }}.grafana.example.org
+    {{- end }}
     metricsStorages:
     - name: shortterm
       retentionPeriod: "3d"
@@ -32,7 +37,6 @@ spec:
       retentionPeriod: "14d"
       deduplicationInterval: "15s"
       storage: 10Gi
-    
     oncall:
       enabled: false
 {{- end }}

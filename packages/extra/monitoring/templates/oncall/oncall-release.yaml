@@ -1,4 +1,6 @@
 {{- if .Values.oncall.enabled }}
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $host := index $myNS.metadata.labels "namespace.cozystack.io/host" }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -22,7 +24,7 @@ spec:
     oncall:
       fullnameOverride: {{ .Release.Name }}-oncall
       externalGrafana:
-        url: {{ .Values.url }}
+        url: "https://{{ .Values.host | default (printf "grafana.%s" $host) }}/"
       
       externalPostgresql:
         host: {{ .Release.Name }}-oncall-db-rw

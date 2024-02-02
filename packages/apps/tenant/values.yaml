@@ -1,3 +1,4 @@
+host: ""
 etcd: false
 monitoring: false
 ingress: false

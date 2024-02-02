@@ -8,6 +8,12 @@ metadata:
   {{- $existingNS := lookup "v1" "Namespace" "" .Release.Namespace }}
   {{- if $existingNS }}
   labels:
+    {{- if .Values.host }}
+    namespace.cozystack.io/host: "{{ .Values.host }}"
+    {{- else }}
+    {{ $parentHost := index $existingNS.metadata.labels "namespace.cozystack.io/host" | required (printf "namespace %s has no namespace.cozystack.io/host label" $.Release.Namespace) }}
+    namespace.cozystack.io/host: "{{ trimPrefix "tenant-" (include "tenant.name" .) }}.{{ $parentHost }}"
+    {{- end }}
     {{- range $x := list "etcd" "monitoring" "ingress" }}
     {{- if (index $.Values $x) }}
     namespace.cozystack.io/{{ $x }}: "{{ include "tenant.name" $ }}"
