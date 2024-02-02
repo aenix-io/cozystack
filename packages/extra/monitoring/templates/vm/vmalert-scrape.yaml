@@ -13,5 +13,5 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: monitoring
-      app.kubernetes.io/instance: vmalertmanager
+      app.kubernetes.io/instance: vmalert
       app.kubernetes.io/name: vmalert

@@ -14,7 +14,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: monitoring
-      app.kubernetes.io/instance: {{ $.Release.Name }}-{{ .name }}
+      app.kubernetes.io/instance: {{ .name }}
       app.kubernetes.io/name: vminsert
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
