@@ -1,22 +1,3 @@
-{{- if ne (include "tenant.name" .) "tenant-root" }}
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ include "tenant.name" . }}
-  {{- if hasPrefix "tenant-" .Release.Namespace }}
-  {{- $existingNS := lookup "v1" "Namespace" "" .Release.Namespace }}
-  {{- if $existingNS }}
-  ownerReferences:
-  - apiVersion: v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Namespace
-    name: {{ .Release.Namespace }}
-    uid: {{ $existingNS.metadata.uid }}
-  {{- end }}
-  {{- end }}
-{{- end }}
 ---
 apiVersion: v1
 kind: ServiceAccount

@@ -1,4 +1,4 @@
-{{- if .Values.ownEtcd }}
+{{- if .Values.etcd }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:

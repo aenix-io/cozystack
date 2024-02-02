@@ -1,0 +1,29 @@
+{{- if ne (include "tenant.name" .) "tenant-root" }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "tenant.name" . }}
+  {{- if hasPrefix "tenant-" .Release.Namespace }}
+  {{- $existingNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+  {{- if $existingNS }}
+  labels:
+    {{- range $x := list "etcd" "monitoring" "ingress" }}
+    {{- if (index $.Values $x) }}
+    namespace.cozystack.io/{{ $x }}: "{{ include "tenant.name" $ }}"
+    {{- else }}
+    namespace.cozystack.io/{{ $x }}: "{{ index $existingNS.metadata.labels (printf "namespace.cozystack.io/%s" $x) | required (printf "namespace %s has no namespace.cozystack.io/%s label" $.Release.Namespace $x) }}"
+    {{- end }}
+    {{- end }}
+  ownerReferences:
+  - apiVersion: v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Namespace
+    name: {{ .Release.Namespace }}
+    uid: {{ $existingNS.metadata.uid }}
+  {{- else }}
+  {{- fail (printf "error lookup exiting namespace: %s" .Release.Namespace) }}
+  {{- end }}
+  {{- end }}
+{{- end }}

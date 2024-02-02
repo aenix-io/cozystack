@@ -1,4 +1,15 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    namespace.cozystack.io/etcd: tenant-root
+    namespace.cozystack.io/monitoring: tenant-root
+    namespace.cozystack.io/ingress: tenant-root
+  name: tenant-root
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:

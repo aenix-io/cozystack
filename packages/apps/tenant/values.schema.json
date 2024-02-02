@@ -2,17 +2,17 @@
   "$schema": "http://json-schema.org/schema#",
   "type": "object",
   "properties": {
-    "ownEtcd": {
+    "etcd": {
       "type": "boolean",
       "title": "Deploy own Etcd cluster",
       "form": true
     },
-    "ownMonitoring": {
+    "monitoring": {
       "type": "boolean",
       "title": "Deploy own Monitoring Stack",
       "form": true
     },
-    "ownIngress": {
+    "ingress": {
       "type": "boolean",
       "title": "Deploy own Ingress Controller",
       "form": true

@@ -1,3 +1,3 @@
-ownEtcd: false
-ownMonitoring: false
-ownIngress: false
+etcd: false
+monitoring: false
+ingress: false
