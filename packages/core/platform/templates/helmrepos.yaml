@@ -28,7 +28,6 @@ metadata:
   name: cozystack-extra
   namespace: cozy-public
   labels:
-    cozystack.io/ui: "true"
     cozystack.io/repository: extra
 spec:
   interval: 5m0s
