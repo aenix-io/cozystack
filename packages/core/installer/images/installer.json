@@ -1,14 +1,14 @@
 {
-  "containerimage.config.digest": "sha256:1e74c5d6b48380c70b04b99ab91ef5a6ef6fde818298edacd9e3487f568d7cc2",
+  "containerimage.config.digest": "sha256:fa3eed4cd2f16714d9f5bd89ae1c9796d566396a718a0cdb81a296286cd33304",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:2a0c1e4c8cf19a74b08fb9de2f0cdc551f3bf54fd842e648f003f96784cb4d73",
+    "digest": "sha256:dd0524e0794343ce0e3cade6eab19fd69be9dffd08329bab769ce8b7e567fa14",
     "size": 2074,
     "platform": {
       "architecture": "amd64",
       "os": "linux"
     }
   },
-  "containerimage.digest": "sha256:2a0c1e4c8cf19a74b08fb9de2f0cdc551f3bf54fd842e648f003f96784cb4d73",
+  "containerimage.digest": "sha256:dd0524e0794343ce0e3cade6eab19fd69be9dffd08329bab769ce8b7e567fa14",
   "image.name": "ghcr.io/aenix-io/cozystack/installer:latest"
 }

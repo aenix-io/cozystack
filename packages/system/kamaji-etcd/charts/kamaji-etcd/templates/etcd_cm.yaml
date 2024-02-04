@@ -57,6 +57,7 @@ data:
       "hosts": [
 {{- range $count := until (int $.Values.replicas) -}}
         {{ printf "\"%s-%d.%s.%s.svc.cluster.local\"," ( include "etcd.fullname" $outer ) $count (include "etcd.serviceName" $outer) $.Release.Namespace }}
+        {{ printf "\"%s-%d.%s.%s.svc\"," ( include "etcd.fullname" $outer ) $count (include "etcd.serviceName" $outer) $.Release.Namespace }}
 {{- end }}
         "etcd-server.{{ .Release.Namespace }}.svc.cluster.local",
         "etcd-server.{{ .Release.Namespace }}.svc",

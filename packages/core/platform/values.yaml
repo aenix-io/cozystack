@@ -7,7 +7,6 @@ namespaces:
   privileged: true
 - name: cozy-fluxcd
 - name: cozy-grafana-operator
-- name: cozy-ingress-nginx
 - name: cozy-kamaji
 - name: cozy-cluster-api
   privileged: true # for capk only

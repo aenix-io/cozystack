@@ -19,7 +19,7 @@ ingress-nginx:
       - --server.telemetry-address=0.0.0.0:9090
       - --server.exporter-address=0.0.0.0:9091
     service:
-      type: NodePort # ClusterIP
+      #type: NodePort # ClusterIP
       externalTrafficPolicy: "Local"
       #allocateLoadBalancerNodePorts: false
     config:
