@@ -50,7 +50,7 @@ spec:
     serviceType: ClusterIP
     ingress:
       hostname: {{ .Values.host | default (printf "%s.%s" .Release.Name $host) }}
-      ingressClassName: "{{ $ingress }}"
+      className: "{{ $ingress }}"
   deployment:
   replicas: 2
   version: 1.29.0
