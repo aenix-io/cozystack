@@ -16,7 +16,7 @@ spec:
   timeout: 5m0s
   values:
     ingress-nginx:
-      fullnameOverride: ingress-nginx
+      fullnameOverride: {{ trimPrefix "tenant-" .Release.Namespace }}-ingress
       controller:
         ingressClass: {{ .Release.Namespace }}
         ingressClassResource:
