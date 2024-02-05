@@ -5,3 +5,4 @@ update:
 	helm pull clastix/kamaji-etcd --untar --untardir charts
 	sed -i 's/hook-failed/before-hook-creation,hook-failed/' `grep -rl hook-failed charts`
 	patch -p4 < patches/fix-svc.diff
+	patch -p4 < patches/fullnameOverride.diff

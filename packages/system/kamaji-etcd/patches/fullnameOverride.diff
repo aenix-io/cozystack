@@ -1,0 +1,31 @@
+diff --git a/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/_helpers.tpl b/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/_helpers.tpl
+index 4f7014e..403e187 100644
+--- a/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/_helpers.tpl
++++ b/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/_helpers.tpl
+@@ -9,8 +9,17 @@ Expand the name of the chart.
+ Create a default fully qualified etcd name.
+ */}}
+ {{- define "etcd.fullname" -}}
+-{{- .Release.Name }}
+-{{- end }}
++{{- if .Values.fullnameOverride -}}
++{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
++{{- else -}}
++{{- $name := default .Chart.Name .Values.nameOverride -}}
++{{- if contains $name .Release.Name -}}
++{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
++{{- else -}}
++{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
++{{- end -}}
++{{- end -}}
++{{- end -}}
+ 
+ {{/*
+ Create chart name and version as used by the chart label.
+@@ -156,4 +165,4 @@ Create the minio-client fully-qualified Docker image to use
+ */}}
+ {{- define "minio-client.fullyQualifiedDockerImage" -}}
+ {{- printf "%s:%s" .Values.backup.s3.image.repository .Values.backup.s3.image.tag -}}
+-{{- end }}
+\ No newline at end of file
++{{- end }}

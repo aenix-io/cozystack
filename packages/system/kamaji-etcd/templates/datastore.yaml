@@ -5,29 +5,29 @@ metadata:
 spec:
   driver: etcd
   endpoints:
-  - {{ .Release.Name }}-0.{{ .Release.Name }}.{{ .Release.Namespace }}.svc:2379
-  - {{ .Release.Name }}-1.{{ .Release.Name }}.{{ .Release.Namespace }}.svc:2379
-  - {{ .Release.Name }}-2.{{ .Release.Name }}.{{ .Release.Namespace }}.svc:2379
+  - etcd-0.etcd.{{ .Release.Namespace }}.svc:2379
+  - etcd-1.etcd.{{ .Release.Namespace }}.svc:2379
+  - etcd-2.etcd.{{ .Release.Namespace }}.svc:2379
   tlsConfig:
     certificateAuthority:
       certificate:
         secretReference:
           keyPath: ca.crt
-          name: {{ .Release.Name }}-certs
+          name: etcd-certs
           namespace: {{ .Release.Namespace }}
       privateKey:
         secretReference:
           keyPath: ca.key
-          name: {{ .Release.Name }}-certs
+          name: etcd-certs
           namespace: {{ .Release.Namespace }}
     clientCertificate:
       certificate:
         secretReference:
           keyPath: tls.crt
-          name: {{ .Release.Name }}-root-client-certs
+          name: etcd-root-client-certs
           namespace: {{ .Release.Namespace }}
       privateKey:
         secretReference:
           keyPath: tls.key
-          name: {{ .Release.Name }}-root-client-certs
+          name: etcd-root-client-certs
           namespace: {{ .Release.Namespace }}
