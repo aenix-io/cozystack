@@ -8,6 +8,12 @@ apiVersion: operator.cluster.x-k8s.io/v1alpha2
 kind: ControlPlaneProvider
 metadata:
   name: kamaji
+spec:
+  # fix: https://github.com/clastix/cluster-api-control-plane-provider-kamaji/pull/78
+  deployment:
+    containers:
+    - name: manager
+      imageUrl: ghcr.io/kvaps/test:cluster-api-control-plane-provider-kamaji-v0.6.0
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
 kind: BootstrapProvider

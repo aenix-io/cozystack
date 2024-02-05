@@ -34,6 +34,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     cluster.x-k8s.io/role: control-plane
+  annotations:
+    kamaji.clastix.io/kubeconfig-secret-key: "super-admin.svc"
 spec:
   dataStoreName: "{{ $etcd }}"
   addons:
