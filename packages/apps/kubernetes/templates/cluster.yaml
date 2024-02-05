@@ -51,7 +51,9 @@ spec:
   network:
     serviceType: ClusterIP
     ingress:
-      hostname: {{ .Values.host | default (printf "%s.%s" .Release.Name $host) }}
+      extraAnnotations:
+        nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+      hostname: {{ .Values.host | default (printf "%s.%s" .Release.Name $host) }}:443
       className: "{{ $ingress }}"
   deployment:
   replicas: 2
@@ -76,6 +78,9 @@ spec:
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs: {}
+        discovery:
+          bootstrapToken:
+            apiServerEndpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc:6443
       initConfiguration:
         skipPhases:
         - addon/kube-proxy

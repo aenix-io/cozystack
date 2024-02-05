@@ -22,3 +22,7 @@ spec:
         ingressClassResource:
           name: {{ .Release.Namespace }}
           controllerValue: k8s.io/ingress-nginx-{{ .Release.Namespace }}
+        {{- if not (eq .Release.Namespace "tenant-root") }}
+        admissionWebhooks:
+          enabled: false
+        {{- end }}

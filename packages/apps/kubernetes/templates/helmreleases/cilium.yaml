@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-cilium
   labels:
     cozystack.io/repository: system
+    coztstack.io/target-cluster-name: {{ .Release.Name }}
 spec:
   interval: 1m
   releaseName: cilium
@@ -39,3 +40,6 @@ spec:
       routingMode: native
       enableIPv4Masquerade: true
       ipv4NativeRoutingCIDR: "10.244.0.0/16"
+  dependsOn:
+  - name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}

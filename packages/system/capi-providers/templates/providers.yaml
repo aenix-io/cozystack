@@ -13,7 +13,7 @@ spec:
   deployment:
     containers:
     - name: manager
-      imageUrl: ghcr.io/kvaps/test:cluster-api-control-plane-provider-kamaji-v0.6.0
+      imageUrl: ghcr.io/kvaps/test:cluster-api-control-plane-provider-kamaji-v0.6.0-fix7
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
 kind: BootstrapProvider

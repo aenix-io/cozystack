@@ -1,5 +1,7 @@
 ingress-nginx:
   controller:
+    extraArgs:
+      enable-ssl-passthrough: true
     image:
       registry: ghcr.io
       image: kvaps/ingress-nginx-with-protobuf-exporter/controller
@@ -23,12 +25,12 @@ ingress-nginx:
       externalTrafficPolicy: "Local"
       #allocateLoadBalancerNodePorts: false
     config:
-      # proxy protocol
-      use-proxy-protocol: "true"
-      use-forwarded-headers: "true"
-      compute-full-forwarded-for: "true"
-      real-ip-header: "proxy_protocol"
-      enable-real-ip: "true"
+      ## proxy protocol
+      #use-proxy-protocol: "true"
+      #use-forwarded-headers: "true"
+      #compute-full-forwarded-for: "true"
+      #real-ip-header: "proxy_protocol"
+      #enable-real-ip: "true"
       # keep-alive
       proxy-connect-timeout: "10s"
       proxy-read-timeout: "10s"
