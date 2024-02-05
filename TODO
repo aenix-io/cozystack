@@ -25,3 +25,5 @@ nginx-ingress has no values
 update all applications to be managed by operators
 fullnameOverride kamaji-etcd
 specify nip.io domain by default
+automatically delete provisioned services with the cluster
+replicated storageclass

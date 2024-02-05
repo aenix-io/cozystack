@@ -37,6 +37,7 @@ spec:
       cni:
         chainingMode: ~
         customConf: false
+        configMap: ""
       routingMode: native
       enableIPv4Masquerade: true
       ipv4NativeRoutingCIDR: "10.244.0.0/16"
