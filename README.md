@@ -137,6 +137,13 @@ machine:
     - name: zfs
   install:
     image: ghcr.io/kvaps/test:cozystack-talos-v1.6.2
+  files:
+  - content: |
+      [plugins]
+        [plugins."io.containerd.grpc.v1.cri"]
+          device_ownership_from_security_context = true
+    path: /etc/cri/conf.d/20-customization.part
+    op: create
 
 cluster:
   network:
