@@ -24,7 +24,7 @@ remove cluster and other namespace resources from apps charts, eg extension-apis
 nginx-ingress has no values
 update all applications to be managed by operators
 fullnameOverride kamaji-etcd
-specify nip.io domain by default
 automatically delete provisioned services with the cluster
-replicated storageclass
-replicated and local storageclasses
+README Who is the platform intended for?
+README how to use platfom
+README logo and sreenshots
