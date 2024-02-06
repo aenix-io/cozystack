@@ -1,12 +1,7 @@
-# Default values for vpn.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-replicaCount: 1
+external: false
 
 users:
-- name: user1
-- name: user2
-  limit: 5Gi
-- name: user3
-  limit: 5Gi
+  user1:
+    password: hackme
+  user2:
+    password: tttt

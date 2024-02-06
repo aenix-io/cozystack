@@ -1,0 +1,25 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-vpn
+  labels:
+    app: {{ .Release.Name }}-vpn
+spec:
+  ports:
+    #- name: apiport-tcp
+    #  protocol: TCP
+    #  port: 60000
+    #  targetPort: 60000
+    - name: accessport-tcp
+      protocol: TCP
+      port: 40000
+      targetPort: 40000
+    - name: accessport-udp
+      protocol: UDP
+      port: 40000
+      targetPort: 40000
+  selector:
+    app: {{ .Release.Name }}-vpn
+  type: LoadBalancer
+  internalTrafficPolicy: Cluster
