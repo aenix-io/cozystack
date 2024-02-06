@@ -46,8 +46,6 @@ spec:
     preferredAddressTypes:
     - InternalIP
     - ExternalIP
-  #network:
-  #  serviceType: LoadBalancer
   network:
     serviceType: ClusterIP
     ingress:

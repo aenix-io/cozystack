@@ -4,9 +4,11 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-external-write
 spec:
-  type: LoadBalancer
+  type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
+  {{- if .Values.external }}
   externalTrafficPolicy: Local
   allocateLoadBalancerNodePorts: false
+  {{- end }}
   ports:
   - name: postgres
     port: 5432

@@ -6,6 +6,11 @@ metadata:
   labels:
     app: {{ .Release.Name }}-vpn
 spec:
+  type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
+  {{- if .Values.external }}
+  externalTrafficPolicy: Local
+  allocateLoadBalancerNodePorts: false
+  {{- end }}
   ports:
     #- name: apiport-tcp
     #  protocol: TCP
@@ -21,5 +26,4 @@ spec:
       targetPort: 40000
   selector:
     app: {{ .Release.Name }}-vpn
-  type: LoadBalancer
   internalTrafficPolicy: Cluster

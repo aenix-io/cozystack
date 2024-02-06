@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
+  type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
   {{- if .Values.external }}
-  type: LoadBalancer
   externalTrafficPolicy: Local
   allocateLoadBalancerNodePorts: false
   {{- end }}
