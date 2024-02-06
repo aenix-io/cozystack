@@ -20,6 +20,7 @@ spec:
         - --cloud-provider=kubevirt
         - --cloud-config=/etc/cloud/cloud-config
         - --kubeconfig=/etc/kubernetes/kubeconfig/super-admin.svc
+        - --cluster-name={{ .Release.Name }}
         command:
         - /bin/kubevirt-cloud-controller-manager
         image: ghcr.io/kvaps/test:kubevirt-cloud-provider

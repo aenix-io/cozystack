@@ -21,6 +21,7 @@ spec:
             - patch
             - helmrelease
             - {{ .Release.Name }}-cilium
+            - {{ .Release.Name }}-csi
             - -p
             - '{"spec": {"suspend": true}}'
             - --type=merge
@@ -52,6 +53,7 @@ rules:
       - patch
     resourceNames:
       - {{ .Release.Name }}-cilium
+      - {{ .Release.Name }}-csi
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

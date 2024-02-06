@@ -40,7 +40,7 @@ spec:
   dataStoreName: "{{ $etcd }}"
   addons:
     coreDNS: {}
-    kubeProxy: {}
+    konnectivity: {}
   kubelet:
     cgroupfs: systemd
     preferredAddressTypes:
