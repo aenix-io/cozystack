@@ -1,14 +1,5 @@
-storage:
-  storageClass: linstor-lvm
-  size: 10Gi
-
-primaryService:
-  ipPool: private-ips
-  ipAddress: 10.100.255.10
-
-secondaryService:
-  ipPool: private-ips
-  ipAddress: 10.100.255.11
+external: false
+size: 10Gi
 
 users:
   user1:
@@ -36,3 +27,13 @@ databases:
       - airflow
     extensions:
     - hstore
+
+backup:
+  enabled: false
+  s3Region: us-east-1
+  s3Bucket: s3.example.org/postgres-backups
+  schedule: "0 2 * * *"
+  cleanupStrategy: "--keep-last=3 --keep-daily=3 --keep-within-weekly=1m"
+  s3AccessKey: oobaiRus9pah8PhohL1ThaeTa4UVa7gu
+  s3SecretKey: ju3eum4dekeich9ahM1te8waeGai0oog
+  resticPassword: ChaXoveekoh6eigh4siesheeda2quai0

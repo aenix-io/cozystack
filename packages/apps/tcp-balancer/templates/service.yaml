@@ -6,14 +6,12 @@ metadata:
   labels:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-  {{- with .Values.loadBalancerIP }}
-  annotations:
-    metallb.universe.tf/loadBalancerIPs: {{ . }}
-  {{- end }}
 spec:
+  {{- if .Values.external }}
   type: LoadBalancer
   externalTrafficPolicy: Local
   allocateLoadBalancerNodePorts: false
+  {{- end }}
   selector:
     app: {{ .Release.Name }}-haproxy
   ports:

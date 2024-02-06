@@ -8,7 +8,11 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
+  {{- if .Values.external }}
   type: LoadBalancer
+  externalTrafficPolicy: Local
+  allocateLoadBalancerNodePorts: false
+  {{- end }}
   selector:
     app.kubernetes.io/component: redis
     app.kubernetes.io/name: {{ .Release.Name }}

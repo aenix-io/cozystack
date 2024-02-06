@@ -7,14 +7,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  # TODO
-  # There is an issue with 'externalTraficPolicy: Local' and VMs accessing externalIP services from
-  # internal network, trafic is not routed due to fact their hipervisor have no local workload running
-  # Current workaround that all the nodes of parnet cluster must have at least one replica per node
-  # which are running the virtual machnes of child cluster.
-  # Consider moving to KubeVirt so all local VMs will get local identities, so internalTrafficPolicy will
-  # considered for them instead of externalTraficPolicy
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: {{ .Release.Name }}-haproxy

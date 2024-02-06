@@ -5,6 +5,7 @@ metadata:
   name: {{ .Release.Name }}
 spec:
   instances: 2
+  enableSuperuserAccess: true
 
   postgresql:
     parameters:
@@ -14,5 +15,4 @@ spec:
     enablePodMonitor: true
 
   storage:
-    storageClass: {{ required ".storage.size is required" .Values.storage.storageClass }}
-    size: {{ required ".storage.size is required" .Values.storage.size }}
+    size: {{ required ".Values.size is required" .Values.size }}

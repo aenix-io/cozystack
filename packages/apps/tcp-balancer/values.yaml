@@ -1,5 +1,4 @@
-loadBalancerIP: 173.0.146.95
-whitelistHTTP: false
+external: false
 httpAndHttps:
   mode: tcp
   targetPorts:
@@ -13,6 +12,7 @@ httpAndHttps:
    - 10.100.3.3
    - 10.100.3.13
 
+whitelistHTTP: false
 whitelist:
 - "1.2.3.4"
 - "10.100.0.0/16"
