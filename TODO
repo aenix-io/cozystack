@@ -27,3 +27,4 @@ fullnameOverride kamaji-etcd
 specify nip.io domain by default
 automatically delete provisioned services with the cluster
 replicated storageclass
+replicated and local storageclasses

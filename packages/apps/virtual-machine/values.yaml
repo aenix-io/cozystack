@@ -1,5 +1,8 @@
-image: fedora
-disk: 10Gi
+external: false
+running: true
+password: hackme
+image: ubuntu
+disk: 5Gi
 resources:
-  cpu: 2
+  cpu: 1
   memory: 1024M

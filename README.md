@@ -213,11 +213,74 @@ kubectl get hr -A
 
 #### Configure Storage
 
+```
+alias linstor='kubectl exec -n cozy-linstor deploy/linstor-controller -- linstor'
+```
+
 TODO
+
+
+Create default storage classes:
+
+```
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: linstor.csi.linbit.com
+parameters:
+  linstor.csi.linbit.com/storagePool: "data"
+  linstor.csi.linbit.com/layerList: "storage"
+  linstor.csi.linbit.com/allowRemoteVolumeAccess: "false"
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: replicated
+provisioner: linstor.csi.linbit.com
+parameters:
+  linstor.csi.linbit.com/storagePool: "data"
+  linstor.csi.linbit.com/autoPlace: "3"
+  linstor.csi.linbit.com/layerList: "drbd storage"
+  linstor.csi.linbit.com/allowRemoteVolumeAccess: "true"
+  property.linstor.csi.linbit.com/DrbdOptions/auto-quorum: suspend-io
+  property.linstor.csi.linbit.com/DrbdOptions/Resource/on-no-data-accessible: suspend-io
+  property.linstor.csi.linbit.com/DrbdOptions/Resource/on-suspended-primary-outdated: force-secondary
+  property.linstor.csi.linbit.com/DrbdOptions/Net/rr-conflict: retry-connect
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+```
 
 #### Configure Networking interconnection
 
 TODO
+
+```
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: cozystack
+  namespace: cozy-metallb
+spec:
+  ipAddressPools:
+  - cozy-public
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: cozystack
+  namespace: cozy-metallb
+spec:
+  addresses:
+  - 192.168.100.200-192.168.100.250
+  autoAssign: true
+  avoidBuggyIPs: false
+```
 
 #### Setup basic applications
 

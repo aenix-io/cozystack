@@ -4,22 +4,25 @@
   "properties": {
     "running": {
       "type": "boolean",
-      "title": "Running",
-      "form": "useSelfHostedDatabase"
+      "title": "Running"
+    },
+    "external": {
+      "type": "boolean",
+      "title": "Enable external Access"
     },
     "image": {
       "type": "string",
       "form": true,
-      "enum": ["ubuntu", "centos", "alpine", "fedora"],
-      "title": "Database Type",
-      "description": "Choose image"
+      "enum": ["ubuntu", "cirros", "alpine", "fedora"],
+      "title": "Choose image"
+    },
+    "password": {
+      "type": "string",
+      "title": "Password"
     },
     "disk": {
       "type": "string",
-      "title": "Disk Size",
-      "x-display": "slider",
-      "minimum": 1,
-      "maximum": 100
+      "title": "Disk Size"
     },
     "resources": {
       "type": "object",
