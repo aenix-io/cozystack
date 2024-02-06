@@ -22,7 +22,6 @@ spec:
     - target_label: service
       replacement: {{ .Release.Name }}
     port: metrics
-  jobLabel: jobLabel
   selector:
     matchLabels:
       app: {{ .Release.Name }}-metrics

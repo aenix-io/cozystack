@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "external": {
+      "type": "boolean",
+      "title": "Enable external Access"
+    },
+    "size": {
+      "type": "string",
+      "title": "Disk Size"
+    }
+  }
+}
