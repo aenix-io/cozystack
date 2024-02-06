@@ -1,32 +1,23 @@
-volumeClaimTemplate:
-  resources:
-    requests:
-      storage: 100Gi
-  accessModes:
-    - ReadWriteOnce
-
-primaryService:
-  ipPool: private-ips
-  ipAddress: 10.100.255.15
-
-secondaryService:
-  ipPool: private-ips
-  ipAddress: 10.100.255.16
-
-secondaryService2:
-  ipPool: private-ips
-  ipAddress: 10.100.255.116
+external: false
+size: 10Gi
 
 users:
+  root:
+    password: strongpassword
   user1:
     privileges: ['ALL']
     maxUserConnections: 1000
+    password: hackme
   user2:
     privileges: ['SELECT']
     maxUserConnections: 1000
+    password: hackme
 
 databases:
 - wordpress1
 - wordpress2
 - wordpress3
 - wordpress4
+
+backup:
+  enabled: false

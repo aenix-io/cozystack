@@ -54,21 +54,18 @@ spec:
     key: config
 
   volumeClaimTemplate:
-    {{- toYaml .Values.volumeClaimTemplate | nindent 4 }}
+    resources:
+      requests:
+        storage: {{ .Values.size }}
+    accessModes:
+      - ReadWriteOnce
 
-  # All possible annotations must be included in the service
-  # https://github.com/mariadb-operator/mariadb-operator/issues/256
 
+
+  {{- if .Values.external }}
   primaryService:
     type: LoadBalancer
-    annotations:
-      metallb.universe.tf/address-pool: {{ .Values.primaryService.ipPool }}
-      metallb.universe.tf/ip-allocated-from-pool: {{ .Values.primaryService.ipPool }}
-      metallb.universe.tf/loadBalancerIPs: {{ .Values.primaryService.ipAddress }}
+  {{- end }}
 
-  secondaryService:
-    type: LoadBalancer
-    annotations:
-      metallb.universe.tf/address-pool: {{ .Values.secondaryService.ipPool }}
-      metallb.universe.tf/ip-allocated-from-pool: {{ .Values.secondaryService.ipPool }}
-      metallb.universe.tf/loadBalancerIPs: {{ .Values.secondaryService.ipAddress }}
+  #secondaryService:
+  #  type: LoadBalancer
