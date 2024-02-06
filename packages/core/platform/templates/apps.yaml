@@ -1,5 +1,8 @@
 {{- $host := "example.org" }}
+{{- $tenantRoot := list }}
+{{- if .Capabilities.APIVersions.Has "helm.toolkit.fluxcd.io/v2beta1" }}
 {{- $tenantRoot := lookup "helm.toolkit.fluxcd.io/v2beta1" "HelmRelease" "tenant-root" "tenant-root" }}
+{{- end }}
 {{- if and $tenantRoot $tenantRoot.spec $tenantRoot.spec.values $tenantRoot.spec.values.host }}
 {{- $host = $tenantRoot.spec.values.host }}
 {{- else }}

@@ -161,10 +161,6 @@ spec:
         kind: HelmRepository
         name: cozystack-system
         namespace: cozy-system
-  values:
-    cozystack:
-      configHash: {{ index (lookup "v1" "ConfigMap" "cozy-system" "cozystack") "data" | toJson | sha256sum }}
-      nodesHash: {{ include "master.nodeIPs" . | sha256sum }}
   dependsOn:
   - name: cilium
     namespace: cozy-cilium
@@ -296,36 +292,6 @@ spec:
     namespace: cozy-cilium
   - name: kubeovn
     namespace: cozy-kubeovn
----
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
-metadata:
-  name: metallb-addresses
-  namespace: cozy-metallb
-  labels:
-    cozystack.io/repository: system
-spec:
-  interval: 1m
-  releaseName: metallb-addresses
-  chart:
-    spec:
-      chart: cozy-metallb-addresses
-      reconcileStrategy: Revision
-      sourceRef:
-        kind: HelmRepository
-        name: cozystack-system
-        namespace: cozy-system
-  values:
-    cozystack:
-      configHash: {{ index (lookup "v1" "ConfigMap" "cozy-system" "cozystack") "data" | toJson | sha256sum }}
-      nodesHash: {{ include "master.nodeIPs" . | sha256sum }}
-  dependsOn:
-  - name: cilium
-    namespace: cozy-cilium
-  - name: kubeovn
-    namespace: cozy-kubeovn
-  - name: metallb
-    namespace: cozy-metallb
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease

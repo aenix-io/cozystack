@@ -4,7 +4,6 @@
   "properties": {
     "host": {
       "type": "string",
-      "required": false,
       "title": "Domain name for this kubernetes cluster",
       "description": "This host will be used for all apps deployed in this tenant"
     }

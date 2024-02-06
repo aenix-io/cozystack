@@ -7,10 +7,10 @@ spec:
     certManager:
       name: linstor-internal-ca
       kind: Issuer
-  storagePools:
-  - name: "data"
-    lvmPool:
-      volumeGroup: "data"
+  #storagePools:
+  #- name: "data"
+  #  lvmPool:
+  #    volumeGroup: "data"
   patches:
     - target:
         kind: Pod

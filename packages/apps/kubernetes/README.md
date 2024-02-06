@@ -17,3 +17,12 @@ Within this cluster, users can take advantage of LoadBalancer services and easil
 - GitHub: https://github.com/clastix/kamaji
 - GitHub: https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt
 - GitHub: https://github.com/kubevirt/csi-driver
+
+
+## How-Tos
+
+How to access to deployed cluster:
+
+```
+kubectl get secret -n <namespace> kubernetes-<clusterName>-admin-kubeconfig -o go-template='{{ printf "%s\n" (index .data "super-admin.conf" | base64decode) }}' > test
+```
