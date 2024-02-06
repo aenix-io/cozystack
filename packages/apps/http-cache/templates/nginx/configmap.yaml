@@ -14,9 +14,8 @@ data:
     error_log  /var/log/nginx/error.log notice;
     pid        /var/run/nginx.pid;
     
-    load_module /usr/lib/nginx/modules/ngx_http_ip2location_module.so;
-    load_module /usr/lib/nginx/modules/ngx_http_ip2proxy_module.so;
-    load_module /usr/lib/nginx/modules/ngx_http_51D_module.so;
+    #load_module /usr/lib/nginx/modules/ngx_http_ip2location_module.so;
+    #load_module /usr/lib/nginx/modules/ngx_http_ip2proxy_module.so;
 
     events {
         use epoll;
@@ -46,15 +45,13 @@ data:
         proxy_cache_path /data/cache levels=1:2 keys_zone=mycache:400m max_size=100g
                          inactive=30d use_temp_path=off;
     
-        ip2location_database /data/dbs/ip2location.bin;
-        ip2location_proxy_recursive	on;
-        ip2location_proxy	10.0.0.0/8;
+        #ip2location_database /data/dbs/ip2location.bin;
+        #ip2location_proxy_recursive	on;
+        #ip2location_proxy	10.0.0.0/8;
 
-        ip2proxy_database /data/dbs/ip2proxy.bin;
-        ip2proxy_proxy_recursive on;
-        ip2proxy_proxy 10.0.0.0/8;
-
-        51D_filePath /data/dbs/51degrees.trie;
+        #ip2proxy_database /data/dbs/ip2proxy.bin;
+        #ip2proxy_proxy_recursive on;
+        #ip2proxy_proxy 10.0.0.0/8;
 
         server {
             listen *:10253;
@@ -75,41 +72,11 @@ data:
             }
         }
 
-        map $ip2location_country_short $ip2location_region_cust {
-            default 1;
-            CN 2; JP 2; TH 2; MY 2; KR 2; SG 2; HK 2; TW 2; PH 2; VN 2; KZ 2; KG 2; ID 2; MN 2; NP 2; BN 2; KH 2; MO 2; KP 2; LA 2; BT 2; BD 2; LK 2; MM 2;
-            PR 3; AR 3; EC 3; CL 3; PE 3; VE 3; DO 3; PY 3; PA 3; MX 3; CO 3; BR 3; GT 3; CR 3; HN 3; BO 3; UY 3; NI 3; SV 3; GP 3; CU 3; WS 3; AW 3; MF 3; TV 3; PF 3;
-            DZ 4; BH 4; EG 4; IQ 4; JO 4; KW 4; LB 4; LY 4; MR 4; MA 4; OM 4; PS 4; QA 4; SA 4; SY 4; TN 4; AE 4; YE 4; IR 4; AF 4; TJ 4; UZ 4; PK 4; TM 4; AZ 4; TR 4; IN 4; MV 4;
-        }
-
-        map $ip2proxy_proxy_type $ip2proxy_anonymous_type {
-            default None;
-            DCH Hosting;
-            PUB Proxy;
-            SES Proxy;
-            TOR Tor;
-            VPN VPN;
-        }
-
         upstream origin_servers {
             {{- range $num, $ep := $.Values.endpoints }} 
             server {{ $ep }};
             {{- end }}
         }
-
-        map $request_method $region {
-           PURGE   $http_x_region;
-           default $ip2location_region_cust;
-        }
-
-        map $http_x_device $mobile_device {
-            default pc;
-            Desktop pc;
-            SmartPhone phone;
-            Phone phone;
-            Tablet tablet;
-        }
-
 
         # URL shorter:
         # / --> /
@@ -138,13 +105,13 @@ data:
             server_name _;
             vhost_traffic_status_filter_by_host on;
 
-            vhost_traffic_status_filter_by_set_key $host region::$region;
+            #vhost_traffic_status_filter_by_set_key $host country::$ip2location_country_short;
             vhost_traffic_status_filter_by_set_key $shorten_url url::$host;
 
             proxy_cache mycache;
             proxy_cache_revalidate on;
             proxy_cache_lock on;
-            proxy_cache_key $region$scheme$http_host$request_uri;
+            proxy_cache_key $scheme$http_host$request_uri;
             proxy_cache_purge PURGE from all;
             cache_purge_response_type json;
         
@@ -159,23 +126,18 @@ data:
             location / {
                 proxy_set_header Host $http_host;
 
-                51D_match_single x-device DeviceType;
-        
                 ## debug
                 add_header X-Cache-Status $upstream_cache_status;
-                #add_header X-Cache-Region "$ip2location_country_short ($region)";
                 #add_header X-Cache-Node $hostname;
-                #add_header X-Cache-Key $region$scheme$http_host$request_uri;
+                #add_header X-Cache-Key $scheme$http_host$request_uri;
 
                 proxy_set_header X-Real-IP $remote_addr;
                 real_ip_header $real_ip_header;
                 real_ip_recursive on;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
-                proxy_set_header X-Anonymous-Type $ip2proxy_anonymous_type;
-                proxy_set_header X-Country $ip2location_country_short;
-                proxy_set_header X-Region $region;
-                proxy_set_header X-Device $mobile_device;
+                #proxy_set_header X-Anonymous-Type $ip2proxy_proxy_type;
+                #proxy_set_header X-Country $ip2location_country_short;
 
                 #proxy_set_header X-Country-Code $ip2location_country_short;
                 #proxy_set_header X-Country-Name $ip2location_country_long;

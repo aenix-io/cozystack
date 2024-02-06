@@ -55,32 +55,15 @@ data:
         {{- end }}
         tcp-request content set-dst-port int(80)
 
-        # match real IP from advanced hosters
-        acl from_ah hdr(X-Ah-Cdn) -i Ahj9oichoo9ohv
-        acl ah_ip_hdr req.hdr(X-AH-XFF) -m found
-        http-request set-header X-Forwarded-For %[req.hdr(X-AH-XFF)] if from_ah ah_ip_hdr
-
         # match real IP from cloudflare
         acl from_cf src -f /usr/local/etc/haproxy/CF_ips.lst
         acl cf_ip_hdr req.hdr(CF-Connecting-IP) -m found
-        http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)] if from_cf cf_ip_hdr !from_ah
+        http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)] if from_cf cf_ip_hdr
 
         # overwrite real IP header from anywhere else
-        http-request set-header X-Forwarded-For %[src] if !from_cf !from_ah
+        http-request set-header X-Forwarded-For %[src] if !from_cf
 
-        use_backend capurge if { method PURGE }
         default_backend http
-
-    backend capurge
-        mode http
-        option forwardfor
-        balance roundrobin
-        retry-on conn-failure
-        retries 2
-        option redispatch 1
-        default-server observe layer7 error-limit 10 on-error mark-down
-
-        server capurge {{ $.Release.Name }}-capurge:8071 check
 
     backend http
         mode http

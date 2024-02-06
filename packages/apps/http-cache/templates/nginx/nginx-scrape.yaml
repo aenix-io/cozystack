@@ -3,7 +3,6 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
   name: nginx-cache
-  namespace: infra-monitoring
 spec:
   jobLabel: jobLabel
   namespaceSelector:

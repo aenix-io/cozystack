@@ -1,5 +1,4 @@
 {{ $imageNginx := .Files.Get "images/nginx.json" | fromJson }}
-{{ $imageDBUpdater := .Files.Get "images/db-updater.json" | fromJson }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -13,7 +12,7 @@ spec:
   selector:
     matchLabels:
       app: {{ $.Release.Name }}-nginx-cache
-{{- range $i := until (int $.Values.replicas) }}
+{{- range $i := until 3 }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -54,8 +53,7 @@ spec:
       shareProcessNamespace: true
       containers:
       - name: nginx
-        image: "{{ index $imageNginx "image.name" }}@{{ index $imageNginx "containerimage.digest" }}"
-{{ index ($imageNginx := .Files.Get "images/nginx.json" | fromJson) "containerimage.digest" }}
+        image: "ghcr.io/aenix-io/cozystack/nginx-cache:latest@{{ index $imageNginx "containerimage.digest" }}"
         readinessProbe:
           httpGet:
             path: /healthz
@@ -84,7 +82,7 @@ spec:
         - mountPath: /run
           name: run
       - name: reloader
-        image: "{{ index $imageNginx "image.name" }}@{{ index $imageNginx "containerimage.digest" }}"
+        image: "ghcr.io/aenix-io/cozystack/nginx-cache:latest@{{ index $imageNginx "containerimage.digest" }}"
         command: ["/usr/bin/nginx-reloader.sh"]
         #command: ["sleep", "infinity"]
         volumeMounts:
@@ -105,53 +103,6 @@ spec:
       - name: run
         emptyDir: {}
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ $.Release.Name }}-nginx-db-updater-{{ $i }}
-  labels:
-    app.kubernetes.io/instance: {{ $.Release.Name }}
-    app.kubernetes.io/managed-by: {{ $.Release.Service }}
-spec:
-  replicas: 1
-  strategy:
-    type: Recreate
-  selector:
-    matchLabels:
-      app: {{ $.Release.Name }}-nginx-db-updater
-      instance: "{{ $i }}"
-  template:
-    metadata:
-      labels:
-        app: {{ $.Release.Name }}-nginx-db-updater
-        instance: "{{ $i }}"
-      annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/nginx/configmap.yaml") $ | sha256sum }}
-        checksum/scripts: {{ include (print $.Template.BasePath "/nginx/scripts.yaml") $ | sha256sum }}
-    spec:
-      imagePullSecrets:
-      - name: {{ $.Release.Name }}-regsecret
-      containers:
-      - name: db-updater
-        image: "{{ index $imageDBUpdater "image.name" }}@{{ index $imageDBUpdater "containerimage.digest" }}"
-        command:
-        - /sbin/tini
-        - -g
-        - /bin/sh
-        - /scripts/init.sh
-        volumeMounts:
-        - mountPath: /scripts
-          name: scripts
-        - mountPath: /data
-          name: data
-      volumes:
-      - name: scripts
-        secret:
-          secretName: {{ $.Release.Name }}-scripts
-      - name: data
-        persistentVolumeClaim:
-          claimName: {{ $.Release.Name }}-nginx-cache-{{ $i }}
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -163,8 +114,7 @@ spec:
   accessModes: [ "ReadWriteOnce" ]
   resources:
     requests:
-      storage: 100Gi
-  storageClassName: linstor-lvm
+      storage: "{{ $.Values.size }}"
 ---
 apiVersion: v1
 kind: Service
