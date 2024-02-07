@@ -32,55 +32,13 @@ Any Linux system installed on it (eg. Ubuntu should be enough)
 
 ### Netboot server
 
-Write configuration:
+Start matchbox with prebuilt Talos image for Cozystack:
 
 ```
-mkdir -p matchbox/assets matchbox/groups matchbox/profiles
-
-wget -O matchbox/assets/initramfs.xz \
-  https://github.com/aenix-io/cozystack/releases/download/v0.0.1/initramfs-metal-amd64.xz
-wget -O matchbox/assets/vmlinuz \
-  https://github.com/aenix-io/cozystack/releases/download/v0.0.1/kernel-amd64
-
-
-cat > matchbox/groups/default.json <<EOT
-{
-  "id": "default",
-  "name": "default",
-  "profile": "default"
-}
-EOT
-
-cat > matchbox/profiles/default.json <<EOT
-{
-  "id": "default",
-  "name": "default",
-  "boot": {
-    "kernel": "/assets/vmlinuz",
-    "initrd": ["/assets/initramfs.xz"],
-    "args": [
-      "initrd=initramfs.xz",
-      "init_on_alloc=1",
-      "slab_nomerge",
-      "pti=on",
-      "console=tty0",
-      "console=ttyS0",
-      "printk.devkmsg=on",
-      "talos.platform=metal"
-    ]
-  }
-}
-EOT
-```
-
-Start matchbox:
-
-```
-sudo docker run --name=matchbox -d --net=host -v ${PWD}/matchbox:/var/lib/matchbox:Z quay.io/poseidon/matchbox:v0.10.0 \
+sudo docker run --name=matchbox -d --net=host ghcr.io/aenix-io/cozystack/matchbox:v0.0.1 \
   -address=:8080 \
   -log-level=debug
 ```
-
 
 Start DHCP-Server:
 ```
@@ -100,17 +58,27 @@ sudo docker run --name=dnsmasq -d --cap-add=NET_ADMIN --net=host quay.io/poseido
   --dhcp-boot=tag:efi64,ipxe.efi \
   --dhcp-userclass=set:ipxe,iPXE \
   --dhcp-boot=tag:ipxe,http://192.168.100.250:8080/boot.ipxe \
-  --address=/matchbox.example.com/192.168.1.2 \
   --log-queries \
   --log-dhcp
 ```
 
+Where:
+- `192.168.100.3,192.168.100.254` range to allocate IPs from
+- `192.168.100.1` your gateway
+- `192.168.100.250` is address of your management server
+
 Check status of containers:
+
 ```
 docker ps
-# CONTAINER ID   IMAGE                               COMMAND                  CREATED          STATUS          PORTS     NAMES
-# e5e1323c014a   quay.io/poseidon/dnsmasq            "/usr/sbin/dnsmasq -…"   2 seconds ago    Up 1 second               dnsmasq
-# d256b46ab9e9   quay.io/poseidon/matchbox:v0.10.0   "/matchbox -address=…"   43 seconds ago   Up 42 seconds             matchbox
+```
+
+Example output:
+
+```
+CONTAINER ID   IMAGE                                        COMMAND                  CREATED          STATUS          PORTS     NAMES
+22044f26f74d   quay.io/poseidon/dnsmasq                     "/usr/sbin/dnsmasq -…"   6 seconds ago    Up 5 seconds              dnsmasq
+231ad81ff9e0   ghcr.io/aenix-io/cozystack/matchbox:v0.0.1   "/matchbox -address=…"   58 seconds ago   Up 57 seconds             matchbox
 ```
 
 ### Bootstrap cluster
@@ -173,16 +141,33 @@ cluster:
 EOT
 ```
 
-Run [talos-bootstrap](https://github.com/aenix-io/talos-bootstrap/) to deploy cluster
+Run [talos-bootstrap](https://github.com/aenix-io/talos-bootstrap/) to deploy cluster:
 
+```
+talos-bootstrap install
+```
+
+Save admin kubeconfig to access your Kubernetes cluster:
+```
+cp -i kubeconfig ~/.kube/config
+```
+
+Check connection:
+```
+kubectl get ns
+```
+
+example output:
+```
+NAME              STATUS   AGE
+default           Active   7m56s
+kube-node-lease   Active   7m56s
+kube-public       Active   7m56s
+kube-system       Active   7m56s
+```
 
 ### Install Cozystack
 
-create namespace:
-
-```
-kubectl create ns cozy-system
-```
 
 write config for cozystack:
 
@@ -204,8 +189,10 @@ data:
 EOT
 ```
 
-Install cozystack system components:
+Create namesapce and install Cozystack system components:
+
 ```
+kubectl create ns cozy-system
 kubectl apply -f cozystack-config.yaml
 kubectl apply -f manifests/cozystack-installer.yaml
 ```
@@ -215,7 +202,7 @@ kubectl apply -f manifests/cozystack-installer.yaml
 kubectl logs -n cozy-system deploy/cozystack
 ```
 
-Check the status of installation:
+Wait for a while, then check the status of installation:
 ```
 kubectl get hr -A
 ```
@@ -287,9 +274,9 @@ example output:
 +-------------------------------------------+
 | Size        | Rotational | Nodes          |
 |===========================================|
-| 34359738368 | True       | srv3[/dev/sda] |
-|             |            | srv1[/dev/sda] |
-|             |            | srv2[/dev/sda] |
+| 34359738368 | True       | srv3[/dev/sdb] |
+|             |            | srv1[/dev/sdb] |
+|             |            | srv2[/dev/sdb] |
 +-------------------------------------------+
 ```
 
@@ -297,9 +284,9 @@ example output:
 create storage pools:
 
 ```
-linstor ps cdp lvm srv1 /dev/sda --pool-name data
-linstor ps cdp lvm srv2 /dev/sda --pool-name data
-linstor ps cdp lvm srv3 /dev/sda --pool-name data
+linstor ps cdp lvm srv1 /dev/sdb --pool-name data --storage-pool data
+linstor ps cdp lvm srv2 /dev/sdb --pool-name data --storage-pool data
+linstor ps cdp lvm srv3 /dev/sdb --pool-name data --storage-pool data
 ```
 
 list storage pools:
@@ -496,7 +483,14 @@ Now you can get public IP of ingress controller:
 kubectl get svc -n tenant-root root-ingress-controller
 ```
 
-Use `grafana.example.org` to access system monitoring, where `example.org` is your domain specified for `tenant-root`
+example output:
+
+```
+NAME                      TYPE           CLUSTER-IP      EXTERNAL-IP       PORT(S)                      AGE
+root-ingress-controller   LoadBalancer   10.96.101.234   192.168.100.200   80:31879/TCP,443:31262/TCP   49s
+```
+
+Use `grafana.example.org` (under 192.168.100.200) to access system monitoring, where `example.org` is your domain specified for `tenant-root`
 
 - login: `admin`
 - password:
