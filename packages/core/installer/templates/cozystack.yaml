@@ -1,4 +1,3 @@
-{{ $image := .Files.Get "images/installer.json" | fromJson }}
 ---
 apiVersion: v1
 kind: Namespace
@@ -53,14 +52,14 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "{{ index $image "image.name" }}@{{ index $image "containerimage.digest" }}"
+        image: "{{ .Files.Get "images/installer.tag" | trim }}@{{ index (.Files.Get "images/installer.json" | fromJson) "containerimage.digest" }}"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
       - name: darkhttpd
-        image: "{{ index $image "image.name" }}@{{ index $image "containerimage.digest" }}"
+        image: "{{ .Files.Get "images/installer.tag" | trim }}@{{ index (.Files.Get "images/installer.json" | fromJson) "containerimage.digest" }}"
         command:
         - /usr/bin/darkhttpd
         - /cozystack/assets

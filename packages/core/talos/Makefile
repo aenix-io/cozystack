@@ -1,18 +1,15 @@
-include versions.env
+TALOS_VERSION=$(shell awk '/^version:/ {print $$2}' profiles/installer.yaml)
 
-gen-versions:
-	hack/gen-versions.sh | tee versions.env
+gen-profiles:
+	hack/gen-profiles.sh
+
+assets: kernel initramfs iso
+
+initramfs kernel installer iso:
+	cat profiles/$@.yaml | docker run --rm -i -v $${PWD}/../../../_out/images:/out -v /dev:/dev --privileged "ghcr.io/siderolabs/imager:$(TALOS_VERSION)" -
 
 image:
-	docker run --rm \
-		-v $${PWD}/../../../_out/images:/out -v /dev:/dev --privileged "ghcr.io/siderolabs/imager:$(TALOS_VERSION)" \
-		--system-extension-image=ghcr.io/siderolabs/amd-ucode:$(AMD_UCODE_VERSION) \
-		--system-extension-image=ghcr.io/siderolabs/amdgpu-firmware:$(AMDGPU_FIRMWARE_VERSION) \
-		--system-extension-image=ghcr.io/siderolabs/bnx2-bnx2x:$(BNX2_BNX2X_VERSION) \
-		--system-extension-image=ghcr.io/siderolabs/i915-ucode:$(I915_UCODE_VERSION) \
-		--system-extension-image=ghcr.io/siderolabs/intel-ice-firmware:$(INTEL_ICE_FIRMWARE_VERSION) \
-		--system-extension-image=ghcr.io/siderolabs/intel-ucode:$(INTEL_UCODE_VERSION) \
-		--system-extension-image=ghcr.io/siderolabs/qlogic-firmware:$(QLOGIC_FIRMWARE_VERSION) \
-		--system-extension-image=ghcr.io/siderolabs/drbd:$(DRBD_VERSION) \
-		--system-extension-image=ghcr.io/siderolabs/zfs:$(ZFS_VERSION) \
-		installer
+	test -f ../../../_out/images/installer-amd64.tar || make installer
+	docker load -i ../../../_out/images/installer-amd64.tar
+	docker tag ghcr.io/siderolabs/installer:$(TALOS_VERSION) ghcr.io/aenix-io/cozystack/talos:$(TALOS_VERSION)
+	docker push ghcr.io/aenix-io/cozystack/talos:$(TALOS_VERSION)

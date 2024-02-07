@@ -116,7 +116,7 @@ spec:
               evictionStrategy: External
               volumes:
               - containerDisk:
-                  image: ghcr.io/kvaps/test:ubuntu-2204-container-disk-v1.29.1-2
+                  image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}@{{ index ($.Files.Get "images/ubuntu-container-disk.json" | fromJson) "containerimage.digest" }}"
                 name: containervolume
 ---
 apiVersion: cluster.x-k8s.io/v1beta1

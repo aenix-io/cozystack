@@ -1,7 +1,9 @@
 NAME=dashboard
 NAMESPACE=cozy-dashboard
-PUSH=1
-LOAD=0
+PUSH := 1
+LOAD := 0
+REPOSITORY := ghcr.io/aenix-io/cozystack
+TAG := v0.0.1
 
 show:
 	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
@@ -21,8 +23,7 @@ update-chart:
 	helm repo update bitnami
 	helm pull bitnami/kubeapps --untar --untardir charts
 	rm -rf charts/kubeapps/charts/postgresql/
-	sed -i 's|{{ include "kubeapps.dashboard.image" . }}|ghcr.io/aenix-io/cozystack/dashboard:latest|g' charts/kubeapps/templates/dashboard/deployment.yaml
-	sed -i 's|{{ include "kubeapps.kubeappsapis.image" . }}|ghcr.io/aenix-io/cozystack/kubeapps-apis:latest|g' charts/kubeapps/templates/kubeappsapis/deployment.yaml
+	ln -s ../../images charts/kubeapps/images
 
 update-dockerfiles:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/vmware-tanzu/kubeapps  | awk -F'[/^]' 'END{print $$3}') && \
@@ -33,23 +34,24 @@ update-dockerfiles:
 	version=$$(echo "$$tag" | sed 's/^v//') && \
 	sed -i "s/ARG VERSION=.*/ARG VERSION=$${version}/" images/dashboard/Dockerfile
 
-
 image-dashboard:
 	docker buildx build images/dashboard \
 		--provenance false \
-		--tag ghcr.io/aenix-io/cozystack/dashboard:latest \
-		--cache-from type=registry,ref=ghcr.io/aenix-io/cozystack/dashboard:latest \
+		--tag $(REPOSITORY)/dashboard:$(TAG) \
+		--cache-from type=registry,ref=$(REPOSITORY)/dashboard:$(TAG) \
 		--cache-to type=inline \
 		--metadata-file images/dashboard.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
+	echo "$(REPOSITORY)/dashboard:$(TAG)" > images/dashboard.tag
 
 image-kubeapps-apis:
 	docker buildx build images/kubeapps-apis \
 		--provenance false \
-		--tag ghcr.io/aenix-io/cozystack/kubeapps-apis:latest \
-		--cache-from type=registry,ref=ghcr.io/aenix-io/cozystack/kubeapps-apis:latest \
+		--tag $(REPOSITORY)/kubeapps-apis:$(TAG) \
+		--cache-from type=registry,ref=$(REPOSITORY)/kubeapps-apis:$(TAG) \
 		--cache-to type=inline \
 		--metadata-file images/kubeapps-apis.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
+	echo "$(REPOSITORY)/kubeapps-apis:$(TAG)" > images/kubeapps-apis.tag

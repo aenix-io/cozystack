@@ -1,4 +1,3 @@
-{{ $imageNginx := .Files.Get "images/nginx.json" | fromJson }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -53,7 +52,7 @@ spec:
       shareProcessNamespace: true
       containers:
       - name: nginx
-        image: "ghcr.io/aenix-io/cozystack/nginx-cache:latest@{{ index $imageNginx "containerimage.digest" }}"
+        image: "{{ $.Files.Get "images/nginx-cache.tag" | trim }}@{{ index ($.Files.Get "images/nginx-cache.json" | fromJson) "containerimage.digest" }}"
         readinessProbe:
           httpGet:
             path: /healthz
@@ -82,7 +81,7 @@ spec:
         - mountPath: /run
           name: run
       - name: reloader
-        image: "ghcr.io/aenix-io/cozystack/nginx-cache:latest@{{ index $imageNginx "containerimage.digest" }}"
+        image: "{{ $.Files.Get "images/nginx-cache.tag" | trim }}@{{ index ($.Files.Get "images/nginx-cache.json" | fromJson) "containerimage.digest" }}"
         command: ["/usr/bin/nginx-reloader.sh"]
         #command: ["sleep", "infinity"]
         volumeMounts:

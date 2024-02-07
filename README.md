@@ -30,26 +30,6 @@ Any Linux system installed on it (eg. Ubuntu should be enough)
 
 **Note:** The VM should support `x86-64-v2` architecture, the most probably you can achieve this by setting cpu model to `host`
 
-### Preapre Talos image for your infrastructure
-
-(later this will be automated)
-
-```
-docker run --rm -t \
-  -v $PWD/_out:/out -v /dev:/dev --privileged ghcr.io/siderolabs/imager:v1.6.2 installer \
-  --system-extension-image=ghcr.io/siderolabs/qlogic-firmware:20240115 \
-  --system-extension-image=ghcr.io/siderolabs/bnx2-bnx2x:20240115 \
-  --system-extension-image=ghcr.io/siderolabs/drbd:9.2.6-v1.6.2 \
-  --system-extension-image=ghcr.io/siderolabs/zfs:2.1.14-v1.6.2
-
-docker load -i _out/installer-amd64.tar
-
-docker tag ghcr.io/siderolabs/installer:v1.6.2 ghcr.io/kvaps/test:cozystack-talos-v1.6.2
-
-docker push ghcr.io/kvaps/test:cozystack-talos-v1.6.2
-```
-
-
 ### Netboot server
 
 Write configuration:
@@ -58,9 +38,9 @@ Write configuration:
 mkdir -p matchbox/assets matchbox/groups matchbox/profiles
 
 wget -O matchbox/assets/initramfs.xz \
-  https://github.com/siderolabs/talos/releases/download/v1.6.0/initramfs-amd64.xz
+  https://github.com/aenix-io/cozystack/releases/download/v0.0.1/initramfs-metal-amd64.xz
 wget -O matchbox/assets/vmlinuz \
-  https://github.com/siderolabs/talos/releases/download/v1.6.0/vmlinuz-amd64
+  https://github.com/aenix-io/cozystack/releases/download/v0.0.1/kernel-amd64
 
 
 cat > matchbox/groups/default.json <<EOT
@@ -152,7 +132,7 @@ machine:
         - usermode_helper=disabled
     - name: zfs
   install:
-    image: ghcr.io/kvaps/test:cozystack-talos-v1.6.2
+    image: ghcr.io/aenix-io/cozystack/talos:v1.6.4
   files:
   - content: |
       [plugins]

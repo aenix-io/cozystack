@@ -1,0 +1,14 @@
+{
+  "containerimage.config.digest": "sha256:d68641167af14b246e0332c14a7a9d9f6c0a4f813881db2de5fc53816bd35786",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:241da53aba9b121d5d1829744a9ba31036cd5e5ffd6cf584da8113ddd79764f2",
+    "size": 1093,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:241da53aba9b121d5d1829744a9ba31036cd5e5ffd6cf584da8113ddd79764f2",
+  "image.name": "ghcr.io/aenix-io/cozystack/nginx-cache:v0.0.1"
+}

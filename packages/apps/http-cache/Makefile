@@ -1,17 +1,20 @@
 PUSH := 1
 LOAD := 0
+REGISTRY := ghcr.io/aenix-io/cozystack
+TAG := v0.0.1
 
 image: image-nginx
 
 image-nginx:
-	docker buildx build --platform linux/amd64 --build-arg ARCH=amd64 images/nginx \
+	docker buildx build --platform linux/amd64 --build-arg ARCH=amd64 images/nginx-cache \
 		--provenance false \
-		--tag ghcr.io/aenix-io/cozystack/nginx-cache:latest \
-		--cache-from type=registry,ref=ghcr.io/aenix-io/cozystack/nginx-cache:latest \
+		--tag $(REGISTRY)/nginx-cache:$(TAG) \
+		--cache-from type=registry,ref=$(REGISTRY)/nginx-cache:$(TAG) \
 		--cache-to type=inline \
-		--metadata-file images/nginx.json \
+		--metadata-file images/nginx-cache.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
+	echo "$(REGISTRY)/nginx:$(TAG)" > images/nginx-cache.tag
 
 update:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/chrislim2888/IP2Location-C-Library | awk -F'[/^]' 'END{print $$3}') && \

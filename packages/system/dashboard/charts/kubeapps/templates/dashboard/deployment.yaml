@@ -70,7 +70,7 @@ spec:
       {{- end }}
       containers:
         - name: dashboard
-          image: ghcr.io/aenix-io/cozystack/dashboard:latest@sha256:9cafd6b4e86ddba373018e574d1076aa3b193f2a60c98e1dea98ddbf36b4b055
+          image: {{ include "kubeapps.dashboard.image" . }}
           imagePullPolicy: {{ .Values.dashboard.image.pullPolicy | quote }}
           {{- if .Values.dashboard.containerSecurityContext.enabled }}
           securityContext: {{- omit .Values.dashboard.containerSecurityContext "enabled" | toYaml | nindent 12 }}

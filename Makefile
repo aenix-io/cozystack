@@ -1,4 +1,4 @@
-.PHONY: manifests repos
+.PHONY: manifests repos assets
 
 manifests:
 	(cd packages/core/installer/; helm template -n cozy-installer installer .) > manifests/cozystack-installer.yaml
@@ -10,3 +10,6 @@ repos:
 	make -C packages/system repo
 	make -C packages/apps repo
 	make -C packages/extra repo
+
+assets:
+	make -C packages/core/talos/ assets
