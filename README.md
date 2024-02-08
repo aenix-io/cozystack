@@ -62,7 +62,7 @@ Cozystack is based on Kubernetes and involves close interaction with its API. We
 
 ## Quick Start
 
-### Preapre infrastructure
+### Prepare infrastructure
 
 
 ![](https://aenix.io/wp-content/uploads/2024/02/Wireframe-2.png)
@@ -82,7 +82,7 @@ Any Linux system installed on it (eg. Ubuntu should be enough)
 
 **Note:** The VM should support `x86-64-v2` architecture, the most probably you can achieve this by setting cpu model to `host`
 
-#### Install dependicies:
+#### Install dependencies:
 
 - `docker`
 - `talosctl`
@@ -228,6 +228,10 @@ kube-node-lease   Active   7m56s
 kube-public       Active   7m56s
 kube-system       Active   7m56s
 ```
+
+
+**Note:**: All nodes should currently show as "Not Ready", don't worry about that, this is because you disabled the default CNI plugin in the previous step. Cozystack will install it's own CNI-plugin on the next step.
+
 
 ### Install Cozystack
 
@@ -439,7 +443,7 @@ metadata:
   namespace: cozy-metallb
 spec:
   ipAddressPools:
-  - cozy-public
+  - cozystack
 ---
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
