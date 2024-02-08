@@ -8,6 +8,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: cilium
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-cilium
@@ -27,6 +33,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: kubeovn
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-kubeovn
@@ -53,6 +65,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: fluxcd
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-fluxcd
@@ -77,6 +95,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: cert-manager
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-cert-manager
@@ -101,6 +125,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: cert-manager-issuers
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-cert-manager-issuers
@@ -127,6 +157,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: victoria-metrics-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-victoria-metrics-operator
@@ -153,6 +189,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: monitoring
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-monitoring
@@ -179,6 +221,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: kubevirt-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-kubevirt-operator
@@ -203,6 +251,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: kubevirt
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-kubevirt
@@ -229,6 +283,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: kubevirt-cdi-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-kubevirt-cdi-operator
@@ -253,6 +313,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: kubevirt-cdi
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-kubevirt-cdi
@@ -279,6 +345,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: metallb
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-metallb
@@ -303,6 +375,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: grafana-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-grafana-operator
@@ -327,6 +405,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: mariadb-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-mariadb-operator
@@ -355,6 +439,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: postgres-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-postgres-operator
@@ -381,6 +471,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: rabbitmq-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-rabbitmq-operator
@@ -405,6 +501,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: redis-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-redis-operator
@@ -429,6 +531,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: piraeus-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-piraeus-operator
@@ -455,6 +563,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: linstor
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-linstor
@@ -483,6 +597,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: traffic-manager
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-telepresence
@@ -507,6 +627,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: dashboard
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-dashboard
@@ -531,6 +657,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: kamaji
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-kamaji
@@ -557,6 +689,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: capi-operator
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-capi-operator
@@ -583,6 +721,12 @@ metadata:
 spec:
   interval: 1m
   releaseName: capi-providers
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   chart:
     spec:
       chart: cozy-capi-providers

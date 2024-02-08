@@ -260,9 +260,9 @@ kubectl apply -f cozystack-config.yaml
 kubectl apply -f manifests/cozystack-installer.yaml
 ```
 
-(optional) You can check logs of installer:
+(optional) You can track the logs of installer:
 ```bash
-kubectl logs -n cozy-system deploy/cozystack
+kubectl logs -n cozy-system deploy/cozystack -f
 ```
 
 Wait for a while, then check the status of installation:
@@ -272,32 +272,32 @@ kubectl get hr -A
 
 Wait until all releases become to `Ready` state:
 ```console
-NAMESPACE                        NAME                        AGE     READY   STATUS
-cozy-cert-manager                cert-manager                2m54s   True    Release reconciliation succeeded
-cozy-cert-manager                cert-manager-issuers        2m54s   True    Release reconciliation succeeded
-cozy-cilium                      cilium                      2m54s   True    Release reconciliation succeeded
-cozy-cluster-api                 capi-operator               2m53s   True    Release reconciliation succeeded
-cozy-cluster-api                 capi-providers              2m53s   True    Release reconciliation succeeded
-cozy-dashboard                   dashboard                   2m53s   True    Release reconciliation succeeded
-cozy-fluxcd                      cozy-fluxcd                 2m54s   True    Release reconciliation succeeded
-cozy-grafana-operator            grafana-operator            2m53s   True    Release reconciliation succeeded
-cozy-kamaji                      kamaji                      2m53s   True    Release reconciliation succeeded
-cozy-kubeovn                     kubeovn                     2m54s   True    Release reconciliation succeeded
-cozy-kubevirt-cdi                kubevirt-cdi                2m54s   True    Release reconciliation succeeded
-cozy-kubevirt-cdi                kubevirt-cdi-operator       2m54s   True    Release reconciliation succeeded
-cozy-kubevirt                    kubevirt                    2m54s   True    Release reconciliation succeeded
-cozy-kubevirt                    kubevirt-operator           2m54s   True    Release reconciliation succeeded
-cozy-linstor                     linstor                     2m53s   True    Release reconciliation succeeded
-cozy-linstor                     piraeus-operator            2m53s   True    Release reconciliation succeeded
-cozy-mariadb-operator            mariadb-operator            2m53s   True    Release reconciliation succeeded
-cozy-metallb                     metallb                     2m53s   True    Release reconciliation succeeded
-cozy-monitoring                  monitoring                  2m54s   True    Release reconciliation succeeded
-cozy-postgres-operator           postgres-operator           2m53s   True    Release reconciliation succeeded
-cozy-rabbitmq-operator           rabbitmq-operator           2m53s   True    Release reconciliation succeeded
-cozy-redis-operator              redis-operator              2m53s   True    Release reconciliation succeeded
-cozy-telepresence                telepresence                2m53s   True    Release reconciliation succeeded
-cozy-victoria-metrics-operator   victoria-metrics-operator   2m54s   True    Release reconciliation succeeded
-tenant-root                      tenant-root                 2m54s   True    Release reconciliation succeeded
+NAMESPACE                        NAME                        AGE    READY   STATUS
+cozy-cert-manager                cert-manager                4m1s   True    Release reconciliation succeeded
+cozy-cert-manager                cert-manager-issuers        4m1s   True    Release reconciliation succeeded
+cozy-cilium                      cilium                      4m1s   True    Release reconciliation succeeded
+cozy-cluster-api                 capi-operator               4m1s   True    Release reconciliation succeeded
+cozy-cluster-api                 capi-providers              4m1s   True    Release reconciliation succeeded
+cozy-dashboard                   dashboard                   4m1s   True    Release reconciliation succeeded
+cozy-fluxcd                      cozy-fluxcd                 4m1s   True    Release reconciliation succeeded
+cozy-grafana-operator            grafana-operator            4m1s   True    Release reconciliation succeeded
+cozy-kamaji                      kamaji                      4m1s   True    Release reconciliation succeeded
+cozy-kubeovn                     kubeovn                     4m1s   True    Release reconciliation succeeded
+cozy-kubevirt-cdi                kubevirt-cdi                4m1s   True    Release reconciliation succeeded
+cozy-kubevirt-cdi                kubevirt-cdi-operator       4m1s   True    Release reconciliation succeeded
+cozy-kubevirt                    kubevirt                    4m1s   True    Release reconciliation succeeded
+cozy-kubevirt                    kubevirt-operator           4m1s   True    Release reconciliation succeeded
+cozy-linstor                     linstor                     4m1s   True    Release reconciliation succeeded
+cozy-linstor                     piraeus-operator            4m1s   True    Release reconciliation succeeded
+cozy-mariadb-operator            mariadb-operator            4m1s   True    Release reconciliation succeeded
+cozy-metallb                     metallb                     4m1s   True    Release reconciliation succeeded
+cozy-monitoring                  monitoring                  4m1s   True    Release reconciliation succeeded
+cozy-postgres-operator           postgres-operator           4m1s   True    Release reconciliation succeeded
+cozy-rabbitmq-operator           rabbitmq-operator           4m1s   True    Release reconciliation succeeded
+cozy-redis-operator              redis-operator              4m1s   True    Release reconciliation succeeded
+cozy-telepresence                telepresence                4m1s   True    Release reconciliation succeeded
+cozy-victoria-metrics-operator   victoria-metrics-operator   4m1s   True    Release reconciliation succeeded
+tenant-root                      tenant-root                 4m1s   True    Release reconciliation succeeded
 ```
 
 #### Configure Storage
@@ -332,13 +332,13 @@ linstor physical-storage list
 
 example output:
 ```console
-+-------------------------------------------+
-| Size        | Rotational | Nodes          |
-|===========================================|
-| 34359738368 | True       | srv3[/dev/sdb] |
-|             |            | srv1[/dev/sdb] |
-|             |            | srv2[/dev/sdb] |
-+-------------------------------------------+
++--------------------------------------------+
+| Size         | Rotational | Nodes          |
+|============================================|
+| 107374182400 | True       | srv3[/dev/sdb] |
+|              |            | srv1[/dev/sdb] |
+|              |            | srv2[/dev/sdb] |
++--------------------------------------------+
 ```
 
 
@@ -487,19 +487,19 @@ kubectl get pvc -n tenant-root
 example output:
 ```console
 NAME                                     STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
-data-etcd-0                              Bound    pvc-bfc844a6-4253-411c-a2cd-94fb5a98b1ce   10Gi       RWO            local          <unset>                 28m
-data-etcd-1                              Bound    pvc-b198f493-fb47-431c-a7aa-3befcf38a7d2   10Gi       RWO            local          <unset>                 28m
-data-etcd-2                              Bound    pvc-554fa8eb-d99b-4088-9dc9-2b7442bcfe1c   10Gi       RWO            local          <unset>                 28m
-grafana-db-1                             Bound    pvc-47a3d4a3-4e81-4724-8efa-eb94ee9e29b4   10Gi       RWO            local          <unset>                 28m
-grafana-db-2                             Bound    pvc-e1188950-cfa8-446a-865d-a30abfb5a018   10Gi       RWO            local          <unset>                 28m
-vmselect-cachedir-vmselect-longterm-0    Bound    pvc-13c5822b-744d-4df3-b9b9-623dd0cad414   2Gi        RWO            local          <unset>                 28m
-vmselect-cachedir-vmselect-longterm-1    Bound    pvc-d7b707cd-d5ec-45d7-b60c-b8edb49993b3   2Gi        RWO            local          <unset>                 28m
-vmselect-cachedir-vmselect-shortterm-0   Bound    pvc-dbe7d9eb-a2ad-4b38-bef6-672c44f16188   2Gi        RWO            local          <unset>                 28m
-vmselect-cachedir-vmselect-shortterm-1   Bound    pvc-a6472fbe-7f7b-4a7e-b6e1-80f8b26d1e44   2Gi        RWO            local          <unset>                 28m
-vmstorage-db-vmstorage-longterm-0        Bound    pvc-0b348bd9-4371-439b-b3e8-9e5b68df6632   10Gi       RWO            local          <unset>                 28m
-vmstorage-db-vmstorage-longterm-1        Bound    pvc-e217d1e4-b467-4487-abb7-585410c96e54   10Gi       RWO            local          <unset>                 28m
-vmstorage-db-vmstorage-shortterm-0       Bound    pvc-b891172e-011c-4a6a-936c-cda4e04ad99f   10Gi       RWO            local          <unset>                 28m
-vmstorage-db-vmstorage-shortterm-1       Bound    pvc-d8d9da02-523e-4ec7-809a-bfc3b8f46f72   10Gi       RWO            local          <unset>                 28m
+data-etcd-0                              Bound    pvc-4cbd29cc-a29f-453d-b412-451647cd04bf   10Gi       RWO            local          <unset>                 2m10s
+data-etcd-1                              Bound    pvc-1579f95a-a69d-4a26-bcc2-b15ccdbede0d   10Gi       RWO            local          <unset>                 115s
+data-etcd-2                              Bound    pvc-907009e5-88bf-4d18-91e7-b56b0dbfb97e   10Gi       RWO            local          <unset>                 91s
+grafana-db-1                             Bound    pvc-7b3f4e23-228a-46fd-b820-d033ef4679af   10Gi       RWO            local          <unset>                 2m41s
+grafana-db-2                             Bound    pvc-ac9b72a4-f40e-47e8-ad24-f50d843b55e4   10Gi       RWO            local          <unset>                 113s
+vmselect-cachedir-vmselect-longterm-0    Bound    pvc-622fa398-2104-459f-8744-565eee0a13f1   2Gi        RWO            local          <unset>                 2m21s
+vmselect-cachedir-vmselect-longterm-1    Bound    pvc-fc9349f5-02b2-4e25-8bef-6cbc5cc6d690   2Gi        RWO            local          <unset>                 2m21s
+vmselect-cachedir-vmselect-shortterm-0   Bound    pvc-7acc7ff6-6b9b-4676-bd1f-6867ea7165e2   2Gi        RWO            local          <unset>                 2m41s
+vmselect-cachedir-vmselect-shortterm-1   Bound    pvc-e514f12b-f1f6-40ff-9838-a6bda3580eb7   2Gi        RWO            local          <unset>                 2m40s
+vmstorage-db-vmstorage-longterm-0        Bound    pvc-e8ac7fc3-df0d-4692-aebf-9f66f72f9fef   10Gi       RWO            local          <unset>                 2m21s
+vmstorage-db-vmstorage-longterm-1        Bound    pvc-68b5ceaf-3ed1-4e5a-9568-6b95911c7c3a   10Gi       RWO            local          <unset>                 2m21s
+vmstorage-db-vmstorage-shortterm-0       Bound    pvc-cee3a2a4-5680-4880-bc2a-85c14dba9380   10Gi       RWO            local          <unset>                 2m41s
+vmstorage-db-vmstorage-shortterm-1       Bound    pvc-d55c235d-cada-4c4a-8299-e5fc3f161789   10Gi       RWO            local          <unset>                 2m41s
 ```
 
 Check all pods are running:
@@ -511,30 +511,32 @@ kubectl get pod -n tenant-root
 
 example output:
 ```console
-NAME                                           READY   STATUS       RESTARTS   AGE
-etcd-0                                         1/1     Running      0          90s
-etcd-1                                         1/1     Running      0          90s
-etcd-2                                         1/1     Running      0          90s
-grafana-deployment-74b5656d6-cp6x4             1/1     Running      0          97s
-grafana-deployment-74b5656d6-wflhs             1/1     Running      0          97s
-root-ingress-controller-6ccf55bc6d-8dsb7       2/2     Running      0          97s
-root-ingress-controller-6ccf55bc6d-xnb8w       2/2     Running      0          96s
-root-ingress-defaultbackend-686bcbbd6c-hl6sb   1/1     Running      0          94s
-vmalert-vmalert-644986d5c-dv9dm                2/2     Running      0          92s
-vmalertmanager-alertmanager-0                  2/2     Running      0          87s
-vmalertmanager-alertmanager-1                  2/2     Running      0          84s
-vminsert-longterm-75789465f-7sv5m              1/1     Running      0          86s
-vminsert-longterm-75789465f-st2vf              1/1     Running      0          88s
-vminsert-shortterm-78456f8fd9-2wmgz            1/1     Running      0          82s
-vminsert-shortterm-78456f8fd9-mc2fp            1/1     Running      0          84s
-vmselect-longterm-0                            1/1     Running      0          75s
-vmselect-longterm-1                            1/1     Running      0          73s
-vmselect-shortterm-0                           1/1     Running      0          71s
-vmselect-shortterm-1                           1/1     Running      0          70s
-vmstorage-longterm-0                           1/1     Running      0          67s
-vmstorage-longterm-1                           1/1     Running      0          70s
-vmstorage-shortterm-0                          1/1     Running      0          69s
-vmstorage-shortterm-1                          1/1     Running      0          68s
+NAME                                           READY   STATUS    RESTARTS       AGE
+etcd-0                                         1/1     Running   0              2m1s
+etcd-1                                         1/1     Running   0              106s
+etcd-2                                         1/1     Running   0              82s
+grafana-db-1                                   1/1     Running   0              119s
+grafana-db-2                                   1/1     Running   0              13s
+grafana-deployment-74b5656d6-5dcvn             1/1     Running   0              90s
+grafana-deployment-74b5656d6-q5589             1/1     Running   1 (105s ago)   111s
+root-ingress-controller-6ccf55bc6d-pg79l       2/2     Running   0              2m27s
+root-ingress-controller-6ccf55bc6d-xbs6x       2/2     Running   0              2m29s
+root-ingress-defaultbackend-686bcbbd6c-5zbvp   1/1     Running   0              2m29s
+vmalert-vmalert-644986d5c-7hvwk                2/2     Running   0              2m30s
+vmalertmanager-alertmanager-0                  2/2     Running   0              2m32s
+vmalertmanager-alertmanager-1                  2/2     Running   0              2m31s
+vminsert-longterm-75789465f-hc6cz              1/1     Running   0              2m10s
+vminsert-longterm-75789465f-m2v4t              1/1     Running   0              2m12s
+vminsert-shortterm-78456f8fd9-wlwww            1/1     Running   0              2m29s
+vminsert-shortterm-78456f8fd9-xg7cw            1/1     Running   0              2m28s
+vmselect-longterm-0                            1/1     Running   0              2m12s
+vmselect-longterm-1                            1/1     Running   0              2m12s
+vmselect-shortterm-0                           1/1     Running   0              2m31s
+vmselect-shortterm-1                           1/1     Running   0              2m30s
+vmstorage-longterm-0                           1/1     Running   0              2m12s
+vmstorage-longterm-1                           1/1     Running   0              2m12s
+vmstorage-shortterm-0                          1/1     Running   0              2m32s
+vmstorage-shortterm-1                          1/1     Running   0              2m31s
 ```
 
 Now you can get public IP of ingress controller:
@@ -544,8 +546,8 @@ kubectl get svc -n tenant-root root-ingress-controller
 
 example output:
 ```console
-NAME                      TYPE           CLUSTER-IP      EXTERNAL-IP       PORT(S)                      AGE
-root-ingress-controller   LoadBalancer   10.96.101.234   192.168.100.200   80:31879/TCP,443:31262/TCP   49s
+NAME                      TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)                      AGE
+root-ingress-controller   LoadBalancer   10.96.16.141   192.168.100.200   80:31632/TCP,443:30113/TCP   3m33s
 ```
 
 Use `grafana.example.org` (under 192.168.100.200) to access system monitoring, where `example.org` is your domain specified for `tenant-root`
