@@ -1,19 +1,71 @@
+![Cozystack](img/cozystack-logo.svg)
+
+[![Open Source](https://img.shields.io/badge/Open-Source-brightgreen)](https://opensource.org/)
+[![GPLv3 License](https://img.shields.io/github/license/aenix.io/cozystack)](https://opensource.org/licenses/)
+[![Support](https://img.shields.io/badge/$-support-12a0df.svg?style=flat)](https://aenix.io/contact-us/#meet)
+[![Active](http://img.shields.io/badge/Status-Active-green.svg)](https://aenix.io/cozystack/)
+[![GitHub Release](https://img.shields.io/github/release/aenix.io/cozystack.svg?style=flat)](https://github.com/aenix.io/cozystack)
+[![GitHub Commit](https://img.shields.io/github/commit-activity/y/linbit/aenix.io/cozystack)](https://github.com/aenix.io/cozystack) 
+
 # Cozystack
+
+**Cozystack** is an open-source **PaaS platform** for cloud providers.
+
+With Cozystack, you can transform your bunch of servers into an intelligent system with a simple REST API for spawning Kubernetes clusters, Database-as-a-Service, virtual machines, load balancers, HTTP caching services, and other services with ease.
+
+You can use Cozystack to build your own cloud or to provide a cost-effective development environments.  
+
+## Use-Cases
+
+### As a backend for a public cloud
+
+Cozystack positions itself as a kind of framework for building public clouds. The key word here is framework. In this case, it's important to understand that Cozystack is made for cloud providers, not for end users.
+
+Despite having a graphical interface, the current security model does not imply public user access to your management cluster.
+
+Instead, end users get access to their own Kubernetes clusters, can order LoadBalancers and additional services from it, but they have no access and know nothing about your management cluster powered by Cozystack.
+
+Thus, to integrate with your billing system, it's enough to teach your system to go to the management Kubernetes and place a YAML file signifying the service you're interested in. Cozystack will do the rest of the work for you.
+
+![](https://aenix.io/wp-content/uploads/2024/02/Wireframe-1.png)
+
+### As a private cloud for Infrastructure-as-Code
+
+One of the use cases is a self-portal for users within your company, where they can order the service they're interested in or a managed database.
+
+You can implement best GitOps practices, where users will launch their own Kubernetes clusters and databases for their needs with a simple commit of configuration into your infrastructure Git repository.
+
+Thanks to the standardization of the approach to deploying applications, you can expand the platform's capabilities using the functionality of standard Helm charts.
+
+### As a Kubernetes distribution for Bare Metal
+
+We created Cozystack primarily for our own needs, having vast experience in building reliable systems on bare metal infrastructure. This experience led to the formation of a separate boxed product, which is aimed at standardizing and providing a ready-to-use tool for managing your infrastructure.
+
+Currently, Cozystack already solves a huge scope of infrastructure tasks: starting from provisioning bare metal servers, having a ready monitoring system, fast and reliable storage, a network fabric with the possibility of interconnect with your infrastructure, the ability to run virtual machines, databases, and much more right out of the box.
+
+All this makes Cozystack a convenient platform for delivering and launching your application on Bare Metal.
+
+## Screenshot
+
+![](https://aenix.io/wp-content/uploads/2023/12/cozystack1-1.png)
+
+## Core values
+
+### Standardization and unification
+All components of the platform are based on open source tools and technologies which are widely known in the industry.
+
+### Collaborate, not compete
+If a feature being developed for the platform could be useful to a upstream project, it should be contributed to upstream project, rather than being implemented within the platform.
+
+### API-first
+Cozystack is based on Kubernetes and involves close interaction with its API. We don't aim to completely hide the all elements behind a pretty UI or any sort of customizations; instead, we provide a standard interface and teach users how to work with basic primitives. The web interface is used solely for deploying applications and quickly diving into basic concepts of platform.
 
 ## Quick Start
 
-Install dependicies:
-
-- `docker`
-- `talosctl`
-- `dialog`
-- `nmap`
-- `make`
-- `yq`
-- `kubectl`
-- `helm`
-
 ### Preapre infrastructure
+
+
+![](https://aenix.io/wp-content/uploads/2024/02/Wireframe-2.png)
 
 You need 3 physical servers or VMs with nested virtualisation:
 
@@ -30,18 +82,29 @@ Any Linux system installed on it (eg. Ubuntu should be enough)
 
 **Note:** The VM should support `x86-64-v2` architecture, the most probably you can achieve this by setting cpu model to `host`
 
+#### Install dependicies:
+
+- `docker`
+- `talosctl`
+- `dialog`
+- `nmap`
+- `make`
+- `yq`
+- `kubectl`
+- `helm`
+
 ### Netboot server
 
 Start matchbox with prebuilt Talos image for Cozystack:
 
-```
+```bash
 sudo docker run --name=matchbox -d --net=host ghcr.io/aenix-io/cozystack/matchbox:v0.0.1 \
   -address=:8080 \
   -log-level=debug
 ```
 
 Start DHCP-Server:
-```
+```bash
 sudo docker run --name=dnsmasq -d --cap-add=NET_ADMIN --net=host quay.io/poseidon/dnsmasq \
   -d -q -p0 \
   --dhcp-range=192.168.100.3,192.168.100.254 \
@@ -57,7 +120,7 @@ sudo docker run --name=dnsmasq -d --cap-add=NET_ADMIN --net=host quay.io/poseido
   --dhcp-match=set:efi64,option:client-arch,9 \
   --dhcp-boot=tag:efi64,ipxe.efi \
   --dhcp-userclass=set:ipxe,iPXE \
-  --dhcp-boot=tag:ipxe,http://192.168.100.250:8080/boot.ipxe \
+  --dhcp-boot=tag:ipxe,http://192.168.100.254:8080/boot.ipxe \
   --log-queries \
   --log-dhcp
 ```
@@ -65,7 +128,7 @@ sudo docker run --name=dnsmasq -d --cap-add=NET_ADMIN --net=host quay.io/poseido
 Where:
 - `192.168.100.3,192.168.100.254` range to allocate IPs from
 - `192.168.100.1` your gateway
-- `192.168.100.250` is address of your management server
+- `192.168.100.254` is address of your management server
 
 Check status of containers:
 
@@ -73,9 +136,9 @@ Check status of containers:
 docker ps
 ```
 
-Example output:
+example output:
 
-```
+```console
 CONTAINER ID   IMAGE                                        COMMAND                  CREATED          STATUS          PORTS     NAMES
 22044f26f74d   quay.io/poseidon/dnsmasq                     "/usr/sbin/dnsmasq -…"   6 seconds ago    Up 5 seconds              dnsmasq
 231ad81ff9e0   ghcr.io/aenix-io/cozystack/matchbox:v0.0.1   "/matchbox -address=…"   58 seconds ago   Up 57 seconds             matchbox
@@ -143,22 +206,22 @@ EOT
 
 Run [talos-bootstrap](https://github.com/aenix-io/talos-bootstrap/) to deploy cluster:
 
-```
+```bash
 talos-bootstrap install
 ```
 
 Save admin kubeconfig to access your Kubernetes cluster:
-```
+```bash
 cp -i kubeconfig ~/.kube/config
 ```
 
 Check connection:
-```
+```bash
 kubectl get ns
 ```
 
 example output:
-```
+```console
 NAME              STATUS   AGE
 default           Active   7m56s
 kube-node-lease   Active   7m56s
@@ -191,25 +254,24 @@ EOT
 
 Create namesapce and install Cozystack system components:
 
-```
+```bash
 kubectl create ns cozy-system
 kubectl apply -f cozystack-config.yaml
 kubectl apply -f manifests/cozystack-installer.yaml
 ```
 
 (optional) You can check logs of installer:
-```
+```bash
 kubectl logs -n cozy-system deploy/cozystack
 ```
 
 Wait for a while, then check the status of installation:
-```
+```bash
 kubectl get hr -A
 ```
 
 Wait until all releases become to `Ready` state:
-
-```
+```console
 NAMESPACE                        NAME                        AGE     READY   STATUS
 cozy-cert-manager                cert-manager                2m54s   True    Release reconciliation succeeded
 cozy-cert-manager                cert-manager-issuers        2m54s   True    Release reconciliation succeeded
@@ -241,18 +303,18 @@ tenant-root                      tenant-root                 2m54s   True    Rel
 #### Configure Storage
 
 Setup alias to access LINSTOR:
-```
+```bash
 alias linstor='kubectl exec -n cozy-linstor deploy/linstor-controller -- linstor'
 ```
 
 list your nodes
-```
+```bash
 linstor node list
 ```
 
 example output:
 
-```
+```console
 +-------------------------------------------------------+
 | Node | NodeType  | Addresses                 | State  |
 |=======================================================|
@@ -264,13 +326,12 @@ example output:
 
 list empty devices:
 
-```
+```bash
 linstor physical-storage list
 ```
 
 example output:
-
-```
+```console
 +-------------------------------------------+
 | Size        | Rotational | Nodes          |
 |===========================================|
@@ -283,7 +344,7 @@ example output:
 
 create storage pools:
 
-```
+```bash
 linstor ps cdp lvm srv1 /dev/sdb --pool-name data --storage-pool data
 linstor ps cdp lvm srv2 /dev/sdb --pool-name data --storage-pool data
 linstor ps cdp lvm srv3 /dev/sdb --pool-name data --storage-pool data
@@ -291,13 +352,13 @@ linstor ps cdp lvm srv3 /dev/sdb --pool-name data --storage-pool data
 
 list storage pools:
 
-```
+```bash
 linstor sp l
 ```
 
 example output:
 
-```
+```console
 +-------------------------------------------------------------------------------------------------------------------------------------+
 | StoragePool          | Node | Driver   | PoolName | FreeCapacity | TotalCapacity | CanSnapshots | State | SharedName                |
 |=====================================================================================================================================|
@@ -350,13 +411,12 @@ EOT
 
 list storageclasses:
 
-```
+```bash
 kubectl get storageclasses
 ```
 
 example output:
-
-```
+```console
 NAME              PROVISIONER              RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
 local (default)   linstor.csi.linbit.com   Delete          WaitForFirstConsumer   true                   11m
 replicated        linstor.csi.linbit.com   Delete          WaitForFirstConsumer   true                   11m
@@ -369,7 +429,7 @@ To access your services select the range of unused IPs, eg. `192.168.100.200-192
 **Note:** These IPs should be from the same network as nodes or they should have all necessary routes for them.
 
 Configure MetalLB to use and announce this range:
-```
+```yaml
 kubectl create -f- <<EOT
 ---
 apiVersion: metallb.io/v1beta1
@@ -397,12 +457,12 @@ EOT
 #### Setup basic applications
 
 Get token from `tenant-root`:
-```
+```bash
 kubectl get secret -n tenant-root tenant-root -o go-template='{{ printf "%s\n" (index .data "token" | base64decode) }}'
 ```
 
 Enable port forward to cozy-dashboard:
-```
+```bash
 kubectl port-forward -n cozy-dashboard svc/dashboard 8080:80
 ```
 
@@ -420,12 +480,12 @@ Open: http://localhost:8080/
 
 Check persistent volumes provisioned:
 
-```
+```bash
 kubectl get pvc -n tenant-root
 ```
 
 example output:
-```
+```console
 NAME                                     STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
 data-etcd-0                              Bound    pvc-bfc844a6-4253-411c-a2cd-94fb5a98b1ce   10Gi       RWO            local          <unset>                 28m
 data-etcd-1                              Bound    pvc-b198f493-fb47-431c-a7aa-3befcf38a7d2   10Gi       RWO            local          <unset>                 28m
@@ -445,13 +505,12 @@ vmstorage-db-vmstorage-shortterm-1       Bound    pvc-d8d9da02-523e-4ec7-809a-bf
 Check all pods are running:
 
 
-```
+```bash
 kubectl get pod -n tenant-root
 ```
 
 example output:
-
-```
+```console
 NAME                                           READY   STATUS       RESTARTS   AGE
 etcd-0                                         1/1     Running      0          90s
 etcd-1                                         1/1     Running      0          90s
@@ -484,8 +543,7 @@ kubectl get svc -n tenant-root root-ingress-controller
 ```
 
 example output:
-
-```
+```console
 NAME                      TYPE           CLUSTER-IP      EXTERNAL-IP       PORT(S)                      AGE
 root-ingress-controller   LoadBalancer   10.96.101.234   192.168.100.200   80:31879/TCP,443:31262/TCP   49s
 ```
@@ -495,6 +553,6 @@ Use `grafana.example.org` (under 192.168.100.200) to access system monitoring, w
 - login: `admin`
 - password:
 
-```
+```bash
 kubectl get secret -n tenant-root grafana-admin-password -o go-template='{{ printf "%s\n" (index .data "password" | base64decode) }}'
 ```
