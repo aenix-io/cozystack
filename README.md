@@ -1,4 +1,5 @@
-![Cozystack](img/cozystack-logo.svg)
+![Cozystack](img/cozystack-logo-black.svg#gh-light-mode-only)
+![Cozystack](img/cozystack-logo-white.svg#gh-dark-mode-only)
 
 [![Open Source](https://img.shields.io/badge/Open-Source-brightgreen)](https://opensource.org/)
 [![Apache-2.0 License](https://img.shields.io/github/license/aenix-io/cozystack)](https://opensource.org/licenses/)
