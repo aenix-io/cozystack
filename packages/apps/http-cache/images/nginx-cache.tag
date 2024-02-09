@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/nginx:v0.0.1
+ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0

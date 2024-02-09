@@ -99,7 +99,7 @@ Any Linux system installed on it (eg. Ubuntu should be enough)
 Start matchbox with prebuilt Talos image for Cozystack:
 
 ```bash
-sudo docker run --name=matchbox -d --net=host ghcr.io/aenix-io/cozystack/matchbox:v0.0.1 \
+sudo docker run --name=matchbox -d --net=host ghcr.io/aenix-io/cozystack/matchbox:v0.0.2 \
   -address=:8080 \
   -log-level=debug
 ```
@@ -142,7 +142,7 @@ example output:
 ```console
 CONTAINER ID   IMAGE                                        COMMAND                  CREATED          STATUS          PORTS     NAMES
 22044f26f74d   quay.io/poseidon/dnsmasq                     "/usr/sbin/dnsmasq -…"   6 seconds ago    Up 5 seconds              dnsmasq
-231ad81ff9e0   ghcr.io/aenix-io/cozystack/matchbox:v0.0.1   "/matchbox -address=…"   58 seconds ago   Up 57 seconds             matchbox
+231ad81ff9e0   ghcr.io/aenix-io/cozystack/matchbox:v0.0.2   "/matchbox -address=…"   58 seconds ago   Up 57 seconds             matchbox
 ```
 
 ### Bootstrap cluster
