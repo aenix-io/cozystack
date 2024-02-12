@@ -99,7 +99,7 @@ Any Linux system installed on it (eg. Ubuntu should be enough)
 Start matchbox with prebuilt Talos image for Cozystack:
 
 ```bash
-sudo docker run --name=matchbox -d --net=host ghcr.io/aenix-io/cozystack/matchbox:v0.0.2 \
+sudo docker run --name=matchbox -d --net=host ghcr.io/aenix-io/cozystack/matchbox:v1.6.4 \
   -address=:8080 \
   -log-level=debug
 ```
