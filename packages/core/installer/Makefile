@@ -24,12 +24,13 @@ image-installer:
 	docker buildx build -f images/installer/Dockerfile ../../.. \
 		--provenance false \
 		--tag $(REGISTRY)/installer:$(TAG) \
-		--cache-from type=registry,ref=$(REGISTRY)/installer:$(TAG) \
+		--tag $(REGISTRY)/installer:$(TALOS_VERSION)-$(TAG) \
+		--cache-from type=registry,ref=$(REGISTRY)/installer:$(TALOS_VERSION) \
 		--cache-to type=inline \
 		--metadata-file images/installer.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/installer:$(TAG)" > images/installer.tag
+	echo "$(REGISTRY)/installer:$(TALOS_VERSION)" > images/installer.tag
 
 image-talos:
 	test -f ../../../_out/assets/installer-amd64.tar || make talos-installer
@@ -43,12 +44,13 @@ image-matchbox:
 	docker buildx build -f images/matchbox/Dockerfile ../../.. \
 		--provenance false \
 		--tag $(REGISTRY)/matchbox:$(TAG) \
-		--cache-from type=registry,ref=$(REGISTRY)/matchbox:$(TAG) \
+		--tag $(REGISTRY)/matchbox:$(TALOS_VERSION)-$(TAG) \
+		--cache-from type=registry,ref=$(REGISTRY)/matchbox:$(TALOS_VERSION) \
 		--cache-to type=inline \
 		--metadata-file images/matchbox.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/matchbox:$(TAG)" > images/matchbox.tag
+	echo "$(REGISTRY)/matchbox:$(TALOS_VERSION)" > images/matchbox.tag
 
 assets: talos-iso
 
