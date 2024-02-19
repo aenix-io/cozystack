@@ -1,3 +1,15 @@
+FROM golang:alpine3.19 as k8s-await-election-builder
+
+ARG K8S_AWAIT_ELECTION_GITREPO=https://github.com/LINBIT/k8s-await-election
+ARG K8S_AWAIT_ELECTION_VERSION=0.4.1
+
+RUN apk add --no-cache git make
+RUN git clone ${K8S_AWAIT_ELECTION_GITREPO} /usr/local/go/k8s-await-election/ \
+ && cd /usr/local/go/k8s-await-election \
+ && git reset --hard v${K8S_AWAIT_ELECTION_VERSION} \
+ && make \
+ && mv ./out/k8s-await-election-amd64 /k8s-await-election
+
 FROM alpine:3.19 AS builder
 
 RUN apk add --no-cache make git
@@ -18,7 +30,8 @@ COPY scripts /cozystack/scripts
 COPY --from=builder /src/packages/core /cozystack/packages/core
 COPY --from=builder /src/packages/system /cozystack/packages/system
 COPY --from=builder /src/_out/repos /cozystack/assets/repos
+COPY --from=k8s-await-election-builder /k8s-await-election /usr/bin/k8s-await-election
 COPY dashboards /cozystack/assets/dashboards
 
 WORKDIR /cozystack
-ENTRYPOINT [ "/cozystack/scripts/installer.sh" ]
+ENTRYPOINT ["/usr/bin/k8s-await-election", "/cozystack/scripts/installer.sh" ]
