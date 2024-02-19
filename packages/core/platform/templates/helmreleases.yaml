@@ -646,6 +646,17 @@ spec:
     namespace: cozy-cilium
   - name: kubeovn
     namespace: cozy-kubeovn
+  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1beta2" }}
+  {{- $repoApps := lookup "source.toolkit.fluxcd.io/v1beta2" "HelmRepository" "cozy-public" "cozystack-apps" }}
+  {{- $repoExtra := lookup "source.toolkit.fluxcd.io/v1beta2" "HelmRepository" "cozy-public" "cozystack-extra" }}
+  values:
+    kubeapps:
+      redis:
+        master:
+          podAnnotations:
+            cozystack.io/repository-hash-apps: {{ (($repoApps.status).artifact).revision | quote }}
+            cozystack.io/repository-hash-extra: {{ (($repoExtra.status).artifact).revision | quote }}
+  {{- end }}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease

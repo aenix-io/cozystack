@@ -35,11 +35,6 @@ kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/re
 # Install platform chart
 make -C packages/core/platform apply
 
-# Flush kubeapps cache
-if kubectl wait --for=condition=ready -n cozy-dashboard pod/dashboard-redis-master-0 --timeout=1s; then
-  kubectl exec -ti -n cozy-dashboard dashboard-redis-master-0 -- sh -c 'redis-cli -a "$REDIS_PASSWORD" flushdb'
-fi
-
 # Reconcile platform chart
 trap 'exit' INT TERM
 while true; do
