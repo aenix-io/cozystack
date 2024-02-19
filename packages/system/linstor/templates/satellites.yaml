@@ -27,6 +27,13 @@ spec:
               $patch: delete
             - name: drbd-module-loader
               $patch: delete
+          containers:
+          - name: linstor-satellite
+            volumeMounts:
+            - mountPath: /run
+              name: host-run
+            securityContext:
+              readOnlyRootFilesystem: false
           volumes:
             - name: run-systemd-system
               $patch: delete
@@ -45,4 +52,8 @@ spec:
             - name: etc-lvm-archive
               hostPath:
                 path: /var/etc/lvm/archive
+                type: DirectoryOrCreate
+            - name: host-run
+              hostPath:
+                path: /run
                 type: DirectoryOrCreate
