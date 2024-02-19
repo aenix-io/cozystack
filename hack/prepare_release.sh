@@ -12,9 +12,6 @@ talos_version=$(awk '/^version:/ {print $2}' packages/core/installer/images/talo
 
 set -x
 
-sed -i "s|\(ghcr.io/aenix-io/cozystack/matchbox:\)v[^ ]\+|\1${talos_version}|g" README.md
-sed -i "s|\(ghcr.io/aenix-io/cozystack/talos:\)v[^ ]\+|\1${talos_version}|g" README.md
-
 sed -i "/^TAG / s|=.*|= ${version}|" \
   packages/apps/http-cache/Makefile \
   packages/apps/kubernetes/Makefile \
