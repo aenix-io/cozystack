@@ -41,8 +41,6 @@ spec:
   selector:
     matchLabels:
       app: cozystack
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -58,6 +56,18 @@ spec:
           value: localhost
         - name: KUBERNETES_SERVICE_PORT
           value: "7445"
+        - name: K8S_AWAIT_ELECTION_ENABLED
+          value: "1"
+        - name: K8S_AWAIT_ELECTION_NAME
+          value: cozystack
+        - name: K8S_AWAIT_ELECTION_LOCK_NAME
+          value: cozystack
+        - name: K8S_AWAIT_ELECTION_LOCK_NAMESPACE
+          value: cozy-system
+        - name: K8S_AWAIT_ELECTION_IDENTITY
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
       - name: darkhttpd
         image: "{{ .Files.Get "images/installer.tag" | trim }}@{{ index (.Files.Get "images/installer.json" | fromJson) "containerimage.digest" }}"
         command:
