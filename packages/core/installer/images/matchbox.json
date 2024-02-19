@@ -1,14 +1,4 @@
 {
-  "containerimage.config.digest": "sha256:cb8cb211017e51f6eb55604287c45cbf6ed8add5df482aaebff3d493a11b5a76",
-  "containerimage.descriptor": {
-    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:3be72cdce2f4ab4886a70fb7b66e4518a1fe4ba0771319c96fa19a0d6f409602",
-    "size": 1488,
-    "platform": {
-      "architecture": "amd64",
-      "os": "linux"
-    }
-  },
-  "containerimage.digest": "sha256:3be72cdce2f4ab4886a70fb7b66e4518a1fe4ba0771319c96fa19a0d6f409602",
-  "image.name": "ghcr.io/aenix-io/cozystack/matchbox:v0.0.2"
+  "containerimage.config.digest": "sha256:b869a6324f9c0e6d1dd48eee67cbe3842ee14efd59bdde477736ad2f90568ff7",
+  "containerimage.digest": "sha256:c30b237c5fa4fbbe47e1aba56e8f99569fe865620aa1953f31fc373794123cd7"
 }

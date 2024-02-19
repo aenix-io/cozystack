@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/matchbox:v0.0.2
+ghcr.io/aenix-io/cozystack/matchbox:v1.6.4

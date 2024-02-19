@@ -3,7 +3,7 @@ NAME=installer
 PUSH := 1
 LOAD := 0
 REGISTRY := ghcr.io/aenix-io/cozystack
-TAG := v0.0.2
+TAG := v0.1.0
 TALOS_VERSION=$(shell awk '/^version:/ {print $$2}' images/talos/profiles/installer.yaml)
 
 show:
@@ -18,19 +18,18 @@ diff:
 update:
 	hack/gen-profiles.sh
 
-image: image-installer image-talos image-matchbox
+image: image-cozystack image-talos image-matchbox
 
-image-installer:
-	docker buildx build -f images/installer/Dockerfile ../../.. \
+image-cozystack:
+	docker buildx build -f images/cozystack/Dockerfile ../../.. \
 		--provenance false \
-		--tag $(REGISTRY)/installer:$(TAG) \
-		--tag $(REGISTRY)/installer:$(TALOS_VERSION)-$(TAG) \
-		--cache-from type=registry,ref=$(REGISTRY)/installer:$(TALOS_VERSION) \
+		--tag $(REGISTRY)/cozystack:$(TAG) \
+		--cache-from type=registry,ref=$(REGISTRY)/cozystack:$(TAG) \
 		--cache-to type=inline \
-		--metadata-file images/installer.json \
+		--metadata-file images/cozystack.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/installer:$(TALOS_VERSION)" > images/installer.tag
+	echo "$(REGISTRY)/cozystack:$(TAG)" > images/cozystack.tag
 
 image-talos:
 	test -f ../../../_out/assets/installer-amd64.tar || make talos-installer
@@ -55,4 +54,7 @@ image-matchbox:
 assets: talos-iso
 
 talos-initramfs talos-kernel talos-installer talos-iso:
-	cat images/talos/profiles/$(subst talos-,,$@).yaml | docker run --rm -i -v $${PWD}/../../../_out/assets:/out -v /dev:/dev --privileged "ghcr.io/siderolabs/imager:$(TALOS_VERSION)" -
+	mkdir -p ../../../_out/assets
+	cat images/talos/profiles/$(subst talos-,,$@).yaml | \
+		docker run --rm -i -v /dev:/dev --privileged "ghcr.io/siderolabs/imager:$(TALOS_VERSION)" --tar-to-stdout - | \
+		tar -C ../../../_out/assets -xzf-
