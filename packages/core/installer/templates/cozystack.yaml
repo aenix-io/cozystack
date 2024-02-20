@@ -50,7 +50,7 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "{{ .Files.Get "images/installer.tag" | trim }}@{{ index (.Files.Get "images/installer.json" | fromJson) "containerimage.digest" }}"
+        image: "{{ .Files.Get "images/cozystack.tag" | trim }}@{{ index (.Files.Get "images/cozystack.json" | fromJson) "containerimage.digest" }}"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
@@ -69,7 +69,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
       - name: darkhttpd
-        image: "{{ .Files.Get "images/installer.tag" | trim }}@{{ index (.Files.Get "images/installer.json" | fromJson) "containerimage.digest" }}"
+        image: "{{ .Files.Get "images/cozystack.tag" | trim }}@{{ index (.Files.Get "images/cozystack.json" | fromJson) "containerimage.digest" }}"
         command:
         - /usr/bin/darkhttpd
         - /cozystack/assets

@@ -3,7 +3,7 @@ NAMESPACE=cozy-dashboard
 PUSH := 1
 LOAD := 0
 REPOSITORY := ghcr.io/aenix-io/cozystack
-TAG := v0.0.2
+TAG := v0.1.0
 
 show:
 	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
