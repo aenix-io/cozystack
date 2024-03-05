@@ -10,7 +10,7 @@
 
 # Cozystack
 
-**Cozystack** is an open-source **PaaS platform** for cloud providers.
+**Cozystack** is a free PaaS platform and framework for building clouds.
 
 With Cozystack, you can transform your bunch of servers into an intelligent system with a simple REST API for spawning Kubernetes clusters, Database-as-a-Service, virtual machines, load balancers, HTTP caching services, and other services with ease.
 
