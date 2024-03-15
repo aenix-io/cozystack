@@ -7,6 +7,10 @@ kind: Deployment
 metadata:
   name: clustermesh-apiserver
   namespace: {{ .Release.Namespace }}
+  {{- with .Values.clustermesh.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     k8s-app: clustermesh-apiserver
     app.kubernetes.io/part-of: cilium
@@ -44,41 +48,37 @@ spec:
       {{- end }}
       initContainers:
       - name: etcd-init
-        image: {{ include "cilium.image" .Values.clustermesh.apiserver.etcd.image | quote }}
-        imagePullPolicy: {{ .Values.clustermesh.apiserver.etcd.image.pullPolicy }}
-        command: ["/bin/sh", "-c"]
+        image: {{ include "cilium.image" .Values.clustermesh.apiserver.image | quote }}
+        imagePullPolicy: {{ .Values.clustermesh.apiserver.image.pullPolicy }}
+        command:
+        - /usr/bin/clustermesh-apiserver
         args:
-        - |
-          rm -rf /var/run/etcd/*;
-          /usr/local/bin/etcd --data-dir=/var/run/etcd --name=clustermesh-apiserver --listen-client-urls=http://127.0.0.1:2379 --advertise-client-urls=http://127.0.0.1:2379 --initial-cluster-token=clustermesh-apiserver --initial-cluster-state=new --auto-compaction-retention=1 &
-
-          # The following key needs to be created before that the cilium agents
-          # have the possibility of connecting to etcd.
-          etcdctl put cilium/.has-cluster-config true
-
-          etcdctl user add root --no-password;
-          etcdctl user grant-role root root;
-          etcdctl user add admin-{{ .Values.cluster.name }} --no-password;
-          etcdctl user grant-role admin-{{ .Values.cluster.name }} root;
-          etcdctl user add externalworkload --no-password;
-          etcdctl role add externalworkload;
-          etcdctl role grant-permission externalworkload --from-key read '';
-          etcdctl role grant-permission externalworkload readwrite --prefix cilium/state/noderegister/v1/;
-          etcdctl role grant-permission externalworkload readwrite --prefix cilium/.initlock/;
-          etcdctl user grant-role externalworkload externalworkload;
-          etcdctl user add remote --no-password;
-          etcdctl role add remote;
-          etcdctl role grant-permission remote --from-key read '';
-          etcdctl user grant-role remote remote;
-          etcdctl auth enable;
-          exit
+        - etcdinit
+        {{- if .Values.debug.enabled }}
+        - --debug
+        {{- end }}
+        # These need to match the equivalent arguments to etcd in the main container.
+        - --etcd-cluster-name=clustermesh-apiserver
+        - --etcd-initial-cluster-token=clustermesh-apiserver
+        - --etcd-data-dir=/var/run/etcd
+        {{- with .Values.clustermesh.apiserver.etcd.init.extraArgs }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
         env:
-        - name: ETCDCTL_API
-          value: "3"
-        - name: HOSTNAME_IP
+          # The Cilium cluster name (specified via the `CILIUM_CLUSTER_NAME` environment variable) and the etcd cluster
+          # name (specified via the `--etcd-cluster-name` argument) are very different concepts. The Cilium cluster name
+          # is the name of the overall Cilium cluster, and is used to set the admin account username. The etcd cluster
+          # name is a concept that's only relevant for etcd itself. The etcd cluster name must be the same for both this
+          # command and the actual invocation of etcd in the main containers of this Pod, but it's otherwise not
+          # relevant to Cilium.
+        - name: CILIUM_CLUSTER_NAME
           valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
+            configMapKeyRef:
+              name: cilium-config
+              key: cluster-name
+        {{- with .Values.clustermesh.apiserver.etcd.init.extraEnv }}
+        {{- toYaml . | trim | nindent 8 }}
+        {{- end }}
         volumeMounts:
         - name: etcd-data-dir
           mountPath: /var/run/etcd
@@ -92,10 +92,11 @@ spec:
         {{- end }}
       containers:
       - name: etcd
-        image: {{ include "cilium.image" .Values.clustermesh.apiserver.etcd.image | quote }}
-        imagePullPolicy: {{ .Values.clustermesh.apiserver.etcd.image.pullPolicy }}
+        # The clustermesh-apiserver container image includes an etcd binary.
+        image: {{ include "cilium.image" .Values.clustermesh.apiserver.image | quote }}
+        imagePullPolicy: {{ .Values.clustermesh.apiserver.image.pullPolicy }}
         command:
-        - /usr/local/bin/etcd
+        - /usr/bin/etcd
         args:
         - --data-dir=/var/run/etcd
         - --name=clustermesh-apiserver
@@ -147,12 +148,17 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{- with .Values.clustermesh.apiserver.etcd.lifecycle }}
+        lifecycle:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       - name: apiserver
         image: {{ include "cilium.image" .Values.clustermesh.apiserver.image | quote }}
         imagePullPolicy: {{ .Values.clustermesh.apiserver.image.pullPolicy }}
         command:
         - /usr/bin/clustermesh-apiserver
         args:
+        - clustermesh
         {{- if .Values.debug.enabled }}
         - --debug
         {{- end }}
@@ -160,6 +166,9 @@ spec:
         - --cluster-id=$(CLUSTER_ID)
         - --kvstore-opt
         - etcd.config=/var/lib/cilium/etcd-config.yaml
+        {{- if hasKey .Values.clustermesh "maxConnectedClusters" }}
+        - --max-connected-clusters={{ .Values.clustermesh.maxConnectedClusters }}
+        {{- end }}
         {{- if ne .Values.clustermesh.apiserver.tls.authMode "legacy" }}
         - --cluster-users-enabled
         - --cluster-users-config-path=/var/lib/cilium/etcd-config/users.yaml
@@ -167,6 +176,7 @@ spec:
         - --enable-external-workloads={{ .Values.externalWorkloads.enabled }}
         {{- if .Values.clustermesh.apiserver.metrics.enabled }}
         - --prometheus-serve-addr=:{{ .Values.clustermesh.apiserver.metrics.port }}
+        - --controller-group-metrics=all
         {{- end }}
         {{- with .Values.clustermesh.apiserver.extraArgs }}
         {{- toYaml . | trim | nindent 8 }}
@@ -224,13 +234,18 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{- with .Values.clustermesh.apiserver.lifecycle }}
+        lifecycle:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       {{- if .Values.clustermesh.apiserver.kvstoremesh.enabled }}
       - name: kvstoremesh
-        image: {{ include "cilium.image" .Values.clustermesh.apiserver.kvstoremesh.image | quote }}
-        imagePullPolicy: {{ .Values.clustermesh.apiserver.kvstoremesh.image.pullPolicy }}
+        image: {{ include "cilium.image" .Values.clustermesh.apiserver.image | quote }}
+        imagePullPolicy: {{ .Values.clustermesh.apiserver.image.pullPolicy }}
         command:
-        - /usr/bin/kvstoremesh
+        - /usr/bin/clustermesh-apiserver
         args:
+        - kvstoremesh
         {{- if .Values.debug.enabled }}
         - --debug
         {{- end }}
@@ -240,8 +255,12 @@ spec:
         - --kvstore-opt=etcd.qps=100
         - --kvstore-opt=etcd.maxInflight=10
         - --clustermesh-config=/var/lib/cilium/clustermesh
+        {{- if hasKey .Values.clustermesh "maxConnectedClusters" }}
+        - --max-connected-clusters={{ .Values.clustermesh.maxConnectedClusters }}
+        {{- end }}
         {{- if .Values.clustermesh.apiserver.metrics.kvstoremesh.enabled }}
         - --prometheus-serve-addr=:{{ .Values.clustermesh.apiserver.metrics.kvstoremesh.port }}
+        - --controller-group-metrics=all
         {{- end }}
         {{- with .Values.clustermesh.apiserver.kvstoremesh.extraArgs }}
         {{- toYaml . | trim | nindent 8 }}
@@ -283,6 +302,10 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         {{- with .Values.clustermesh.apiserver.kvstoremesh.securityContext }}
         securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.clustermesh.apiserver.kvstoremesh.lifecycle }}
+        lifecycle:
           {{- toYaml . | nindent 10 }}
         {{- end }}
       {{- end }}
@@ -371,6 +394,7 @@ spec:
       priorityClassName: {{ include "cilium.priorityClass" (list $ .Values.clustermesh.apiserver.priorityClassName "system-cluster-critical") }}
       serviceAccount: {{ .Values.serviceAccounts.clustermeshApiserver.name | quote }}
       serviceAccountName: {{ .Values.serviceAccounts.clustermeshApiserver.name | quote }}
+      terminationGracePeriodSeconds: {{ .Values.clustermesh.apiserver.terminationGracePeriodSeconds }}
       automountServiceAccountToken: {{ .Values.serviceAccounts.clustermeshApiserver.automount }}
       {{- with .Values.clustermesh.apiserver.affinity }}
       affinity:

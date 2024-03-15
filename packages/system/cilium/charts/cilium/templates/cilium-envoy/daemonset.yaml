@@ -6,6 +6,10 @@ kind: DaemonSet
 metadata:
   name: cilium-envoy
   namespace: {{ .Release.Namespace }}
+  {{- with .Values.envoy.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     k8s-app: cilium-envoy
     app.kubernetes.io/part-of: cilium
@@ -61,11 +65,11 @@ spec:
         image: {{ include "cilium.image" .Values.envoy.image | quote }}
         imagePullPolicy: {{ .Values.envoy.image.pullPolicy }}
         command:
-        - /usr/bin/cilium-envoy
+        - /usr/bin/cilium-envoy-starter
         args:
         - '-c /var/run/cilium/envoy/bootstrap-config.json'
         - '--base-id 0'
-        {{- if and (hasKey .Values.debug "verbose") (.Values.debug.verbose) (has "envoy" ( splitList " " .Values.debug.verbose )) }}
+        {{- if and (.Values.debug.enabled) (hasKey .Values.debug "verbose") (.Values.debug.verbose) (has "envoy" ( splitList " " .Values.debug.verbose )) }}
         - '--log-level trace'
         {{- else if and (.Values.debug.enabled) (hasKey .Values.debug "verbose") (.Values.debug.verbose) (has "flow" ( splitList " " .Values.debug.verbose )) }}
         - '--log-level debug'
@@ -82,17 +86,18 @@ spec:
         {{- if semverCompare ">=1.20-0" .Capabilities.KubeVersion.Version }}
         startupProbe:
           httpGet:
-            host: "localhost"
+            host: {{ .Values.ipv4.enabled | ternary "127.0.0.1" "::1" | quote }}
             path: /healthz
             port: {{ .Values.envoy.healthPort }}
             scheme: HTTP
           failureThreshold: {{ .Values.envoy.startupProbe.failureThreshold }}
           periodSeconds: {{ .Values.envoy.startupProbe.periodSeconds }}
           successThreshold: 1
+          initialDelaySeconds: 5
         {{- end }}
         livenessProbe:
           httpGet:
-            host: "localhost"
+            host: {{ .Values.ipv4.enabled | ternary "127.0.0.1" "::1" | quote }}
             path: /healthz
             port: {{ .Values.envoy.healthPort }}
             scheme: HTTP
@@ -110,7 +115,7 @@ spec:
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            host: "localhost"
+            host: {{ .Values.ipv4.enabled | ternary "127.0.0.1" "::1" | quote }}
             path: /healthz
             port: {{ .Values.envoy.healthPort }}
             scheme: HTTP
@@ -175,6 +180,9 @@ spec:
         - name: envoy-sockets
           mountPath: /var/run/cilium/envoy/sockets
           readOnly: false
+        - name: envoy-artifacts
+          mountPath: /var/run/cilium/envoy/artifacts
+          readOnly: true
         - name: envoy-config
           mountPath: /var/run/cilium/envoy/
           readOnly: true
@@ -223,6 +231,10 @@ spec:
       - name: envoy-sockets
         hostPath:
           path: "{{ .Values.daemon.runPath }}/envoy/sockets"
+          type: DirectoryOrCreate
+      - name: envoy-artifacts
+        hostPath:
+          path: "{{ .Values.daemon.runPath }}/envoy/artifacts"
           type: DirectoryOrCreate
       - name: envoy-config
         configMap:

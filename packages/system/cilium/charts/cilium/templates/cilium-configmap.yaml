@@ -1,6 +1,5 @@
 {{- if and (.Values.agent) (not .Values.preflight.enabled) }}
 {{- /*  Default values with backwards compatibility */ -}}
-{{- $defaultEnableCnpStatusUpdates := "true" -}}
 {{- $defaultBpfMapDynamicSizeRatio := 0.0 -}}
 {{- $defaultBpfMasquerade := "false" -}}
 {{- $defaultBpfClockProbe := "false" -}}
@@ -13,10 +12,12 @@
 {{- $fragmentTracking := "true" -}}
 {{- $defaultKubeProxyReplacement := "false" -}}
 {{- $azureUsePrimaryAddress := "true" -}}
+{{- $defaultK8sClientQPS := 5 -}}
+{{- $defaultK8sClientBurst := 10 -}}
+{{- $defaultDNSProxyEnableTransparentMode := "false" -}}
 
 {{- /* Default values when 1.8 was initially deployed */ -}}
 {{- if semverCompare ">=1.8" (default "1.8" .Values.upgradeCompatibility) -}}
-  {{- $defaultEnableCnpStatusUpdates = "false" -}}
   {{- $defaultBpfMapDynamicSizeRatio = 0.0025 -}}
   {{- $defaultBpfMasquerade = "true" -}}
   {{- $defaultBpfClockProbe = "true" -}}
@@ -48,6 +49,7 @@
       {{- $azureUsePrimaryAddress = "false" -}}
   {{- end }}
   {{- $defaultKubeProxyReplacement = "disabled" -}}
+  {{- $defaultDNSProxyEnableTransparentMode = "true" -}}
 {{- end -}}
 
 {{- /* Default values when 1.14 was initially deployed */ -}}
@@ -75,6 +77,11 @@
   {{- $cniChainingMode = .Values.cni.chainingMode  -}}
 {{- else if (not (kindIs "invalid" .Values.cni.chainingTarget)) -}}
   {{- $cniChainingMode = "generic-veth" -}}
+{{- end -}}
+
+{{- if semverCompare ">=1.27-0" .Capabilities.KubeVersion.Version -}}
+  {{- $defaultK8sClientQPS = 10 -}}
+  {{- $defaultK8sClientBurst = 20 -}}
 {{- end -}}
 ---
 apiVersion: v1
@@ -189,6 +196,11 @@ data:
   enable-policy: "{{ lower .Values.policyEnforcementMode }}"
 {{- end }}
 
+{{- if hasKey .Values "policyCIDRMatchMode" }}
+  policy-cidr-match-mode: {{ join " " .Values.policyCIDRMatchMode | quote }}
+{{- end}}
+
+
 {{- if .Values.prometheus.enabled }}
   # If you want metrics enabled in all of your Cilium agents, set the port for
   # which the Cilium agents will have their metrics exposed.
@@ -202,6 +214,13 @@ data:
   # list. (+metric_foo to enable metric_foo , -metric_bar to disable
   # metric_bar).
   metrics: {{- range .Values.prometheus.metrics }}
+    {{ . }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.prometheus.controllerGroupMetrics }}
+  # A space-separated list of controller groups for which to enable metrics.
+  # The special values of "all" and "none" are supported.
+  controller-group-metrics: {{- range .Values.prometheus.controllerGroupMetrics }}
     {{ . }}
   {{- end }}
   {{- end }}
@@ -238,6 +257,7 @@ data:
 {{- if .Values.ingressController.enabled }}
   enable-ingress-controller: "true"
   enforce-ingress-https: {{ .Values.ingressController.enforceHttps | quote }}
+  enable-ingress-proxy-protocol: {{ .Values.ingressController.enableProxyProtocol | quote }}
   enable-ingress-secrets-sync: {{ .Values.ingressController.secretsNamespace.sync | quote }}
   ingress-secrets-namespace: {{ .Values.ingressController.secretsNamespace.name | quote }}
   ingress-lb-annotation-prefixes: {{ .Values.ingressController.ingressLBAnnotationPrefixes | join " " | quote }}
@@ -430,28 +450,23 @@ data:
   #   - vxlan (default)
   #   - geneve
 {{- if .Values.gke.enabled }}
+  {{- if ne (.Values.routingMode | default "native") "native" }}
+    {{- fail (printf "RoutingMode must be set to native when gke.enabled=true" )}}
+  {{- end }}
   routing-mode: "native"
   enable-endpoint-routes: "true"
-  enable-local-node-route: "false"
 {{- else if .Values.aksbyocni.enabled }}
+  {{- if ne (.Values.routingMode | default "tunnel") "tunnel" }}
+    {{- fail (printf "RoutingMode must be set to tunnel when aksbyocni.enabled=true" )}}
+  {{- end }}
   routing-mode: "tunnel"
   tunnel-protocol: "vxlan"
 {{- else if .Values.routingMode }}
   routing-mode: {{ .Values.routingMode | quote }}
 {{- else }}
-  {{- if eq .Values.tunnel "disabled" }}
-  routing-mode: "native"
-  {{- else if eq .Values.tunnel "vxlan" }}
-  routing-mode: "tunnel"
-  tunnel-protocol: "vxlan"
-  {{- else if eq .Values.tunnel "geneve" }}
-  routing-mode: "tunnel"
-  tunnel-protocol: "geneve"
-  {{- else }}
   # Default case
   routing-mode: "tunnel"
   tunnel-protocol: "vxlan"
-  {{- end }}
 {{- end }}
 
 {{- if .Values.tunnelProtocol }}
@@ -461,6 +476,10 @@ data:
 {{- if .Values.tunnelPort }}
   tunnel-port: {{ .Values.tunnelPort | quote }}
 {{- end }}
+
+{{- if .Values.serviceNoBackendResponse }}
+  service-no-backend-response: "{{ .Values.serviceNoBackendResponse }}"
+{{- end}}
 
 {{- if .Values.MTU }}
   mtu: {{ .Values.MTU | quote }}
@@ -500,7 +519,6 @@ data:
 {{- if .Values.azure.enabled }}
   enable-endpoint-routes: "true"
   auto-create-cilium-node-resource: "true"
-  enable-local-node-route: "false"
 {{- if .Values.azure.userAssignedIdentityID }}
   azure-user-assigned-identity-id: {{ .Values.azure.userAssignedIdentityID | quote }}
 {{- end }}
@@ -551,6 +569,7 @@ data:
 {{- else if eq $defaultBpfMasquerade "true" }}
   enable-bpf-masquerade: {{ $defaultBpfMasquerade | quote }}
 {{- end }}
+  enable-masquerade-to-route-source: {{ .Values.enableMasqueradeRouteSource | quote }}
 {{- if hasKey .Values "egressMasqueradeInterfaces" }}
   egress-masquerade-interfaces: {{ .Values.egressMasqueradeInterfaces }}
 {{- end }}
@@ -583,13 +602,21 @@ data:
     {{- if .Values.encryption.wireguard.userspaceFallback }}
   enable-wireguard-userspace-fallback: {{ .Values.encryption.wireguard.userspaceFallback | quote }}
     {{- end }}
-    {{- if .Values.encryption.wireguard.encapsulate }}
-  wireguard-encapsulate: {{ .Values.encryption.wireguard.encapsulate | quote }}
+    {{- if .Values.encryption.wireguard.persistentKeepalive }}
+  wireguard-persistent-keepalive: {{ .Values.encryption.wireguard.persistentKeepalive | quote }}
     {{- end }}
   {{- end }}
   {{- if .Values.encryption.nodeEncryption }}
   encrypt-node: {{ .Values.encryption.nodeEncryption | quote }}
   {{- end }}
+{{- end }}
+
+{{- if .Values.encryption.strictMode.enabled }}
+  enable-encryption-strict-mode: {{ .Values.encryption.strictMode.enabled | quote }}
+
+  encryption-strict-mode-cidr: {{ .Values.encryption.strictMode.cidr | quote }}
+
+  encryption-strict-mode-allow-remote-node-identities: {{ .Values.encryption.strictMode.allowRemoteNodeIdentities | quote }}
 {{- end }}
 
   enable-xt-socket-fallback: {{ .Values.enableXTSocketFallback | quote }}
@@ -693,6 +720,11 @@ data:
 {{- end }}
 {{- if hasKey .Values.nodePort "enableHealthCheck" }}
   enable-health-check-nodeport: {{ .Values.nodePort.enableHealthCheck | quote}}
+{{- end }}
+{{- if .Values.gke.enabled }}
+  enable-health-check-loadbalancer-ip: "true"
+{{- else if hasKey .Values.nodePort "enableHealthCheckLoadBalancerIP" }}
+  enable-health-check-loadbalancer-ip: {{ .Values.nodePort.enableHealthCheckLoadBalancerIP | quote}}
 {{- end }}
   node-port-bind-protection: {{ .Values.nodePort.bindProtection | quote }}
   enable-auto-protect-node-port-range: {{ .Values.nodePort.autoProtectPortRange | quote }}
@@ -828,7 +860,7 @@ data:
 
 {{- if .Values.hubble.enabled }}
   # Enable Hubble gRPC service.
-  enable-hubble: {{ .Values.hubble.enabled  | quote }}
+  enable-hubble: {{ .Values.hubble.enabled | quote }}
   # UNIX domain socket for Hubble server to listen to.
   hubble-socket-path: {{ .Values.hubble.socketPath | quote }}
 {{- if hasKey .Values.hubble "eventQueueSize" }}
@@ -851,6 +883,49 @@ data:
     {{.}}
 {{- end }}
   enable-hubble-open-metrics: {{ .Values.hubble.metrics.enableOpenMetrics | quote }}
+{{- end }}
+{{- if .Values.hubble.redact }}
+{{- if eq .Values.hubble.redact.enabled true }}
+  # Enables hubble redact capabilities
+  hubble-redact-enabled: "true"
+{{- if .Values.hubble.redact.http }}
+  # Enables redaction of the http URL query part in flows
+  hubble-redact-http-urlquery: {{ .Values.hubble.redact.http.urlQuery | quote }}
+  # Enables redaction of the http user info in flows
+  hubble-redact-http-userinfo: {{ .Values.hubble.redact.http.userInfo | quote }}
+{{- if .Values.hubble.redact.http.headers }}
+{{- if .Values.hubble.redact.http.headers.allow }}
+  # Redact all http headers that do not match this list
+  hubble-redact-http-headers-allow: {{- range .Values.hubble.redact.http.headers.allow }}
+    {{ . }}
+{{- end }}
+{{- end }}
+{{- if .Values.hubble.redact.http.headers.deny }}
+  # Redact all http headers that match this list
+  hubble-redact-http-headers-deny: {{- range .Values.hubble.redact.http.headers.deny }}
+    {{ . }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if .Values.hubble.redact.kafka }}
+  # Enables redaction of the Kafka API key part in flows
+  hubble-redact-kafka-apikey: {{ .Values.hubble.redact.kafka.apiKey | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if .Values.hubble.export }}
+  hubble-export-file-max-size-mb: {{ .Values.hubble.export.fileMaxSizeMb | quote }}
+  hubble-export-file-max-backups: {{ .Values.hubble.export.fileMaxBackups | quote }}
+{{- if .Values.hubble.export.static.enabled }}
+  hubble-export-file-path: {{ .Values.hubble.export.static.filePath | quote }}
+  hubble-export-fieldmask: {{ .Values.hubble.export.static.fieldMask | join " " | quote }}
+  hubble-export-allowlist: {{ .Values.hubble.export.static.allowList | join "," | quote }}
+  hubble-export-denylist: {{ .Values.hubble.export.static.denyList | join "," | quote }}
+{{- end }}
+{{- if .Values.hubble.export.dynamic.enabled }}
+  hubble-flowlogs-config-path: /flowlog-config/flowlogs.yaml
+{{- end }}
 {{- end }}
 {{- if hasKey .Values.hubble "listenAddress" }}
   # An additional address for Hubble server to listen to (e.g. ":4244").
@@ -885,7 +960,7 @@ data:
   ipam-cilium-node-update-rate: {{ include "validateDuration" .Values.ipam.ciliumNodeUpdateRate | quote }}
 {{- end }}
 
-{{- if or (eq $ipam "cluster-pool") (eq $ipam "cluster-pool-v2beta") }}
+{{- if (eq $ipam "cluster-pool") }}
 {{- if .Values.ipv4.enabled }}
   {{- if hasKey .Values.ipam.operator "clusterPoolIPv4PodCIDR" }}
     {{- /* ipam.operator.clusterPoolIPv4PodCIDR removed in v1.14, remove this failsafe around v1.17 */ -}}
@@ -927,11 +1002,8 @@ data:
   limit-ipam-api-qps: {{ .Values.ipam.operator.externalAPILimitQPS | quote }}
 {{- end }}
 
-{{- if .Values.enableCnpStatusUpdates }}
-  disable-cnp-status-updates: "false"
-{{- else if (eq $defaultEnableCnpStatusUpdates "false") }}
-  disable-cnp-status-updates: "true"
-  cnp-node-status-gc-interval: "0s"
+{{- if .Values.apiRateLimit }}
+  api-rate-limit: {{ .Values.apiRateLimit | quote }}
 {{- end }}
 
 {{- if .Values.egressGateway.enabled }}
@@ -961,10 +1033,6 @@ data:
 {{- if hasKey .Values.vtep "mac" }}
   vtep-mac: {{ .Values.vtep.mac | quote }}
 {{- end }}
-{{- end }}
-
-{{- if .Values.enableK8sEventHandover }}
-  enable-k8s-event-handover: "true"
 {{- end }}
 
 {{- if .Values.crdWaitTimeout }}
@@ -1018,6 +1086,7 @@ data:
 
 {{- if .Values.bgpControlPlane.enabled }}
   enable-bgp-control-plane: "true"
+  bgp-secrets-namespace: {{ .Values.bgpControlPlane.secretsNamespace.name | quote }}
 {{- else }}
   enable-bgp-control-plane: "false"
 {{- end }}
@@ -1064,10 +1133,8 @@ data:
   annotate-k8s-node: "true"
 {{- end }}
 
-{{- if hasKey .Values "k8sClientRateLimit" }}
-  k8s-client-qps: {{ .Values.k8sClientRateLimit.qps | quote }}
-  k8s-client-burst: {{ .Values.k8sClientRateLimit.burst | quote }}
-{{- end }}
+  k8s-client-qps: {{ .Values.k8sClientRateLimit.qps | default $defaultK8sClientQPS | quote}}
+  k8s-client-burst: {{ .Values.k8sClientRateLimit.burst | default $defaultK8sClientBurst | quote }}
 
 {{- if and .Values.operator.setNodeTaints (not .Values.operator.removeNodeTaints) -}}
   {{ fail "Cannot have operator.setNodeTaintsMaxNodes and not operator.removeNodeTaints = false" }}
@@ -1092,6 +1159,13 @@ data:
 {{- end }}
 
 {{- if .Values.dnsProxy }}
+  {{- if hasKey .Values.dnsProxy "enableTransparentMode" }}
+  # explicit setting gets precedence
+  dnsproxy-enable-transparent-mode: {{ .Values.dnsProxy.enableTransparentMode | quote }}
+  {{- else if eq $cniChainingMode "none" }}
+  # default DNS proxy to transparent mode in non-chaining modes
+  dnsproxy-enable-transparent-mode: {{ $defaultDNSProxyEnableTransparentMode | quote }}
+  {{- end }}
   {{- if .Values.dnsProxy.dnsRejectResponseCode }}
   tofqdns-dns-reject-response-code: {{ .Values.dnsProxy.dnsRejectResponseCode | quote }}
   {{- end }}
@@ -1121,10 +1195,6 @@ data:
   {{- end }}
 {{- end }}
 
-{{- if .Values.extraConfig }}
-  {{ toYaml .Values.extraConfig | nindent 2 }}
-{{- end }}
-
 {{- if hasKey .Values "agentNotReadyTaintKey" }}
   agent-not-ready-taint-key: {{ .Values.agentNotReadyTaintKey | quote }}
 {{- end }}
@@ -1138,6 +1208,7 @@ data:
   mesh-auth-mutual-enabled: "true"
   mesh-auth-mutual-listener-port: {{ .Values.authentication.mutual.port | quote }}
   mesh-auth-spire-agent-socket: {{ .Values.authentication.mutual.spire.agentSocketPath | quote }}
+  mesh-auth-mutual-connect-timeout: {{ include "validateDuration" .Values.authentication.mutual.connectTimeout | quote }}
   {{- if .Values.authentication.mutual.spire.serverAddress }}
   mesh-auth-spire-server-address: {{ .Values.authentication.mutual.spire.serverAddress | quote }}
   {{- else }}
@@ -1156,6 +1227,16 @@ data:
 
 {{- if .Values.envoy.log.path }}
   envoy-log: {{ .Values.envoy.log.path | quote }}
+{{- end }}
+
+{{- if hasKey .Values.clustermesh "maxConnectedClusters" }}
+  max-connected-clusters: {{ .Values.clustermesh.maxConnectedClusters | quote }}
+{{- end }}
+
+# Extra config allows adding arbitrary properties to the cilium config.
+# By putting it at the end of the ConfigMap, it's also possible to override existing properties.
+{{- if .Values.extraConfig }}
+  {{ toYaml .Values.extraConfig | nindent 2 }}
 {{- end }}
 
 {{- end }}
