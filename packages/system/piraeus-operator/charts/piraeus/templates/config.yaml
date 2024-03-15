@@ -17,19 +17,19 @@ data:
     #   quay.io/piraeusdatastore/piraeus-server:v1.24.2
     components:
       linstor-controller:
-        tag: v1.25.1
+        tag: v1.26.2
         image: piraeus-server
       linstor-satellite:
-        tag: v1.25.1
+        tag: v1.26.2
         image: piraeus-server
       linstor-csi:
-        tag: v1.3.0
+        tag: v1.4.0
         image: piraeus-csi
       drbd-reactor:
         tag: v1.4.0
         image: drbd-reactor
       ha-controller:
-        tag: v1.1.4
+        tag: v1.2.0
         image: piraeus-ha-controller
       drbd-shutdown-guard:
         tag: v1.0.0
@@ -38,7 +38,7 @@ data:
         tag: v0.10
         image: ktls-utils
       drbd-module-loader:
-        tag: v9.2.6
+        tag: v9.2.8
         # The special "match" attribute is used to select an image based on the node's reported OS.
         # The operator will first check the k8s node's ".status.nodeInfo.osImage" field, and compare it against the list
         # here. If one matches, that specific image name will be used instead of the fallback image.
@@ -54,12 +54,18 @@ data:
             image: drbd9-almalinux8
           - osImage: AlmaLinux 9
             image: drbd9-almalinux9
+          - osImage: Rocky Linux 8
+            image: drbd9-almalinux8
+          - osImage: Rocky Linux 9
+            image: drbd9-almalinux9
           - osImage: Ubuntu 18\.04
             image: drbd9-bionic
           - osImage: Ubuntu 20\.04
             image: drbd9-focal
           - osImage: Ubuntu 22\.04
             image: drbd9-jammy
+          - osImage: Debian GNU/Linux 12
+            image: drbd9-bookworm
           - osImage: Debian GNU/Linux 11
             image: drbd9-bullseye
           - osImage: Debian GNU/Linux 10
@@ -69,25 +75,25 @@ data:
     base: registry.k8s.io/sig-storage
     components:
       csi-attacher:
-        tag: v4.4.2
+        tag: v4.5.0
         image: csi-attacher
       csi-livenessprobe:
-        tag: v2.11.0
+        tag: v2.12.0
         image: livenessprobe
       csi-provisioner:
-        tag: v3.6.2
+        tag: v4.0.0
         image: csi-provisioner
       csi-snapshotter:
-        tag: v6.3.2
+        tag: v7.0.1
         image: csi-snapshotter
       csi-resizer:
-        tag: v1.9.2
+        tag: v1.10.0
         image: csi-resizer
       csi-external-health-monitor-controller:
-        tag: v0.10.0
+        tag: v0.11.0
         image: csi-external-health-monitor-controller
       csi-node-driver-registrar:
-        tag: v2.9.1
+        tag: v2.10.0
         image: csi-node-driver-registrar
   {{- range $idx, $value := .Values.imageConfigOverride }}
   {{ add $idx 1 }}_helm_override.yaml: |

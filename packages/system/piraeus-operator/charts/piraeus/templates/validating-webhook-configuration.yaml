@@ -152,3 +152,27 @@ webhooks:
     resources:
     - linstorsatelliteconfigurations
   sideEffects: None
+- admissionReviewVersions:
+    - v1
+  clientConfig:
+    service:
+      name: '{{ include "piraeus-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-storage-k8s-io-v1-storageclass
+    {{- if not .Values.tls.certManagerIssuerRef }}
+    caBundle: {{ $ca }}
+    {{- end }}
+  failurePolicy: {{ .Values.webhook.failurePolicy }}
+  timeoutSeconds: {{ .Values.webhook.timeoutSeconds }}
+  name: vstorageclass.kb.io
+  rules:
+    - apiGroups:
+        - storage.k8s.io
+      apiVersions:
+        - v1
+      operations:
+        - CREATE
+        - UPDATE
+      resources:
+        - storageclasses
+  sideEffects: None
