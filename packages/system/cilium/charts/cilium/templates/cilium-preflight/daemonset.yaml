@@ -4,6 +4,10 @@ kind: DaemonSet
 metadata:
   name: cilium-pre-flight-check
   namespace: {{ .Release.Namespace }}
+  {{- with .Values.preflight.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
@@ -66,8 +70,13 @@ spec:
               - /tmp/ready
             initialDelaySeconds: 5
             periodSeconds: 5
-          {{- with .Values.preflight.extraEnv }}
           env:
+          - name: K8S_NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          {{- with .Values.preflight.extraEnv }}
             {{- toYaml . | trim | nindent 12 }}
           {{- end }}
           volumeMounts:
@@ -104,7 +113,7 @@ spec:
           args:
           - -ec
           - |
-            cilium preflight fqdn-poller --tofqdns-pre-cache {{ .Values.preflight.tofqdnsPreCache }};
+            cilium-dbg preflight fqdn-poller --tofqdns-pre-cache {{ .Values.preflight.tofqdnsPreCache }};
             touch /tmp/ready-tofqdns-precache;
           livenessProbe:
             exec:

@@ -10,10 +10,15 @@ metadata:
     {{- with .Values.prometheus.serviceMonitor.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  {{- if or .Values.prometheus.serviceMonitor.annotations .Values.annotations }}
   annotations:
-    {{- with .Values.prometheus.serviceMonitor.annotations }}
-    {{- toYaml . | nindent 4 }}
+    {{- with .Values.annotations }}
+      {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- with .Values.prometheus.serviceMonitor.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
@@ -34,6 +39,23 @@ spec:
     metricRelabelings:
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  {{- if .Values.envoy.prometheus.serviceMonitor.enabled }}
+  - port: envoy-metrics
+    interval: {{ .Values.envoy.prometheus.serviceMonitor.interval | quote }}
+    honorLabels: true
+    path: /metrics
+    {{- with .Values.envoy.prometheus.serviceMonitor.relabelings }}
+    relabelings:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.envoy.prometheus.serviceMonitor.metricRelabelings }}
+    metricRelabelings:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
   targetLabels:
   - k8s-app
+{{- if .Values.prometheus.serviceMonitor.jobLabel }}
+  jobLabel: {{ .Values.prometheus.serviceMonitor.jobLabel | quote }}
+{{- end }}
 {{- end }}
