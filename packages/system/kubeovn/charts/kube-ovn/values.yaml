@@ -40,7 +40,6 @@ networking:
     VLAN_ID: "100"
   EXCHANGE_LINK_NAME: false
   ENABLE_EIP_SNAT: true
-  POD_DEFAULT_FIP_TYPE: ""
   DEFAULT_SUBNET: "ovn-default"
   DEFAULT_VPC: "ovn-cluster"
   NODE_SUBNET: "join"
@@ -63,6 +62,7 @@ func:
   ENABLE_LB_SVC: false
   ENABLE_KEEP_VM_IP: true
   LS_DNAT_MOD_DL_DST: true
+  LS_CT_SKIP_DST_LPORT_IPS: true
   CHECK_GATEWAY: true
   LOGICAL_GATEWAY: false
   ENABLE_BIND_LOCAL_IP: true
@@ -90,8 +90,6 @@ dual_stack:
   PINGER_EXTERNAL_DOMAIN: "google.com."
 
 performance:
-  MODULES: "kube_ovn_fastpath.ko"
-  RPMS: "openvswitch-kmod"
   GC_INTERVAL: 360
   INSPECT_INTERVAL: 20
   OVS_VSCTL_CONCURRENCY: 100
@@ -145,7 +143,7 @@ ovs-ovn:
     cpu: "200m"
     memory: "200Mi"
   limits:
-    cpu: "1000m"
+    cpu: "2"
     memory: "1000Mi"
 kube-ovn-controller:
   requests:

@@ -1,5 +1,4 @@
-{{ if (lookup "apps/v1" "DaemonSet" .Values.namespace "ovs-ovn") }}
-{{ if eq (lookup "apps/v1" "DaemonSet" .Values.namespace "ovs-ovn").spec.updateStrategy.type "OnDelete" }}
+{{- if eq (include "kubeovn.ovs-ovn.updateStrategy" .) "OnDelete" }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -34,6 +33,16 @@ rules:
     verbs:
       - get
   - apiGroups:
+      - apps
+    resources:
+      - deployments
+    resourceNames:
+      - ovn-central
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
       - ""
     resources:
       - nodes
@@ -46,6 +55,7 @@ rules:
     verbs:
       - list
       - get
+      - watch
       - delete
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -127,16 +137,27 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: ENABLE_SSL
+              value: "{{ .Values.networking.ENABLE_SSL }}"
+            - name: OVN_DB_IPS
+              value: "{{ .Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .) }}"
           command:
-            - sh
+            - bash
+            - -eo
+            - pipefail
             - -c
             - /kube-ovn/upgrade-ovs.sh 2>&1 | tee -a /var/log/kube-ovn/upgrade-ovs.log
           volumeMounts:
             - mountPath: /var/log/kube-ovn
               name: kube-ovn-log
+            - mountPath: /var/run/tls
+              name: kube-ovn-tls
       volumes:
         - name: kube-ovn-log
           hostPath:
             path: {{ .Values.log_conf.LOG_DIR }}/kube-ovn
-{{ end }}
+        - name: kube-ovn-tls
+          secret:
+            optional: true
+            secretName: kube-ovn-tls
 {{ end }}

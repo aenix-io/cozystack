@@ -1,12 +1,4 @@
 kube-ovn:
-  global:
-    registry:
-      address: ghcr.io/kvaps
-    images:
-      kubeovn:
-        repository: test
-        tag: kube-ovn-static-v1.13.0-cozystack2
-
   namespace: cozy-kubeovn
 
   func:

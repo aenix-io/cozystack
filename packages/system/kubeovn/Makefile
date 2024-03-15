@@ -12,6 +12,7 @@ diff:
 
 update:
 	rm -rf charts && mkdir -p charts/kube-ovn
-	curl -sSL https://github.com/kubeovn/kube-ovn/archive/refs/heads/master.tar.gz | \
-	tar -C charts/kube-ovn -xzvf - --strip 2 kube-ovn-master/charts
+	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/kubeovn/kube-ovn  | awk -F'[/^]' 'END{print $$3}') && \
+	curl -sSL https://github.com/kubeovn/kube-ovn/archive/refs/tags/$${tag}.tar.gz | \
+	tar xzvf - --strip 1 kube-ovn-$${tag#*v}/charts
 	patch -p4 < patches/cozyconfig.diff
