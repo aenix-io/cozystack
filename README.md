@@ -44,6 +44,8 @@ If you encounter any difficulties, start with the [troubleshooting guide](https:
 Versioning adheres to the [Semantic Versioning](http://semver.org/) principles.  
 A full list of the available releases is available in the GitHub repository's [Release](https://github.com/aenix-io/cozystack/releases) section.
 
+- [Roadmap](https://github.com/orgs/aenix-io/projects/2)
+
 ## Contributions
 
 Contributions are highly appreciated and very welcomed!
