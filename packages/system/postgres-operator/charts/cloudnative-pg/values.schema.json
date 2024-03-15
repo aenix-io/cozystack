@@ -95,6 +95,26 @@
         "monitoring": {
             "type": "object",
             "properties": {
+                "grafanaDashboard": {
+                    "type": "object",
+                    "properties": {
+                        "configMapName": {
+                            "type": "string"
+                        },
+                        "create": {
+                            "type": "boolean"
+                        },
+                        "namespace": {
+                            "type": "string"
+                        },
+                        "sidecarLabel": {
+                            "type": "string"
+                        },
+                        "sidecarLabelValue": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "podMonitorEnabled": {
                     "type": "boolean"
                 }
