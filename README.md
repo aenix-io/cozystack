@@ -33,7 +33,7 @@ You can use Cozystack as Kubernetes distribution for Bare Metal
 
 ## Documentation
 
-The documentation is located on official [cozystack.io](cozystack.io) website.
+The documentation is located on official [cozystack.io](https://cozystack.io) website.
 
 Read [Get Started](https://cozystack.io/docs/get-started/) section for a quick start.
 
