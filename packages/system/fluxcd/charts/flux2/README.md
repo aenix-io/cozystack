@@ -1,6 +1,6 @@
 # flux2
 
-![Version: 2.11.0](https://img.shields.io/badge/Version-2.11.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.1.2](https://img.shields.io/badge/AppVersion-2.1.2-informational?style=flat-square)
+![Version: 2.12.4](https://img.shields.io/badge/Version-2.12.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.3](https://img.shields.io/badge/AppVersion-2.2.3-informational?style=flat-square)
 
 A Helm chart for flux2
 
@@ -19,7 +19,7 @@ This helm chart is maintained and released by the fluxcd-community on a best eff
 | cli.image | string | `"ghcr.io/fluxcd/flux-cli"` |  |
 | cli.nodeSelector | object | `{}` |  |
 | cli.serviceAccount.automount | bool | `true` |  |
-| cli.tag | string | `"v2.1.2"` |  |
+| cli.tag | string | `"v2.2.3"` |  |
 | cli.tolerations | list | `[]` |  |
 | clusterDomain | string | `"cluster.local"` |  |
 | crds.annotations | object | `{}` | Add annotations to all CRD resources, e.g. "helm.sh/resource-policy": keep |
@@ -41,7 +41,7 @@ This helm chart is maintained and released by the fluxcd-community on a best eff
 | helmController.serviceAccount.annotations | object | `{}` |  |
 | helmController.serviceAccount.automount | bool | `true` |  |
 | helmController.serviceAccount.create | bool | `true` |  |
-| helmController.tag | string | `"v0.36.2"` |  |
+| helmController.tag | string | `"v0.37.4"` |  |
 | helmController.tolerations | list | `[]` |  |
 | imageAutomationController.affinity | object | `{}` |  |
 | imageAutomationController.annotations."prometheus.io/port" | string | `"8080"` |  |
@@ -60,7 +60,7 @@ This helm chart is maintained and released by the fluxcd-community on a best eff
 | imageAutomationController.serviceAccount.annotations | object | `{}` |  |
 | imageAutomationController.serviceAccount.automount | bool | `true` |  |
 | imageAutomationController.serviceAccount.create | bool | `true` |  |
-| imageAutomationController.tag | string | `"v0.36.1"` |  |
+| imageAutomationController.tag | string | `"v0.37.1"` |  |
 | imageAutomationController.tolerations | list | `[]` |  |
 | imagePullSecrets | list | `[]` | contents of pod imagePullSecret in form 'name=[secretName]'; applied to all controllers |
 | imageReflectionController.affinity | object | `{}` |  |
@@ -80,7 +80,7 @@ This helm chart is maintained and released by the fluxcd-community on a best eff
 | imageReflectionController.serviceAccount.annotations | object | `{}` |  |
 | imageReflectionController.serviceAccount.automount | bool | `true` |  |
 | imageReflectionController.serviceAccount.create | bool | `true` |  |
-| imageReflectionController.tag | string | `"v0.30.0"` |  |
+| imageReflectionController.tag | string | `"v0.31.2"` |  |
 | imageReflectionController.tolerations | list | `[]` |  |
 | installCRDs | bool | `true` |  |
 | kustomizeController.affinity | object | `{}` |  |
@@ -105,7 +105,7 @@ This helm chart is maintained and released by the fluxcd-community on a best eff
 | kustomizeController.serviceAccount.annotations | object | `{}` |  |
 | kustomizeController.serviceAccount.automount | bool | `true` |  |
 | kustomizeController.serviceAccount.create | bool | `true` |  |
-| kustomizeController.tag | string | `"v1.1.1"` |  |
+| kustomizeController.tag | string | `"v1.2.2"` |  |
 | kustomizeController.tolerations | list | `[]` |  |
 | logLevel | string | `"info"` |  |
 | multitenancy.defaultServiceAccount | string | `"default"` | All Kustomizations and HelmReleases which don’t have spec.serviceAccountName specified, will use the default account from the tenant’s namespace. Tenants have to specify a service account in their Flux resources to be able to deploy workloads in their namespaces as the default account has no permissions. |
@@ -130,7 +130,7 @@ This helm chart is maintained and released by the fluxcd-community on a best eff
 | notificationController.serviceAccount.annotations | object | `{}` |  |
 | notificationController.serviceAccount.automount | bool | `true` |  |
 | notificationController.serviceAccount.create | bool | `true` |  |
-| notificationController.tag | string | `"v1.1.0"` |  |
+| notificationController.tag | string | `"v1.2.4"` |  |
 | notificationController.tolerations | list | `[]` |  |
 | notificationController.webhookReceiver.ingress.annotations | object | `{}` |  |
 | notificationController.webhookReceiver.ingress.create | bool | `false` |  |
@@ -169,6 +169,6 @@ This helm chart is maintained and released by the fluxcd-community on a best eff
 | sourceController.serviceAccount.annotations | object | `{}` |  |
 | sourceController.serviceAccount.automount | bool | `true` |  |
 | sourceController.serviceAccount.create | bool | `true` |  |
-| sourceController.tag | string | `"v1.1.2"` |  |
+| sourceController.tag | string | `"v1.2.4"` |  |
 | sourceController.tolerations | list | `[]` |  |
 | watchAllNamespaces | bool | `true` |  |

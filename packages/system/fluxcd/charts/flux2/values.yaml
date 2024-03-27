@@ -23,7 +23,7 @@ clusterDomain: cluster.local
 
 cli:
   image: ghcr.io/fluxcd/flux-cli
-  tag: v2.1.2
+  tag: v2.2.3
   nodeSelector: {}
   affinity: {}
   tolerations: []
@@ -36,7 +36,7 @@ cli:
 helmController:
   create: true
   image: ghcr.io/fluxcd/helm-controller
-  tag: v0.36.2
+  tag: v0.37.4
   resources:
     limits: {}
     # cpu: 1000m
@@ -84,7 +84,7 @@ helmController:
 imageAutomationController:
   create: true
   image: ghcr.io/fluxcd/image-automation-controller
-  tag: v0.36.1
+  tag: v0.37.1
   resources:
     limits: {}
     # cpu: 1000m
@@ -112,7 +112,7 @@ imageAutomationController:
 imageReflectionController:
   create: true
   image: ghcr.io/fluxcd/image-reflector-controller
-  tag: v0.30.0
+  tag: v0.31.2
   resources:
     limits: {}
     # cpu: 1000m
@@ -140,7 +140,7 @@ imageReflectionController:
 kustomizeController:
   create: true
   image: ghcr.io/fluxcd/kustomize-controller
-  tag: v1.1.1
+  tag: v1.2.2
   resources:
     limits: {}
     # cpu: 1000m
@@ -188,7 +188,7 @@ kustomizeController:
 notificationController:
   create: true
   image: ghcr.io/fluxcd/notification-controller
-  tag: v1.1.0
+  tag: v1.2.4
   resources:
     limits: {}
     # cpu: 1000m
@@ -220,8 +220,8 @@ notificationController:
       create: false
       # ingressClassName: nginx
       annotations: {}
-        # kubernetes.io/ingress.class: nginx
-        # kubernetes.io/tls-acme: "true"
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
       labels: {}
       hosts:
         - host: flux-webhook.example.com
@@ -241,7 +241,7 @@ notificationController:
 sourceController:
   create: true
   image: ghcr.io/fluxcd/source-controller
-  tag: v1.1.2
+  tag: v1.2.4
   resources:
     limits: {}
     # cpu: 1000m
@@ -278,6 +278,8 @@ rbac:
   createAggregation: true
   # -- Add annotations to all RBAC resources, e.g. "helm.sh/resource-policy": keep
   annotations: {}
+  roleRef:
+    name: cluster-admin
 
 logLevel: info
 watchAllNamespaces: true

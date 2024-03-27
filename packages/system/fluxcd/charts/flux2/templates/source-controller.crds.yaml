@@ -341,6 +341,10 @@ spec:
                   to ensure efficient use of resources.
                 pattern: ^([0-9]+(\.[0-9]+)?(ms|s|m|h))+$
                 type: string
+              prefix:
+                description: Prefix to use for server-side filtering of files in the
+                  Bucket.
+                type: string
               provider:
                 default: generic
                 description: Provider of the object storage bucket. Defaults to 'generic',
@@ -2150,6 +2154,32 @@ spec:
                   Chart dependencies, which are not bundled in the umbrella chart
                   artifact, are not verified.
                 properties:
+                  matchOIDCIdentity:
+                    description: MatchOIDCIdentity specifies the identity matching
+                      criteria to use while verifying an OCI artifact which was signed
+                      using Cosign keyless signing. The artifact's identity is deemed
+                      to be verified if any of the specified matchers match against
+                      the identity.
+                    items:
+                      description: OIDCIdentityMatch specifies options for verifying
+                        the certificate identity, i.e. the issuer and the subject
+                        of the certificate.
+                      properties:
+                        issuer:
+                          description: Issuer specifies the regex pattern to match
+                            against to verify the OIDC issuer in the Fulcio certificate.
+                            The pattern must be a valid Go regular expression.
+                          type: string
+                        subject:
+                          description: Subject specifies the regex pattern to match
+                            against to verify the identity subject in the Fulcio certificate.
+                            The pattern must be a valid Go regular expression.
+                          type: string
+                      required:
+                      - issuer
+                      - subject
+                      type: object
+                    type: array
                   provider:
                     default: cosign
                     description: Provider specifies the technology used to sign the
@@ -2653,6 +2683,11 @@ spec:
                 required:
                 - name
                 type: object
+              insecure:
+                description: Insecure allows connecting to a non-TLS HTTP container
+                  registry. This field is only taken into account if the .spec.type
+                  field is set to 'oci'.
+                type: boolean
               interval:
                 description: Interval at which the HelmRepository URL is checked for
                   updates. This interval is approximate and may be subject to jitter
@@ -2697,10 +2732,10 @@ spec:
                   of this HelmRepository.
                 type: boolean
               timeout:
-                default: 60s
                 description: Timeout is used for the index fetch operation for an
                   HTTPS helm repository, and for remote OCI Repository operations
-                  like pulling for an OCI helm repository. Its default value is 60s.
+                  like pulling for an OCI helm chart by the associated HelmChart.
+                  Its default value is 60s.
                 pattern: ^([0-9]+(\.[0-9]+)?(ms|s|m))+$
                 type: string
               type:
@@ -2713,9 +2748,9 @@ spec:
               url:
                 description: URL of the Helm repository, a valid URL contains at least
                   a protocol and host.
+                pattern: ^(http|https|oci)://.*$
                 type: string
             required:
-            - interval
             - url
             type: object
           status:
@@ -3033,6 +3068,32 @@ spec:
                   public keys used to verify the signature and specifies which provider
                   to use to check whether OCI image is authentic.
                 properties:
+                  matchOIDCIdentity:
+                    description: MatchOIDCIdentity specifies the identity matching
+                      criteria to use while verifying an OCI artifact which was signed
+                      using Cosign keyless signing. The artifact's identity is deemed
+                      to be verified if any of the specified matchers match against
+                      the identity.
+                    items:
+                      description: OIDCIdentityMatch specifies options for verifying
+                        the certificate identity, i.e. the issuer and the subject
+                        of the certificate.
+                      properties:
+                        issuer:
+                          description: Issuer specifies the regex pattern to match
+                            against to verify the OIDC issuer in the Fulcio certificate.
+                            The pattern must be a valid Go regular expression.
+                          type: string
+                        subject:
+                          description: Subject specifies the regex pattern to match
+                            against to verify the identity subject in the Fulcio certificate.
+                            The pattern must be a valid Go regular expression.
+                          type: string
+                      required:
+                      - issuer
+                      - subject
+                      type: object
+                    type: array
                   provider:
                     default: cosign
                     description: Provider specifies the technology used to sign the
