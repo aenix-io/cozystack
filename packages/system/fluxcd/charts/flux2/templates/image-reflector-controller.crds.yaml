@@ -737,6 +737,10 @@ spec:
               image:
                 description: Image is the name of the image repository
                 type: string
+              insecure:
+                description: Insecure allows connecting to a non-TLS HTTP container
+                  registry.
+                type: boolean
               interval:
                 description: Interval is the length of time to wait between scans
                   of the image repository.
