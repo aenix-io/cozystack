@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if kubectl get -n cozy-mariadb-operator secret/mariadb-operator-webhook-cert; then
+  kubectl annotate -n cozy-mariadb-operator secret/mariadb-operator-webhook-cert meta.helm.sh/release-namespace=cozy-mariadb-operator meta.helm.sh/release-name=mariadb-operator
+  kubectl label -n cozy-mariadb-operator secret/mariadb-operator-webhook-cert app.kubernetes.io/managed-by=Helm
+fi
+
+kubectl create configmap -n cozy-system cozystack-version --from-literal=version=2 --dry-run=client -o yaml | kubectl apply -f-

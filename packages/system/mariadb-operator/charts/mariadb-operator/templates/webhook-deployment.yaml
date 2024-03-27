@@ -1,10 +1,14 @@
+{{ $fullName := include "mariadb-operator.fullname" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "mariadb-operator.fullname" . }}-webhook
+  name: {{ $fullName }}-webhook
   labels:
     {{ include "mariadb-operator-webhook.labels" . | nindent 4 }}
 spec:
+  {{ if .Values.webhook.ha.enabled }}
+  replicas: {{ .Values.webhook.ha.replicas}}
+  {{ end }}
   selector:
     matchLabels:
       {{ include "mariadb-operator-webhook.selectorLabels" . | nindent 6 }}
@@ -46,12 +50,18 @@ spec:
           name: webhook
           args:
             - webhook
-            - --cert-dir={{ .Values.webhook.certificate.path }}
+            {{- if .Values.webhook.cert.certManager.enabled }}
+            - --ca-cert-path={{ .Values.webhook.cert.path }}/ca.crt
+            {{- else }}
+            - --ca-cert-path={{ .Values.webhook.cert.caPath }}/tls.crt
+            {{- end }}
+            - --cert-dir={{ .Values.webhook.cert.path }}
+            - --dns-name={{ $fullName }}-webhook.{{ .Release.Namespace }}.svc
             - --port={{ .Values.webhook.port }}
             - --metrics-addr=:8080
             - --health-addr=:8081
             - --log-level={{ .Values.logLevel }}
-            {{- range .Values.extrArgs }}
+            {{- range .Values.webhook.extrArgs }}
             - {{ . }}
             {{- end }}
           ports:
@@ -65,7 +75,12 @@ spec:
               protocol: TCP
               name: health
           volumeMounts:
-            - mountPath: {{ .Values.webhook.certificate.path }}
+            {{- if not .Values.webhook.cert.certManager.enabled }}
+            - mountPath: {{ .Values.webhook.cert.caPath }}
+              name: ca
+              readOnly: true
+            {{- end }}
+            - mountPath: {{ .Values.webhook.cert.path }}
               name: cert
               readOnly: true
           {{- if .Values.webhook.extraVolumeMounts }}
@@ -73,22 +88,10 @@ spec:
           {{- end }}
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /readyz
               port: 8081
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8081
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          startupProbe:
-            httpGet:
-              path: /healthz
-              port: 8081
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 20
+            periodSeconds: 5
           {{ with .Values.webhook.resources }}
           resources:
             {{ toYaml . | nindent 12 }}
@@ -98,10 +101,16 @@ spec:
             {{ toYaml . | nindent 12 }}
           {{ end }}
       volumes:
+        {{- if not .Values.webhook.cert.certManager.enabled }}
+        - name: ca
+          secret:
+            defaultMode: 420
+            secretName: {{ $fullName }}-webhook-ca
+        {{- end }}
         - name: cert
           secret:
             defaultMode: 420
-            secretName: {{ include "mariadb-operator-webhook.certificate" . }}
+            secretName: {{ $fullName }}-webhook-cert
       {{- if .Values.webhook.extraVolumes }}
       {{- toYaml .Values.webhook.extraVolumes | nindent 8 }}
       {{- end }}
