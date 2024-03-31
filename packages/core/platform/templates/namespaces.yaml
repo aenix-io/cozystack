@@ -1,13 +1,27 @@
-{{- range $ns := .Values.namespaces }}
+{{- $bundle := tpl (.Files.Get "bundles/full.yaml") . | fromYaml }}
+{{- $namespaces := dict }}
+
+{{/* collect namespaces from releases */}}
+{{- range $x := $bundle.releases }}
+{{- if not (hasKey $namespaces $x.namespace) }}
+{{- $_ := set $namespaces $x.namespace false }}
+{{- end }}
+{{/* if at least one release requires a privileged namespace, then it should be privileged */}}
+{{- if or $x.privileged (index $namespaces $x.namespace) }}
+{{- $_ := set $namespaces $x.namespace true }}
+{{- end }}
+{{- end }}
+
+{{- range $namespace, $privileged := $namespaces }}
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
     "helm.sh/resource-policy": keep
-  {{- if $ns.privileged }}
+  {{- if $privileged }}
   labels:
     pod-security.kubernetes.io/enforce: privileged
   {{- end }}
-  name: {{ $ns.name }}
+  name: {{ $namespace }}
 {{- end }}

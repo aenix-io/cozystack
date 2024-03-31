@@ -96,10 +96,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-          - name: MODULES
-            value: "{{- .Values.performance.MODULES }}"
-          - name: RPMS
-            value: "{{- .Values.performance.RPMS }}"
           - name: POD_IPS
             valueFrom:
               fieldRef:
@@ -139,8 +135,6 @@ spec:
           - mountPath: /etc/localtime
             name: localtime
             readOnly: true
-          - mountPath: /tmp
-            name: tmp
         readinessProbe:
           failureThreshold: 3
           periodSeconds: 7
@@ -205,9 +199,6 @@ spec:
         - name: host-log-ovn
           hostPath:
             path: {{ .Values.log_conf.LOG_DIR }}/ovn
-        - name: tmp
-          hostPath:
-            path: /tmp
         {{- if .Values.cni_conf.MOUNT_LOCAL_BIN_DIR }}
         - name: local-bin
           hostPath:
