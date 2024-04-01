@@ -1,0 +1,69 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+
+releases:
+- name: fluxcd
+  releaseName: fluxcd
+  chart: cozy-fluxcd
+  namespace: cozy-fluxcd
+  dependsOn: []
+
+- name: cert-manager
+  releaseName: cert-manager
+  chart: cozy-cert-manager
+  namespace: cozy-cert-manager
+  dependsOn: []
+
+- name: cert-manager-issuers
+  releaseName: cert-manager-issuers
+  chart: cozy-cert-manager-issuers
+  namespace: cozy-cert-manager
+  dependsOn: [cert-manager]
+
+- name: victoria-metrics-operator
+  releaseName: victoria-metrics-operator
+  chart: cozy-victoria-metrics-operator
+  namespace: cozy-victoria-metrics-operator
+  dependsOn: [cert-manager]
+
+- name: monitoring
+  releaseName: monitoring
+  chart: cozy-monitoring
+  namespace: cozy-monitoring
+  privileged: true
+  dependsOn: [victoria-metrics-operator]
+
+- name: grafana-operator
+  releaseName: grafana-operator
+  chart: cozy-grafana-operator
+  namespace: cozy-grafana-operator
+  dependsOn: []
+
+- name: mariadb-operator
+  releaseName: mariadb-operator
+  chart: cozy-mariadb-operator
+  namespace: cozy-mariadb-operator
+  dependsOn: [victoria-metrics-operator]
+
+- name: postgres-operator
+  releaseName: postgres-operator
+  chart: cozy-postgres-operator
+  namespace: cozy-postgres-operator
+  dependsOn: [cert-manager]
+
+- name: rabbitmq-operator
+  releaseName: rabbitmq-operator
+  chart: cozy-rabbitmq-operator
+  namespace: cozy-rabbitmq-operator
+  dependsOn: []
+
+- name: redis-operator
+  releaseName: redis-operator
+  chart: cozy-redis-operator
+  namespace: cozy-redis-operator
+  dependsOn: []
+
+- name: telepresence
+  releaseName: traffic-manager
+  chart: cozy-telepresence
+  namespace: cozy-telepresence
+  dependsOn: []
