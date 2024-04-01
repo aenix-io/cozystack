@@ -7,6 +7,13 @@ releases:
   namespace: cozy-cilium
   privileged: true
   dependsOn: []
+  values:
+    cilium:
+      cni:
+        chainingMode: ~
+        customConf: false
+        configMap: ""
+      enableIPv4Masquerade: true
 
 - name: fluxcd
   releaseName: fluxcd
@@ -93,4 +100,4 @@ releases:
   releaseName: traffic-manager
   chart: cozy-telepresence
   namespace: cozy-telepresence
-  dependsOn: [kubeovn]
+  dependsOn: []
