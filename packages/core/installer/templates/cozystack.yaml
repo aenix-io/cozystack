@@ -82,6 +82,9 @@ spec:
       - key: "node.kubernetes.io/not-ready"
         operator: "Exists"
         effect: "NoSchedule"
+      - key: "node.cilium.io/agent-not-ready"
+        operator: "Exists"
+        effect: "NoSchedule"
 ---
 apiVersion: v1
 kind: Service
