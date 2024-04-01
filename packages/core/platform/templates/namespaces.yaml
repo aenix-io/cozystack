@@ -14,6 +14,8 @@
 {{- end }}
 {{- end }}
 
+{{/* Add extra namespaces */}}
+{{- $_ := set $namespaces "cozy-public" false }}
 {{- $_ := set $namespaces "cozy-fluxcd" false }}
 
 {{- range $namespace, $privileged := $namespaces }}
