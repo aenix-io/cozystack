@@ -3,11 +3,10 @@ cilium:
     enabled: false
   externalIPs:
     enabled: true
-  tunnel: disabled
   autoDirectNodeRoutes: false
   kubeProxyReplacement: strict
   bpf:
-    masquerade: true
+    masquerade: false
   loadBalancer:
     algorithm: maglev
   cgroup:
@@ -25,3 +24,4 @@ cilium:
     configMap: cni-configuration
   routingMode: native
   enableIPv4Masquerade: false
+  enableIdentityMark: false

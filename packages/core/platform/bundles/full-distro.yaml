@@ -9,11 +9,14 @@ releases:
   dependsOn: []
   values:
     cilium:
+      bpf:
+        masquerade: true
       cni:
         chainingMode: ~
         customConf: false
         configMap: ""
       enableIPv4Masquerade: true
+      enableIdentityMark: true
 
 - name: fluxcd
   releaseName: fluxcd
