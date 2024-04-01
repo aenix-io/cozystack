@@ -12,6 +12,12 @@ kube-ovn:
   func:
     ENABLE_NP: false
 
+  ipv4:
+    POD_CIDR: "10.244.0.0/16"
+    POD_GATEWAY: "10.244.0.1"
+    SVC_CIDR: "10.96.0.0/16"
+    JOIN_CIDR: "100.64.0.0/16"
+
   MASTER_NODES_LABEL: "node-role.kubernetes.io/control-plane"
   networking:
     ENABLE_SSL: true

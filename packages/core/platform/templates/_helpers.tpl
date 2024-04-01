@@ -1,7 +1,7 @@
 {{/*
 Get IP-addresses of master nodes
 */}}
-{{- define "master.nodeIPs" -}}
+{{- define "cozystack.master-node-ips" -}}
 {{- $nodes := lookup "v1" "Node" "" "" -}}
 {{- $ips := list -}}
 {{- range $node := $nodes.items -}}

@@ -1,0 +1,96 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+
+releases:
+- name: cilium
+  releaseName: cilium
+  chart: cozy-cilium
+  namespace: cozy-cilium
+  privileged: true
+  dependsOn: []
+
+- name: fluxcd
+  releaseName: fluxcd
+  chart: cozy-fluxcd
+  namespace: cozy-fluxcd
+  dependsOn: [cilium]
+
+- name: cert-manager
+  releaseName: cert-manager
+  chart: cozy-cert-manager
+  namespace: cozy-cert-manager
+  dependsOn: [cilium]
+
+- name: cert-manager-issuers
+  releaseName: cert-manager-issuers
+  chart: cozy-cert-manager-issuers
+  namespace: cozy-cert-manager
+  dependsOn: [cilium,cert-manager]
+
+- name: victoria-metrics-operator
+  releaseName: victoria-metrics-operator
+  chart: cozy-victoria-metrics-operator
+  namespace: cozy-victoria-metrics-operator
+  dependsOn: [cilium,cert-manager]
+
+- name: monitoring
+  releaseName: monitoring
+  chart: cozy-monitoring
+  namespace: cozy-monitoring
+  privileged: true
+  dependsOn: [cilium,victoria-metrics-operator]
+
+- name: metallb
+  releaseName: metallb
+  chart: cozy-metallb
+  namespace: cozy-metallb
+  privileged: true
+  dependsOn: [cilium]
+
+- name: grafana-operator
+  releaseName: grafana-operator
+  chart: cozy-grafana-operator
+  namespace: cozy-grafana-operator
+  dependsOn: [cilium]
+
+- name: mariadb-operator
+  releaseName: mariadb-operator
+  chart: cozy-mariadb-operator
+  namespace: cozy-mariadb-operator
+  dependsOn: [cilium,cert-manager,victoria-metrics-operator]
+
+- name: postgres-operator
+  releaseName: postgres-operator
+  chart: cozy-postgres-operator
+  namespace: cozy-postgres-operator
+  dependsOn: [cilium,cert-manager]
+
+- name: rabbitmq-operator
+  releaseName: rabbitmq-operator
+  chart: cozy-rabbitmq-operator
+  namespace: cozy-rabbitmq-operator
+  dependsOn: [cilium]
+
+- name: redis-operator
+  releaseName: redis-operator
+  chart: cozy-redis-operator
+  namespace: cozy-redis-operator
+  dependsOn: [cilium]
+
+- name: piraeus-operator
+  releaseName: piraeus-operator
+  chart: cozy-piraeus-operator
+  namespace: cozy-linstor
+  dependsOn: [cilium,cert-manager]
+
+- name: linstor
+  releaseName: linstor
+  chart: cozy-linstor
+  namespace: cozy-linstor
+  privileged: true
+  dependsOn: [piraeus-operator,cilium,cert-manager]
+
+- name: telepresence
+  releaseName: traffic-manager
+  chart: cozy-telepresence
+  namespace: cozy-telepresence
+  dependsOn: [kubeovn]
