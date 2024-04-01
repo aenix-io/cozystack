@@ -1,5 +1,6 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
-{{- $bundle := tpl (.Files.Get "bundles/full.yaml") . | fromYaml }}
+{{- $bundleName := index $cozyConfig.data "bundle-name" }}
+{{- $bundle := tpl (.Files.Get (printf "bundles/%s.yaml" $bundleName)) . | fromYaml }}
 {{- $dependencyNamespaces := dict }}
 
 {{/* collect dependency namespaces from releases */}}
