@@ -1,3 +1,4 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 {{- $bundle := tpl (.Files.Get "bundles/full.yaml") . | fromYaml }}
 {{- $dependencyNamespaces := dict }}
 
@@ -32,7 +33,14 @@ spec:
         kind: HelmRepository
         name: cozystack-system
         namespace: cozy-system
+  {{- $values := dict }}
   {{- with $x.values }}
+  {{- $values = merge . $values }}
+  {{- end }}
+  {{- with index $cozyConfig.data (printf "values-%s" $x.name) }}
+  {{- $values = merge (fromYaml .) $values }}
+  {{- end }}
+  {{- with $values }}
   values:
     {{- toYaml . | nindent 4}}
   {{- end }}
