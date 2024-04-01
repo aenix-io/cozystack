@@ -53,17 +53,17 @@ spec:
             {{- if .Values.ha.enabled }}
             - --leader-elect
             {{- end }}
-            {{- if .Values.metrics.enabled }}
-            - --service-monitor-reconciler
-            {{- end }}
-            {{- range .Values.extrArgs }}
+            {{- range .Values.extraArgs }}
             - {{ . }}
             {{- end }}
           ports:
             - containerPort: 8080
               protocol: TCP
               name: metrics
-          env: 
+          envFrom:
+            - configMapRef:
+                name: mariadb-operator-env
+          env:
             - name: CLUSTER_NAME
               value: {{ .Values.clusterName }}
             - name: MARIADB_OPERATOR_NAME
@@ -76,6 +76,9 @@ spec:
                   fieldPath: metadata.namespace
             - name: MARIADB_OPERATOR_SA_PATH
               value: /var/run/secrets/kubernetes.io/serviceaccount/token
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- if .Values.extraVolumeMounts }}
           volumeMounts:
           {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
@@ -88,21 +91,6 @@ spec:
           securityContext:
             {{ toYaml . | nindent 12 }}
           {{ end }}
-          readinessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          livenessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          startupProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 10
       {{- if .Values.extraVolumes }}
       volumes:
       {{- toYaml .Values.extraVolumes | nindent 8 }}

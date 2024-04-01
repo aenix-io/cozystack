@@ -1,0 +1,13 @@
+apiVersion: v1
+data:
+  MARIADB_GALERA_AGENT_IMAGE: ghcr.io/mariadb-operator/mariadb-operator:v0.0.27
+  MARIADB_GALERA_INIT_IMAGE: ghcr.io/mariadb-operator/mariadb-operator:v0.0.27
+  MARIADB_GALERA_LIB_PATH: /usr/lib/galera/libgalera_smm.so
+  MARIADB_OPERATOR_IMAGE: ghcr.io/mariadb-operator/mariadb-operator:v0.0.27
+  RELATED_IMAGE_EXPORTER: prom/mysqld-exporter:v0.15.1
+  RELATED_IMAGE_MARIADB: mariadb:11.2.2
+  RELATED_IMAGE_MAXSCALE: mariadb/maxscale:23.08
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: mariadb-operator-env

@@ -1,9 +1,18 @@
 #!/bin/sh
+VERSION=2
 set -o pipefail
 set -e
 
 run_migrations() {
-  return 0
+  if ! kubectl get configmap -n cozy-system cozystack-version; then
+    kubectl create configmap -n cozy-system cozystack-version --from-literal=version="$VERSION" --dry-run=client -o yaml | kubectl create -f-
+  fi
+  current_version=$(kubectl get configmap -n cozy-system cozystack-version -o jsonpath='{.data.version}') || true
+  until [ "$current_version" = "$VERSION" ]; do
+    echo "run migration: $current_version --> $VERSION"
+    scripts/migrations/$current_version
+    current_version=$(kubectl get configmap -n cozy-system cozystack-version -o jsonpath='{.data.version}')
+  done
 }
 
 flux_is_ok() {
@@ -18,6 +27,9 @@ install_basic_charts() {
 
 cd "$(dirname "$0")/.."
 
+# Run migrations
+run_migrations
+
 # Install namespaces
 make -C packages/core/platform namespaces-apply
 
@@ -25,9 +37,6 @@ make -C packages/core/platform namespaces-apply
 if ! flux_is_ok; then
   install_basic_charts
 fi
-
-# Run migrations
-run_migrations
 
 # Reconcile Helm repositories
 kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
