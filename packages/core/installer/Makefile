@@ -21,6 +21,7 @@ update:
 image: image-cozystack image-talos image-matchbox
 
 image-cozystack:
+	make -C ../../.. repos
 	docker buildx build -f images/cozystack/Dockerfile ../../.. \
 		--provenance false \
 		--tag $(REGISTRY)/cozystack:$(TAG) \
