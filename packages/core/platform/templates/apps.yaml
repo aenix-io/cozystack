@@ -1,7 +1,10 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $bundleName := index $cozyConfig.data "bundle-name" }}
+{{- $bundle := tpl (.Files.Get (printf "bundles/%s.yaml" $bundleName)) . | fromYaml }}
 {{- $host := "example.org" }}
 {{- $tenantRoot := list }}
-{{- if .Capabilities.APIVersions.Has "helm.toolkit.fluxcd.io/v2beta1" }}
-{{- $tenantRoot = lookup "helm.toolkit.fluxcd.io/v2beta1" "HelmRelease" "tenant-root" "tenant-root" }}
+{{- if .Capabilities.APIVersions.Has "helm.toolkit.fluxcd.io/v2beta2" }}
+{{- $tenantRoot = lookup "helm.toolkit.fluxcd.io/v2beta2" "HelmRelease" "tenant-root" "tenant-root" }}
 {{- end }}
 {{- if and $tenantRoot $tenantRoot.spec $tenantRoot.spec.values $tenantRoot.spec.values.host }}
 {{- $host = $tenantRoot.spec.values.host }}
@@ -19,7 +22,7 @@ metadata:
     namespace.cozystack.io/host: "{{ $host }}"
   name: tenant-root
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: tenant-root
@@ -45,7 +48,9 @@ spec:
   values:
     host: "{{ $host }}"
   dependsOn:
-  - name: cilium
-    namespace: cozy-cilium
-  - name: kubeovn
-    namespace: cozy-kubeovn
+  {{- range $x := $bundle.releases }}
+  {{- if has $x.name (list "cilium" "kubeovn") }}
+  - name: {{ $x.name }}
+    namespace: {{ $x.namespace }}
+  {{- end }}
+  {{- end }}
