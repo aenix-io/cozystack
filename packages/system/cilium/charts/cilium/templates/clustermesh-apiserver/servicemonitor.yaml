@@ -14,15 +14,10 @@ metadata:
     {{- with .Values.clustermesh.apiserver.metrics.serviceMonitor.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- if or .Values.clustermesh.apiserver.metrics.serviceMonitor.annotations .Values.clustermesh.annotations }}
   annotations:
-    {{- with .Values.clustermesh.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
     {{- with .Values.clustermesh.apiserver.metrics.serviceMonitor.annotations }}
-      {{- toYaml . | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- end }}
 spec:
   selector:
     matchLabels:

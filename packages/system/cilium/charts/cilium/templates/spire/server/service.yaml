@@ -4,14 +4,9 @@ kind: Service
 metadata:
   name: spire-server
   namespace: {{ .Values.authentication.mutual.spire.install.namespace }}
-  {{- if or .Values.authentication.mutual.spire.install.server.service.annotations .Values.authentication.mutual.spire.annotations }}
+  {{- with .Values.authentication.mutual.spire.install.server.service.annotations }}
   annotations:
-    {{- with .Values.authentication.mutual.spire.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with .Values.authentication.mutual.spire.install.server.service.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
+    {{- toYaml . | nindent 8 }}
   {{- end }}
   {{- with .Values.authentication.mutual.spire.install.server.service.labels }}
   labels:

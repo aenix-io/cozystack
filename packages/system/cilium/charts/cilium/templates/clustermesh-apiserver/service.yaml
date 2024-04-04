@@ -8,14 +8,9 @@ metadata:
     k8s-app: clustermesh-apiserver
     app.kubernetes.io/part-of: cilium
     app.kubernetes.io/name: clustermesh-apiserver
-  {{- if or .Values.clustermesh.apiserver.service.annotations .Values.clustermesh.annotations }}
+  {{- with .Values.clustermesh.apiserver.service.annotations }}
   annotations:
-    {{- with .Values.clustermesh.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with .Values.clustermesh.apiserver.service.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   type: {{ .Values.clustermesh.apiserver.service.type }}

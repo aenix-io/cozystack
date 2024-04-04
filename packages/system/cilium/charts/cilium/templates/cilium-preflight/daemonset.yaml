@@ -4,10 +4,6 @@ kind: DaemonSet
 metadata:
   name: cilium-pre-flight-check
   namespace: {{ .Release.Namespace }}
-  {{- with .Values.preflight.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
   selector:
     matchLabels:
@@ -113,7 +109,7 @@ spec:
           args:
           - -ec
           - |
-            cilium-dbg preflight fqdn-poller --tofqdns-pre-cache {{ .Values.preflight.tofqdnsPreCache }};
+            cilium preflight fqdn-poller --tofqdns-pre-cache {{ .Values.preflight.tofqdnsPreCache }};
             touch /tmp/ready-tofqdns-precache;
           livenessProbe:
             exec:

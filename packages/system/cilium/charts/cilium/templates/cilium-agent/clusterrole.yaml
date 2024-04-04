@@ -6,10 +6,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cilium
-  {{- with .Values.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   labels:
     app.kubernetes.io/part-of: cilium
 rules:
@@ -86,9 +82,6 @@ rules:
   resources:
   - ciliumloadbalancerippools
   - ciliumbgppeeringpolicies
-  - ciliumbgpnodeconfigs
-  - ciliumbgpadvertisements
-  - ciliumbgppeerconfigs
   - ciliumclusterwideenvoyconfigs
   - ciliumclusterwidenetworkpolicies
   - ciliumegressgatewaypolicies
@@ -144,7 +137,6 @@ rules:
   - ciliumendpoints/status
   - ciliumendpoints
   - ciliuml2announcementpolicies/status
-  - ciliumbgpnodeconfigs/status
   verbs:
   - patch
 {{- end }}

@@ -15,14 +15,9 @@ metadata:
     {{- if $.Values.hubble.metrics.dashboards.label }}
     {{ $.Values.hubble.metrics.dashboards.label }}: {{ ternary $.Values.hubble.metrics.dashboards.labelValue "1" (not (empty $.Values.hubble.metrics.dashboards.labelValue)) | quote }}
     {{- end }}
-  {{- if or $.Values.hubble.metrics.dashboards.annotations $.Values.hubble.annotations }}
+  {{- with $.Values.hubble.metrics.dashboards.annotations }}
   annotations:
-    {{- with $.Values.hubble.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with $.Values.hubble.metrics.dashboards.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 data:
   {{ $dashboardName }}.json: {{ $.Files.Get $path | toJson }}

@@ -5,10 +5,6 @@ kind: ConfigMap
 metadata:
   name: clustermesh-remote-users
   namespace: {{ .Release.Namespace }}
-  {{- with .Values.clustermesh.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   labels:
     app.kubernetes.io/part-of: cilium
 data:
