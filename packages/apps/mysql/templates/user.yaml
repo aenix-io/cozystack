@@ -2,7 +2,7 @@
 {{ if not (eq $name "root") }}
 {{ $dnsName := replace "_" "-" $name }}
 ---
-apiVersion: mariadb.mmontes.io/v1alpha1
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: User
 metadata:
   name: {{ $.Release.Name }}-{{ $dnsName }}
@@ -15,7 +15,7 @@ spec:
     key: {{ $name }}-password
   maxUserConnections: {{ $u.maxUserConnections }}
 ---
-apiVersion: mariadb.mmontes.io/v1alpha1
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
   name: {{ $.Release.Name }}-{{ $dnsName }}

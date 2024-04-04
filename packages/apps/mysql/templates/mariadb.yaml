@@ -1,5 +1,5 @@
 ---
-apiVersion: mariadb.mmontes.io/v1alpha1
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: MariaDB
 metadata:
   name: {{ .Release.Name }}
@@ -53,14 +53,10 @@ spec:
     name: {{ .Release.Name }}-my-cnf
     key: config
 
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: {{ .Values.size }}
-    accessModes:
-      - ReadWriteOnce
-
-
+  storage:
+    size: {{ .Values.size }}
+    resizeInUseVolumes: true
+    waitForVolumeResize: true
 
   {{- if .Values.external }}
   primaryService:

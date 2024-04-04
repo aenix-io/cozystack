@@ -1,7 +1,7 @@
 {{- range $name := .Values.databases }}
 {{ $dnsName := replace "_" "-" $name }}
 ---
-apiVersion: mariadb.mmontes.io/v1alpha1
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: Database
 metadata:
   name: {{ $.Release.Name }}-{{ $dnsName }}
