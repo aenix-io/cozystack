@@ -1,6 +1,7 @@
 http-cache 0.1.0 HEAD
 kubernetes 0.1.0 HEAD
-mysql 0.1.0 HEAD
+mysql 0.1.0 f642698
+mysql 0.2.0 HEAD
 postgres 0.1.0 HEAD
 rabbitmq 0.1.0 HEAD
 redis 0.1.1 HEAD
