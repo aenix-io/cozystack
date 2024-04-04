@@ -1,12 +1,6 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 
 releases:
-- name: fluxcd
-  releaseName: fluxcd
-  chart: cozy-fluxcd
-  namespace: cozy-fluxcd
-  dependsOn: []
-
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager

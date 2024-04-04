@@ -1,4 +1,4 @@
-NAMESPACE=cozy-installer
+NAMESPACE=cozy-system
 NAME=installer
 PUSH := 1
 LOAD := 0

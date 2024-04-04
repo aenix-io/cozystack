@@ -20,12 +20,6 @@ releases:
       ipv4NativeRoutingCIDR: "{{ index $cozyConfig.data "ipv4-pod-cidr" }}"
       autoDirectNodeRoutes: true
 
-- name: fluxcd
-  releaseName: fluxcd
-  chart: cozy-fluxcd
-  namespace: cozy-fluxcd
-  dependsOn: [cilium]
-
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager

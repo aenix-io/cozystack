@@ -24,12 +24,6 @@ releases:
         SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
         JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
 
-- name: fluxcd
-  releaseName: fluxcd
-  chart: cozy-fluxcd
-  namespace: cozy-fluxcd
-  dependsOn: [cilium,kubeovn]
-
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager

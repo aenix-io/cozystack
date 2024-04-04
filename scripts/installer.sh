@@ -27,7 +27,6 @@ install_basic_charts() {
   if [ "$bundle" = "full-paas" ]; then
     make -C packages/system/kubeovn apply
   fi
-  make -C packages/system/fluxcd apply
 }
 
 cd "$(dirname "$0")/.."
@@ -38,10 +37,8 @@ run_migrations
 # Install namespaces
 make -C packages/core/platform namespaces-apply
 
-# Install fluxcd CRDs
-if ! flux_is_ok; then
-  make -C packages/system/fluxcd apply-crds
-fi
+# Install fluxcd
+make -C packages/core/fluxcd apply
 
 # Reconcile Helm repositories
 kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
