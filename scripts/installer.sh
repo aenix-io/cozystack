@@ -21,10 +21,10 @@ flux_is_ok() {
 
 install_basic_charts() {
   bundle=$(kubectl get configmap -n cozy-system cozystack -o 'go-template={{index .data "bundle-name"}}')
-  if [ "$bundle" = "full-paas" ] || [ "$bundle" = "full-distro" ]; then
+  if [ "$bundle" = "paas-full" ] || [ "$bundle" = "distro-full" ]; then
   make -C packages/system/cilium apply
   fi
-  if [ "$bundle" = "full-paas" ]; then
+  if [ "$bundle" = "paas-full" ]; then
     make -C packages/system/kubeovn apply
   fi
 }
