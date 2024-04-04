@@ -17,6 +17,8 @@ releases:
         configMap: ""
       enableIPv4Masquerade: true
       enableIdentityMark: true
+      ipv4NativeRoutingCIDR: "{{ index $cozyConfig.data "ipv4-pod-cidr" }}"
+      autoDirectNodeRoutes: true
 
 - name: fluxcd
   releaseName: fluxcd
