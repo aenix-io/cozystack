@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/cozystack:v0.1.0
+ghcr.io/aenix-io/cozystack/cozystack:v0.2.0

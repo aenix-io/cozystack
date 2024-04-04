@@ -1,11 +1,14 @@
 #!/bin/sh
-VERSION=2
 set -o pipefail
 set -e
+
+BUNDLE=$(set -x; kubectl get configmap -n cozy-system cozystack -o 'go-template={{index .data "bundle-name"}}')
+VERSION=2
 
 run_migrations() {
   if ! kubectl get configmap -n cozy-system cozystack-version; then
     kubectl create configmap -n cozy-system cozystack-version --from-literal=version="$VERSION" --dry-run=client -o yaml | kubectl create -f-
+    return
   fi
   current_version=$(kubectl get configmap -n cozy-system cozystack-version -o jsonpath='{.data.version}') || true
   until [ "$current_version" = "$VERSION" ]; do
@@ -20,11 +23,10 @@ flux_is_ok() {
 }
 
 install_basic_charts() {
-  bundle=$(kubectl get configmap -n cozy-system cozystack -o 'go-template={{index .data "bundle-name"}}')
-  if [ "$bundle" = "paas-full" ] || [ "$bundle" = "distro-full" ]; then
+  if [ "$BUNDLE" = "paas-full" ] || [ "$BUNDLE" = "distro-full" ]; then
   make -C packages/system/cilium apply
   fi
-  if [ "$bundle" = "paas-full" ]; then
+  if [ "$BUNDLE" = "paas-full" ]; then
     make -C packages/system/kubeovn apply
   fi
 }
