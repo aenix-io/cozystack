@@ -5,10 +5,6 @@ metadata:
   name: clustermesh-apiserver
   labels:
     app.kubernetes.io/part-of: cilium
-  {{- with .Values.clustermesh.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 rules:
 - apiGroups:
   - cilium.io

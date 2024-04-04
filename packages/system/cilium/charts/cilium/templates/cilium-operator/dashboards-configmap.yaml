@@ -15,14 +15,9 @@ metadata:
     {{- if $.Values.operator.dashboards.label }}
     {{ $.Values.operator.dashboards.label }}: {{ ternary $.Values.operator.dashboards.labelValue "1" (not (empty $.Values.operator.dashboards.labelValue)) | quote }}
     {{- end }}
-  {{- if or $.Values.operator.dashboards.annotations $.Values.operator.annotations }}
+  {{- with $.Values.operator.dashboards.annotations }}
   annotations:
-    {{- with $.Values.operator.dashboards.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with $.Values.operator.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 data:
   {{ $dashboardName }}.json: {{ $.Files.Get $path | toJson }}

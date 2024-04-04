@@ -60,9 +60,5 @@ spec:
       volumes:
       {{- toYaml . | nindent 6 }}
       {{- end }}
-      affinity:
-      {{- with .Values.certgen.affinity }}
-      {{- toYaml . | nindent 8 }}
-      {{- end }}
   ttlSecondsAfterFinished: {{ .Values.certgen.ttlSecondsAfterFinished }}
 {{- end }}
