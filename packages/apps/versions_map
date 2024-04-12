@@ -1,4 +1,6 @@
+clickhouse 0.1.0 HEAD
 http-cache 0.1.0 HEAD
+kafka 0.1.0 HEAD
 kubernetes 0.1.0 HEAD
 mysql 0.1.0 f642698
 mysql 0.2.0 HEAD
