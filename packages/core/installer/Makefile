@@ -52,9 +52,9 @@ image-matchbox:
 		--load=$(LOAD)
 	echo "$(REGISTRY)/matchbox:$(TALOS_VERSION)" > images/matchbox.tag
 
-assets: talos-iso
+assets: talos-iso talos-nocloud
 
-talos-initramfs talos-kernel talos-installer talos-iso:
+talos-initramfs talos-kernel talos-installer talos-iso talos-nocloud:
 	mkdir -p ../../../_out/assets
 	cat images/talos/profiles/$(subst talos-,,$@).yaml | \
 		docker run --rm -i -v /dev:/dev --privileged "ghcr.io/siderolabs/imager:$(TALOS_VERSION)" --tar-to-stdout - | \
