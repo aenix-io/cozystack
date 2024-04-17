@@ -3,7 +3,7 @@ NAMESPACE=cozy-$(NAME)
 PUSH := 1
 LOAD := 0
 REPOSITORY := ghcr.io/aenix-io/cozystack
-TAG := v0.2.0
+TAG := v0.3.0
 
 include ../../../hack/package-system.mk
 
