@@ -1,5 +1,5 @@
-NAMESPACE=cozy-fluxcd
 NAME=fluxcd
+NAMESPACE=cozy-$(NAME)
 
 API_VERSIONS_FLAGS=$(addprefix -a ,$(shell kubectl api-versions))
 

@@ -1,18 +1,11 @@
 NAME=dashboard
-NAMESPACE=cozy-dashboard
+NAMESPACE=cozy-$(NAME)
 PUSH := 1
 LOAD := 0
 REPOSITORY := ghcr.io/aenix-io/cozystack
 TAG := v0.2.0
 
-show:
-	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
-
-apply:
-	helm upgrade -i -n $(NAMESPACE) $(NAME) .
-
-diff:
-	helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) .
+include ../../hack/package-system.mk
 
 update: update-chart update-dockerfiles
 image: image-dashboard image-kubeapps-apis
