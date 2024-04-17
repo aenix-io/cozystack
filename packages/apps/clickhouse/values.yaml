@@ -1,4 +1,8 @@
-data:
-  size: 10Gi
-log:
-  size: 1Gi
+size: 10Gi
+
+users:
+  user1:
+    password: strongpassword
+  user2:
+    readonly: true
+    password: hackme
