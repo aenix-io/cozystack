@@ -1,21 +1,14 @@
 NAME=dashboard
-NAMESPACE=cozy-dashboard
+NAMESPACE=cozy-$(NAME)
 PUSH := 1
 LOAD := 0
 REPOSITORY := ghcr.io/aenix-io/cozystack
 TAG := v0.2.0
 
-show:
-	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
-
-apply:
-	helm upgrade -i -n $(NAMESPACE) $(NAME) .
-
-diff:
-	helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) .
+include ../../hack/package-system.mk
 
 update: update-chart update-dockerfiles
-image: image-dashboard image-kubeapps-apis
+image: image-$(NAME) image-kubeapps-apis
 
 update-chart:
 	rm -rf charts
@@ -29,21 +22,21 @@ update-dockerfiles:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/vmware-tanzu/kubeapps  | awk -F'[/^]' 'END{print $$3}') && \
 	wget https://github.com/vmware-tanzu/kubeapps/raw/$${tag}/cmd/kubeapps-apis/Dockerfile -O images/kubeapps-apis/Dockerfile && \
 	patch images/kubeapps-apis/Dockerfile < images/kubeapps-apis/dockerfile.diff && \
-	node_image=$$(wget -O- https://github.com/vmware-tanzu/kubeapps/raw/main/dashboard/Dockerfile | awk '/FROM bitnami\/node/ {print $$2}') && \
-	sed -i "s|FROM .* AS build|FROM $${node_image} AS build|" images/dashboard/Dockerfile && \
+	node_image=$$(wget -O- https://github.com/vmware-tanzu/kubeapps/raw/main/$(NAME)/Dockerfile | awk '/FROM bitnami\/node/ {print $$2}') && \
+	sed -i "s|FROM .* AS build|FROM $${node_image} AS build|" images/$(NAME)/Dockerfile && \
 	version=$$(echo "$$tag" | sed 's/^v//') && \
-	sed -i "s/ARG VERSION=.*/ARG VERSION=$${version}/" images/dashboard/Dockerfile
+	sed -i "s/ARG VERSION=.*/ARG VERSION=$${version}/" images/$(NAME)/Dockerfile
 
 image-dashboard:
-	docker buildx build images/dashboard \
+	docker buildx build images/$(NAME) \
 		--provenance false \
-		--tag $(REPOSITORY)/dashboard:$(TAG) \
-		--cache-from type=registry,ref=$(REPOSITORY)/dashboard:$(TAG) \
+		--tag $(REPOSITORY)/$(NAME):$(TAG) \
+		--cache-from type=registry,ref=$(REPOSITORY)/$(NAME):$(TAG) \
 		--cache-to type=inline \
-		--metadata-file images/dashboard.json \
+		--metadata-file images/$(NAME).json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REPOSITORY)/dashboard:$(TAG)" > images/dashboard.tag
+	echo "$(REPOSITORY)/$(NAME):$(TAG)" > images/$(NAME).tag
 
 image-kubeapps-apis:
 	docker buildx build images/kubeapps-apis \

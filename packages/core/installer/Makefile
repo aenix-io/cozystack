@@ -1,5 +1,5 @@
-NAMESPACE=cozy-system
 NAME=installer
+NAMESPACE=cozy-system
 PUSH := 1
 LOAD := 0
 REGISTRY := ghcr.io/aenix-io/cozystack

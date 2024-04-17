@@ -1,17 +1,10 @@
 NAME=metallb
-NAMESPACE=cozy-metallb
+NAMESPACE=cozy-$(NAME)
 
-show:
-	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
-
-apply:
-	helm upgrade -i -n $(NAMESPACE) $(NAME) .
-
-diff:
-	helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) .
+include ../../hack/package-system.mk
 
 update:
 	rm -rf charts
-	helm repo add metallb https://metallb.github.io/metallb
-	helm repo update metallb
-	helm pull metallb/metallb --untar --untardir charts
+	helm repo add $(NAME) https://$(NAME).github.io/$(NAME)
+	helm repo update $(NAME)
+	helm pull $(NAME)/$(NAME) --untar --untardir charts

@@ -1,14 +1,7 @@
-NAMESPACE=cozy-kubeovn
 NAME=kubeovn
+NAMESPACE=cozy-$(NAME)
 
-show:
-	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | helm template --dry-run=server -n $(NAMESPACE) $(NAME) . -f -
-
-apply:
-	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | helm upgrade -i -n $(NAMESPACE) $(NAME) . -f -
-
-diff:
-	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) . -f -
+include ../../hack/package-system.mk
 
 update:
 	rm -rf charts && mkdir -p charts/kube-ovn
