@@ -119,11 +119,7 @@ Name of the etcd root-client secret.
 Retrieve the current Kubernetes version to launch a kubectl container with the minimum version skew possible.
 */}}
 {{- define "etcd.jobsTagKubeVersion" -}}
-{{- if contains "-eks-" .Capabilities.KubeVersion.GitVersion }}
 {{- print "v" .Capabilities.KubeVersion.Major "." (.Capabilities.KubeVersion.Minor | replace "+" "") -}}
-{{- else }}
-{{- print "v" .Capabilities.KubeVersion.Major "." .Capabilities.KubeVersion.Minor -}}
-{{- end }}
 {{- end }}
 
 {{/*
