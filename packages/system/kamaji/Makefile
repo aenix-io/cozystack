@@ -7,4 +7,4 @@ update:
 	rm -rf charts
 	helm repo add clastix https://clastix.github.io/charts
 	helm repo update clastix
-	helm pull clastix/$(NAME) --untar --untardir charts
+	helm pull clastix/kamaji --untar --untardir charts
