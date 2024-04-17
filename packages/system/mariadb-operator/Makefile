@@ -5,6 +5,6 @@ include ../../hack/package-system.mk
 
 update:
 	rm -rf charts
-	helm repo add $(NAME) https://$(NAME).github.io/$(NAME)
-	helm repo update $(NAME)
-	helm pull $(NAME)/$(NAME) --untar --untardir charts
+	helm repo add mariadb-operator https://mariadb-operator.github.io/mariadb-operator
+	helm repo update mariadb-operator
+	helm pull mariadb-operator/mariadb-operator --untar --untardir charts
