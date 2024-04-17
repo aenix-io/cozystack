@@ -1,7 +1,7 @@
 NAME=clickhouse-operator
 NAMESPACE=cozy-clickhouse-operator
 
-include ../../hack/package-system.mk
+include ../../../hack/package-system.mk
 
 update:
 	rm -rf charts

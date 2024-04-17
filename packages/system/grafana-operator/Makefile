@@ -1,7 +1,7 @@
 NAME=grafana-operator
 NAMESPACE=cozy-grafana-operator
 
-include ../../hack/package-system.mk
+include ../../../hack/package-system.mk
 
 update:
 	rm -rf charts
