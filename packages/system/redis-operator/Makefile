@@ -5,7 +5,7 @@ include ../../hack/package-system.mk
 
 update:
 	rm -rf charts
-	helm repo add $(NAME) https://spotahome.github.io/$(NAME)
-	helm repo update $(NAME)
-	helm pull $(NAME)/$(NAME) --untar --untardir charts
-	sed -i '/{{/d' charts/$(NAME)/crds/databases.spotahome.com_redisfailovers.yaml
+	helm repo add redis-operator https://spotahome.github.io/redis-operator
+	helm repo update redis-operator
+	helm pull redis-operator/redis-operator --untar --untardir charts
+	sed -i '/{{/d' charts/redis-operator/crds/databases.spotahome.com_redisfailovers.yaml
