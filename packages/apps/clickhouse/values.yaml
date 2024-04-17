@@ -1,0 +1,4 @@
+data:
+  size: 10Gi
+log:
+  size: 1Gi
