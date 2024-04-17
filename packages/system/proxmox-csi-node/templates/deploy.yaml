@@ -213,7 +213,7 @@ spec:
             - name: ADDRESS
               value: /csi/csi.sock
             - name: DRIVER_REG_SOCK_PATH
-              value: /var/lib/kubelet/plugins/csi.kubevirt.io/csi.sock
+              value: /var/lib/kubelet/plugins/csi.proxmox.io/csi.sock
           volumeMounts:
             - name: plugin-dir
               mountPath: /csi
@@ -243,7 +243,7 @@ spec:
             type: Directory
         - name: plugin-dir
           hostPath:
-            path: /var/lib/kubelet/plugins/csi.kubevirt.io/
+            path: /var/lib/kubelet/plugins/csi.proxmox.io/
             type: DirectoryOrCreate
         - name: registration-dir
           hostPath:
