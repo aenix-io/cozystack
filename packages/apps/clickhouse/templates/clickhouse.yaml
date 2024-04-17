@@ -3,16 +3,27 @@ kind: "ClickHouseInstallation"
 metadata:
   name: "{{ .Release.Name }}"
 spec:
+  {{- with .Values.size }}
   defaults:
     templates:
       dataVolumeClaimTemplate: data-volume-template
-      logVolumeClaimTemplate: log-volume-template
+  {{- end }}
   configuration:
+    {{- with .Values.users }}
+    users:
+      {{- range $name, $u := . }}
+      {{ $name }}/password_sha256_hex: {{ sha256sum $u.password }}
+      {{ $name }}/profile: {{ ternary "readonly" "default" (index $u "readonly" | default false) }}
+      {{- end }}
+    {{- end }}
+    profiles:
+      readonly/readonly: "1"
     clusters:
       - name: "clickhouse"
         layout:
           shardsCount: 1
           replicasCount: 2
+  {{- with .Values.size }}
   templates:
     volumeClaimTemplates:
       - name: data-volume-template
@@ -21,11 +32,5 @@ spec:
             - ReadWriteOnce
           resources:
             requests:
-              storage: {{ .Values.data.size }}
-      - name: log-volume-template
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: {{ .Values.log.size }}
+              storage: {{ . }}
+  {{- end }}
