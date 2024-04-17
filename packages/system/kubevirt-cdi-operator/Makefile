@@ -1,7 +1,7 @@
 NAME=kubevirt-cdi-operator
 NAMESPACE=cozy-kubevirt-cdi
 
-include ../../hack/package-system.mk
+include ../../../hack/package-system.mk
 
 update:
 	rm -rf templates

@@ -1,7 +1,7 @@
 NAME=traffic-manager
 NAMESPACE=cozy-telepresence
 
-include ../../hack/package-system.mk
+include ../../../hack/package-system.mk
 
 update:
 	rm -rf charts

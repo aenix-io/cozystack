@@ -5,7 +5,7 @@ LOAD := 0
 REPOSITORY := ghcr.io/aenix-io/cozystack
 TAG := v0.2.0
 
-include ../../hack/package-system.mk
+include ../../../hack/package-system.mk
 
 update: update-chart update-dockerfiles
 image: image-dashboard image-kubeapps-apis

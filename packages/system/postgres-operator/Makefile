@@ -1,7 +1,7 @@
 NAME=postgres-operator
 NAMESPACE=cozy-$(NAME)
 
-include ../../hack/package-system.mk
+include ../../../hack/package-system.mk
 
 update:
 	rm -rf charts
