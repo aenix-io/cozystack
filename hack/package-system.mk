@@ -6,12 +6,12 @@ help: ## Show this help.
 
 show: ## Show output of rendered templates
 	case "$(NAME)" in
-    	cilium|kubeovn)
-        	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | helm template --dry-run=server -n $(NAMESPACE) $(NAME) . -f -
-        	;;
-    	*)
-        	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
-        	;;
+    		cilium|kubeovn)
+        		kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | helm template --dry-run=server -n $(NAMESPACE) $(NAME) . -f -
+        		;;
+    		*)
+        		helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
+        		;;
 	esac
 
 apply: suspend ## Apply Helm release to a Kubernetes cluster 
