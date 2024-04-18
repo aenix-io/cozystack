@@ -12,12 +12,6 @@ metadata:
   name: cozystack
   namespace: cozy-system
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: cozystack
-  namespace: cozy-system
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
