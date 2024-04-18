@@ -15,13 +15,6 @@ metadata:
   namespace: cozy-system
 ---
 # Source: cozy-installer/templates/cozystack.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: cozystack
-  namespace: cozy-system
----
-# Source: cozy-installer/templates/cozystack.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
