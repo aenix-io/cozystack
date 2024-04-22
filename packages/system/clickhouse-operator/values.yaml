@@ -3,4 +3,4 @@ altinity-clickhouse-operator:
     files:
       config.yaml:
         watch:
-          namespaces: ["*"]
+          namespaces: [".*"]
