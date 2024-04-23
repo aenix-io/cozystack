@@ -3,7 +3,7 @@ NAMESPACE=cozy-system
 PUSH := 1
 LOAD := 0
 REGISTRY := ghcr.io/aenix-io/cozystack
-TAG := v0.3.0
+TAG := v0.3.1
 TALOS_VERSION=$(shell awk '/^version:/ {print $$2}' images/talos/profiles/installer.yaml)
 
 show:
