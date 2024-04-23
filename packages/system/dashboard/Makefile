@@ -1,10 +1,7 @@
 NAME=dashboard
 NAMESPACE=cozy-$(NAME)
-PUSH := 1
-LOAD := 0
-REPOSITORY := ghcr.io/aenix-io/cozystack
-TAG := v0.3.1
 
+include ../../../scripts/common-envs.mk
 include ../../../scripts/package-system.mk
 
 update: update-chart update-dockerfiles
@@ -30,21 +27,21 @@ update-dockerfiles:
 image-dashboard:
 	docker buildx build images/dashboard \
 		--provenance false \
-		--tag $(REPOSITORY)/dashboard:$(TAG) \
-		--cache-from type=registry,ref=$(REPOSITORY)/dashboard:$(TAG) \
+		--tag $(REGISTRY)/dashboard:$(call settag,$(TAG)) \
+		--cache-from type=registry,ref=$(REGISTRY)/dashboard:latest \
 		--cache-to type=inline \
 		--metadata-file images/dashboard.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REPOSITORY)/dashboard:$(TAG)" > images/dashboard.tag
+	echo "$(REGISTRY)/dashboard:$(call settag,$(TAG))" > images/dashboard.tag
 
 image-kubeapps-apis:
 	docker buildx build images/kubeapps-apis \
 		--provenance false \
-		--tag $(REPOSITORY)/kubeapps-apis:$(TAG) \
-		--cache-from type=registry,ref=$(REPOSITORY)/kubeapps-apis:$(TAG) \
+		--tag $(REGISTRY)/kubeapps-apis:$(call settag,$(TAG)) \
+		--cache-from type=registry,ref=$(REGISTRY)/kubeapps-apis:latest \
 		--cache-to type=inline \
 		--metadata-file images/kubeapps-apis.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REPOSITORY)/kubeapps-apis:$(TAG)" > images/kubeapps-apis.tag
+	echo "$(REGISTRY)/kubeapps-apis:$(call settag,$(TAG))" > images/kubeapps-apis.tag
