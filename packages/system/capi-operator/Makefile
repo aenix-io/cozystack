@@ -1,7 +1,7 @@
 NAME=capi-operator
 NAMESPACE=cozy-cluster-api
 
-include ../../../hack/package-system.mk
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf charts

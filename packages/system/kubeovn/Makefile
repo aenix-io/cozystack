@@ -1,7 +1,7 @@
 NAME=kubeovn
 NAMESPACE=cozy-$(NAME)
 
-include ../../../hack/package-system.mk
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf charts && mkdir -p charts/kube-ovn

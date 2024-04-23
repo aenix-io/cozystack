@@ -1,7 +1,7 @@
 NAME=cert-manager
 NAMESPACE=cozy-$(NAME)
 
-include ../../../hack/package-system.mk
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf charts

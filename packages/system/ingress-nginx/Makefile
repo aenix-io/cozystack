@@ -1,7 +1,7 @@
 NAME=ingress-nginx
 NAMESPACE=cozy-$(NAME)
 
-include ../../../hack/package-system.mk
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf charts
