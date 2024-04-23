@@ -2,7 +2,7 @@ PUSH := 1
 LOAD := 0
 REGISTRY := ghcr.io/aenix-io/cozystack
 NGINX_CACHE_TAG = v0.1.0
-TAG := v0.3.0
+TAG := v0.3.1
 
 image: image-nginx
 

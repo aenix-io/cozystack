@@ -1,7 +1,7 @@
 PUSH := 1
 LOAD := 0
 REGISTRY := ghcr.io/aenix-io/cozystack
-TAG := v0.3.0
+TAG := v0.3.1
 UBUNTU_CONTAINER_DISK_TAG = v1.29.1
 
 image: image-ubuntu-container-disk
