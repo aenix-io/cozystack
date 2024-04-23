@@ -1,7 +1,7 @@
 NAME=kubevirt-operator
 NAMESPACE=cozy-kubevirt
 
-include ../../../hack/package-system.mk
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf templates

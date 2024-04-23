@@ -1,7 +1,7 @@
 NAME=piraeus-operator
 NAMESPACE=cozy-linstor
 
-include ../../../hack/package-system.mk
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf charts
