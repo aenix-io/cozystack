@@ -1,5 +1,5 @@
 NAME=etcd-operator
-NAMESPACE=cozy-etcd-operator
+NAMESPACE=cozy-${NAME}
 
 include ../../../scripts/package-system.mk
 
