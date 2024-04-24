@@ -14,7 +14,7 @@ diff: ## Diff Helm release against objects in a Kubernetes cluster
 	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) . -f -
 
 suspend: ## Suspend reconciliation for an existing Helm release
-	kubectl patch hr -n $(NAMESPACE) $(NAME) -p '{"spec": {"suspend": true}}' --type=merge
+	kubectl patch hr -n $(NAMESPACE) $(NAME) -p '{"spec": {"suspend": true}}' --type=merge --field-manager=flux-client-side-apply
 
 resume: ## Resume reconciliation for an existing Helm release
-	kubectl patch hr -n $(NAMESPACE) $(NAME) -p '{"spec": {"suspend": null}}' --type=merge
+	kubectl patch hr -n $(NAMESPACE) $(NAME) -p '{"spec": {"suspend": null}}' --type=merge --field-manager=flux-client-side-apply
