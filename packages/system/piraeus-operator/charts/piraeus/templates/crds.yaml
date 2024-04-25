@@ -1043,6 +1043,22 @@ spec:
                           minItems: 1
                           type: array
                       type: object
+                    zfsPool:
+                      description: Configures a ZFS system based storage pool, allocating
+                        zvols from the given zpool.
+                      properties:
+                        zPool:
+                          description: ZPool is the name of the ZFS zpool.
+                          type: string
+                      type: object
+                    zfsThinPool:
+                      description: Configures a ZFS system based storage pool, allocating
+                        sparse zvols from the given zpool.
+                      properties:
+                        zPool:
+                          description: ZPool is the name of the ZFS zpool.
+                          type: string
+                      type: object
                   required:
                   - name
                   type: object
@@ -1406,6 +1422,22 @@ spec:
                             type: string
                           minItems: 1
                           type: array
+                      type: object
+                    zfsPool:
+                      description: Configures a ZFS system based storage pool, allocating
+                        zvols from the given zpool.
+                      properties:
+                        zPool:
+                          description: ZPool is the name of the ZFS zpool.
+                          type: string
+                      type: object
+                    zfsThinPool:
+                      description: Configures a ZFS system based storage pool, allocating
+                        sparse zvols from the given zpool.
+                      properties:
+                        zPool:
+                          description: ZPool is the name of the ZFS zpool.
+                          type: string
                       type: object
                   required:
                   - name
