@@ -1,27 +1,27 @@
-diff --git b/system/kubeapps/images/kubeapps-apis/Dockerfile a/system/kubeapps/images/kubeapps-apis/Dockerfile
-index e5fcd8c..f72964d 100644
 --- b/system/kubeapps/images/kubeapps-apis/Dockerfile
 +++ a/system/kubeapps/images/kubeapps-apis/Dockerfile
-@@ -3,9 +3,17 @@
+@@ -3,9 +3,19 @@
  
  # syntax = docker/dockerfile:1
  
 +FROM alpine as source
-+ARG VERSION=v2.9.0
++ARG VERSION=v2.10.0
 +RUN apk add --no-cache patch
 +WORKDIR /source
 +RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/${VERSION}.tar.gz | tar xzf - --strip-components=1
-+COPY fix-flux.diff /patches/fix-flux.diff
-+RUN patch -p1 < /patches/fix-flux.diff
++COPY labels.diff /patches/labels.diff
++COPY reconcile-strategy.diff /patches/reconcile-strategy.diff
++RUN patch -p1 < /patches/labels.diff
++RUN patch -p1 < /patches/reconcile-strategy.diff
 +
- FROM bitnami/golang:1.21.1 as builder
+ FROM bitnami/golang:1.22.2 as builder
  WORKDIR /go/src/github.com/vmware-tanzu/kubeapps
 -COPY go.mod go.sum ./
 +COPY --from=source /source/go.mod /source/go.sum ./
  ARG VERSION="devel"
  ARG TARGETARCH
  
-@@ -40,8 +48,8 @@ RUN --mount=type=cache,target=/go/pkg/mod  \
+@@ -40,8 +52,8 @@
  
  # We don't copy the pkg and cmd directories until here so the above layers can
  # be reused.
@@ -30,5 +30,5 @@ index e5fcd8c..f72964d 100644
 +COPY --from=source /source/pkg pkg
 +COPY --from=source /source/cmd cmd
  
- RUN if [ ! -z "$lint" ]; then \
+ RUN if [ ! -z ${lint:-} ]; then \
      # Run golangci-lint to detect issues

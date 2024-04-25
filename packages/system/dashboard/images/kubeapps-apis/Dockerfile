@@ -1,21 +1,19 @@
-# Copyright 2021-2023 the Kubeapps contributors.
+# Copyright 2021-2024 the Kubeapps contributors.
 # SPDX-License-Identifier: Apache-2.0
 
 # syntax = docker/dockerfile:1
 
 FROM alpine as source
-ARG VERSION=v2.9.0
+ARG VERSION=v2.10.0
 RUN apk add --no-cache patch
 WORKDIR /source
 RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/${VERSION}.tar.gz | tar xzf - --strip-components=1
-COPY fix-flux.diff /patches/fix-flux.diff
 COPY labels.diff /patches/labels.diff
 COPY reconcile-strategy.diff /patches/reconcile-strategy.diff
-RUN patch -p1 < /patches/fix-flux.diff
 RUN patch -p1 < /patches/labels.diff
 RUN patch -p1 < /patches/reconcile-strategy.diff
 
-FROM bitnami/golang:1.21.1 as builder
+FROM bitnami/golang:1.22.2 as builder
 WORKDIR /go/src/github.com/vmware-tanzu/kubeapps
 COPY --from=source /source/go.mod /source/go.sum ./
 ARG VERSION="devel"
@@ -25,16 +23,16 @@ ARG TARGETARCH
 ARG lint
 
 # https://github.com/bufbuild/buf/releases/
-ARG BUF_VERSION="1.26.0"
+ARG BUF_VERSION="1.30.1"
 
 # https://github.com/golangci/golangci-lint/releases
-ARG GOLANGCILINT_VERSION="1.53.3"
+ARG GOLANGCILINT_VERSION="1.57.2"
 
 # https://github.com/grpc-ecosystem/grpc-health-probe/releases/
-ARG GRPC_HEALTH_PROBE_VERSION="0.4.19"
+ARG GRPC_HEALTH_PROBE_VERSION="0.4.25"
 
 # Install lint tools
-RUN if [ ! -z "$lint" ]; then \
+RUN if [ ! -z ${lint:-} ]; then \
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@v$GOLANGCILINT_VERSION; \
     fi
 
@@ -55,7 +53,7 @@ RUN --mount=type=cache,target=/go/pkg/mod  \
 COPY --from=source /source/pkg pkg
 COPY --from=source /source/cmd cmd
 
-RUN if [ ! -z "$lint" ]; then \
+RUN if [ ! -z ${lint:-} ]; then \
     # Run golangci-lint to detect issues
     golangci-lint run --timeout=10m ./cmd/kubeapps-apis/... && \
     golangci-lint run --timeout=10m ./pkg/...; \
@@ -67,6 +65,7 @@ RUN /tmp/buf lint ./cmd/kubeapps-apis
 # Build the main grpc server
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
+    GOPROXY="https://proxy.golang.org,direct" \
     go build \
     -ldflags "-X github.com/vmware-tanzu/kubeapps/cmd/kubeapps-apis/cmd.version=$VERSION" \
     ./cmd/kubeapps-apis
