@@ -1,2 +1,3 @@
+replicas: 2
 external: false
 size: 5Gi

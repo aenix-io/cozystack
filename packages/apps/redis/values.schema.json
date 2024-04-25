@@ -9,6 +9,10 @@
     "size": {
       "type": "string",
       "title": "Disk Size"
+    },
+    "replicas": {
+      "type": "integer",
+      "title": "Replicas"
     }
   }
 }

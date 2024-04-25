@@ -21,8 +21,8 @@ spec:
     clusters:
       - name: "clickhouse"
         layout:
-          shardsCount: 1
-          replicasCount: 2
+          shardsCount: {{ .Values.shards }}
+          replicasCount: {{ .Values.replicas }}
   {{- with .Values.size }}
   templates:
     volumeClaimTemplates:

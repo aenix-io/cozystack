@@ -1,8 +1,10 @@
 external: false
 kafka:
   size: 10Gi
+  replicas: 3
 zookeeper:
   size: 5Gi
+  replicas: 3
 
 topics:
   - name: Results

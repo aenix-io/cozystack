@@ -11,7 +11,7 @@ spec:
   selector:
     matchLabels:
       app: {{ $.Release.Name }}-nginx-cache
-{{- range $i := until 3 }}
+{{- range $i := until (int $.Values.nginx.replicas) }}
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -5,6 +5,10 @@
     "external": {
       "type": "boolean",
       "title": "Enable external Access"
+    },
+    "replicas": {
+      "type": "integer",
+      "title": "Replicas"
     }
   }
 }

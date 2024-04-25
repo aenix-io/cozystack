@@ -14,7 +14,7 @@ spec:
       limits:
         memory: 100Mi
   redis:
-    replicas: 3
+    replicas: {{ .Values.replicas }}
     resources:
       requests:
         cpu: 150m
