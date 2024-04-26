@@ -1,3 +1,9 @@
-replicas: 2
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param size Persistent Volume size
+## @param replicas Number of Redis replicas
+##
 external: false
-size: 5Gi
+size: 1Gi
+replicas: 2

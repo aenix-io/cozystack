@@ -1,0 +1,5 @@
+## @section Common parameters
+
+## @param replicas Number of ingress-nginx replicas
+##
+replicas: 2

@@ -1,0 +1,72 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "external": {
+            "type": "boolean",
+            "description": "Enable external access from outside the cluster",
+            "default": false
+        },
+        "size": {
+            "type": "string",
+            "description": "Persistent Volume size",
+            "default": "10Gi"
+        },
+        "replicas": {
+            "type": "number",
+            "description": "Number of MariaDB replicas",
+            "default": 2
+        },
+        "databases": {
+            "type": "array",
+            "description": "Databases configuration",
+            "default": [],
+            "items": {}
+        },
+        "backup": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable pereiodic backups",
+                    "default": false
+                },
+                "s3Region": {
+                    "type": "string",
+                    "description": "The AWS S3 region where backups are stored",
+                    "default": "us-east-1"
+                },
+                "s3Bucket": {
+                    "type": "string",
+                    "description": "The S3 bucket used for storing backups",
+                    "default": "s3.example.org/postgres-backups"
+                },
+                "schedule": {
+                    "type": "string",
+                    "description": "Cron schedule for automated backups",
+                    "default": "0 2 * * *"
+                },
+                "cleanupStrategy": {
+                    "type": "string",
+                    "description": "The strategy for cleaning up old backups",
+                    "default": "--keep-last=3 --keep-daily=3 --keep-within-weekly=1m"
+                },
+                "s3AccessKey": {
+                    "type": "string",
+                    "description": "The access key for S3, used for authentication",
+                    "default": "oobaiRus9pah8PhohL1ThaeTa4UVa7gu"
+                },
+                "s3SecretKey": {
+                    "type": "string",
+                    "description": "The secret key for S3, used for authentication",
+                    "default": "ju3eum4dekeich9ahM1te8waeGai0oog"
+                },
+                "resticPassword": {
+                    "type": "string",
+                    "description": "The password for Restic backup encryption",
+                    "default": "ChaXoveekoh6eigh4siesheeda2quai0"
+                }
+            }
+        }
+    }
+}

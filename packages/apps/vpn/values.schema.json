@@ -1,0 +1,16 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "external": {
+            "type": "boolean",
+            "description": "Enable external access from outside the cluster",
+            "default": false
+        },
+        "replicas": {
+            "type": "number",
+            "description": "Number of VPN-server replicas",
+            "default": 2
+        }
+    }
+}

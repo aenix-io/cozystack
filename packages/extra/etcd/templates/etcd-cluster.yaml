@@ -1,0 +1,165 @@
+---
+apiVersion: etcd.aenix.io/v1alpha1
+kind: EtcdCluster
+metadata:
+  name: etcd
+spec:
+  replicas: {{ .Values.replicas }}
+  storage:
+    volumeClaimTemplate:
+      spec:
+        resources:
+          requests:
+            storage: {{ .Values.size }}
+  security:
+    tls:
+      peerTrustedCASecret: etcd-peer-ca-tls
+      peerSecret: etcd-peer-tls
+      serverSecret: etcd-server-tls
+      clientTrustedCASecret: etcd-ca-tls
+      clientSecret: etcd-client-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: etcd-selfsigning-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: etcd-peer-ca
+spec:
+  isCA: true
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "cert sign"
+  commonName: etcd-peer-ca
+  subject:
+    organizations:
+      - ACME Inc.
+    organizationalUnits:
+      - Widgets
+  secretName: etcd-peer-ca-tls
+  privateKey:
+    algorithm: RSA
+    size: 4096
+  issuerRef:
+    name: etcd-selfsigning-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: etcd-ca
+spec:
+  isCA: true
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "cert sign"
+  commonName: etcd-ca
+  subject:
+    organizations:
+      - ACME Inc.
+    organizationalUnits:
+      - Widgets
+  secretName: etcd-ca-tls
+  privateKey:
+    algorithm: RSA
+    size: 4096
+  issuerRef:
+    name: etcd-selfsigning-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: etcd-peer-issuer
+spec:
+  ca:
+    secretName: etcd-peer-ca-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: etcd-issuer
+spec:
+  ca:
+    secretName: etcd-ca-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: etcd-server
+spec:
+  secretName: etcd-server-tls
+  isCA: false
+  usages:
+    - "server auth"
+    - "signing"
+    - "key encipherment"
+  dnsNames:
+  {{- range $i := until (int $.Values.replicas) }}
+  - etcd-{{ $i }}
+  - etcd-{{ $i }}.etcd-headless
+  - etcd-{{ $i }}.etcd-headless.{{ $.Release.Namespace }}.svc
+  {{- end }}
+  - localhost
+  - "127.0.0.1"
+  privateKey:
+    rotationPolicy: Always
+    algorithm: RSA
+    size: 4096
+  issuerRef:
+    name: etcd-issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: etcd-peer
+spec:
+  secretName: etcd-peer-tls
+  isCA: false
+  usages:
+    - "server auth"
+    - "client auth"
+    - "signing"
+    - "key encipherment"
+  dnsNames:
+  {{- range $i := until (int $.Values.replicas) }}
+  - etcd-{{ $i }}
+  - etcd-{{ $i }}.etcd-headless
+  - etcd-{{ $i }}.etcd-headless.{{ $.Release.Namespace }}.svc
+  {{- end }}
+  - localhost
+  - "127.0.0.1"
+  privateKey:
+    rotationPolicy: Always
+    algorithm: RSA
+    size: 4096
+  issuerRef:
+    name: etcd-peer-issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: etcd-client
+spec:
+  commonName: root
+  secretName: etcd-client-tls
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
+  privateKey:
+    rotationPolicy: Always
+    algorithm: RSA
+    size: 4096
+  issuerRef:
+    name: etcd-issuer
+    kind: Issuer

@@ -2,6 +2,9 @@ UBUNTU_CONTAINER_DISK_TAG = v1.29.1
 
 include ../../../scripts/common-envs.mk
 
+generate:
+	readme-generator -v values.yaml -s values.schema.json -r README.md
+
 image: image-ubuntu-container-disk
 
 image-ubuntu-container-disk:
