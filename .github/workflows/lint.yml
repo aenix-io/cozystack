@@ -32,8 +32,8 @@ jobs:
     - name: Super-linter
       uses: super-linter/super-linter/slim@latest # x-release-please-version
       env:
+        VALIDATE_ALL_CODEBASE: ${{ !contains(github.event_name, 'pull_request') }}
         LINTER_RULES_PATH: '.'
-        VALIDATE_ALL_CODEBASE: true
         VALIDATE_JAVASCRIPT_ES: false
         VALIDATE_PYTHON_BLACK: false
         VALIDATE_HTML: false
@@ -42,3 +42,26 @@ jobs:
         VALIDATE_JAVA: false
         # To report GitHub Actions status checks
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # by default super-linter assumes our repo default branch doesn't change
+        # and it also assumes our PRs are always against that default branch
+        # for multi-trunk (releases) repos, this get the base branch from the previous steps
+        # see issue https://github.com/github/super-linter/issues/1123
+        DEFAULT_BRANCH: ${{ env.DEFAULT_BRANCH }}
+        # setting this to false means that only changed files will be scanned in each commit
+        VALIDATE_ALL_CODEBASE: ${{ !contains(github.event_name, 'pull_request') }}
+        # turn off dockerfilelint, as its a dead project
+        # https://github.com/replicatedhq/dockerfilelint/issues/169
+        # hadolint will still run and is sufficient (no need for two linters)
+        VALIDATE_DOCKERFILE: false
+        # turn off JSCPD copy/paste detection, which results in lots of results for examples and devops repos
+        VALIDATE_JSCPD: false
+        # turn off shfmt shell formatter as we already have shellcheck
+        VALIDATE_SHELL_SHFMT: false
+        # editorconfig is great, but...
+        # editorconfig-linter is rather generic and file-specific linters are better
+        # turn off editorconfig-checker, which flags too many false positives
+        VALIDATE_EDITORCONFIG: false
+        # prevent Kubernetes CRD API's from causing kubeval to fail
+        # also change schema location to an up-to-date list
+        # https://github.com/yannh/kubernetes-json-schema/#kubeval
+        KUBERNETES_KUBEVAL_OPTIONS: --ignore-missing-schemas --schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/
