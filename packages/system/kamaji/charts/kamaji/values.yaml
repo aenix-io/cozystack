@@ -214,3 +214,8 @@ datastore:
         namespace:
         # -- Key of the Secret which contains the content of the private key.
         keyPath:
+
+cfssl:
+  image:
+    repository: cfssl/cfssl
+    tag: latest
