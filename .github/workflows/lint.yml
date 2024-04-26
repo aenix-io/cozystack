@@ -32,8 +32,7 @@ jobs:
     - name: Super-linter
       uses: super-linter/super-linter/slim@latest # x-release-please-version
       env:
-        VALIDATE_ALL_CODEBASE: ${{ !contains(github.event_name, 'pull_request') }}
-        LINTER_RULES_PATH: '.'
+        VALIDATE_ALL_CODEBASE: true
         VALIDATE_JAVASCRIPT_ES: false
         VALIDATE_PYTHON_BLACK: false
         VALIDATE_HTML: false
@@ -46,9 +45,9 @@ jobs:
         # and it also assumes our PRs are always against that default branch
         # for multi-trunk (releases) repos, this get the base branch from the previous steps
         # see issue https://github.com/github/super-linter/issues/1123
-        DEFAULT_BRANCH: ${{ env.DEFAULT_BRANCH }}
+        #DEFAULT_BRANCH: ${{ env.DEFAULT_BRANCH }}
         # setting this to false means that only changed files will be scanned in each commit
-        VALIDATE_ALL_CODEBASE: ${{ !contains(github.event_name, 'pull_request') }}
+        #VALIDATE_ALL_CODEBASE: ${{ !contains(github.event_name, 'pull_request') }}
         # turn off dockerfilelint, as its a dead project
         # https://github.com/replicatedhq/dockerfilelint/issues/169
         # hadolint will still run and is sufficient (no need for two linters)
