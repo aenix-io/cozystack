@@ -64,12 +64,13 @@ metadata:
     cluster.x-k8s.io/managed-by: kamaji
   name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
+{{- range $groupName, $group := .Values.nodeGroups }}
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfigTemplate
 metadata:
-  name: {{ .Release.Name }}-md-0
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-{{ $groupName }}
+  namespace: {{ $.Release.Namespace }}
 spec:
   template:
     spec:
@@ -78,7 +79,7 @@ spec:
           kubeletExtraArgs: {}
         discovery:
           bootstrapToken:
-            apiServerEndpoint: {{ .Release.Name }}.{{ .Release.Namespace }}.svc:6443
+            apiServerEndpoint: {{ $.Release.Name }}.{{ $.Release.Namespace }}.svc:6443
       initConfiguration:
         skipPhases:
         - addon/kube-proxy
@@ -86,8 +87,8 @@ spec:
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: KubevirtMachineTemplate
 metadata:
-  name: {{ .Release.Name }}-md-0
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-{{ $groupName }}
+  namespace: {{ $.Release.Namespace }}
 spec:
   template:
     spec:
@@ -95,7 +96,7 @@ spec:
         checkStrategy: ssh
       virtualMachineTemplate:
         metadata:
-          namespace: {{ .Release.Namespace }}
+          namespace: {{ $.Release.Namespace }}
         spec:
           runStrategy: Always
           template:
@@ -103,7 +104,7 @@ spec:
               domain:
                 cpu:
                   threads: 1
-                  cores: 2
+                  cores: {{ $group.resources.cpu }}
                   sockets: 1
                 devices:
                   disks:
@@ -112,7 +113,7 @@ spec:
                     name: containervolume
                   networkInterfaceMultiqueue: true
                 memory:
-                  guest: 1024Mi
+                  guest: {{ $group.resources.memory }}
               evictionStrategy: External
               volumes:
               - containerDisk:
@@ -122,29 +123,28 @@ spec:
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
 metadata:
-  name: {{ .Release.Name }}-md-0
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-{{ $groupName }}
+  namespace: {{ $.Release.Namespace }}
   annotations:
-    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "2"
-    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "0"
-    capacity.cluster-autoscaler.kubernetes.io/memory: "1024Mi"
-    capacity.cluster-autoscaler.kubernetes.io/cpu: "2"
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "{{ $group.minReplicas }}"
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "{{ $group.maxReplicas }}"
+    capacity.cluster-autoscaler.kubernetes.io/memory: "{{ $group.resources.memory }}"
+    capacity.cluster-autoscaler.kubernetes.io/cpu: "{{ $group.resources.cpu }}"
 spec:
-  clusterName: {{ .Release.Name }}
-  selector:
-    matchLabels: null
+  clusterName: {{ $.Release.Name }}
   template:
     spec:
       bootstrap:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
           kind: KubeadmConfigTemplate
-          name: {{ .Release.Name }}-md-0
+          name: {{ $.Release.Name }}-{{ $groupName }}
           namespace: default
-      clusterName: {{ .Release.Name }}
+      clusterName: {{ $.Release.Name }}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
         kind: KubevirtMachineTemplate
-        name: {{ .Release.Name }}-md-0
+        name: {{ $.Release.Name }}-{{ $groupName }}
         namespace: default
-      version: v1.23.10
+      version: v1.29.0
+{{- end }}

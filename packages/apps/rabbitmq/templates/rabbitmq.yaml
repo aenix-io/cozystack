@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  replicas: 3
+  replicas: {{ .Values.replicas }}
   {{- if .Values.external }}
   service:
     type: LoadBalancer
