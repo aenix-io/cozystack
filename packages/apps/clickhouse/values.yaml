@@ -1,0 +1,10 @@
+size: 10Gi
+shards: 1
+replicas: 2
+
+users:
+  user1:
+    password: strongpassword
+  user2:
+    readonly: true
+    password: hackme

@@ -1,5 +1,5 @@
-NAMESPACE=cozy-system
 NAME=platform
+NAMESPACE=cozy-system
 
 API_VERSIONS_FLAGS=$(addprefix -a ,$(shell kubectl api-versions))
 

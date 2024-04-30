@@ -1,14 +1,7 @@
-NAMESPACE=cozy-cilium
 NAME=cilium
+NAMESPACE=cozy-$(NAME)
 
-show:
-	kubectl get hr -n cozy-cilium cilium -o jsonpath='{.spec.values}' | helm template --dry-run=server -n $(NAMESPACE) $(NAME) . -f -
-
-apply:
-	kubectl get hr -n cozy-cilium cilium -o jsonpath='{.spec.values}' | helm upgrade -i -n $(NAMESPACE) $(NAME) . -f -
-
-diff:
-	kubectl get hr -n cozy-cilium cilium -o jsonpath='{.spec.values}' | helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) . -f -
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf charts

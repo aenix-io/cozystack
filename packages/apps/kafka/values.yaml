@@ -1,0 +1,22 @@
+external: false
+kafka:
+  size: 10Gi
+  replicas: 3
+zookeeper:
+  size: 5Gi
+  replicas: 3
+
+topics:
+  - name: Results
+    partitions: 1
+    replicas: 3
+    config:
+      min.insync.replicas: 2
+  - name: Orders
+    config:
+      cleanup.policy: compact
+      segment.ms: 3600000
+      max.compaction.lag.ms: 5400000
+      min.insync.replicas: 2
+    partitions: 1
+    replicationFactor: 3

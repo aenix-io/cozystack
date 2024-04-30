@@ -1,0 +1,6 @@
+altinity-clickhouse-operator:
+  configs:
+    files:
+      config.yaml:
+        watch:
+          namespaces: [".*"]

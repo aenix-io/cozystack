@@ -1,0 +1,16 @@
+diff --git a/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/_helpers.tpl b/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/_helpers.tpl
+index 403e187..e68a967 100644
+--- a/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/_helpers.tpl
++++ b/packages/system/kamaji-etcd/charts/kamaji-etcd/templates/_helpers.tpl
+@@ -119,11 +119,7 @@ Name of the etcd root-client secret.
+ Retrieve the current Kubernetes version to launch a kubectl container with the minimum version skew possible.
+ */}}
+ {{- define "etcd.jobsTagKubeVersion" -}}
+-{{- if contains "-eks-" .Capabilities.KubeVersion.GitVersion }}
+ {{- print "v" .Capabilities.KubeVersion.Major "." (.Capabilities.KubeVersion.Minor | replace "+" "") -}}
+-{{- else }}
+-{{- print "v" .Capabilities.KubeVersion.Major "." .Capabilities.KubeVersion.Minor -}}
+-{{- end }}
+ {{- end }}
+ 
+ {{/*

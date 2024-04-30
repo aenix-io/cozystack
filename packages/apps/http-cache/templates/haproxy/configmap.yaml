@@ -74,7 +74,7 @@ data:
         option redispatch 1
         default-server observe layer7 error-limit 10 on-error mark-down
 
-        {{- range $i, $e := until (int $.Values.replicas) }}
+        {{- range $i, $e := until (int $.Values.nginx.replicas) }}
         server cache{{ $i }} {{ $.Release.Name }}-nginx-cache-{{ $i }}:80 check
         {{- end }}
         {{- range $i, $e := $.Values.endpoints }} 

@@ -1,14 +1,7 @@
 NAME=victoria-metrics-operator
-NAMESPACE=cozy-victoria-metrics-operator
+NAMESPACE=cozy-$(NAME)
 
-show:
-	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
-
-apply:
-	helm upgrade -i -n $(NAMESPACE) $(NAME) .
-
-diff:
-	helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) .
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf charts

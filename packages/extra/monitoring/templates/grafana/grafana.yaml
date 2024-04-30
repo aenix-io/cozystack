@@ -67,7 +67,7 @@ spec:
   ingress:
     metadata:
       annotations:
-        kubernetes.io/ingress.class: "{{ $ingress }}"
+        acme.cert-manager.io/http01-ingress-class: "{{ $ingress }}"
         cert-manager.io/cluster-issuer: letsencrypt-prod
     spec:
       ingressClassName: "{{ $ingress }}"

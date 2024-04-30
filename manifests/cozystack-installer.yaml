@@ -15,13 +15,6 @@ metadata:
   namespace: cozy-system
 ---
 # Source: cozy-installer/templates/cozystack.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: cozystack
-  namespace: cozy-system
----
-# Source: cozy-installer/templates/cozystack.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -70,7 +63,7 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.2.0"
+        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.3.1"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
@@ -89,7 +82,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
       - name: darkhttpd
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.2.0"
+        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.3.1"
         command:
         - /usr/bin/darkhttpd
         - /cozystack/assets

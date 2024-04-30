@@ -99,6 +99,18 @@ releases:
   namespace: cozy-postgres-operator
   dependsOn: [cilium,kubeovn,cert-manager]
 
+- name: kafka-operator
+  releaseName: kafka-operator
+  chart: cozy-kafka-operator
+  namespace: cozy-kafka-operator
+  dependsOn: [cilium,kubeovn]
+
+- name: clickhouse-operator
+  releaseName: clickhouse-operator
+  chart: cozy-clickhouse-operator
+  namespace: cozy-clickhouse-operator
+  dependsOn: [cilium,kubeovn]
+
 - name: rabbitmq-operator
   releaseName: rabbitmq-operator
   chart: cozy-rabbitmq-operator

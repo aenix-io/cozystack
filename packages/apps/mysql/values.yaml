@@ -1,6 +1,8 @@
 external: false
 size: 10Gi
 
+replicas: 2
+
 users:
   root:
     password: strongpassword

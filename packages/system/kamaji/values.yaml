@@ -1,8 +1,3 @@
 kamaji:
   etcd:
     deploy: false
-
-  # Fix https://github.com/clastix/kamaji/pull/408
-  image:
-    repository: ghcr.io/kvaps/test
-    tag: kamaji-v0.4.1-fix

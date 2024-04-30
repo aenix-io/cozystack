@@ -1,4 +1,5 @@
 external: false
+replicas: 2
 httpAndHttps:
   mode: tcp
   targetPorts:

@@ -1,0 +1,36 @@
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "{{ .Release.Name }}"
+spec:
+  {{- with .Values.size }}
+  defaults:
+    templates:
+      dataVolumeClaimTemplate: data-volume-template
+  {{- end }}
+  configuration:
+    {{- with .Values.users }}
+    users:
+      {{- range $name, $u := . }}
+      {{ $name }}/password_sha256_hex: {{ sha256sum $u.password }}
+      {{ $name }}/profile: {{ ternary "readonly" "default" (index $u "readonly" | default false) }}
+      {{- end }}
+    {{- end }}
+    profiles:
+      readonly/readonly: "1"
+    clusters:
+      - name: "clickhouse"
+        layout:
+          shardsCount: {{ .Values.shards }}
+          replicasCount: {{ .Values.replicas }}
+  {{- with .Values.size }}
+  templates:
+    volumeClaimTemplates:
+      - name: data-volume-template
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ . }}
+  {{- end }}

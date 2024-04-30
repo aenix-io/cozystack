@@ -6,3 +6,4 @@ update:
 	sed -i 's/hook-failed/before-hook-creation,hook-failed/' `grep -rl hook-failed charts`
 	patch -p4 < patches/fix-svc.diff
 	patch -p4 < patches/fullnameOverride.diff
+	patch -p4 < patches/remove-plus.patch

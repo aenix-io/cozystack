@@ -1,15 +1,7 @@
 NAME=kamaji
-NAMESPACE=cozy-kamaji
+NAMESPACE=cozy-$(NAME)
 
-show:
-	helm template --dry-run=server -n $(NAMESPACE) $(NAME) .
-
-apply:
-	flux suspend hr kamaji -n cozy-kamaji || true
-	helm upgrade -i -n $(NAMESPACE) $(NAME) .
-
-diff:
-	helm diff upgrade --allow-unreleased --normalize-manifests -n $(NAMESPACE) $(NAME) .
+include ../../../scripts/package-system.mk
 
 update:
 	rm -rf charts

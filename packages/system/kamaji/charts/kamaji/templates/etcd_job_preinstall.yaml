@@ -19,7 +19,7 @@ spec:
       restartPolicy: Never
       initContainers:
         - name: cfssl
-          image: cfssl/cfssl:latest
+          image: "{{ .Values.cfssl.image.repository }}:{{ .Values.cfssl.image.tag }}"
           command:
             - bash
             - -c
