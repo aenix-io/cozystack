@@ -23,9 +23,11 @@ spec:
   interval: 1m
   releaseName: {{ $x.releaseName | default $x.name }}
   install:
+    crds: CreateReplace
     remediation:
       retries: -1
   upgrade:
+    crds: CreateReplace
     remediation:
       retries: -1
   chart:

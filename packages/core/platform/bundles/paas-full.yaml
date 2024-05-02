@@ -81,6 +81,12 @@ releases:
   privileged: true
   dependsOn: [cilium,kubeovn]
 
+- name: etcd-operator
+  releaseName: etcd-operator
+  chart: cozy-etcd-operator
+  namespace: cozy-etcd-operator
+  dependsOn: [cilium,kubeovn,cert-manager]
+
 - name: grafana-operator
   releaseName: grafana-operator
   chart: cozy-grafana-operator
