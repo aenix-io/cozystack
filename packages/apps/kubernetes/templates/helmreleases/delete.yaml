@@ -12,6 +12,12 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}-flux-teardown
       restartPolicy: Never
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: "NoSchedule"
       containers:
         - name: kubectl
           image: docker.io/clastix/kubectl:v1.29.1
