@@ -50,6 +50,4 @@ spec:
       - secret:
           secretName: {{ .Release.Name }}-admin-kubeconfig
         name: kubeconfig
-      tolerations:
-      - operator: Exists
       serviceAccountName: {{ .Release.Name }}-kccm
