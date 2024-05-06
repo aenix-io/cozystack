@@ -12,6 +12,15 @@ spec:
       serverSecret: etcd-server-tls
       clientTrustedCASecret: etcd-ca-tls
       clientSecret: etcd-client-tls
+  podTemplate:
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: etcd
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
