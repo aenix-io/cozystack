@@ -3,8 +3,6 @@ apiVersion: kamaji.clastix.io/v1alpha1
 kind: DataStore
 metadata:
   name: {{ .Release.Namespace }}
-  annotations:
-    helm.sh/hook: post-install,post-upgrade
 spec:
   driver: etcd
   endpoints:
@@ -34,3 +32,19 @@ spec:
           keyPath: tls.key
           name: etcd-client-tls
           namespace: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: etcd-ca-tls
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/resource-policy: keep
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: etcd-client-tls
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/resource-policy: keep
