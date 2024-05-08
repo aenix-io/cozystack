@@ -20,4 +20,4 @@ repos:
 	make -C packages/extra repo
 
 assets:
-	make -C packages/core/talos/ assets
+	make -C packages/core/installer/ assets
