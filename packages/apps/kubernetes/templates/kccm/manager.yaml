@@ -14,6 +14,12 @@ spec:
       labels:
         k8s-app: {{ .Release.Name }}-kccm
     spec:
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: "NoSchedule"
       containers:
       - name: kubevirt-cloud-controller-manager
         args:
@@ -44,6 +50,4 @@ spec:
       - secret:
           secretName: {{ .Release.Name }}-admin-kubeconfig
         name: kubeconfig
-      tolerations:
-      - operator: Exists
       serviceAccountName: {{ .Release.Name }}-kccm
