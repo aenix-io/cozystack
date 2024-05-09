@@ -35,6 +35,11 @@ spec:
   selector:
     matchLabels:
       app: cozystack
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   template:
     metadata:
       labels:
