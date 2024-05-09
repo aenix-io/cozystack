@@ -4,9 +4,11 @@ kind: MariaDB
 metadata:
   name: {{ .Release.Name }}
 spec:
+  {{- if (and .Values.users.root .Values.users.root.password) }}
   rootPasswordSecretKeyRef:
     name: {{ .Release.Name }}
     key: root-password
+  {{- end }}
 
   image: "mariadb:11.0.2"
 
