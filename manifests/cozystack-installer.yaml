@@ -54,6 +54,11 @@ spec:
   selector:
     matchLabels:
       app: cozystack
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -63,7 +68,7 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.4.0"
+        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.5.0"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
@@ -82,7 +87,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
       - name: darkhttpd
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.4.0"
+        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.5.0"
         command:
         - /usr/bin/darkhttpd
         - /cozystack/assets

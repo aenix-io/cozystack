@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/kubeapps-apis:v0.4.0
+ghcr.io/aenix-io/cozystack/kubeapps-apis:v0.5.0
