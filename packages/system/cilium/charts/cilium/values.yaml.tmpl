@@ -1854,9 +1854,9 @@ envoy:
   image:
     override: ~
     repository: "quay.io/cilium/cilium-envoy"
-    tag: "v1.26.7-bbde4095997ea57ead209f56158790d47224a0f5"
+    tag: "v1.27.4-21905253931655328edaacf3cd16aeda73bbea2f"
     pullPolicy: "${PULL_POLICY}"
-    digest: "sha256:39b75548447978230dedcf25da8940e4d3540c741045ef391a8e74dbb9661a86"
+    digest: "sha256:d52f476c29a97c8b250fdbfbb8472191a268916f6a8503671d0da61e323b02cc"
     useDigest: true
 
   # -- Additional containers added to the cilium Envoy DaemonSet.
@@ -2469,6 +2469,8 @@ nodeinit:
     override: ~
     repository: "${CILIUM_NODEINIT_REPO}"
     tag: "${CILIUM_NODEINIT_VERSION}"
+    digest: "${CILIUM_NODEINIT_DIGEST}"
+    useDigest: true
     pullPolicy: "${PULL_POLICY}"
 
   # -- The priority class to use for the nodeinit pod.
