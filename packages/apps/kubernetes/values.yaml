@@ -1,6 +1,14 @@
+## @section Common parameters
+
+## @param host The hostname used to access the Kubernetes cluster externally (defaults to using the cluster name as a subdomain for the tenant host).
+## @param controlPlane.replicas Number of replicas for Kubernetes contorl-plane components
+##
 host: ""
 controlPlane:
   replicas: 2
+
+## @param nodeGroups [object] nodeGroups configuration
+##
 nodeGroups:
   md0:
     minReplicas: 0

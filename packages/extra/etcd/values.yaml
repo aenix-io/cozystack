@@ -1,0 +1,7 @@
+## @section Common parameters
+
+## @param size Persistent Volume size
+## @param replicas Number of etcd replicas
+##
+size: 4Gi
+replicas: 3

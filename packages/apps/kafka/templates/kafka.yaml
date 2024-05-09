@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   kafka:
-    replicas: {{ .Values.replicas }}
+    replicas: {{ .Values.kafka.replicas }}
     listeners:
       - name: plain
         port: 9092
@@ -41,7 +41,7 @@ spec:
         {{- end }}
         deleteClaim: true
   zookeeper:
-    replicas: {{ .Values.replicas }}
+    replicas: {{ .Values.zookeeper.replicas }}
     storage:
       type: persistent-claim
       {{- with .Values.zookeeper.size }}

@@ -1,0 +1,11 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "replicas": {
+            "type": "number",
+            "description": "Number of ingress-nginx replicas",
+            "default": 2
+        }
+    }
+}

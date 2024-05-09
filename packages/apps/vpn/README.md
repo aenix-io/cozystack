@@ -10,3 +10,18 @@ The VPN Service is powered by the Outline Server, an advanced and user-friendly 
 
 - Docs: https://shadowsocks.org/
 - Docs: https://github.com/Jigsaw-Code/outline-server/tree/master/src/shadowbox
+
+## Parameters
+
+### Common parameters
+
+| Name       | Description                                     | Value   |
+| ---------- | ----------------------------------------------- | ------- |
+| `external` | Enable external access from outside the cluster | `false` |
+| `replicas` | Number of VPN-server replicas                   | `2`     |
+
+### Configuration parameters
+
+| Name    | Description         | Value |
+| ------- | ------------------- | ----- |
+| `users` | Users configuration | `{}`  |

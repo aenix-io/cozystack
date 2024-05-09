@@ -1,0 +1,42 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "external": {
+            "type": "boolean",
+            "description": "Enable external access from outside the cluster",
+            "default": false
+        },
+        "size": {
+            "type": "string",
+            "description": "Persistent Volume size",
+            "default": "10Gi"
+        },
+        "haproxy": {
+            "type": "object",
+            "properties": {
+                "replicas": {
+                    "type": "number",
+                    "description": "Number of HAProxy replicas",
+                    "default": 2
+                }
+            }
+        },
+        "nginx": {
+            "type": "object",
+            "properties": {
+                "replicas": {
+                    "type": "number",
+                    "description": "Number of Nginx replicas",
+                    "default": 2
+                }
+            }
+        },
+        "endpoints": {
+            "type": "array",
+            "description": "Endpoints configuration",
+            "default": [],
+            "items": {}
+        }
+    }
+}

@@ -6,9 +6,9 @@ metadata:
 spec:
   driver: etcd
   endpoints:
-  - etcd-0.etcd-headless.{{ .Release.Namespace }}.svc:2379
-  - etcd-1.etcd-headless.{{ .Release.Namespace }}.svc:2379
-  - etcd-2.etcd-headless.{{ .Release.Namespace }}.svc:2379
+  {{- range $i := until (int $.Values.replicas) }}
+  - etcd-{{ $i }}.etcd-headless.{{ $.Release.Namespace }}.svc:2379
+  {{- end }}
   tlsConfig:
     certificateAuthority:
       certificate:

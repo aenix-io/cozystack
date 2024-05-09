@@ -45,3 +45,14 @@ tenant-u1
     ├── kubernetes-cluster1
     └── postgres-db1
 ```
+
+## Parameters
+
+### Common parameters
+
+| Name         | Description                                                                                                                 | Value   |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `host`       | The hostname used to access tenant services (defaults to using the tenant name as a subdomain for it's parent tenant host). | `""`    |
+| `etcd`       | Deploy own Etcd cluster                                                                                                     | `false` |
+| `monitoring` | Deploy own Monitoring Stack                                                                                                 | `false` |
+| `ingress`    | Deploy own Ingress Controller                                                                                               | `false` |

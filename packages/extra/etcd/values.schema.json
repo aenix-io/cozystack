@@ -1,0 +1,16 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "size": {
+            "type": "string",
+            "description": "Persistent Volume size",
+            "default": "4Gi"
+        },
+        "replicas": {
+            "type": "number",
+            "description": "Number of etcd replicas",
+            "default": 3
+        }
+    }
+}

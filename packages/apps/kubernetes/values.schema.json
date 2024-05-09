@@ -1,0 +1,21 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "host": {
+            "type": "string",
+            "description": "The hostname used to access the Kubernetes cluster externally (defaults to using the cluster name as a subdomain for the tenant host).",
+            "default": ""
+        },
+        "controlPlane": {
+            "type": "object",
+            "properties": {
+                "replicas": {
+                    "type": "number",
+                    "description": "Number of replicas for Kubernetes contorl-plane components",
+                    "default": 2
+                }
+            }
+        }
+    }
+}
