@@ -55,3 +55,20 @@ The deployment architecture is illustrated in the diagram below:
 
 VTS module shows wrong upstream resonse time
 - https://github.com/vozlt/nginx-module-vts/issues/198
+
+## Parameters
+
+### Common parameters
+
+| Name               | Description                                     | Value   |
+| ------------------ | ----------------------------------------------- | ------- |
+| `external`         | Enable external access from outside the cluster | `false` |
+| `size`             | Persistent Volume size                          | `10Gi`  |
+| `haproxy.replicas` | Number of HAProxy replicas                      | `2`     |
+| `nginx.replicas`   | Number of Nginx replicas                        | `2`     |
+
+### Configuration parameters
+
+| Name        | Description             | Value |
+| ----------- | ----------------------- | ----- |
+| `endpoints` | Endpoints configuration | `[]`  |

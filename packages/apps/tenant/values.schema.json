@@ -1,27 +1,26 @@
 {
-  "$schema": "http://json-schema.org/schema#",
-  "type": "object",
-  "properties": {
-    "host": {
-      "type": "string",
-      "form": true,
-      "title": "Domain name for this tenant",
-      "description": "This host will be used for all apps deployed in this tenant"
-    },
-    "etcd": {
-      "type": "boolean",
-      "title": "Deploy own Etcd cluster",
-      "form": true
-    },
-    "monitoring": {
-      "type": "boolean",
-      "title": "Deploy own Monitoring Stack",
-      "form": true
-    },
-    "ingress": {
-      "type": "boolean",
-      "title": "Deploy own Ingress Controller",
-      "form": true
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "host": {
+            "type": "string",
+            "description": "The hostname used to access tenant services (defaults to using the tenant name as a subdomain for it's parent tenant host).",
+            "default": ""
+        },
+        "etcd": {
+            "type": "boolean",
+            "description": "Deploy own Etcd cluster",
+            "default": false
+        },
+        "monitoring": {
+            "type": "boolean",
+            "description": "Deploy own Monitoring Stack",
+            "default": false
+        },
+        "ingress": {
+            "type": "boolean",
+            "description": "Deploy own Ingress Controller",
+            "default": false
+        }
     }
-  }
 }

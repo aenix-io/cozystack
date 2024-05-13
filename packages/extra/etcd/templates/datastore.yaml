@@ -3,14 +3,12 @@ apiVersion: kamaji.clastix.io/v1alpha1
 kind: DataStore
 metadata:
   name: {{ .Release.Namespace }}
-  annotations:
-    helm.sh/hook: post-install,post-upgrade
 spec:
   driver: etcd
   endpoints:
-  - etcd-0.etcd-headless.{{ .Release.Namespace }}.svc:2379
-  - etcd-1.etcd-headless.{{ .Release.Namespace }}.svc:2379
-  - etcd-2.etcd-headless.{{ .Release.Namespace }}.svc:2379
+  {{- range $i := until (int $.Values.replicas) }}
+  - etcd-{{ $i }}.etcd-headless.{{ $.Release.Namespace }}.svc:2379
+  {{- end }}
   tlsConfig:
     certificateAuthority:
       certificate:
@@ -34,3 +32,19 @@ spec:
           keyPath: tls.key
           name: etcd-client-tls
           namespace: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: etcd-ca-tls
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/resource-policy: keep
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: etcd-client-tls
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/resource-policy: keep

@@ -48,6 +48,7 @@ rules:
   - configmaps
   verbs:
   - create
+  - delete
   - get
   - list
   - patch
@@ -87,6 +88,7 @@ rules:
   - persistentvolumeclaims
   verbs:
   - create
+  - deletecollection
   - list
   - patch
   - watch
@@ -99,12 +101,6 @@ rules:
   - get
   - list
   - watch
-- apiGroups:
-  - ""
-  resources:
-  - pvcs
-  verbs:
-  - list
 - apiGroups:
   - ""
   resources:

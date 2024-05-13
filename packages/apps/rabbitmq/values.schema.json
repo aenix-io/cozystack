@@ -1,14 +1,16 @@
 {
-  "$schema": "http://json-schema.org/schema#",
-  "type": "object",
-  "properties": {
-    "external": {
-      "type": "boolean",
-      "title": "Enable external Access"
-    },
-    "replicas": {
-      "type": "integer",
-      "title": "Replicas"
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "external": {
+            "type": "boolean",
+            "description": "Enable external access from outside the cluster",
+            "default": false
+        },
+        "replicas": {
+            "type": "number",
+            "description": "Number of RabbitMQ replicas",
+            "default": 3
+        }
     }
-  }
 }

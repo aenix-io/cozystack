@@ -1,0 +1,47 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "external": {
+            "type": "boolean",
+            "description": "Enable external access from outside the cluster",
+            "default": false
+        },
+        "kafka": {
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "string",
+                    "description": "Persistent Volume size for Kafka",
+                    "default": "10Gi"
+                },
+                "replicas": {
+                    "type": "number",
+                    "description": "Number of Kafka replicas",
+                    "default": 3
+                }
+            }
+        },
+        "zookeeper": {
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "string",
+                    "description": "Persistent Volume size for ZooKeeper",
+                    "default": "5Gi"
+                },
+                "replicas": {
+                    "type": "number",
+                    "description": "Number of ZooKeeper replicas",
+                    "default": 3
+                }
+            }
+        },
+        "topics": {
+            "type": "array",
+            "description": "Topics configuration",
+            "default": [],
+            "items": {}
+        }
+    }
+}

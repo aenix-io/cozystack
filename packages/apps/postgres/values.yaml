@@ -1,34 +1,57 @@
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param size Persistent Volume size
+## @param replicas Number of MariaDB replicas
+##
 external: false
 size: 10Gi
 replicas: 2
 
-users:
-  user1:
-    password: strongpassword
-  user2:
-    password: hackme
-  airflow:
-    password: qwerty123
-  debezium:
-    replication: true
+## @section Configuration parameters
 
-databases:
+## @param users [object] Users configuration
+## Example:
+## users:
+##   user1:
+##     password: strongpassword
+##   user2:
+##     password: hackme
+##   airflow:
+##     password: qwerty123
+##   debezium:
+##     replication: true
+##
+users: {}
 
-  myapp:
-    roles:
-      admin:
-      - user1
-      - debezium
-      readonly:
-      - user2
+## @param databases Databases configuration
+## Example:
+## databases:
+##   myapp:
+##     roles:
+##       admin:
+##       - user1
+##       - debezium
+##       readonly:
+##       - user2
+##   airflow:
+##     roles:
+##       admin:
+##       - airflow
+##     extensions:
+##     - hstore
+databases: {}
 
-  airflow:
-    roles:
-      admin:
-      - airflow
-    extensions:
-    - hstore
+## @section Backup parameters
 
+## @param backup.enabled Enable pereiodic backups
+## @param backup.s3Region The AWS S3 region where backups are stored
+## @param backup.s3Bucket The S3 bucket used for storing backups
+## @param backup.schedule Cron schedule for automated backups
+## @param backup.cleanupStrategy The strategy for cleaning up old backups
+## @param backup.s3AccessKey The access key for S3, used for authentication
+## @param backup.s3SecretKey The secret key for S3, used for authentication
+## @param backup.resticPassword The password for Restic backup encryption
 backup:
   enabled: false
   s3Region: us-east-1

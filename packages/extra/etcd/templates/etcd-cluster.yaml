@@ -4,7 +4,13 @@ kind: EtcdCluster
 metadata:
   name: etcd
 spec:
-  storage: {}
+  replicas: {{ .Values.replicas }}
+  storage:
+    volumeClaimTemplate:
+      spec:
+        resources:
+          requests:
+            storage: {{ .Values.size }}
   security:
     tls:
       peerTrustedCASecret: etcd-peer-ca-tls
@@ -12,6 +18,15 @@ spec:
       serverSecret: etcd-server-tls
       clientTrustedCASecret: etcd-ca-tls
       clientSecret: etcd-client-tls
+  podTemplate:
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: "kubernetes.io/hostname"
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: etcd
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -98,15 +113,11 @@ spec:
     - "signing"
     - "key encipherment"
   dnsNames:
-  - etcd-0
-  - etcd-0.etcd-headless
-  - etcd-0.etcd-headless.{{ .Release.Namespace }}.svc
-  - etcd-1
-  - etcd-1.etcd-headless
-  - etcd-1.etcd-headless.{{ .Release.Namespace }}.svc
-  - etcd-2
-  - etcd-2.etcd-headless
-  - etcd-2.etcd-headless.{{ .Release.Namespace }}.svc
+  {{- range $i := until (int $.Values.replicas) }}
+  - etcd-{{ $i }}
+  - etcd-{{ $i }}.etcd-headless
+  - etcd-{{ $i }}.etcd-headless.{{ $.Release.Namespace }}.svc
+  {{- end }}
   - localhost
   - "127.0.0.1"
   privateKey:
@@ -129,15 +140,11 @@ spec:
     - "signing"
     - "key encipherment"
   dnsNames:
-  - etcd-0
-  - etcd-0.etcd-headless
-  - etcd-0.etcd-headless.{{ .Release.Namespace }}.svc
-  - etcd-1
-  - etcd-1.etcd-headless
-  - etcd-1.etcd-headless.{{ .Release.Namespace }}.svc
-  - etcd-2
-  - etcd-2.etcd-headless
-  - etcd-2.etcd-headless.{{ .Release.Namespace }}.svc
+  {{- range $i := until (int $.Values.replicas) }}
+  - etcd-{{ $i }}
+  - etcd-{{ $i }}.etcd-headless
+  - etcd-{{ $i }}.etcd-headless.{{ $.Release.Namespace }}.svc
+  {{- end }}
   - localhost
   - "127.0.0.1"
   privateKey:

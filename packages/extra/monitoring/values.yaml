@@ -1,5 +1,10 @@
+## @section Common parameters
+
+## @param host The hostname used to access the grafana externally (defaults to 'grafana' subdomain for the tenant host).
 host: ""
 
+## @param metricsStorages [array] Configuration of metrics storage instances
+##
 metricsStorages:
 - name: shortterm
   retentionPeriod: "3d"
@@ -10,5 +15,7 @@ metricsStorages:
   deduplicationInterval: "15s"
   storage: 10Gi
 
+## @param oncall.enabled Enable Grafana OnCall
+## 
 oncall:
   enabled: false

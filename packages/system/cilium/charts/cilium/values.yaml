@@ -143,10 +143,10 @@ rollOutCiliumPods: false
 image:
   override: ~
   repository: "quay.io/cilium/cilium"
-  tag: "v1.14.9"
+  tag: "v1.14.10"
   pullPolicy: "IfNotPresent"
   # cilium-digest
-  digest: "sha256:4ef1eb7a3bc39d0fefe14685e6c0d4e01301c40df2a89bc93ffca9a1ab927301"
+  digest: "sha256:0a1bcd2859c6d18d60dba6650cca8c707101716a3e47b126679040cbd621c031"
   useDigest: true
 
 # -- Affinity for cilium-agent.
@@ -933,8 +933,8 @@ certgen:
   image:
     override: ~
     repository: "quay.io/cilium/certgen"
-    tag: "v0.1.9"
-    digest: "sha256:89a0847753686444daabde9474b48340993bd19c7bea66a46e45b2974b82041f"
+    tag: "v0.1.11"
+    digest: "sha256:5586de5019abc104637a9818a626956cd9b1e827327b958186ec412ae3d5dea6"
     useDigest: true
     pullPolicy: "IfNotPresent"
   # -- Seconds after which the completed job pod will be deleted
@@ -1109,9 +1109,9 @@ hubble:
     image:
       override: ~
       repository: "quay.io/cilium/hubble-relay"
-      tag: "v1.14.9"
+      tag: "v1.14.10"
        # hubble-relay-digest
-      digest: "sha256:f506f3c6e0a979437cde79eb781654fda4f10ddb5642cebc4dc81254cfb7eeaa"
+      digest: "sha256:c156c4fc2da520d2876142ea17490440b95431a1be755d2050e72115a495cfd0"
       useDigest: true
       pullPolicy: "IfNotPresent"
 
@@ -1853,9 +1853,9 @@ envoy:
   image:
     override: ~
     repository: "quay.io/cilium/cilium-envoy"
-    tag: "v1.26.7-bbde4095997ea57ead209f56158790d47224a0f5"
+    tag: "v1.27.4-21905253931655328edaacf3cd16aeda73bbea2f"
     pullPolicy: "IfNotPresent"
-    digest: "sha256:39b75548447978230dedcf25da8940e4d3540c741045ef391a8e74dbb9661a86"
+    digest: "sha256:d52f476c29a97c8b250fdbfbb8472191a268916f6a8503671d0da61e323b02cc"
     useDigest: true
 
   # -- Additional containers added to the cilium Envoy DaemonSet.
@@ -2269,15 +2269,15 @@ operator:
   image:
     override: ~
     repository: "quay.io/cilium/operator"
-    tag: "v1.14.9"
+    tag: "v1.14.10"
     # operator-generic-digest
-    genericDigest: "sha256:1552d653870dd8ebbd16ee985a5497dd78a2097370978b0cfbd2da2072f30712"
+    genericDigest: "sha256:415b7f0bb0e7339c6231d4b9ee74a6a513b2865acfccec884dbc806ecc3dd909"
     # operator-azure-digest
-    azureDigest: "sha256:2d3b9d868eb03fa9256d34192a734a2abab283f527a9c97b7cefcd3401649d17"
+    azureDigest: "sha256:404a46bb0a232c7d5ab7ab97a1d1a55635cdf0e334529a18d1ddb50f4aad71b4"
     # operator-aws-digest
-    awsDigest: "sha256:041ad5b49ae63ba0f1974e1a1d9ebf9f52541cd2813088fa687f9d544125a1ec"
+    awsDigest: "sha256:72440aa4cb8a42dddb05cfc74c6fba0a18d0902b1e434f5dcde8dca0354a8be6"
     # operator-alibabacloud-digest
-    alibabacloudDigest: "sha256:765314779093b54750f83280f009229f20fe1f28466a633d9bb4143d2ad669c5"
+    alibabacloudDigest: "sha256:2fbb53c2fc9c7203db9065c4e6cedb8e98d32d5ebc64549949636b5344cd1f14"
     useDigest: true
     pullPolicy: "IfNotPresent"
     suffix: ""
@@ -2468,6 +2468,8 @@ nodeinit:
     override: ~
     repository: "quay.io/cilium/startup-script"
     tag: "62093c5c233ea914bfa26a10ba41f8780d9b737f"
+    digest: "sha256:e1d442546e868db1a3289166c14011e0dbd32115b338b963e56f830972bc22a2"
+    useDigest: true
     pullPolicy: "IfNotPresent"
 
   # -- The priority class to use for the nodeinit pod.
@@ -2554,9 +2556,9 @@ preflight:
   image:
     override: ~
     repository: "quay.io/cilium/cilium"
-    tag: "v1.14.9"
+    tag: "v1.14.10"
     # cilium-digest
-    digest: "sha256:4ef1eb7a3bc39d0fefe14685e6c0d4e01301c40df2a89bc93ffca9a1ab927301"
+    digest: "sha256:0a1bcd2859c6d18d60dba6650cca8c707101716a3e47b126679040cbd621c031"
     useDigest: true
     pullPolicy: "IfNotPresent"
 
@@ -2704,9 +2706,9 @@ clustermesh:
     image:
       override: ~
       repository: "quay.io/cilium/clustermesh-apiserver"
-      tag: "v1.14.9"
+      tag: "v1.14.10"
       # clustermesh-apiserver-digest
-      digest: "sha256:5c16f8b8e22ce41e11998e70846fbcecea3a6b683a38253809ead8d871f6d8a3"
+      digest: "sha256:609fea274caa016f15646f6e0b0f1f7c56b238c551e7b261bc1e99ce64f7b798"
       useDigest: true
       pullPolicy: "IfNotPresent"
 
@@ -2751,9 +2753,9 @@ clustermesh:
       image:
         override: ~
         repository: "quay.io/cilium/kvstoremesh"
-        tag: "v1.14.9"
+        tag: "v1.14.10"
         # kvstoremesh-digest
-        digest: "sha256:9d9efb25806660f3663b9cd803fb8679f2b115763470002a9770e2c1eb1e5b22"
+        digest: "sha256:871ec4e3b07401d90b4433c7e2b7210b9b0c5f1a536caab3d0281a5faeea5070"
         useDigest: true
         pullPolicy: "IfNotPresent"
 
