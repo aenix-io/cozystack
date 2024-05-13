@@ -1,0 +1,3 @@
+To get kubeconfig for this cluster run:
+
+kubectl get secret -n {{ .Release.Namespace }} {{ .Release.Name }}-admin-kubeconfig -o go-template='{{`{{ printf "%s\n" (index .data "super-admin.conf" | base64decode) }}`}}'
