@@ -19,6 +19,7 @@ metadata:
     namespace.cozystack.io/etcd: tenant-root
     namespace.cozystack.io/monitoring: tenant-root
     namespace.cozystack.io/ingress: tenant-root
+    namespace.cozystack.io/seaweedfs: tenant-root
     namespace.cozystack.io/host: "{{ $host }}"
   name: tenant-root
 ---
