@@ -74,6 +74,8 @@ metadata:
 spec:
   template:
     spec:
+      preKubeadmCommands:
+      - sed -i 's|root:x:|root::|' /etc/passwd
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs: {}
