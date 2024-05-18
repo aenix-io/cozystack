@@ -7,6 +7,7 @@ kafka 0.2.0 HEAD
 kubernetes 0.1.0 f642698
 kubernetes 0.2.0 7cd7de73
 kubernetes 0.3.0 HEAD
+kubernetes-proxmox 0.2.0 HEAD
 mysql 0.1.0 f642698
 mysql 0.2.0 8b975ff0
 mysql 0.3.0 HEAD
