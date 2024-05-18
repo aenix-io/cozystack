@@ -74,6 +74,21 @@ metadata:
 spec:
   template:
     spec:
+      diskSetup:
+        filesystems:
+        - device: /dev/vdb
+          filesystem: xfs
+          label: containerd
+          partition: "none"
+        - device: /dev/vdc
+          filesystem: xfs
+          label: kubelet
+          partition: "none"
+      mounts:
+      - ["LABEL=containerd", "/var/lib/containerd"]
+      - ["LABEL=kubelet", "/var/lib/kubelet"]
+      preKubeadmCommands:
+      - sed -i 's|root:x:|root::|' /etc/passwd
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs: {}
@@ -108,17 +123,32 @@ spec:
                   sockets: 1
                 devices:
                   disks:
-                  - disk:
+                  - name: system
+                    disk:
                       bus: virtio
-                    name: containervolume
+                      pciAddress: 0000:07:00.0
+                  - name: containerd
+                    disk:
+                      bus: virtio
+                      pciAddress: 0000:08:00.0
+                  - name: kubelet
+                    disk:
+                      bus: virtio
+                      pciAddress: 0000:09:00.0
                   networkInterfaceMultiqueue: true
                 memory:
                   guest: {{ $group.resources.memory }}
               evictionStrategy: External
               volumes:
-              - containerDisk:
+              - name: system
+                containerDisk:
                   image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}@{{ index ($.Files.Get "images/ubuntu-container-disk.json" | fromJson) "containerimage.digest" }}"
-                name: containervolume
+              - name: containerd
+                emptyDisk:
+                  capacity: 20Gi
+              - name: kubelet
+                emptyDisk:
+                  capacity: 20Gi
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
