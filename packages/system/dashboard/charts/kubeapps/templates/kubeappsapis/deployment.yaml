@@ -133,7 +133,7 @@ spec:
             # longer-term pass something to the plugins so that the plugins won't need to
             # know these details). Currently they're used directly by the flux plugin
             - name: REDIS_ADDR
-              value: {{ printf "%s-master.%s.svc.cluster.local:6379" (include "kubeapps.redis.fullname" .) .Release.Namespace }}
+              value: {{ printf "%s-master.%s.svc:6379" (include "kubeapps.redis.fullname" .) .Release.Namespace }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
