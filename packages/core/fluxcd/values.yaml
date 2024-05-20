@@ -1,5 +1,4 @@
 flux2:
-  clusterDomain: ""
   helmController:
     resources:
       requests:
