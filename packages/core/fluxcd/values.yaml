@@ -1,0 +1,26 @@
+flux2:
+  clusterDomain: ""
+  helmController:
+    resources:
+      requests:
+        cpu: 50m
+  imageAutomationController:
+    resources:
+      requests:
+        cpu: 10m
+  imageReflectionController:
+    resources:
+      requests:
+        cpu: 20m
+  kustomizeController:
+    resources:
+      requests:
+        cpu: 10m
+  notificationController:
+    resources:
+      requests:
+        cpu: 50m
+  sourceController:
+    resources:
+      requests:
+        cpu: 10m
