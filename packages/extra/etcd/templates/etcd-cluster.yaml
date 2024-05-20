@@ -15,6 +15,9 @@ metadata:
 spec:
   options:
     quota-backend-bytes: {{ include "calculateQuotaBackendBytes" .Values.size | quote }}
+    auto-compaction-mode: "periodic"
+    auto-compaction-retention: "5m"
+    snapshot-count: "10000"
   replicas: {{ .Values.replicas }}
   storage:
     volumeClaimTemplate:
