@@ -14,6 +14,7 @@ update-chart:
 	helm pull bitnami/kubeapps --untar --untardir charts
 	rm -rf charts/kubeapps/charts/postgresql/
 	ln -s ../../images charts/kubeapps/images
+	sed -i 's/.cluster.local//g' charts/kubeapps/templates/kubeappsapis/deployment.yaml
 
 update-dockerfiles:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/vmware-tanzu/kubeapps  | awk -F'[/^]' 'END{print $$3}') && \
