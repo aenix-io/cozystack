@@ -26,7 +26,9 @@ spec:
   values:
     cilium:
       tunnel: disabled
-      autoDirectNodeRoutes: true
+      autoDirectNodeRoutes: false
+      bpf:
+        masquerade: true
       cgroup:
         autoMount:
           enabled: true
@@ -38,9 +40,9 @@ spec:
         chainingMode: ~
         customConf: false
         configMap: ""
-      routingMode: native
+      routingMode: tunnel
       enableIPv4Masquerade: true
-      ipv4NativeRoutingCIDR: "10.244.0.0/16"
+      ipv4NativeRoutingCIDR: ""
   dependsOn:
   - name: {{ .Release.Name }}
     namespace: {{ .Release.Namespace }}
