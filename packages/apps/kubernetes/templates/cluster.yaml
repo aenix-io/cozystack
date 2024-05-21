@@ -39,7 +39,9 @@ metadata:
 spec:
   dataStoreName: "{{ $etcd }}"
   addons:
-    coreDNS: {}
+    coreDNS:
+      dnsServiceIPs:
+      - 10.95.0.10
     konnectivity: {}
   kubelet:
     cgroupfs: systemd
