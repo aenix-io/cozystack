@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/cozystack:v0.6.0
+mgr.cp.if.ua:5000/cozystack:latest
