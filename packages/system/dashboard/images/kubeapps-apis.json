@@ -1,4 +1,48 @@
 {
-  "containerimage.config.digest": "sha256:79ac02f0fe54d2007b222efe05596a1bf35b8557e406d018f825a2334bd73249",
-  "containerimage.digest": "sha256:1c1dbee8e5c4be14e5df36a69be75a6a2907445564379e23b7f8fbea1afc7093"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/bitnami/golang@1.22.2?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "f6238d0feb519be3a157e0f29d56312fdcbfde165d96987f3956581126371977"
+        }
+      },
+      {
+        "uri": "pkg:docker/bitnami/minideb@bookworm?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "6cc3baf349947d587a9cd4971e81ff3ffc0d17382f2b5b6de63d6542bff10c16"
+        }
+      },
+      {
+        "uri": "pkg:docker/alpine@latest?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "77726ef6b57ddf65bb551896826ec38bc3e53f75cdde31354fbffb4f25238ebd"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "default/default/odf1stlt7iubsgs7c7jo2rdip",
+  "containerimage.config.digest": "sha256:f5cfdc764f491235a432ef8cbcc966c60fcc6cd78c266a98172b38a1cd1227bf",
+  "containerimage.digest": "sha256:711275f5a0f2c1630b23b62c69190844b515f18df876e03bc8a87f49c505c862",
+  "image.name": "mgr.cp.if.ua/kubeapps-apis:v0.6.0-proxmox-test2"
 }
