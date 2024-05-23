@@ -39,7 +39,9 @@ metadata:
 spec:
   dataStoreName: "{{ $etcd }}"
   addons:
-    coreDNS: {}
+    coreDNS:
+      dnsServiceIPs:
+      - 10.95.0.10
     konnectivity: {}
   kubelet:
     cgroupfs: systemd
@@ -55,7 +57,7 @@ spec:
       className: "{{ $ingress }}"
   deployment:
   replicas: 2
-  version: 1.29.0
+  version: 1.29.4
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: KubevirtCluster
@@ -176,5 +178,5 @@ spec:
         kind: KubevirtMachineTemplate
         name: {{ $.Release.Name }}-{{ $groupName }}
         namespace: default
-      version: v1.29.0
+      version: v1.29.4
 {{- end }}

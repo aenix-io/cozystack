@@ -1,4 +1,6 @@
 etcd 1.0.0 f7eaab0
-etcd 2.0.0 HEAD
+etcd 2.0.0 a6d0f7cf
+etcd 2.0.1 6fc1cc7d
+etcd 2.1.0 HEAD
 ingress 1.0.0 HEAD
 monitoring 1.0.0 HEAD

@@ -5,12 +5,15 @@ http-cache 0.2.0 HEAD
 kafka 0.1.0 760f86d2
 kafka 0.2.0 HEAD
 kubernetes 0.1.0 f642698
-kubernetes 0.2.0 HEAD
+kubernetes 0.2.0 7cd7de73
+kubernetes 0.3.0 7caccec1
+kubernetes 0.4.0 HEAD
 mysql 0.1.0 f642698
 mysql 0.2.0 8b975ff0
 mysql 0.3.0 HEAD
 postgres 0.1.0 f642698
-postgres 0.2.0 HEAD
+postgres 0.2.0 7cd7de73
+postgres 0.2.1 HEAD
 rabbitmq 0.1.0 f642698
 rabbitmq 0.2.0 HEAD
 redis 0.1.1 f642698

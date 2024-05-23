@@ -9,4 +9,4 @@ repo:
 	cd "$(OUT)" && helm repo index .
 
 fix-chartnames:
-	find . -name Chart.yaml -maxdepth 2 | awk -F/ '{print $$2}' | while read i; do sed -i "s/^name: .*/name: cozy-$$i/" "$$i/Chart.yaml"; done
+	find . -maxdepth 2 -name Chart.yaml | awk -F/ '{print $$2}' | while read i; do sed -i "s/^name: .*/name: cozy-$$i/" "$$i/Chart.yaml"; done
