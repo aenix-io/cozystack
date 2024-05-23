@@ -1,1 +1,1 @@
-mgr.cp.if.ua:5000/cozystack:latest
+mgr.cp.if.ua/cozystack:0.6.0-fix1
