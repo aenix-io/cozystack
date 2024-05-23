@@ -1,12 +1,3 @@
-{{- define "calculateQuotaBackendBytes" -}}
-{{- $units := dict "Ki" 1024 "Mi" 1048576 "Gi" 1073741824 -}}
-{{- $value := regexFind "[0-9.]+" . -}}
-{{- $unit := regexFind "[a-zA-Z]+" . -}}
-{{- $numericValue := float64 $value -}}
-{{- $bytes := mulf $numericValue (index $units $unit) -}}
-{{- $result := mulf $bytes 0.95 -}}
-{{- printf "%.0f" $result -}}
-{{- end -}}
 ---
 apiVersion: etcd.aenix.io/v1alpha1
 kind: EtcdCluster
@@ -14,7 +5,6 @@ metadata:
   name: etcd
 spec:
   options:
-    quota-backend-bytes: {{ include "calculateQuotaBackendBytes" .Values.size | quote }}
   replicas: {{ .Values.replicas }}
   storage:
     volumeClaimTemplate:
