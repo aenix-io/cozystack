@@ -4,7 +4,6 @@ kind: EtcdCluster
 metadata:
   name: etcd
 spec:
-  options:
   replicas: {{ .Values.replicas }}
   storage:
     volumeClaimTemplate:

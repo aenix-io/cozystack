@@ -1,42 +1,4 @@
 {
-  "buildx.build.provenance": {
-    "buildType": "https://mobyproject.org/buildkit@v1",
-    "materials": [
-      {
-        "uri": "pkg:docker/alpine@3.19?platform=linux%2Famd64",
-        "digest": {
-          "sha256": "c5b1261d6d3e43071626931fc004f70149baeba2c8ec672bd4f27761f8e1ad6b"
-        }
-      },
-      {
-        "uri": "pkg:docker/golang@alpine3.19?platform=linux%2Famd64",
-        "digest": {
-          "sha256": "f1fe698725f6ed14eb944dc587591f134632ed47fc0732ec27c7642adbe90618"
-        }
-      }
-    ],
-    "invocation": {
-      "configSource": {
-        "entryPoint": "Dockerfile"
-      },
-      "parameters": {
-        "frontend": "dockerfile.v0",
-        "locals": [
-          {
-            "name": "context"
-          },
-          {
-            "name": "dockerfile"
-          }
-        ]
-      },
-      "environment": {
-        "platform": "linux/amd64"
-      }
-    }
-  },
-  "buildx.build.ref": "default/default/uk46jvh3cmihgnfrcc3gjchje",
-  "containerimage.config.digest": "sha256:c1200a909cb602b6e59b029252a0621c7cb3fb3e75f0e5befa5478d0a416a569",
-  "containerimage.digest": "sha256:4498a14b63cdbe4283aa054aff82579212b206dfa020b69298c751c69808d98e",
-  "image.name": "mgr.cp.if.ua/cozystack:0.6.0-fix1"
+  "containerimage.config.digest": "sha256:dac122af1e85d9d668e0a0260d08bb80892f1087b09fb4a4ace2e568257889d2",
+  "containerimage.digest": "sha256:bc9029117d985748290b88839082b65b28aaa718b694ff686d6cf49971be424f"
 }
