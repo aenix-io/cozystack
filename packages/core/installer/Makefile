@@ -34,8 +34,8 @@ image-cozystack:
 image-talos:
 	test -f ../../../_out/assets/installer-amd64.tar || make talos-installer
 	docker load -i ../../../_out/assets/installer-amd64.tar
-	docker tag ghcr.io/siderolabs/installer:$(TALOS_VERSION) ghcr.io/aenix-io/cozystack/talos:$(call settag,$(TALOS_VERSION))
-	docker push ghcr.io/aenix-io/cozystack/talos:$(call settag,$(TALOS_VERSION))
+	docker tag ghcr.io/siderolabs/installer:$(TALOS_VERSION) $(REGISTRY)/talos:$(call settag,$(TALOS_VERSION))
+	docker push $(REGISTRY)/talos:$(call settag,$(TALOS_VERSION))
 
 image-matchbox:
 	test -f ../../../_out/assets/kernel-amd64 || make talos-kernel
