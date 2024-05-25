@@ -41,8 +41,8 @@
       }
     }
   },
-  "buildx.build.ref": "default/default/odf1stlt7iubsgs7c7jo2rdip",
-  "containerimage.config.digest": "sha256:f5cfdc764f491235a432ef8cbcc966c60fcc6cd78c266a98172b38a1cd1227bf",
-  "containerimage.digest": "sha256:711275f5a0f2c1630b23b62c69190844b515f18df876e03bc8a87f49c505c862",
-  "image.name": "mgr.cp.if.ua/kubeapps-apis:v0.6.0-proxmox-test2"
+  "buildx.build.ref": "default/default/4gq5eh1ceuj4npz5nj5ezrv1a",
+  "containerimage.config.digest": "sha256:3ae1438190e12a038e96c9081e5fba9bb01a6bddf22941c10010d1cef16dc826",
+  "containerimage.digest": "sha256:6458df23156817cd5785e0b6a0c84c3bbbf553814a71155f59733f574ca0de05",
+  "image.name": "mgr.cp.if.ua/kubeapps-apis:latest"
 }

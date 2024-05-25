@@ -1,6 +1,29 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 
 releases:
+- name: cilium
+  releaseName: cilium
+  chart: cozy-cilium
+  namespace: cozy-cilium
+  privileged: true
+  dependsOn: []
+
+- name: kubeovn
+  releaseName: kubeovn
+  chart: cozy-kubeovn
+  namespace: cozy-kubeovn
+  privileged: true
+  dependsOn: [cilium]
+  values:
+    cozystack:
+      nodesHash: {{ include "cozystack.master-node-ips" . | sha256sum }}
+    kube-ovn:
+      ipv4:
+        POD_CIDR: "{{ index $cozyConfig.data "ipv4-pod-cidr" }}"
+        POD_GATEWAY: "{{ index $cozyConfig.data "ipv4-pod-gateway" }}"
+        SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
+        JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager

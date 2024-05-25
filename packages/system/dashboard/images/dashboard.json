@@ -35,8 +35,8 @@
       }
     }
   },
-  "buildx.build.ref": "default/default/zffzbk9delblgrcntq4d3wq4k",
+  "buildx.build.ref": "default/default/jopxx6bk67y2yketb3wogqwd9",
   "containerimage.config.digest": "sha256:8f2194dd28579a83f2d42e4344e85bc21a8f83b4d3715a3ce93a137f4417557b",
   "containerimage.digest": "sha256:42eb215842470ecc430be735da7abac9b35e78daa80111452fce0d5c1740e314",
-  "image.name": "mgr.cp.if.ua/dashboard:v0.6.0-proxmox-test2"
+  "image.name": "mgr.cp.if.ua/dashboard:latest"
 }
