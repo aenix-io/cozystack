@@ -30,7 +30,7 @@ spec:
       hostPID: true
       initContainers:
       - name: install-cni
-        image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
+        image: {{ include "kubeovn.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["/kube-ovn/install-cni.sh"]
         securityContext:
@@ -45,24 +45,18 @@ spec:
           {{- end }}
       containers:
       - name: cni-server
-        image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
+        image: {{ include "kubeovn.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
           - bash
           - /kube-ovn/start-cniserver.sh
         args:
+          {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
           - --enable-mirror={{- .Values.debug.ENABLE_MIRROR }}
           - --mirror-iface={{- .Values.debug.MIRROR_IFACE }}
           - --node-switch={{ .Values.networking.NODE_SUBNET }}
           - --encap-checksum=true
-          - --service-cluster-ip-range=
-          {{- if eq .Values.networking.NET_STACK "dual_stack" -}}
-          {{ .Values.dual_stack.SVC_CIDR }}
-          {{- else if eq .Values.networking.NET_STACK "ipv4" -}}
-          {{ .Values.ipv4.SVC_CIDR }}
-          {{- else if eq .Values.networking.NET_STACK "ipv6" -}}
-          {{ .Values.ipv6.SVC_CIDR }}
-          {{- end }}
+          - --service-cluster-ip-range={{ index $cozyConfig.data "ipv4-svc-cidr" }}
           {{- if eq .Values.networking.NETWORK_TYPE "vlan" }}
           - --iface=
           {{- else}}
@@ -96,10 +90,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-          - name: MODULES
-            value: "{{- .Values.performance.MODULES }}"
-          - name: RPMS
-            value: "{{- .Values.performance.RPMS }}"
           - name: POD_IPS
             valueFrom:
               fieldRef:
@@ -139,8 +129,6 @@ spec:
           - mountPath: /etc/localtime
             name: localtime
             readOnly: true
-          - mountPath: /tmp
-            name: tmp
         readinessProbe:
           failureThreshold: 3
           periodSeconds: 7
@@ -205,9 +193,6 @@ spec:
         - name: host-log-ovn
           hostPath:
             path: {{ .Values.log_conf.LOG_DIR }}/ovn
-        - name: tmp
-          hostPath:
-            path: /tmp
         {{- if .Values.cni_conf.MOUNT_LOCAL_BIN_DIR }}
         - name: local-bin
           hostPath:
