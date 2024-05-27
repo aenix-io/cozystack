@@ -6,6 +6,10 @@ kind: DaemonSet
 metadata:
   name: cilium-envoy
   namespace: {{ .Release.Namespace }}
+  {{- with .Values.envoy.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     k8s-app: cilium-envoy
     app.kubernetes.io/part-of: cilium
@@ -31,10 +35,12 @@ spec:
         cilium.io/cilium-envoy-configmap-checksum: {{ include (print $.Template.BasePath "/cilium-envoy/configmap.yaml") . | sha256sum | quote }}
         {{- end }}
         {{- if not .Values.envoy.securityContext.privileged }}
+        {{- if semverCompare "<1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor) }}
         # Set app AppArmor's profile to "unconfined". The value of this annotation
         # can be modified as long users know which profiles they have available
         # in AppArmor.
         container.apparmor.security.beta.kubernetes.io/cilium-envoy: "unconfined"
+        {{- end }}
         {{- end }}
         {{- with .Values.envoy.podAnnotations }}
         {{- toYaml . | nindent 8 }}
@@ -52,6 +58,11 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- /* K8s version lower than 1.30.0 don't support the "appArmorProfile" field, */}}
+      {{- /* thus we have to remove it. */}}
+      {{- if semverCompare "<1.30.0" (printf "%d.%d.0" (semver .Capabilities.KubeVersion.Version).Major (semver .Capabilities.KubeVersion.Version).Minor) }}
+        {{- $_ := unset .Values.envoy.podSecurityContext "appArmorProfile" }}
+      {{- end }}
       {{- with .Values.envoy.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -65,7 +76,7 @@ spec:
         args:
         - '-c /var/run/cilium/envoy/bootstrap-config.json'
         - '--base-id 0'
-        {{- if and (hasKey .Values.debug "verbose") (.Values.debug.verbose) (has "envoy" ( splitList " " .Values.debug.verbose )) }}
+        {{- if and (.Values.debug.enabled) (hasKey .Values.debug "verbose") (.Values.debug.verbose) (has "envoy" ( splitList " " .Values.debug.verbose )) }}
         - '--log-level trace'
         {{- else if and (.Values.debug.enabled) (hasKey .Values.debug "verbose") (.Values.debug.verbose) (has "flow" ( splitList " " .Values.debug.verbose )) }}
         - '--log-level debug'
@@ -89,6 +100,7 @@ spec:
           failureThreshold: {{ .Values.envoy.startupProbe.failureThreshold }}
           periodSeconds: {{ .Values.envoy.startupProbe.periodSeconds }}
           successThreshold: 1
+          initialDelaySeconds: 5
         {{- end }}
         livenessProbe:
           httpGet:
@@ -175,6 +187,9 @@ spec:
         - name: envoy-sockets
           mountPath: /var/run/cilium/envoy/sockets
           readOnly: false
+        - name: envoy-artifacts
+          mountPath: /var/run/cilium/envoy/artifacts
+          readOnly: true
         - name: envoy-config
           mountPath: /var/run/cilium/envoy/
           readOnly: true
@@ -223,6 +238,10 @@ spec:
       - name: envoy-sockets
         hostPath:
           path: "{{ .Values.daemon.runPath }}/envoy/sockets"
+          type: DirectoryOrCreate
+      - name: envoy-artifacts
+        hostPath:
+          path: "{{ .Values.daemon.runPath }}/envoy/artifacts"
           type: DirectoryOrCreate
       - name: envoy-config
         configMap:
