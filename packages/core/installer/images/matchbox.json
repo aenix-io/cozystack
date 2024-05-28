@@ -1,4 +1,4 @@
 {
-  "containerimage.config.digest": "sha256:05f6f9ed2e662dde64ace18dbbd69001b39778841bda812d7b6b86e064270e64",
-  "containerimage.digest": "sha256:56ef77367394c4b073c862974726d882036c9b95d27a56a774987fe3244c35f6"
+  "containerimage.config.digest": "sha256:ed483d1187cdfeb92df319a30dde57141ceb1d4bafcc28ba006a1e60abc445ff",
+  "containerimage.digest": "sha256:000a46c2bffc3cf13909dc0ca570cdcea9692d85b1ef2a875afe08ea8136d2c2"
 }
