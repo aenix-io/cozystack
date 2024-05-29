@@ -14,6 +14,7 @@ spec:
       {{- range $name, $u := . }}
       {{ $name }}/password_sha256_hex: {{ sha256sum $u.password }}
       {{ $name }}/profile: {{ ternary "readonly" "default" (index $u "readonly" | default false) }}
+      {{ $name }}/networks/ip: ["::/0"]
       {{- end }}
     {{- end }}
     profiles:
