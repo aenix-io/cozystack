@@ -29,8 +29,8 @@
       }
     }
   },
-  "buildx.build.ref": "default/default/rcwm4zsb7mxd80x2jjx517zyr",
-  "containerimage.config.digest": "sha256:4e1daf5302d73e9354523e57f08e035f538beb41441770265b27d1de852c846c",
-  "containerimage.digest": "sha256:e30e30b6ca96238aac47118af4fb12299d1138399cb2f683a3f8a4250cab6a09",
-  "image.name": "mgr.cp.if.ua/matchbox:latest,mgr.cp.if.ua/matchbox:latest"
+  "buildx.build.ref": "default/default/a4c3v6f2svmao7g1qrdclagjs",
+  "containerimage.config.digest": "sha256:7bc68a091b1ea2855288b5e2d6f0e5c0083c52e7fe12f6b4290e920307198703",
+  "containerimage.digest": "sha256:37f93f14b23b02fbe4d9dc59b3e074955645a1d8c9f74482b4df6ee27ceeba69",
+  "image.name": "mgr.cp.if.ua/matchbox:v0.6.1-2,mgr.cp.if.ua/matchbox:v1.7.1-v0.6.1-2"
 }

@@ -35,8 +35,8 @@
       }
     }
   },
-  "buildx.build.ref": "default/default/yrb3pkkfqp2dtuuqw4bfh5eub",
-  "containerimage.config.digest": "sha256:0958927a854e9b8cf01bda490e741439121d7e093c5d23384ef54a7c3fd0f136",
-  "containerimage.digest": "sha256:eb27736f423f77f2de0286d507ecb1e42a4456dd8d7ef5569f6425cfa67263fe",
-  "image.name": "mgr.cp.if.ua/cozystack:latest"
+  "buildx.build.ref": "default/default/yl8ay4qgn21yi6fl1vkvv7q0q",
+  "containerimage.config.digest": "sha256:b15e3f99a35085209f84d8832a44e9250b6c3dd78510355dc846e504f435716f",
+  "containerimage.digest": "sha256:914a96cca1101fd34354a89bd9b8b72b75c93a81c5abefeb0e895f956120916c",
+  "image.name": "mgr.cp.if.ua/cozystack:v0.6.1-2"
 }

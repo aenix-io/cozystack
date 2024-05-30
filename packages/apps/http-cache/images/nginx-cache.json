@@ -32,8 +32,8 @@
       }
     }
   },
-  "buildx.build.ref": "default/default/bkskzd9ii17e6v7u3bnfjle7f",
-  "containerimage.config.digest": "sha256:0a76955e08c334177db01197b4c0e5e840809cf00685725672e43fb3ed539c2c",
-  "containerimage.digest": "sha256:f8872e5eb3cea1e5f3e89e5f4bbfd5a8c0484797f8b2604729d58c4ba9629c13",
-  "image.name": "mgr.cp.if.ua/nginx-cache:latest,mgr.cp.if.ua/nginx-cache:latest"
+  "buildx.build.ref": "default/default/na719vcch4rrxzkdpcgx2zo6q",
+  "containerimage.config.digest": "sha256:92851e36b025f0ac6160963d7488830dcab846c24a269dea252f2d33c2b07d04",
+  "containerimage.digest": "sha256:c51996c102fd22bbe0160e5aec2e489c4870e897e99fa8b9fa2611f0bc3ac799",
+  "image.name": "mgr.cp.if.ua/nginx-cache:v0.1.0,mgr.cp.if.ua/nginx-cache:v0.1.0-v0.6.1-2"
 }

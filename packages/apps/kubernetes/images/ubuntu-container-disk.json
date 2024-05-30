@@ -32,8 +32,8 @@
       }
     }
   },
-  "buildx.build.ref": "default/default/w6tbiac8fa35qgqq1s53rbyce",
+  "buildx.build.ref": "default/default/l99y440iab5ypx66oqg83llt4",
   "containerimage.config.digest": "sha256:d297828b945ff40cd3f8c12f631f6db3b40f2b53ed5202c5205982cfbbc2a1df",
   "containerimage.digest": "sha256:6a8b43af59ea188f295807ef4c42408a80793ddecf3c1245f27e9c37ff43a726",
-  "image.name": "mgr.cp.if.ua/ubuntu-container-disk:latest,mgr.cp.if.ua/ubuntu-container-disk:latest"
+  "image.name": "mgr.cp.if.ua/ubuntu-container-disk:v1.29.1,mgr.cp.if.ua/ubuntu-container-disk:v1.29.1-v0.6.1-2"
 }

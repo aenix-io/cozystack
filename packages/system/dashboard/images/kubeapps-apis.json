@@ -41,8 +41,8 @@
       }
     }
   },
-  "buildx.build.ref": "default/default/4gq5eh1ceuj4npz5nj5ezrv1a",
-  "containerimage.config.digest": "sha256:3ae1438190e12a038e96c9081e5fba9bb01a6bddf22941c10010d1cef16dc826",
-  "containerimage.digest": "sha256:6458df23156817cd5785e0b6a0c84c3bbbf553814a71155f59733f574ca0de05",
-  "image.name": "mgr.cp.if.ua/kubeapps-apis:latest"
+  "buildx.build.ref": "default/default/ao0jq2cd1xv1r7w0t4zc3v6jg",
+  "containerimage.config.digest": "sha256:1ab7b96c8870db7d86e57bdb21fc222196369c30330a8d6d7a7c8b985a1545c9",
+  "containerimage.digest": "sha256:be834737c0099db19edd886d3645cc395d0b79416f4a97581bf279168b1d15ea",
+  "image.name": "mgr.cp.if.ua/kubeapps-apis:v0.6.1-2"
 }
