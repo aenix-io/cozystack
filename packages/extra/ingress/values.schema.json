@@ -6,6 +6,14 @@
             "type": "number",
             "description": "Number of ingress-nginx replicas",
             "default": 2
+        },
+        "externalIPs": {
+            "type": "array",
+            "description": "List of externalIPs for service.",
+            "default": "[]",
+            "items": {
+                "type": "string"
+            }
         }
     }
 }
