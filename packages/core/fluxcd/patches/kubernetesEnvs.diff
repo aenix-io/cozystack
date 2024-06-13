@@ -3,8 +3,8 @@ index 8ffd8d8..5ad96a8 100644
 --- a/charts/flux-operator/templates/deployment.yaml
 +++ b/charts/flux-operator/templates/deployment.yaml
 @@ -58,6 +58,7 @@ spec:
-             - name: MARKETPLACE_LICENSE
-               value: {{ . }}
+             {{- if .Values.extraEnvs }}
+               {{- toYaml .Values.extraEnvs | nindent 12 }}
              {{- end }}
 +            {{- include "cozy.kubernetes_envs" . | nindent 12 }}
            securityContext:
