@@ -91,8 +91,8 @@ releases:
   chart: cozy-dashboard
   namespace: cozy-dashboard
   dependsOn: []
-  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1beta2" }}
-  {{- with (lookup "source.toolkit.fluxcd.io/v1beta2" "HelmRepository" "cozy-public" "").items }}
+  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
+  {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
   values:
     kubeapps:
       redis:
