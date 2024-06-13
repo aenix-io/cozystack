@@ -6,3 +6,10 @@ spec:
   distribution:
     version: 2.2.x
     registry: ghcr.io/fluxcd
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+    - image-reflector-controller
+    - image-automation-controller
