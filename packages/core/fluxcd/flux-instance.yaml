@@ -5,3 +5,4 @@ metadata:
 spec:
   distribution:
     version: 2.2.x
+    registry: ghcr.io/fluxcd
