@@ -27,3 +27,13 @@ spec:
         admissionWebhooks:
           enabled: false
         {{- end }}
+        service:
+          {{- if .Values.externalIPs }}
+          externalIPs:
+            {{- toYaml .Values.externalIPs | nindent 12 }}
+          type: ClusterIP
+          externalTrafficPolicy: Cluster
+          {{- else }}
+          type: LoadBalancer
+          externalTrafficPolicy: Local
+          {{- end }}
