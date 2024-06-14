@@ -1,0 +1,70 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: storagedownloadurls.proxmox.alperen.cloud
+spec:
+  conversion:
+    strategy: None
+  group: proxmox.alperen.cloud
+  names:
+    kind: StorageDownloadURL
+    listKind: StorageDownloadURLList
+    plural: storagedownloadurls
+    singular: storagedownloadurl
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: StorageDownloadURL is the Schema for the storagedownloadurls
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: StorageDownloadURLSpec defines the desired state of StorageDownloadURL
+            properties:
+              checksum:
+                description: Optional fields
+                type: string
+              checksumAlgorithm:
+                type: string
+              compression:
+                type: string
+              content:
+                type: string
+              filename:
+                type: string
+              node:
+                type: string
+              storage:
+                type: string
+              url:
+                type: string
+              verifyCertificate:
+                type: boolean
+            required:
+            - content
+            - filename
+            - node
+            - storage
+            - url
+            type: object
+          status:
+            description: StorageDownloadURLStatus defines the observed state of StorageDownloadURL
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-defrag
+spec:
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: etcd-defrag
+            image: ghcr.io/ahrtr/etcd-defrag:v0.13.0
+            args:
+            - --endpoints={{ range $i, $e := until (int .Values.replicas) }}{{ if $i }},{{ end }}https://{{ $.Release.Name }}-{{ $i }}.{{ $.Release.Name }}-headless.{{ $.Release.Namespace }}.svc:2379{{ end }}
+            - --cacert=/etc/etcd/pki/client/cert/ca.crt
+            - --cert=/etc/etcd/pki/client/cert/tls.crt
+            - --key=/etc/etcd/pki/client/cert/tls.key
+            - --cluster
+            - --defrag-rule
+            - "dbQuotaUsage > 0.8 || dbSize - dbSizeInUse > 200*1024*1024"
+            volumeMounts:
+            - mountPath: /etc/etcd/pki/client/cert
+              name: client-certificate
+              readOnly: true
+          volumes:
+          - name: client-certificate
+            secret:
+              secretName: {{ .Release.Name }}-client-tls
+          restartPolicy: OnFailure

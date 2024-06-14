@@ -1,4 +1,42 @@
 {
-  "containerimage.config.digest": "sha256:8126f86f18708a9157206884c63dc9df7f3090a33e05f4a1b94f2a7da7610c74",
-  "containerimage.digest": "sha256:e1a285812d1ce34bcf5c37db2a5c12ec99887c930b46ac261895dc98f674c066"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/bitnami/nginx@1.25.2?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "fbd9335f55d83d8aaf9ab1a539b0f2a87b444e8c54f34c9a1ca9d7df15605db4"
+        }
+      },
+      {
+        "uri": "pkg:docker/bitnami/node@20.12.1?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "ac00b5d3742ef2b522e149ac3912a9118ca8dc27556f13700d4a53c1982b1460"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "default/default/2ot90pccljzk2p5k794ime6v2",
+  "containerimage.config.digest": "sha256:8f2194dd28579a83f2d42e4344e85bc21a8f83b4d3715a3ce93a137f4417557b",
+  "containerimage.digest": "sha256:42eb215842470ecc430be735da7abac9b35e78daa80111452fce0d5c1740e314",
+  "image.name": "mgr.cp.if.ua/dashboard:v0.6.1-2"
 }

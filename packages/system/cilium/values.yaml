@@ -18,10 +18,15 @@ cilium:
   k8sServiceHost: localhost
   k8sServicePort: 7445
 
+# cni:
+#   chainingMode: generic-veth
+#   customConf: true
+#   configMap: cni-configuration
+# routingMode: native
+# enableIPv4Masquerade: false
+#  enableIdentityMark: false
+
   cni:
-    chainingMode: generic-veth
-    customConf: true
-    configMap: cni-configuration
-  routingMode: native
-  enableIPv4Masquerade: false
-  enableIdentityMark: false
+    chainingMode: null
+    configMap: ""
+    customConf: false

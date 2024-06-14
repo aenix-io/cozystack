@@ -1,4 +1,36 @@
 {
-  "containerimage.config.digest": "sha256:05f6f9ed2e662dde64ace18dbbd69001b39778841bda812d7b6b86e064270e64",
-  "containerimage.digest": "sha256:56ef77367394c4b073c862974726d882036c9b95d27a56a774987fe3244c35f6"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/quay.io/poseidon/matchbox@v0.10.0?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "e14cc4a8f6e8f1182fce74d04fe949b6bfc91b04132b3944297661e2c38c9790"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "default/default/a4c3v6f2svmao7g1qrdclagjs",
+  "containerimage.config.digest": "sha256:7bc68a091b1ea2855288b5e2d6f0e5c0083c52e7fe12f6b4290e920307198703",
+  "containerimage.digest": "sha256:37f93f14b23b02fbe4d9dc59b3e074955645a1d8c9f74482b4df6ee27ceeba69",
+  "image.name": "mgr.cp.if.ua/matchbox:v0.6.1-2,mgr.cp.if.ua/matchbox:v1.7.1-v0.6.1-2"
 }

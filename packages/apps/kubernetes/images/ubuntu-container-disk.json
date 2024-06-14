@@ -1,4 +1,39 @@
 {
-  "containerimage.config.digest": "sha256:24cee18d0bc9ed40e741412da86820dd99bdb9ffa4c794c81856725a4a10d86e",
-  "containerimage.digest": "sha256:6a43369905e0630bb401e1cf73084bbef3060e960756f261676cd3bea4195e9a"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/ubuntu@22.04?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "a6d2b38300ce017add71440577d5b0a90460d0e57fd7aec21dd0d1b0761bbfb2"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "args": {
+          "build-arg:ARCH": "amd64"
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "default/default/l99y440iab5ypx66oqg83llt4",
+  "containerimage.config.digest": "sha256:d297828b945ff40cd3f8c12f631f6db3b40f2b53ed5202c5205982cfbbc2a1df",
+  "containerimage.digest": "sha256:6a8b43af59ea188f295807ef4c42408a80793ddecf3c1245f27e9c37ff43a726",
+  "image.name": "mgr.cp.if.ua/ubuntu-container-disk:v1.29.1,mgr.cp.if.ua/ubuntu-container-disk:v1.29.1-v0.6.1-2"
 }
