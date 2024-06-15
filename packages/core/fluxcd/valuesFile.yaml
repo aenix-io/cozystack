@@ -1,0 +1,5 @@
+flux-operator:
+  tolerations:
+    - key: node.kubernetes.io/not-ready
+      operator: Equal
+      value: NoSchedule
