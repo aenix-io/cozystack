@@ -58,10 +58,9 @@ spec:
             - name: MARKETPLACE_LICENSE
               value: {{ . }}
             {{- end }}
-            - name: KUBERNETES_SERVICE_HOST
-              value: localhost
-            - name: KUBERNETES_SERVICE_PORT
-              value: "7445"
+            {{- if .Values.extraEnvs }}
+              {{- toYaml .Values.extraEnvs | nindent 12 }}
+            {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

@@ -4,3 +4,8 @@ flux-operator:
       operator: Exists
       effect: NoSchedule
   hostNetwork: true
+  extraEnvs:
+    - name: KUBERNETES_SERVICE_HOST
+      value: localhost
+    - name: KUBERNETES_SERVICE_PORT
+      value: "7445"
