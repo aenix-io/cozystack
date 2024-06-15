@@ -3,6 +3,8 @@ kind: FluxInstance
 metadata:
   name: flux
 spec:
+  cluster:
+    domain: cozy.local
   distribution:
     version: 2.2.x
     registry: ghcr.io/fluxcd
