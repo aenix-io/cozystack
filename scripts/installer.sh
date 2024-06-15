@@ -18,8 +18,12 @@ run_migrations() {
   done
 }
 
+
 flux_operator_is_ok() {
   kubectl wait --for=condition=available -n cozy-fluxcd deploy/fluxcd-flux-operator --timeout=1m
+}
+
+flux_instance_is_ok() {
   kubectl wait --for=condition=ready -n cozy-fluxcd fluxinstance/flux --timeout=5m
 }
 
@@ -54,6 +58,8 @@ fi
 # Install platform chart
 make -C packages/core/platform apply
 
+# We should check flux_instance_is_ok, somewhere, but not yet... it won't be ready now
+
 # Install basic system charts (should be after platform chart applied)
 if ! flux_controllers_ok; then
   install_basic_charts
@@ -61,6 +67,8 @@ fi
 
 # Reconcile Helm repositories
 kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
+
+# At this point I sure hope flux_instance_is_ok ( 😅 )
 
 # Reconcile platform chart
 trap 'exit' INT TERM
