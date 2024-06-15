@@ -23,7 +23,7 @@ flux_operator_is_ok() {
   kubectl wait --for=condition=ready -n cozy-fluxcd fluxinstance/flux --timeout=5m
 }
 
-flux_crd_is_ok() {
+flux_controllers_ok() {
   kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=10s 
 }
 
@@ -47,16 +47,16 @@ make -C packages/core/platform namespaces-apply
 # Install fluxcd
 make -C packages/core/fluxcd apply
 
+if flux_operator_is_ok; then
+  echo "Flux operator is installed and Flux CRD is ready"
+fi
+
 # Install platform chart
 make -C packages/core/platform apply
 
 # Install basic system charts (should be after platform chart applied)
-if ! flux_crd_is_ok; then
+if ! flux_controllers_ok; then
   install_basic_charts
-fi
-
-if flux_operator_is_ok; then
-  echo "Flux operator is installed and Flux is ready"
 fi
 
 # Reconcile Helm repositories
