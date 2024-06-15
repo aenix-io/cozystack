@@ -3,3 +3,4 @@ flux-operator:
     - key: node.kubernetes.io/not-ready
       operator: Exists
       effect: NoSchedule
+  hostNetwork: true
