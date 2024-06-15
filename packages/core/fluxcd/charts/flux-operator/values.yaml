@@ -87,3 +87,6 @@ tolerations: [ ] # @schema item: object ; uniqueItems: true
 marketplace:
   license: ""
   account: ""
+
+# -- If `true`, start flux-operator in hostNetwork mode.
+hostNetwork: false

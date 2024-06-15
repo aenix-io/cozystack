@@ -36,6 +36,7 @@ see the Flux Operator [documentation](https://fluxcd.control-plane.io/operator/)
 | commonAnnotations | object | `{}` | Common annotations to add to all deployed objects including pods. |
 | commonLabels | object | `{}` | Common labels to add to all deployed objects including pods. |
 | fullnameOverride | string | `""` |  |
+| hostNetwork | bool | `false` | If `true`, start flux-operator in hostNetwork mode. |
 | image | object | `{"pullSecrets":[],"repository":"ghcr.io/controlplaneio-fluxcd/flux-operator","tag":""}` | Container image settings. The image tag defaults to the chart appVersion. |
 | installCRDs | bool | `true` | Install and upgrade the custom resource definitions. |
 | livenessProbe | object | `{"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20}` | Container liveness probe settings. |

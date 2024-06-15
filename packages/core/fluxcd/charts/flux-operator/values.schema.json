@@ -74,6 +74,10 @@
         "fullnameOverride": {
             "type": "string"
         },
+        "hostNetwork": {
+            "default": false,
+            "type": "boolean"
+        },
         "image": {
             "properties": {
                 "pullSecrets": {
