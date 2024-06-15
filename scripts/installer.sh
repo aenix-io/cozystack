@@ -18,6 +18,11 @@ run_migrations() {
   done
 }
 
+flux_operator_is_ok() {
+  kubectl wait --for=condition=available -n cozy-fluxcd deploy/fluxcd-flux-operator --timeout=10s
+  kubectl wait --for=condition=ready -n cozy-fluxcd fluxinstance/flux --timeout=1m
+}
+
 flux_is_ok() {
   kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=10s 
 }
@@ -42,11 +47,15 @@ make -C packages/core/platform namespaces-apply
 # Install fluxcd
 make -C packages/core/fluxcd apply
 
-# Reconcile Helm repositories
-kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
-
 # Install platform chart
 make -C packages/core/platform apply
+
+if ! flux_operator_is_ok; then
+  echo "Flux operator is installed and Flux is ready"
+fi
+
+# Reconcile Helm repositories
+kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
 
 # Install basic system charts (should be after platform chart applied)
 if ! flux_is_ok; then

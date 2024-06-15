@@ -9,7 +9,6 @@ show:
 apply:
 	helm template -n $(NAMESPACE) $(NAME) . --no-hooks --dry-run=server $(API_VERSIONS_FLAGS) | kubectl apply -n $(NAMESPACE) -f-
 	kubectl apply -n $(NAMESPACE) -f flux-instance.yaml
-	kubectl -n $(NAMESPACE) wait fluxinstance/flux --for=condition=ready --timeout=5m
 
 diff:
 	helm template -n $(NAMESPACE) $(NAME) . --no-hooks --dry-run=server $(API_VERSIONS_FLAGS) | kubectl diff -n $(NAMESPACE) -f-
