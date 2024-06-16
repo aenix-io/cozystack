@@ -52,7 +52,7 @@ make -C packages/core/platform namespaces-apply
 make -C packages/core/fluxcd apply || make -C packages/core/fluxcd apply
 
 if flux_operator_is_ok; then
-  echo "Flux operator is installed and Flux CRD is ready"
+  echo "Flux operator is installed and FluxInstance CRD is ready"
 fi
 
 # Install platform chart
