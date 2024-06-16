@@ -1,0 +1,3 @@
+fluxInstance:
+  cluster:
+    domain: cozy.local

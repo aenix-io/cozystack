@@ -4,7 +4,7 @@ metadata:
   name: flux
 spec:
   cluster:
-    domain: cozy.local
+    domain: {{ .Values.fluxInstance.cluster.domain }}
   distribution:
     version: 2.2.x
     registry: ghcr.io/fluxcd
