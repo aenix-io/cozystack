@@ -6,12 +6,10 @@ spec:
   cluster:
     domain: {{ .Values.fluxInstance.cluster.domain }}
   distribution:
-    version: 2.2.x
-    registry: ghcr.io/fluxcd
+    version: {{ .Values.fluxInstance.distribution.version }}
+    registry: {{ .Values.fluxInstance.distribution.registry }}
   components:
-    - source-controller
-    - kustomize-controller
-    - helm-controller
-    - notification-controller
-    - image-reflector-controller
-    - image-automation-controller
+  {{- if .Values.fluxInstance.components }}
+    {{- toYaml .Values.fluxInstance.components | nindent 4 }}
+  {{- end }}
+
