@@ -48,8 +48,8 @@ run_migrations
 # Install namespaces
 make -C packages/core/platform namespaces-apply
 
-# Install fluxcd
-make -C packages/core/fluxcd apply
+# Install fluxcd twice (once it will fail, since CRDs can't be ordered)
+make -C packages/core/fluxcd apply || make -C packages/core/fluxcd apply
 
 if flux_operator_is_ok; then
   echo "Flux operator is installed and Flux CRD is ready"
@@ -58,8 +58,6 @@ fi
 # Install platform chart
 make -C packages/core/platform apply
 
-# We should check flux_instance_is_ok, somewhere, but not yet... it won't be ready now
-
 # Install basic system charts (should be after platform chart applied)
 if ! flux_controllers_ok; then
   install_basic_charts
@@ -67,8 +65,6 @@ fi
 
 # Reconcile Helm repositories
 kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
-
-# At this point I sure hope flux_instance_is_ok ( 😅 )
 
 # Reconcile platform chart
 trap 'exit' INT TERM
