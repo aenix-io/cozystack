@@ -1,6 +1,6 @@
 fluxInstance:
-  cluster:
-    domain: cozy.local
+  # cluster:
+  #   domain: cozy.local
   distribution:
     version: 2.3.x
     registry: ghcr.io/fluxcd
