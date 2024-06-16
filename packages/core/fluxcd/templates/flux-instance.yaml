@@ -3,8 +3,12 @@ kind: FluxInstance
 metadata:
   name: flux
 spec:
+  {{- with .Values.fluxInstance.cluster }}
   cluster:
-    domain: {{ .Values.fluxInstance.cluster.domain }}
+    {{- with .domain }}
+    domain: {{ . }}
+    {{- end }}
+  {{- end }}
   distribution:
     version: {{ .Values.fluxInstance.distribution.version }}
     registry: {{ .Values.fluxInstance.distribution.registry }}
