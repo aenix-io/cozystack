@@ -27,9 +27,9 @@ ip link add cozy-br0 type bridge
 ip link set cozy-br0 up
 ip addr add 192.168.123.1/24 dev cozy-br0
 
-# Enable masquerading
-iptables -t nat -D POSTROUTING -s 192.168.123.0/24 ! -d 192.168.123.0/24 -j MASQUERADE || true
-iptables -t nat -A POSTROUTING -s 192.168.123.0/24 ! -d 192.168.123.0/24 -j MASQUERADE
+# Enable forward & masquerading
+echo 1 > /proc/sys/net/ipv4/ip_forward
+iptables -t nat -A POSTROUTING -s 192.168.123.0/24 -j MASQUERADE
 
 rm -rf srv1 srv2 srv3
 mkdir -p srv1 srv2 srv3
