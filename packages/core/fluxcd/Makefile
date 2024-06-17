@@ -7,11 +7,11 @@ show:
 	helm template -n $(NAMESPACE) $(NAME) . --no-hooks --dry-run=server $(API_VERSIONS_FLAGS)
 
 apply:
-	helm template -n $(NAMESPACE) $(NAME) . --no-hooks -f valuesFile.yaml \
+	helm template -n $(NAMESPACE) $(NAME) . --no-hooks -f valuesFile.yaml -f flux-customizations.yaml \
 		--dry-run=server $(API_VERSIONS_FLAGS) | kubectl apply -n $(NAMESPACE) -f-
 
 diff:
-	helm template -n $(NAMESPACE) $(NAME) . --no-hooks -f valuesFile.yaml \
+	helm template -n $(NAMESPACE) $(NAME) . --no-hooks -f valuesFile.yaml -f flux-customizations.yaml \
 		--dry-run=server $(API_VERSIONS_FLAGS) | kubectl diff -n $(NAMESPACE) -f-
 
 update:
