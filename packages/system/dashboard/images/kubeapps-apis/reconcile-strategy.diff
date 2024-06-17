@@ -3,7 +3,7 @@ index 8884a6484..4bf77071c 100644
 --- a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
 +++ b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
 @@ -530,6 +530,7 @@ func (s *Server) newFluxHelmRelease(chart *models.Chart, targetName types.Namesp
- 						Kind:      sourcev1beta2.HelmRepositoryKind,
+ 						Kind:      sourcev1.HelmRepositoryKind,
  						Namespace: chart.Repo.Namespace,
  					},
 +					ReconcileStrategy: "Revision",
