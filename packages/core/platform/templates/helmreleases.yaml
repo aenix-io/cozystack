@@ -12,7 +12,7 @@
 {{- range $x := $bundle.releases }}
 {{- if not (has $x.name $disabledComponents) }}
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $x.name }}

@@ -3,8 +3,12 @@ kind: FluxInstance
 metadata:
   name: flux
 spec:
+  {{- with .Values.fluxInstance.cluster }}
   cluster:
-    domain: {{ .Values.fluxInstance.cluster.domain }}
+    {{- with .domain }}
+    domain: {{ . }}
+    {{- end }}
+  {{- end }}
   distribution:
     version: {{ .Values.fluxInstance.distribution.version }}
     registry: {{ .Values.fluxInstance.distribution.registry }}
@@ -12,4 +16,7 @@ spec:
   {{- if .Values.fluxInstance.components }}
     {{- toYaml .Values.fluxInstance.components | nindent 4 }}
   {{- end }}
-
+  kustomize:
+  {{- if .Values.fluxInstance.kustomize }}
+    {{- toYaml .Values.fluxInstance.kustomize | nindent 4 }}
+  {{- end }}
