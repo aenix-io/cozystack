@@ -58,9 +58,7 @@ spec:
             - name: MARKETPLACE_LICENSE
               value: {{ . }}
             {{- end }}
-            {{- if .Values.extraEnvs }}
-              {{- toYaml .Values.extraEnvs | nindent 12 }}
-            {{- end }}
+            {{- include "cozy.kubernetes_envs" . | nindent 12 }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
