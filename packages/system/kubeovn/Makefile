@@ -24,4 +24,4 @@ image:
 		--metadata-file images/kubeovn.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/kubeovn:$(call settag,$(TAG))" > images/kubeovn.tag
+	echo "$(REGISTRY)/kubeovn:$(call settag,$(KUBEOVN_TAG))" > images/kubeovn.tag
