@@ -27,4 +27,4 @@ image:
 		--metadata-file images/cilium.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/cilium:$(call settag,$(TAG))" > images/cilium.tag
+	echo "$(REGISTRY)/cilium:$(call settag,$(CILIUM_TAG))" > images/cilium.tag

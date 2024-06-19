@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/cilium:v0.7.0
+ghcr.io/aenix-io/cozystack/cilium:latest
