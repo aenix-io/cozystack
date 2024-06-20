@@ -1,4 +1,10 @@
 {
-  "containerimage.config.digest": "sha256:6d54a5b971e80fbaace664054d4e67f24fd1fbb7807ebaffd036d4ea7195df10",
-  "containerimage.digest": "sha256:a6b167235d8556ff7e45f4582c2491a2ad48292a46005dcf767908e2fb78e74e"
+  "buildx.build.ref": "youthful_hertz/youthful_hertz0/aafwjh8j28i98f59smgh3qe86",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+    "digest": "sha256:e0c0defb9f5b10f5187d4002ccec7d01841e96c7350963f253003c0efeff6cef",
+    "size": 685
+  },
+  "containerimage.digest": "sha256:e0c0defb9f5b10f5187d4002ccec7d01841e96c7350963f253003c0efeff6cef",
+  "image.name": "ghcr.io/aenix-io/cozystack/cozystack:latest"
 }
