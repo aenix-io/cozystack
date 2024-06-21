@@ -25,6 +25,7 @@ image-cozystack:
 		--provenance false \
 		--tag $(REGISTRY)/cozystack:$(call settag,$(TAG)) \
 		--cache-from type=registry,ref=$(REGISTRY)/cozystack:latest \
+		--platform linux/amd64,linux/arm64 \
 		--cache-to type=inline \
 		--metadata-file images/cozystack.json \
 		--push=$(PUSH) \
