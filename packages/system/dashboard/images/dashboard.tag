@@ -1,1 +1,1 @@
-mgr.cp.if.ua/dashboard:v0.6.1-2
+ghcr.io/aenix-io/cozystack/dashboard:v0.7.0

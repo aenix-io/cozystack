@@ -43,7 +43,7 @@ spec:
       hostNetwork: true
       containers:
         - name: ovn-ic-controller
-          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
+          image: {{ include "kubeovn.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/kube-ovn/start-ic-controller.sh"]
           args:

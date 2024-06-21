@@ -1,42 +1,10 @@
 {
-  "buildx.build.provenance": {
-    "buildType": "https://mobyproject.org/buildkit@v1",
-    "materials": [
-      {
-        "uri": "pkg:docker/alpine@3.19?platform=linux%2Famd64",
-        "digest": {
-          "sha256": "c5b1261d6d3e43071626931fc004f70149baeba2c8ec672bd4f27761f8e1ad6b"
-        }
-      },
-      {
-        "uri": "pkg:docker/golang@alpine3.19?platform=linux%2Famd64",
-        "digest": {
-          "sha256": "f1fe698725f6ed14eb944dc587591f134632ed47fc0732ec27c7642adbe90618"
-        }
-      }
-    ],
-    "invocation": {
-      "configSource": {
-        "entryPoint": "Dockerfile"
-      },
-      "parameters": {
-        "frontend": "dockerfile.v0",
-        "locals": [
-          {
-            "name": "context"
-          },
-          {
-            "name": "dockerfile"
-          }
-        ]
-      },
-      "environment": {
-        "platform": "linux/amd64"
-      }
-    }
+  "buildx.build.ref": "youthful_hertz/youthful_hertz0/aafwjh8j28i98f59smgh3qe86",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+    "digest": "sha256:e0c0defb9f5b10f5187d4002ccec7d01841e96c7350963f253003c0efeff6cef",
+    "size": 685
   },
-  "buildx.build.ref": "default/default/yl8ay4qgn21yi6fl1vkvv7q0q",
-  "containerimage.config.digest": "sha256:b15e3f99a35085209f84d8832a44e9250b6c3dd78510355dc846e504f435716f",
-  "containerimage.digest": "sha256:914a96cca1101fd34354a89bd9b8b72b75c93a81c5abefeb0e895f956120916c",
-  "image.name": "mgr.cp.if.ua/cozystack:v0.6.1-2"
+  "containerimage.digest": "sha256:e0c0defb9f5b10f5187d4002ccec7d01841e96c7350963f253003c0efeff6cef",
+  "image.name": "ghcr.io/aenix-io/cozystack/cozystack:latest"
 }

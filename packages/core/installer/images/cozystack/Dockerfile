@@ -3,12 +3,15 @@ FROM golang:alpine3.19 as k8s-await-election-builder
 ARG K8S_AWAIT_ELECTION_GITREPO=https://github.com/LINBIT/k8s-await-election
 ARG K8S_AWAIT_ELECTION_VERSION=0.4.1
 
+# TARGETARCH is a docker special variable: https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
+ARG TARGETARCH
+
 RUN apk add --no-cache git make
 RUN git clone ${K8S_AWAIT_ELECTION_GITREPO} /usr/local/go/k8s-await-election/ \
  && cd /usr/local/go/k8s-await-election \
  && git reset --hard v${K8S_AWAIT_ELECTION_VERSION} \
  && make \
- && mv ./out/k8s-await-election-amd64 /k8s-await-election
+ && mv ./out/k8s-await-election-${TARGETARCH} /k8s-await-election
 
 FROM alpine:3.19 AS builder
 

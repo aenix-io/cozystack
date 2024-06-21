@@ -3,6 +3,8 @@
 build:
 	make -C packages/apps/http-cache image
 	make -C packages/apps/kubernetes image
+	make -C packages/system/cilium image
+	make -C packages/system/kubeovn image
 	make -C packages/system/dashboard image
 	make -C packages/core/installer image
 	make manifests
