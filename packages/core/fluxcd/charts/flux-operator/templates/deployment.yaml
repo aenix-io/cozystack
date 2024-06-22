@@ -35,7 +35,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "flux-operator.fullname" . }}
+      serviceAccountName: {{ include "flux-operator.serviceAccountName" . }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -50,6 +50,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            {{- with .Values.marketplace.type }}
+            - name: MARKETPLACE_TYPE
+              value: {{ . }}
+            {{- end }}
             {{- with .Values.marketplace.account }}
             - name: MARKETPLACE_ACCOUNT
               value: {{ . }}
@@ -61,6 +65,7 @@ spec:
             {{- if .Values.extraEnvs }}
               {{- toYaml .Values.extraEnvs | nindent 12 }}
             {{- end }}
+            {{- include "cozy.kubernetes_envs" . | nindent 12 }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

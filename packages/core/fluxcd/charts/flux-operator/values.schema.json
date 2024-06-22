@@ -147,6 +147,9 @@
                 },
                 "license": {
                     "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -279,6 +282,9 @@
             },
             "properties": {
                 "automount": {
+                    "type": "boolean"
+                },
+                "create": {
                     "type": "boolean"
                 },
                 "name": {
