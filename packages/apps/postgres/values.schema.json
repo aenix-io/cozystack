@@ -14,8 +14,23 @@
         },
         "replicas": {
             "type": "number",
-            "description": "Number of MariaDB replicas",
+            "description": "Number of Postgres replicas",
             "default": 2
+        },
+        "quorum": {
+            "type": "object",
+            "properties": {
+                "minSyncReplicas": {
+                    "type": "number",
+                    "description": "Minimum number of synchronous replicas that must acknowledge a transaction before it is considered committed.",
+                    "default": 0
+                },
+                "maxSyncReplicas": {
+                    "type": "number",
+                    "description": "Maximum number of synchronous replicas that can acknowledge a transaction (must be lower than the number of instances).",
+                    "default": 0
+                }
+            }
         },
         "databases": {
             "type": "object",
