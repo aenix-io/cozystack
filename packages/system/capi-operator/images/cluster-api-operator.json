@@ -1,0 +1,6 @@
+{
+  "buildx.build.ref": "default/default/7nxaun3sgw6z95qhgc4c873qo",
+  "containerimage.config.digest": "sha256:0ff1e569cc97f686d6c0c9ed6e6396c72eca93df746e7ca469f97124cae1e73d",
+  "containerimage.digest": "sha256:79282412e0b891630235ecf919c45b0531f25a0926825385a51bb2a7dde880fb",
+  "image.name": "localhost:5000/aenix-io/cozystack/system/cluster-api-operator:v0.8.1"
+}
