@@ -36,3 +36,4 @@ kubectl get secret -n <namespace> kubernetes-<clusterName>-admin-kubeconfig -o g
 | `host`                  | The hostname used to access the Kubernetes cluster externally (defaults to using the cluster name as a subdomain for the tenant host). | `""`  |
 | `controlPlane.replicas` | Number of replicas for Kubernetes contorl-plane components                                                                             | `2`   |
 | `nodeGroups`            | nodeGroups configuration                                                                                                               | `{}`  |
+| `addons`                | addons configuration                                                                                                                   | `{}`  |

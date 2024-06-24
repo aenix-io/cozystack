@@ -16,3 +16,9 @@ nodeGroups:
     resources:
       cpu: 2
       memory: 1024Mi
+
+## @param addons [object] addons configuration
+##
+addons:
+  certManager:
+    enabled: false
