@@ -1,0 +1,52 @@
+diff --git a/charts/flux-operator/README.md b/charts/flux-operator/README.md
+index 071e024..2fccc5f 100644
+--- a/charts/flux-operator/README.md
++++ b/charts/flux-operator/README.md
+@@ -36,6 +36,7 @@ see the Flux Operator [documentation](https://fluxcd.control-plane.io/operator/)
+ | commonAnnotations | object | `{}` | Common annotations to add to all deployed objects including pods. |
+ | commonLabels | object | `{}` | Common labels to add to all deployed objects including pods. |
+ | fullnameOverride | string | `""` |  |
++| hostNetwork | bool | `false` | If `true`, start flux-operator in hostNetwork mode. |
+ | image | object | `{"pullSecrets":[],"repository":"ghcr.io/controlplaneio-fluxcd/flux-operator","tag":""}` | Container image settings. The image tag defaults to the chart appVersion. |
+ | installCRDs | bool | `true` | Install and upgrade the custom resource definitions. |
+ | livenessProbe | object | `{"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20}` | Container liveness probe settings. |
+diff --git a/charts/flux-operator/templates/deployment.yaml b/charts/flux-operator/templates/deployment.yaml
+index 2d75821..8ffd8d8 100644
+--- a/charts/flux-operator/templates/deployment.yaml
++++ b/charts/flux-operator/templates/deployment.yaml
+@@ -40,6 +40,9 @@ spec:
+       securityContext:
+         {{- toYaml . | nindent 8 }}
+       {{- end }}
++      {{- if .Values.hostNetwork }}
++      hostNetwork: true
++      {{- end }}
+       containers:
+         - name: manager
+           env:
+diff --git a/charts/flux-operator/values.schema.json b/charts/flux-operator/values.schema.json
+index 85e4d02..64270a7 100644
+--- a/charts/flux-operator/values.schema.json
++++ b/charts/flux-operator/values.schema.json
+@@ -74,6 +74,10 @@
+         "fullnameOverride": {
+             "type": "string"
+         },
++        "hostNetwork": {
++            "default": false,
++            "type": "boolean"
++        },
+         "image": {
+             "properties": {
+                 "pullSecrets": {
+diff --git a/charts/flux-operator/values.yaml b/charts/flux-operator/values.yaml
+index 59b8a23..7ecefc0 100644
+--- a/charts/flux-operator/values.yaml
++++ b/charts/flux-operator/values.yaml
+@@ -87,3 +87,6 @@ tolerations: [ ] # @schema item: object ; uniqueItems: true
+ marketplace:
+   license: ""
+   account: ""
++
++# -- If `true`, start flux-operator in hostNetwork mode.
++hostNetwork: false
