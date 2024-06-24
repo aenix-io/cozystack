@@ -8,8 +8,10 @@ ARG VERSION=v2.10.0
 RUN apk add --no-cache patch
 WORKDIR /source
 RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/${VERSION}.tar.gz | tar xzf - --strip-components=1
+COPY fluxcd.diff /patches/fluxcd.diff
 COPY labels.diff /patches/labels.diff
 COPY reconcile-strategy.diff /patches/reconcile-strategy.diff
+RUN patch -p1 < /patches/fluxcd.diff
 RUN patch -p1 < /patches/labels.diff
 RUN patch -p1 < /patches/reconcile-strategy.diff
 
@@ -70,15 +72,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     -ldflags "-X github.com/vmware-tanzu/kubeapps/cmd/kubeapps-apis/cmd.version=$VERSION" \
     ./cmd/kubeapps-apis
 
-# Build 'kapp-controller' plugin, version 'v1alpha1'
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    GOPROXY="https://proxy.golang.org,direct" \
-    go build \
-    -ldflags "-X github.com/vmware-tanzu/kubeapps/cmd/kubeapps-apis/cmd.version=$VERSION" \
-    -o /kapp-controller-packages-v1alpha1-plugin.so -buildmode=plugin \
-    ./cmd/kubeapps-apis/plugins/kapp_controller/packages/v1alpha1/*.go
-
 ## Build 'fluxv2' plugin, version 'v1alpha1'
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
@@ -111,7 +104,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 FROM bitnami/minideb:bookworm
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/src/github.com/vmware-tanzu/kubeapps/kubeapps-apis /kubeapps-apis
-COPY --from=builder /kapp-controller-packages-v1alpha1-plugin.so /plugins/kapp-controller-packages/
 COPY --from=builder /fluxv2-packages-v1alpha1-plugin.so /plugins/fluxv2-packages/
 COPY --from=builder /helm-packages-v1alpha1-plugin.so /plugins/helm-packages/
 COPY --from=builder /resources-v1alpha1-plugin.so /plugins/resources/

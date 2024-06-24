@@ -3,8 +3,8 @@
 {{- $bundle := tpl (.Files.Get (printf "bundles/%s.yaml" $bundleName)) . | fromYaml }}
 {{- $host := "example.org" }}
 {{- $tenantRoot := list }}
-{{- if .Capabilities.APIVersions.Has "helm.toolkit.fluxcd.io/v2beta2" }}
-{{- $tenantRoot = lookup "helm.toolkit.fluxcd.io/v2beta2" "HelmRelease" "tenant-root" "tenant-root" }}
+{{- if .Capabilities.APIVersions.Has "helm.toolkit.fluxcd.io/v2" }}
+{{- $tenantRoot = lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" "tenant-root" "tenant-root" }}
 {{- end }}
 {{- if and $tenantRoot $tenantRoot.spec $tenantRoot.spec.values $tenantRoot.spec.values.host }}
 {{- $host = $tenantRoot.spec.values.host }}
@@ -22,7 +22,7 @@ metadata:
     namespace.cozystack.io/host: "{{ $host }}"
   name: tenant-root
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: tenant-root

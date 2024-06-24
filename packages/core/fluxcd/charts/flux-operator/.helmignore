@@ -21,5 +21,4 @@
 .idea/
 *.tmproj
 .vscode/
-
-tests/
+helmdocs.gotmpl
