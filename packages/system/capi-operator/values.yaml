@@ -1,0 +1,5 @@
+cluster-api-operator:
+  image:
+    manager:
+      repository: "localhost:5000/aenix-io/cozystack/system/cluster-api-operator"
+      tag: "v0.8.1@sha256:79282412e0b891630235ecf919c45b0531f25a0926825385a51bb2a7dde880fb"

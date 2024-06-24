@@ -20,9 +20,9 @@ update-dockerfiles:
 components := $(subst /,,$(subst images/,,$(dir $(wildcard images/*/Dockerfile))))
 img_targets := $(addprefix image-,$(components))
 
-update-images: $(img-targets)
+update-images: $(img_targets)
 
-.PHONY = $(img_targets)
+.PHONY: $(img_targets)
 $(img_targets):
 	@$(eval name := $(subst image-,,$@))
 	@$(eval tag := $(shell egrep -o "FROM .*$(name).*" images/$(name)/Dockerfile | awk -F: '{print $$NF}'))
@@ -33,5 +33,10 @@ $(img_targets):
 		--cache-to type=inline \
 		--metadata-file images/$(name).json \
 		--push=$(PUSH) \
-		--load=$(LOAD)
+		--load=$(LOAD) && \
+	img_name=$$(jq -r '."image.name" | split(":")[:-1] | join(":")' images/$(name).json) \
+		yq -i '.$(name).image.manager.repository = ("$${img_name}"|envsubst(nu,ne))' values.yaml && \
+	img_tag=$$(jq -r '."image.name" | split(":")[-1]' images/$(name).json) \
+	img_digest=$$(jq -r '."containerimage.digest"' images/$(name).json) \
+		yq -i '.$(name).image.manager.tag = ("$${img_tag}@$${img_digest}"|envsubst(nu,ne))' values.yaml
 
