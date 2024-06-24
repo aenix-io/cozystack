@@ -71,6 +71,13 @@
             "properties": {},
             "type": "object"
         },
+        "extraEnvs": {
+            "items": {
+                "type": "object"
+            },
+            "type": "array",
+            "uniqueItems": true
+        },
         "fullnameOverride": {
             "type": "string"
         },
@@ -139,6 +146,9 @@
                     "type": "string"
                 },
                 "license": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             },
@@ -272,6 +282,9 @@
             },
             "properties": {
                 "automount": {
+                    "type": "boolean"
+                },
+                "create": {
                     "type": "boolean"
                 },
                 "name": {

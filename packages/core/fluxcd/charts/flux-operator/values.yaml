@@ -51,6 +51,7 @@ readinessProbe: # @schema default: {"httpGet":{"path":"/readyz","port":8081},"in
 # -- Pod service account settings.
 # The name of the service account defaults to the release name.
 serviceAccount: # @schema default: {"create":true,"automount":true,"name":""}
+  create: true
   automount: true
   name: ""
 
@@ -85,8 +86,12 @@ tolerations: [ ] # @schema item: object ; uniqueItems: true
 
 # -- Marketplace settings.
 marketplace:
+  type: ""
   license: ""
   account: ""
 
-# -- If `true`, start flux-operator in hostNetwork mode.
-hostNetwork: false
+# -- If `true`, the container ports (`8080` and `8081`) are exposed on the host network.
+hostNetwork: false # @schema default: false
+
+# -- Container extra environment variables.
+extraEnvs: [ ] # @schema item: object ; uniqueItems: true

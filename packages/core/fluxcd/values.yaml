@@ -6,8 +6,9 @@ flux-operator:
   hostNetwork: true
 
 fluxInstance:
-  # cluster:
-  #   domain: cozy.local
+  cluster:
+    networkPolicy: true
+  #  domain: cozy.local
   distribution:
     version: 2.3.x
     registry: ghcr.io/fluxcd

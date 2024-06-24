@@ -17,5 +17,4 @@ diff:
 update:
 	rm -rf charts
 	helm pull oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator --untar --untardir charts
-	patch -p1 --no-backup-if-mismatch < patches/hostNetwork.diff
 	patch -p1 --no-backup-if-mismatch < patches/kubernetesEnvs.diff

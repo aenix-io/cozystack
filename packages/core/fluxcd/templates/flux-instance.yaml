@@ -5,6 +5,9 @@ metadata:
 spec:
   {{- with .Values.fluxInstance.cluster }}
   cluster:
+    {{- with .networkPolicy }}
+    networkPolicy: {{ . }}
+    {{- end }}
     {{- with .domain }}
     domain: {{ . }}
     {{- end }}
