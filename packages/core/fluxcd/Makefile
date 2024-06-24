@@ -7,13 +7,15 @@ show:
 	helm template -n $(NAMESPACE) $(NAME) . --no-hooks --dry-run=server $(API_VERSIONS_FLAGS)
 
 apply:
-	helm template -n $(NAMESPACE) $(NAME) . --no-hooks -f valuesFile.yaml -f flux-customizations.yaml \
+	helm template -n $(NAMESPACE) $(NAME) . --no-hooks \
 		--dry-run=server $(API_VERSIONS_FLAGS) | kubectl apply -n $(NAMESPACE) -f-
 
 diff:
-	helm template -n $(NAMESPACE) $(NAME) . --no-hooks -f valuesFile.yaml -f flux-customizations.yaml \
+	helm template -n $(NAMESPACE) $(NAME) . --no-hooks \
 		--dry-run=server $(API_VERSIONS_FLAGS) | kubectl diff -n $(NAMESPACE) -f-
 
 update:
 	rm -rf charts
 	helm pull oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator --untar --untardir charts
+	patch -p1 --no-backup-if-mismatch < patches/hostNetwork.diff
+	patch -p1 --no-backup-if-mismatch < patches/kubernetesEnvs.diff

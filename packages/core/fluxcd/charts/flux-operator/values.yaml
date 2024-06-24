@@ -90,6 +90,3 @@ marketplace:
 
 # -- If `true`, start flux-operator in hostNetwork mode.
 hostNetwork: false
-
-# -- Add environment variables eg. for kubeprism KUBERNETES_SERVICE_HOST and _PORT
-extraEnvs: [ ]
