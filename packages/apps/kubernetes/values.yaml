@@ -19,13 +19,26 @@ nodeGroups:
     roles:
     - ingress-nginx
 
+## @section Cluster Addons
+##
 addons:
-  ## @param addons.certManager.enabled Enables the certificate manager which automatically creates and manages SSL/TLS certificates
-  certManager:
-    enabled: true
 
-  ## @param addons.ingressNginx.enabled Enables Ingress-NGINX Controller on nodes with 'ingress-nginx' role
-  ## @param addons.ingressNginx.host The domain name that should be passtrough to the cluster by upper ingress.
+  ## Cert-manager: automatically creates and manages SSL/TLS certificate
+  ##
+  certManager:
+    ## @param addons.certManager.enabled Enables the cert-manager
+    enabled: false
+
+  ## Ingress-NGINX Controller
+  ##
   ingressNginx:
-    enabled: true
-    host: "example.org"
+    ## @param addons.ingressNginx.enabled Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)
+    ##
+    enabled: false
+    ## @param addons.ingressNginx.hosts List of domain names that should be passed through to the cluster by upper cluster
+    ## e.g:
+    ## hosts:
+    ## - example.org
+    ## - foo.example.net
+    ##
+    hosts: []

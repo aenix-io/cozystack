@@ -1,6 +1,6 @@
 {{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
 {{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
-{{- if .Values.addons.ingressNginx.enabled }}
+{{- if .Values.addons.ingressNginx.hosts }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -12,16 +12,18 @@ metadata:
 spec:
   ingressClassName: "{{ $ingress }}"
   rules:
-  - host: {{ .Values.addons.ingressNginx.host | quote }}
+  {{- range .Values.addons.ingressNginx.hosts }}
+  - host: {{ . | quote }}
     http:
       paths:
       - path: /
         pathType: ImplementationSpecific
         backend:
           service:
-            name: {{ .Release.Name }}-ingress-nginx
+            name: {{ $.Release.Name }}-ingress-nginx
             port:
               number: 443
+  {{- end }}
 ---
 apiVersion: v1
 kind: Service
