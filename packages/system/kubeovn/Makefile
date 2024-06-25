@@ -10,7 +10,7 @@ update:
 	rm -rf charts && mkdir -p charts/kube-ovn
 	curl -sSL https://github.com/kubeovn/kube-ovn/archive/refs/heads/master.tar.gz | \
 	tar xzvf - --strip 1 kube-ovn-master/charts
-	patch -p4 --no-backup-if-mismatch < patches/cozyconfig.diff
+	patch --no-backup-if-mismatch -p4 < patches/cozyconfig.diff
 	ln -s ../../images charts/kube-ovn/images
 	sed -i '/image:/ s/{{.*}}/{{ include "kubeovn.image" . }}/g' `grep -rl image: charts/kube-ovn/templates/`
 
