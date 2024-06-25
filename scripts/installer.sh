@@ -3,7 +3,7 @@ set -o pipefail
 set -e
 
 BUNDLE=$(set -x; kubectl get configmap -n cozy-system cozystack -o 'go-template={{index .data "bundle-name"}}')
-VERSION=4
+VERSION=5
 
 run_migrations() {
   if ! kubectl get configmap -n cozy-system cozystack-version; then
@@ -20,15 +20,17 @@ run_migrations() {
 
 
 flux_operator_is_ok() {
-  kubectl wait --for=condition=available -n cozy-fluxcd deploy/fluxcd-flux-operator --timeout=1m
-}
-
-flux_instance_is_ok() {
-  kubectl wait --for=condition=ready -n cozy-fluxcd fluxinstance/flux --timeout=5m
+  kubectl wait --for=condition=available -n cozy-fluxcd deploy/fluxcd-flux-operator --timeout=10s
 }
 
 flux_controllers_ok() {
-  kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=10s 
+  if timeout 60 sh -c 'until kubectl get -n cozy-fluxcd deploy/source-controller deploy/helm-controller; do sleep 1; done'; then
+    kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=10s 
+  fi
+}
+
+flux_crds_ok() {
+  timeout 60 sh -c 'until kubectl get crd helmrepositories.source.toolkit.fluxcd.io helmcharts.source.toolkit.fluxcd.io; do sleep 1; done'
 }
 
 install_basic_charts() {
@@ -38,6 +40,7 @@ install_basic_charts() {
   if [ "$BUNDLE" = "paas-full" ]; then
     make -C packages/system/kubeovn apply resume
   fi
+  make -C packages/system/fluxcd apply
 }
 
 cd "$(dirname "$0")/.."
@@ -48,20 +51,19 @@ run_migrations
 # Install namespaces
 make -C packages/core/platform namespaces-apply
 
-# Install fluxcd twice (once it will fail, since CRDs can't be ordered)
-make -C packages/core/fluxcd apply || make -C packages/core/fluxcd apply
+# Install fluxcd-operator
+if ! flux_operator_is_ok; then
+  make -C packages/system/fluxcd-operator apply-locally
+fi
 
-if flux_operator_is_ok; then
-  echo "Flux operator is installed and FluxInstance CRD is ready"
+# Wait for CRDs
+if ! flux_crds_ok; then
+  echo "Flux CRDs are not ready" >&2
+  exit 1
 fi
 
 # Install platform chart
 make -C packages/core/platform apply
-
-# Install basic system charts (should be after platform chart applied)
-if ! flux_controllers_ok; then
-  install_basic_charts
-fi
 
 # Reconcile Helm repositories
 kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
