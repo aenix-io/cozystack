@@ -16,6 +16,36 @@
                     "default": 2
                 }
             }
+        },
+        "addons": {
+            "type": "object",
+            "properties": {
+                "certManager": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables the certificate manager which automatically creates and manages SSL/TLS certificates",
+                            "default": true
+                        }
+                    }
+                },
+                "ingressNginx": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables Ingress-NGINX Controller on nodes with 'ingress-nginx' role",
+                            "default": true
+                        },
+                        "host": {
+                            "type": "string",
+                            "description": "The domain name that should be passtrough to the cluster by upper ingress.",
+                            "default": "example.org"
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -16,9 +16,16 @@ nodeGroups:
     resources:
       cpu: 2
       memory: 1024Mi
+    roles:
+    - ingress-nginx
 
-## @param addons [object] addons configuration
-##
 addons:
+  ## @param addons.certManager.enabled Enables the certificate manager which automatically creates and manages SSL/TLS certificates
   certManager:
-    enabled: false
+    enabled: true
+
+  ## @param addons.ingressNginx.enabled Enables Ingress-NGINX Controller on nodes with 'ingress-nginx' role
+  ## @param addons.ingressNginx.host The domain name that should be passtrough to the cluster by upper ingress.
+  ingressNginx:
+    enabled: true
+    host: "example.org"

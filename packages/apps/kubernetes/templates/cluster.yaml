@@ -114,6 +114,10 @@ spec:
       virtualMachineTemplate:
         metadata:
           namespace: {{ $.Release.Namespace }}
+          labels:
+            {{- range $group.roles }}
+            node-role.kubernetes.io/{{ . }}: ""
+            {{- end }}
         spec:
           runStrategy: Always
           template:
@@ -165,6 +169,11 @@ metadata:
 spec:
   clusterName: {{ $.Release.Name }}
   template:
+    metadata:
+      labels:
+        {{- range $group.roles }}
+        node-role.kubernetes.io/{{ . }}: ""
+        {{- end }}
     spec:
       bootstrap:
         configRef:
