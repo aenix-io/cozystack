@@ -1,5 +1,5 @@
-NAME=metallb
-NAMESPACE=cozy-$(NAME)
+export NAME=metallb
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/package-system.mk
 

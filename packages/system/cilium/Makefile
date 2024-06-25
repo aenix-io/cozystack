@@ -1,7 +1,7 @@
 CILIUM_TAG=$(shell awk '$$1 == "version:" {print $$2}' charts/cilium/Chart.yaml)
 
-NAME=cilium
-NAMESPACE=cozy-$(NAME)
+export NAME=cilium
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/common-envs.mk
 include ../../../scripts/package-system.mk

@@ -1,5 +1,5 @@
-NAME=rabbitmq-operator
-NAMESPACE=cozy-$(NAME)
+export NAME=rabbitmq-operator
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/package-system.mk
 

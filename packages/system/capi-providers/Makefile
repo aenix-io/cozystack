@@ -1,4 +1,4 @@
-NAME=capi-providers
-NAMESPACE=cozy-cluster-api
+export NAME=capi-providers
+export NAMESPACE=cozy-cluster-api
 
 include ../../../scripts/package-system.mk

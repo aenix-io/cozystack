@@ -1,7 +1,7 @@
 KUBEOVN_TAG = v1.13.0
 
-NAME=kubeovn
-NAMESPACE=cozy-$(NAME)
+export NAME=kubeovn
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/common-envs.mk
 include ../../../scripts/package-system.mk
