@@ -1,5 +1,5 @@
-NAME=etcd-operator
-NAMESPACE=cozy-${NAME}
+export NAME=etcd-operator
+export NAMESPACE=cozy-${NAME}
 
 include ../../../scripts/package-system.mk
 

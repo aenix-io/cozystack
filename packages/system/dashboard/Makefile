@@ -1,5 +1,5 @@
-NAME=dashboard
-NAMESPACE=cozy-$(NAME)
+export NAME=dashboard
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/common-envs.mk
 include ../../../scripts/package-system.mk

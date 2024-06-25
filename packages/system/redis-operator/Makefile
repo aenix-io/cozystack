@@ -1,5 +1,5 @@
-NAME=redis-operator
-NAMESPACE=cozy-$(NAME)
+export NAME=redis-operator
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/package-system.mk
 

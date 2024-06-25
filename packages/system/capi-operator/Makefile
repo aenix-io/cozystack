@@ -1,5 +1,5 @@
-NAME=capi-operator
-NAMESPACE=cozy-cluster-api
+export NAME=capi-operator
+export NAMESPACE=cozy-cluster-api
 
 include ../../../scripts/package-system.mk
 

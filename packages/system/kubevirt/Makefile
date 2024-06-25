@@ -1,5 +1,5 @@
-NAME=kubevirt
-NAMESPACE=cozy-$(NAME)
+export NAME=kubevirt
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/package-system.mk
 
