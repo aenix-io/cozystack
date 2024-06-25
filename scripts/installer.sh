@@ -18,17 +18,27 @@ run_migrations() {
   done
 }
 
-
-flux_operator_is_ok() {
-  kubectl wait --for=condition=available -n cozy-fluxcd deploy/fluxcd-flux-operator --timeout=1m
+flux_is_ok() {
+  kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=1s
 }
 
-flux_instance_is_ok() {
-  kubectl wait --for=condition=ready -n cozy-fluxcd fluxinstance/flux --timeout=5m
+ensure_fluxcd() {
+  if flux_is_ok; then
+    return
+  fi
+  if kubectl get crd helmreleases.helm.toolkit.fluxcd.io helmrepositories.source.toolkit.fluxcd.io; then
+    targets="apply resume"
+  else
+    targets="apply-locally"
+  fi
+  make -C packages/system/fluxcd-operator $targets
+  wait_for_crds fluxinstances.fluxcd.controlplane.io
+  make -C packages/system/fluxcd $targets
+  wait_for_crds helmreleases.helm.toolkit.fluxcd.io helmrepositories.source.toolkit.fluxcd.io
 }
 
-flux_controllers_ok() {
-  kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=10s 
+wait_for_crds() {
+  timeout 60 sh -c "until kubectl get crd $*; do sleep 1; done"
 }
 
 install_basic_charts() {
@@ -48,18 +58,14 @@ run_migrations
 # Install namespaces
 make -C packages/core/platform namespaces-apply
 
-# Install fluxcd twice (once it will fail, since CRDs can't be ordered)
-make -C packages/core/fluxcd apply || make -C packages/core/fluxcd apply
-
-if flux_operator_is_ok; then
-  echo "Flux operator is installed and FluxInstance CRD is ready"
-fi
+# Install fluxcd
+ensure_fluxcd
 
 # Install platform chart
 make -C packages/core/platform apply
 
-# Install basic system charts (should be after platform chart applied)
-if ! flux_controllers_ok; then
+# Install basic charts
+if ! flux_is_ok; then
   install_basic_charts
 fi
 
