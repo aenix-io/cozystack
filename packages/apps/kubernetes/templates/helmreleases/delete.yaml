@@ -22,15 +22,18 @@ spec:
         - name: kubectl
           image: docker.io/clastix/kubectl:v1.29.1
           command:
-            - kubectl
-            - --namespace={{ .Release.Namespace }}
-            - patch
-            - helmrelease
-            - {{ .Release.Name }}-cilium
-            - {{ .Release.Name }}-csi
-            - -p
-            - '{"spec": {"suspend": true}}'
-            - --type=merge
+            - /bin/sh
+            - -c
+            - |
+                kubectl
+                --namespace={{ .Release.Namespace }}
+                patch
+                helmrelease
+                {{ .Release.Name }}-cilium
+                {{ .Release.Name }}-csi
+                {{ .Release.Name }}-cert-manager
+                -p '{"spec": {"suspend": true}}'
+                --type=merge --field-manager=flux-client-side-apply || true
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -60,6 +63,7 @@ rules:
     resourceNames:
       - {{ .Release.Name }}-cilium
       - {{ .Release.Name }}-csi
+      - {{ .Release.Name }}-cert-manager
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
