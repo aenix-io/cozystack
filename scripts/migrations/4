@@ -1,17 +1,6 @@
 #!/bin/sh
 # Migration 4 --> 5
 
-helm template packages/system/fluxcd/ . -n cozy-fluxcd | kubectl delete -f - -n cozy-fluxcd || true
-
-if kubectl get crd fluxinstances.fluxcd.controlplane.io; then
-  kubectl patch crd fluxinstances.fluxcd.controlplane.io -p '{"metadata":{"finalizers":null}}' --type=merge
-fi
-if kubectl get fluxinstances.fluxcd.controlplane.io -n cozy-fluxcd flux; then
-  kubectl delete fluxinstances.fluxcd.controlplane.io -n cozy-fluxcd flux --wait=false
-  kubectl patch fluxinstances.fluxcd.controlplane.io -n cozy-fluxcd flux -p '{"metadata":{"finalizers":null}}' --type=merge
-fi
-
-
 # Fix kubeovn crds
 fluxcd_crds=$(kubectl get crd -o name | grep '\.fluxcd\.io$')
 if [ -n "$fluxcd_crds" ]; then
