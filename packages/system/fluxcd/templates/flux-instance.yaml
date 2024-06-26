@@ -1,0 +1,25 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+spec:
+  {{- with .Values.cluster }}
+  cluster:
+    {{- with .networkPolicy }}
+    networkPolicy: {{ . }}
+    {{- end }}
+    {{- with .domain }}
+    domain: {{ . }}
+    {{- end }}
+  {{- end }}
+  distribution:
+    version: {{ .Values.distribution.version }}
+    registry: {{ .Values.distribution.registry }}
+  components:
+  {{- if .Values.components }}
+    {{- toYaml .Values.components | nindent 4 }}
+  {{- end }}
+  kustomize:
+  {{- if .Values.kustomize }}
+    {{- toYaml .Values.kustomize | nindent 4 }}
+  {{- end }}

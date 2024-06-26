@@ -294,22 +294,22 @@ kubectl patch -n tenant-root hr/tenant-root --type=merge -p '{"spec":{ "values":
 timeout 60 sh -c 'until kubectl get hr -n tenant-root etcd ingress monitoring tenant-root; do sleep 1; done'
 
 # Wait for HelmReleases be installed
-kubectl wait --timeout=2m --for=condition=ready hr -n tenant-root etcd ingress monitoring tenant-root
+kubectl wait --timeout=2m --for=condition=ready -n tenant-root hr etcd ingress monitoring tenant-root
 
 # Wait for nginx-ingress-controller
 timeout 60 sh -c 'until kubectl get deploy -n tenant-root root-ingress-controller; do sleep 1; done'
-kubectl wait deploy -n tenant-root --timeout=5m --for=condition=available root-ingress-controller
+kubectl wait --timeout=5m --for=condition=available -n tenant-root deploy root-ingress-controller
 
 # Wait for etcd
-kubectl wait --for=jsonpath=.status.readyReplicas=3 -n tenant-root --timeout=5m sts etcd
+kubectl wait --timeout=5m --for=jsonpath=.status.readyReplicas=3 -n tenant-root sts etcd
 
 # Wait for Victoria metrics
-kubectl wait deploy -n tenant-root --timeout=5m --for=condition=available vmalert-vmalert vminsert-longterm vminsert-shortterm
-kubectl wait --for=jsonpath=.status.readyReplicas=2 -n tenant-root --timeout=5m sts vmalertmanager-alertmanager vmselect-longterm vmselect-shortterm vmstorage-longterm vmstorage-shortterm
+kubectl wait --timeout=5m --for=condition=available deploy -n tenant-root vmalert-vmalert vminsert-longterm vminsert-shortterm
+kubectl wait --timeout=5m --for=jsonpath=.status.readyReplicas=2 -n tenant-root sts vmalertmanager-alertmanager vmselect-longterm vmselect-shortterm vmstorage-longterm vmstorage-shortterm
 
 # Wait for grafana
-kubectl wait --for=condition=ready clusters.postgresql.cnpg.io -n tenant-root grafana-db
-kubectl wait deploy -n tenant-root --timeout=5m --for=condition=available grafana-deployment 
+kubectl wait --timeout=5m --for=condition=ready -n tenant-root clusters.postgresql.cnpg.io grafana-db
+kubectl wait --timeout=5m --for=condition=available -n tenant-root deploy grafana-deployment 
 
 # Get IP of nginx-ingress
 ip=$(kubectl get svc -n tenant-root root-ingress-controller -o jsonpath='{.status.loadBalancer.ingress..ip}')
