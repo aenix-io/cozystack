@@ -45,6 +45,16 @@
                             "items": {}
                         }
                     }
+                },
+                "fluxcd": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables Flux CD",
+                            "default": false
+                        }
+                    }
                 }
             }
         }

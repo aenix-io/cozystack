@@ -42,3 +42,10 @@ addons:
     ## - foo.example.net
     ##
     hosts: []
+
+  ## Flux CD
+  ##
+  fluxcd:
+    ## @param addons.fluxcd.enabled Enables Flux CD
+    ##
+    enabled: false
