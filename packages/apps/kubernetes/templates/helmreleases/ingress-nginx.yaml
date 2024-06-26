@@ -8,7 +8,7 @@ metadata:
     coztstack.io/target-cluster-name: {{ .Release.Name }}
 spec:
   interval: 1m
-  releaseName: cert-mnager
+  releaseName: ingress-nginx
   chart:
     spec:
       chart: cozy-ingress-nginx
@@ -40,5 +40,7 @@ spec:
     namespace: {{ .Release.Namespace }}
   {{- end }}
   - name: {{ .Release.Name }}-cilium
+    namespace: {{ .Release.Namespace }}
+  - name: {{ .Release.Name }}-cert-manager
     namespace: {{ .Release.Namespace }}
 {{- end }}
