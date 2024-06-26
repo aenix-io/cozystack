@@ -8,7 +8,7 @@ metadata:
     coztstack.io/target-cluster-name: {{ .Release.Name }}
 spec:
   interval: 1m
-  releaseName: cert-mnager
+  releaseName: cert-manager
   chart:
     spec:
       chart: cozy-cert-manager
