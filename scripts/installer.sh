@@ -20,6 +20,7 @@ run_migrations() {
 
 flux_is_ok() {
   kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=1s
+  kubectl wait --for=condition=ready -n cozy-fluxcd helmrelease/fluxcd --timeout=1s # to call "apply resume" below
 }
 
 ensure_fluxcd() {
