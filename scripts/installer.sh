@@ -23,11 +23,10 @@ flux_is_ok() {
 }
 
 install_basic_charts() {
-  case "$BUNDLE" in
-    *-full)
-      make -C packages/system/cilium apply resume
-      ;;
-  esac
+  if [ "$BUNDLE" = "paas-full" ] || [ "$BUNDLE" = "distro-full" ] || [ "$BUNDLE" = "paas-proxmox-full" ]; then
+    make -C packages/system/cilium apply resume
+  fi
+  
   if [ "$BUNDLE" = "paas-full" ] || [ "$BUNDLE" = "paas-proxmox-full" ]; then
     make -C packages/system/kubeovn apply resume
   fi
