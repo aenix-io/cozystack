@@ -25,8 +25,8 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean",
-                            "description": "Enables the certificate manager which automatically creates and manages SSL/TLS certificates",
-                            "default": true
+                            "description": "Enables the cert-manager",
+                            "default": false
                         }
                     }
                 },
@@ -35,13 +35,24 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean",
-                            "description": "Enables Ingress-NGINX Controller on nodes with 'ingress-nginx' role",
-                            "default": true
+                            "description": "Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)",
+                            "default": false
                         },
-                        "host": {
-                            "type": "string",
-                            "description": "The domain name that should be passtrough to the cluster by upper ingress.",
-                            "default": "example.org"
+                        "hosts": {
+                            "type": "array",
+                            "description": "List of domain names that should be passed through to the cluster by upper cluster",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "fluxcd": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables Flux CD",
+                            "default": false
                         }
                     }
                 }

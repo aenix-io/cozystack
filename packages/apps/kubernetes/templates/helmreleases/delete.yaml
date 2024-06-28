@@ -32,6 +32,9 @@ spec:
                 {{ .Release.Name }}-cilium
                 {{ .Release.Name }}-csi
                 {{ .Release.Name }}-cert-manager
+                {{ .Release.Name }}-ingress-nginx
+                {{ .Release.Name }}-fluxcd-operator
+                {{ .Release.Name }}-fluxcd
                 -p '{"spec": {"suspend": true}}'
                 --type=merge --field-manager=flux-client-side-apply || true
 ---
@@ -64,6 +67,9 @@ rules:
       - {{ .Release.Name }}-cilium
       - {{ .Release.Name }}-csi
       - {{ .Release.Name }}-cert-manager
+      - {{ .Release.Name }}-ingress-nginx
+      - {{ .Release.Name }}-fluxcd-operator
+      - {{ .Release.Name }}-fluxcd
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
