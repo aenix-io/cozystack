@@ -6,15 +6,15 @@ help: ## Show this help.
 
 show: ## Show output of rendered templates
 	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | \
-		NAMESPACE=$(NAMESPACE) NAME=$(NAME) helm template --dry-run=server --post-renderer ../../../scripts/fluxcd-kustomize.sh -n $(NAMESPACE) $(NAME) . -f -
+	NAMESPACE=$(NAMESPACE) NAME=$(NAME) helm template --dry-run=server --post-renderer ../../../scripts/fluxcd-kustomize.sh -n $(NAMESPACE) $(NAME) . -f -
 
 apply: suspend ## Apply Helm release to a Kubernetes cluster
 	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | \
-		NAMESPACE=$(NAMESPACE) NAME=$(NAME) helm upgrade -i --post-renderer ../../../scripts/fluxcd-kustomize.sh -n $(NAMESPACE) $(NAME) . -f -
+	NAMESPACE=$(NAMESPACE) NAME=$(NAME) helm upgrade -i --post-renderer ../../../scripts/fluxcd-kustomize.sh -n $(NAMESPACE) $(NAME) . -f -
 
 diff: ## Diff Helm release against objects in a Kubernetes cluster
 	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | \
-		NAMESPACE=$(NAMESPACE) NAME=$(NAME)	helm diff upgrade --allow-unreleased --post-renderer ../../../scripts/fluxcd-kustomize.sh -n $(NAMESPACE) $(NAME) . -f -
+	NAMESPACE=$(NAMESPACE) NAME=$(NAME) helm diff upgrade --allow-unreleased --post-renderer ../../../scripts/fluxcd-kustomize.sh -n $(NAMESPACE) $(NAME) . -f -
 
 suspend: ## Suspend reconciliation for an existing Helm release
 	kubectl patch hr -n $(NAMESPACE) $(NAME) -p '{"spec": {"suspend": true}}' --type=merge --field-manager=flux-client-side-apply
