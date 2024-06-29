@@ -1,0 +1,9 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: seaweed1-db
+spec:
+  instances: 2
+  storage:
+    size: 10Gi
