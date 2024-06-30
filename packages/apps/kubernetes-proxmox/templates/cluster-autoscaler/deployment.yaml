@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-cluster-autoscaler
+  labels:
+    app: {{ .Release.Name }}-cluster-autoscaler
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-cluster-autoscaler
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-cluster-autoscaler
+    spec:
+      containers:
+      - image: ghcr.io/kvaps/test:cluster-autoscaller
+        name: cluster-autoscaler
+        command:
+        - /cluster-autoscaler
+        args:
+        - --cloud-provider=clusterapi
+        - --kubeconfig=/etc/kubernetes/kubeconfig/super-admin.svc
+        - --clusterapi-cloud-config-authoritative
+        - --node-group-auto-discovery=clusterapi:namespace={{ .Release.Namespace }},clusterName={{ .Release.Name }}
+        volumeMounts:
+        - mountPath: /etc/kubernetes/kubeconfig
+          name: kubeconfig
+          readOnly: true
+      volumes:
+      - configMap:
+          name: {{ .Release.Name }}-cloud-config
+        name: cloud-config
+      - secret:
+          secretName: {{ .Release.Name }}-admin-kubeconfig
+        name: kubeconfig
+      serviceAccountName: {{ .Release.Name }}-cluster-autoscaler
+      terminationGracePeriodSeconds: 10
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Release.Name }}-cluster-autoscaler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Release.Name }}-cluster-autoscaler
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-cluster-autoscaler
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-cluster-autoscaler
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Release.Name }}-cluster-autoscaler
+rules:
+  - apiGroups:
+    - cluster.x-k8s.io
+    resources:
+    - machinedeployments
+    - machinedeployments/scale
+    - machines
+    - machinesets
+    - machinepools
+    verbs:
+    - get
+    - list
+    - update
+    - watch
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    resources:
+    - proxmoxmachinetemplates
+    verbs:
+    - get
+    - list
+    - update
+    - watch

@@ -1,0 +1,156 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.12.0
+  name: virtualmachines.proxmox.alperen.cloud
+spec:
+  group: proxmox.alperen.cloud
+  names:
+    kind: VirtualMachine
+    listKind: VirtualMachineList
+    plural: virtualmachines
+    singular: virtualmachine
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: VirtualMachine is the Schema for the virtualmachines API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: VirtualMachineSpec defines the desired state of VirtualMachine
+            properties:
+              name:
+                description: Name is the name of the VM
+                type: string
+              nodeName:
+                description: NodeName is the name of the target node of Proxmox
+                type: string
+              template:
+                description: TemplateSpec of the source VM
+                properties:
+                  cores:
+                    description: Cores is the number of CPU cores
+                    type: integer
+                  disk:
+                    description: Disks is the list of disks
+                    items:
+                      properties:
+                        size:
+                          description: Size is the size of the disk in GB
+                          type: integer
+                        storage:
+                          description: Storage is the name of the storage
+                          type: string
+                        type:
+                          description: Type is the type of the disk
+                          type: string
+                      required:
+                      - size
+                      - storage
+                      - type
+                      type: object
+                    type: array
+                  memory:
+                    description: Memory is the amount of memory in MB
+                    type: integer
+                  name:
+                    description: Name of the template
+                    type: string
+                  network:
+                    description: Networks is the list of networks
+                    items:
+                      properties:
+                        bridge:
+                          description: Bridge is the name of the bridge
+                          type: string
+                        model:
+                          description: Model is the model of the network card
+                          type: string
+                      required:
+                      - bridge
+                      - model
+                      type: object
+                    type: array
+                  socket:
+                    description: Socket is the number of CPU sockets
+                    type: integer
+                type: object
+              vmSpec:
+                description: This field should be modified further
+                properties:
+                  cores:
+                    description: CPUs
+                    type: integer
+                  disk:
+                    description: Disks is the list of disks
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+                    type: object
+                  memory:
+                    description: Memory is the amount of memory in MB
+                    type: integer
+                  network:
+                    description: Networks is the list of networks
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+                    type: object
+                  osImage:
+                    description: OS Image
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+                    type: object
+                type: object
+            required:
+            - name
+            - nodeName
+            type: object
+          status:
+            description: VirtualMachineStatus defines the observed state of VirtualMachine
+            properties:
+              IPAddress:
+                type: string
+              OSInfo:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+              node:
+                type: string
+              state:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
+              uptime:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

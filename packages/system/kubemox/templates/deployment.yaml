@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kubemox.fullname" . }}
+  labels:
+    {{- include "kubemox.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kubemox.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kubemox.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kubemox.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: PROXMOX_ENDPOINT
+            value: {{ .Values.proxmox.endpoint }} 
+          - name: PROXMOX_INSECURE_SKIP_TLS_VERIFY
+            value: {{ .Values.proxmox.insecureSkipTLSVerify | quote }}
+          {{- if .Values.proxmox.tokenID }}
+          - name: PROXMOX_TOKEN_ID
+            valueFrom:
+              secretKeyRef:
+                name: proxmox-credentials 
+                key: tokenID
+          {{- end }}
+          {{- if .Values.proxmox.secret }}
+          - name: PROXMOX_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: proxmox-credentials 
+                key: secret
+          {{- end }}
+          {{- if .Values.proxmox.username }}
+          - name: PROXMOX_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: proxmox-credentials 
+                key: username
+          {{- end }}
+          {{- if .Values.proxmox.password }}
+          - name: PROXMOX_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: proxmox-credentials 
+                key: password
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

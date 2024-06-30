@@ -1,0 +1,107 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: containers.proxmox.alperen.cloud
+spec:
+  conversion:
+    strategy: None
+  group: proxmox.alperen.cloud
+  names:
+    kind: Container
+    listKind: ContainerList
+    plural: containers
+    singular: container
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Container is the Schema for the containers API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ContainerSpec defines the desired state of Container
+            properties:
+              name:
+                description: Name is the name of the Container
+                type: string
+              nodeName:
+                description: NodeName is the name of the target node of Proxmox
+                type: string
+              template:
+                description: TemplateSpec of the source Container
+                properties:
+                  cores:
+                    description: Cores is the number of CPU cores
+                    type: integer
+                  disk:
+                    description: Disks is the list of disks
+                    items:
+                      properties:
+                        size:
+                          description: Size is the size of the disk
+                          type: integer
+                        storage:
+                          description: Storage is the name of the storage
+                          type: string
+                        type:
+                          description: Type is the type of the disk
+                          type: string
+                      type: object
+                    type: array
+                  memory:
+                    description: Memory is the amount of memory in MB
+                    type: integer
+                  name:
+                    description: Name of the template
+                    type: string
+                  network:
+                    description: Networks is the list of networks
+                    items:
+                      properties:
+                        bridge:
+                          description: Bridge is the name of the bridge
+                          type: string
+                        model:
+                          description: Name is the name of the network
+                          type: string
+                      type: object
+                    type: array
+                type: object
+            required:
+            - name
+            - nodeName
+            type: object
+          status:
+            description: ContainerStatus defines the observed state of Container
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              node:
+                type: string
+              state:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
+              uptime:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
