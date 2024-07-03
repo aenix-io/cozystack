@@ -58,6 +58,12 @@ spec:
             - configMapRef:
                 name: {{ include "etcd-operator.fullname" . }}-env
           {{- end }}
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
           volumeMounts:
             - mountPath: /tmp/k8s-webhook-server/serving-certs
               name: cert

@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: etcd-operator-system/etcd-operator-serving-cert
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: etcdclusters.etcd.aenix.io
 spec:
   conversion:
@@ -202,25 +202,43 @@ spec:
                 security:
                   description: Security describes security settings of etcd (authentication, certificates, rbac)
                   properties:
+                    enableAuth:
+                      description: Section to enable etcd auth
+                      type: boolean
                     tls:
                       description: Section for user-managed tls certificates
                       properties:
                         clientSecret:
-                          description: Client certificate for etcd-operator to do maintenance. It is expected to have tls.crt and tls.key fields in the secret.
+                          description: |-
+                            Client certificate for etcd-operator to do maintenance. It is expected to have tls.crt and tls.key fields in the secret.
+                            This secret must be created in the namespace with etcdCluster CR.
                           type: string
                         clientTrustedCASecret:
-                          description: Trusted CA for client certificates that are provided by client to etcd. It is expected to have tls.crt field in the secret.
+                          description: |-
+                            Trusted CA for client certificates that are provided by client to etcd. It is expected to have ca.crt field in the secret.
+                            This secret must be created in the namespace with etcdCluster CR.
                           type: string
                         peerSecret:
-                          description: Certificate secret to secure peer-to-peer communication between etcd nodes. It is expected to have tls.crt and tls.key fields in the secret.
+                          description: |-
+                            Certificate secret to secure peer-to-peer communication between etcd nodes. It is expected to have tls.crt and tls.key fields in the secret.
+                            This secret must be created in the namespace with etcdCluster CR.
                           type: string
                         peerTrustedCASecret:
-                          description: Trusted CA certificate secret to secure peer-to-peer communication between etcd nodes. It is expected to have tls.crt field in the secret.
+                          description: |-
+                            Trusted CA certificate secret to secure peer-to-peer communication between etcd nodes. It is expected to have ca.crt field in the secret.
+                            This secret must be created in the namespace with etcdCluster CR.
                           type: string
                         serverSecret:
                           description: |-
                             Server certificate secret to secure client-server communication. Is provided to the client who connects to etcd by client port (2379 by default).
                             It is expected to have tls.crt and tls.key fields in the secret.
+                            This secret must be created in the namespace with etcdCluster CR.
+                          type: string
+                        serverTrustedCASecret:
+                          description: |-
+                            Trusted CA for etcd server certificates for client-server communication. Is necessary to set trust between operator and etcd.
+                            It is expected to have ca.crt field in the secret. If it is not specified, then insecure communication will be used.
+                            This secret must be created in the namespace with etcdCluster CR.
                           type: string
                       type: object
                   type: object
@@ -581,6 +599,7 @@ spec:
                             not set, the implementation will apply its default routing strategy. If set
                             to "PreferClose", implementations should prioritize endpoints that are
                             topologically close (e.g., same zone).
+                            This is an alpha field and requires enabling ServiceTrafficDistribution feature.
                           type: string
                         type:
                           description: |-
