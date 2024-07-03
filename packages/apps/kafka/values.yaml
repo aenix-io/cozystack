@@ -32,6 +32,6 @@ zookeeper:
 ##       max.compaction.lag.ms: 5400000
 ##       min.insync.replicas: 2
 ##     partitions: 1
-##     replicationFactor: 3
+##     replicas: 3
 ##
 topics: []
