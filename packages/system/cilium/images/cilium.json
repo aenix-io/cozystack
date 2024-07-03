@@ -1,4 +1,61 @@
 {
-  "containerimage.config.digest": "sha256:5d7a65f2d5c41bd53cccaa55d4f5d28933c08f5294e732b9a00427d091c1d78f",
-  "containerimage.digest": "sha256:f9f46b6c57cbe9ccb2686be7e58236e3bfae0942c4be687f0bf16270832f09ab"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/docker/dockerfile@experimental",
+        "digest": {
+          "sha256": "600e5c62eedff338b3f7a0850beb7c05866e0ef27b2d2e8c02aa468e78496ff5"
+        }
+      },
+      {
+        "uri": "pkg:docker/golang@1.22-bookworm?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "7dcf6f2084586b44844aea8615db684c9361cf6bebf235a1750595633ed021bd"
+        }
+      },
+      {
+        "uri": "pkg:docker/quay.io/cilium/cilium@v1.15.5?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "4ce1666a73815101ec9a4d360af6c5b7f1193ab00d89b7124f8505dee147ca40"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "gateway.v0",
+        "args": {
+          "cmdline": "docker/dockerfile:experimental",
+          "source": "docker/dockerfile:experimental"
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/fsidbune5vw82lhgf2ofhwo0g",
+  "containerimage.config.digest": "sha256:79635c7d6c1f3a457406d39590ee94168caa925eae7a82bac4fed42e751f135d",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:3cee2f43abcc7ae34dddf589345b871d4eb6a4f0281c7758844b05c7c5ec4965",
+    "size": 2083,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:3cee2f43abcc7ae34dddf589345b871d4eb6a4f0281c7758844b05c7c5ec4965",
+  "image.name": "ghcr.io/aenix-io/cozystack/cilium:1.15.5,ghcr.io/aenix-io/cozystack/cilium:1.15.5-v0.8.0"
 }

@@ -1,4 +1,51 @@
 {
-  "containerimage.config.digest": "sha256:b3d76d1764c8c470a32b4d3b19e48592eda547710e8e6508666930e1db1b4cb3",
-  "containerimage.digest": "sha256:e5275d3a367aba3b4a7ec0bf25583cc21241e320da2ffd86f5c9cf4a7f6fac77"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/kubeovn/kube-ovn-base@v1.13.0?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "c9348ac30ee286aa2c801600f5587e54d07b96b9e137919fa28a84f4ed6806d2"
+        }
+      },
+      {
+        "uri": "pkg:docker/golang@1.22-bookworm?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "7dcf6f2084586b44844aea8615db684c9361cf6bebf235a1750595633ed021bd"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/uy5qpumete0kfxr1v5cf2dyjo",
+  "containerimage.config.digest": "sha256:b83d8f607c54ba91b71517099aef98c5f373ef64d268e53fe7f95e15e18ec0af",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:9bedea10c9d2fc0b1213338b4b73b056d5e8ea53302395696d623e6be48bc0be",
+    "size": 5015,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:9bedea10c9d2fc0b1213338b4b73b056d5e8ea53302395696d623e6be48bc0be",
+  "image.name": "ghcr.io/aenix-io/cozystack/kubeovn:v1.13.0,ghcr.io/aenix-io/cozystack/kubeovn:v1.13.0-v0.8.0"
 }
