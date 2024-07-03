@@ -7,7 +7,7 @@ metadata:
     cozystack.io/repository: system
     coztstack.io/target-cluster-name: {{ .Release.Name }}
 spec:
-  interval: 1m
+  interval: 5m
   releaseName: fluxcd-operator
   chart:
     spec:
@@ -24,6 +24,11 @@ spec:
   storageNamespace: cozy-fluxcd
   install:
     createNamespace: true
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   values:
     flux-operator:
       fullnameOverride: flux-operator
@@ -45,7 +50,7 @@ metadata:
     cozystack.io/repository: system
     coztstack.io/target-cluster-name: {{ .Release.Name }}
 spec:
-  interval: 1m
+  interval: 5m
   releaseName: fluxcd
   chart:
     spec:
@@ -62,6 +67,11 @@ spec:
   storageNamespace: cozy-fluxcd
   install:
     createNamespace: true
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   dependsOn:
   {{- if lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" .Release.Namespace .Release.Name }}
   - name: {{ .Release.Name }}
