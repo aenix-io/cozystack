@@ -1,5 +1,5 @@
-cluster:
-  networkPolicy: true
+cluster: {}
+#  networkPolicy: true
 #  domain: cozy.local
 distribution:
   version: 2.3.x
