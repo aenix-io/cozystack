@@ -84,14 +84,21 @@ affinity: # @schema default: {"nodeAffinity":{"requiredDuringSchedulingIgnoredDu
 # -- Pod tolerations settings.
 tolerations: [ ] # @schema item: object ; uniqueItems: true
 
-# -- Marketplace settings.
-marketplace:
-  type: ""
-  license: ""
-  account: ""
-
 # -- If `true`, the container ports (`8080` and `8081`) are exposed on the host network.
 hostNetwork: false # @schema default: false
 
 # -- Container extra environment variables.
 extraEnvs: [ ] # @schema item: object ; uniqueItems: true
+
+# -- Prometheus Operator scraping settings.
+serviceMonitor: # @schema default: {"create":false,"interval":"60s","scrapeTimeout":"30s"}
+  create: false
+  interval: 60s
+  scrapeTimeout: 30s
+  labels: { }
+
+# -- Marketplace settings.
+marketplace:
+  type: ""
+  license: ""
+  account: ""

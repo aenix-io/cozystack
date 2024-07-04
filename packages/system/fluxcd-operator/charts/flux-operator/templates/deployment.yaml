@@ -18,10 +18,13 @@ spec:
       {{- include "flux-operator.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.commonAnnotations }}
       annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+        {{- with .Values.commonAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "flux-operator.labels" . | nindent 8 }}
         {{- with .Values.commonLabels }}
