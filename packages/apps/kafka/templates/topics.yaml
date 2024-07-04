@@ -8,8 +8,12 @@ metadata:
     strimzi.io/cluster: "{{ $.Release.Name }}"
 spec:
   topicName: "{{ $topic.name }}"
-  partitions: 10
-  replicas: 3
+  {{- with $topic.partitions }}
+  partitions: "{{ . }}"
+  {{- end }}
+  {{- with $topic.replicas }}
+  replicas: "{{ . }}"
+  {{- end }}
   {{- with $topic.config }}
   config:
     {{- toYaml . | nindent 4 }}
