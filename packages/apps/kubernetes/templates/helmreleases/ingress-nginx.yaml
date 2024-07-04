@@ -7,7 +7,7 @@ metadata:
     cozystack.io/repository: system
     coztstack.io/target-cluster-name: {{ .Release.Name }}
 spec:
-  interval: 1m
+  interval: 5m
   releaseName: ingress-nginx
   chart:
     spec:
@@ -24,6 +24,11 @@ spec:
   storageNamespace: cozy-ingress-nginx
   install:
     createNamespace: true
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   values:
     ingress-nginx:
       fullnameOverride: ingress-nginx

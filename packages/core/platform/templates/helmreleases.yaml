@@ -20,7 +20,7 @@ metadata:
   labels:
     cozystack.io/repository: system
 spec:
-  interval: 1m
+  interval: 5m
   releaseName: {{ $x.releaseName | default $x.name }}
   install:
     crds: CreateReplace
