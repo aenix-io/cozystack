@@ -1,10 +1,10 @@
 {
-  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/bkyp0lfy9cwyxbqtk2t3sl0ki",
+  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/cyr9s3a1cszjq9tt9vrh2czxt",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-    "digest": "sha256:539c8bc610ecee7ea8d1b728020b6131eb5e46aafe40d5a4d85e8cf79fae3c72",
+    "digest": "sha256:48e9f676f4eca5f7036648a56767c31beb0aca8fdc6d6798bd65de74886ed1ef",
     "size": 685
   },
-  "containerimage.digest": "sha256:539c8bc610ecee7ea8d1b728020b6131eb5e46aafe40d5a4d85e8cf79fae3c72",
+  "containerimage.digest": "sha256:48e9f676f4eca5f7036648a56767c31beb0aca8fdc6d6798bd65de74886ed1ef",
   "image.name": "ghcr.io/aenix-io/cozystack/cozystack:v0.8.0"
 }
