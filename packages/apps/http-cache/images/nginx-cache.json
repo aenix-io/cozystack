@@ -1,4 +1,48 @@
 {
-  "containerimage.config.digest": "sha256:31dedc466b9f92131f3e0f35b47d1f3771b6895d5b9a6cc089786b76b00c3a25",
-  "containerimage.digest": "sha256:86c7a8f2a11cbede492c778ffd67c759f722ab6958cab4a9df66af4035b1d7d9"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/ubuntu@22.04?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "340d9b015b194dc6e2a13938944e0d016e57b9679963fdeb9ce021daac430221"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "args": {
+          "build-arg:ARCH": "amd64"
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/iixrpj9up3jfyyrovbx167irv",
+  "containerimage.config.digest": "sha256:a359a6c83a1861ac146c42030e513b925ec155207b77baf5f61f19c507ab3ee5",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:57b113a4392b958612c14ed348147c221fe17d3ad6623fb7bd778e54139f45b9",
+    "size": 1094,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:57b113a4392b958612c14ed348147c221fe17d3ad6623fb7bd778e54139f45b9",
+  "image.name": "ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0,ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0-v0.8.0"
 }
