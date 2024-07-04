@@ -1,11 +1,11 @@
 flux-instance:
   instance:
     cluster:
-      # domain: cluster.local
-      # multitenant: false
-      # networkPolicy: true
-      # tenantDefaultServiceAccount: default
-      # type: kubernetes
+      domain: cluster.local
+      multitenant: false
+      networkPolicy: true
+      tenantDefaultServiceAccount: default
+      type: kubernetes
     distribution:
       version: 2.3.x
       registry: ghcr.io/fluxcd
