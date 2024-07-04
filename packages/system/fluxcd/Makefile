@@ -1,7 +1,11 @@
 NAME=fluxcd
 NAMESPACE=cozy-$(NAME)
 
+include ../../../scripts/package-system.mk
+
 apply-locally:
 	helm upgrade -i -n $(NAMESPACE) $(NAME) .
 
-include ../../../scripts/package-system.mk
+update:
+	rm -rf charts
+	helm pull oci://ghcr.io/controlplaneio-fluxcd/charts/flux-instance --untar --untardir charts
