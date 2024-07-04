@@ -27,14 +27,20 @@ ensure_fluxcd() {
   if flux_is_ok; then
     return
   fi
-  if kubectl get crd helmreleases.helm.toolkit.fluxcd.io helmrepositories.source.toolkit.fluxcd.io; then
-    targets="apply resume"
+  # Install fluxcd-operator
+  if kubectl get helmreleases.helm.toolkit.fluxcd.io  -n cozy-fluxcd fluxcd-operator; then
+    make -C packages/system/fluxcd-operator apply resume
   else
-    targets="apply-locally"
+    make -C packages/system/fluxcd-operator apply-locally
   fi
-  make -C packages/system/fluxcd-operator $targets
   wait_for_crds fluxinstances.fluxcd.controlplane.io
-  make -C packages/system/fluxcd $targets
+
+   # Install fluxcd
+  if kubectl get helmreleases.helm.toolkit.fluxcd.io  -n cozy-fluxcd fluxcd; then
+    make -C packages/system/fluxcd apply resume
+  else
+    make -C packages/system/fluxcd apply-locally
+  fi
   wait_for_crds helmreleases.helm.toolkit.fluxcd.io helmrepositories.source.toolkit.fluxcd.io
 }
 
