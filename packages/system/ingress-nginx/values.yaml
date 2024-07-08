@@ -1,7 +1,7 @@
 ingress-nginx:
   controller:
     extraArgs:
-      enable-ssl-passthrough: true
+      enable-ssl-passthrough: ""
     image:
       registry: ghcr.io
       image: kvaps/ingress-nginx-with-protobuf-exporter/controller
