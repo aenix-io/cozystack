@@ -71,10 +71,12 @@ spec:
                               minLength: 1
                               type: string
                             name:
-                              description: name is unique within a namespace to reference a secret resource.
+                              description: name is unique within a namespace to reference
+                                a secret resource.
                               type: string
                             namespace:
-                              description: namespace defines the space within which the secret name must be unique.
+                              description: namespace defines the space within which
+                                the secret name must be unique.
                               type: string
                           required:
                             - keyPath
@@ -98,10 +100,12 @@ spec:
                               minLength: 1
                               type: string
                             name:
-                              description: name is unique within a namespace to reference a secret resource.
+                              description: name is unique within a namespace to reference
+                                a secret resource.
                               type: string
                             namespace:
-                              description: namespace defines the space within which the secret name must be unique.
+                              description: namespace defines the space within which
+                                the secret name must be unique.
                               type: string
                           required:
                             - keyPath
@@ -118,6 +122,7 @@ spec:
                     - etcd
                     - MySQL
                     - PostgreSQL
+                    - NATS
                   type: string
                 endpoints:
                   description: |-
@@ -128,7 +133,9 @@ spec:
                   minItems: 1
                   type: array
                 tlsConfig:
-                  description: Defines the TLS/SSL configuration required to connect to the data store in a secure way.
+                  description: |-
+                    Defines the TLS/SSL configuration required to connect to the data store in a secure way.
+                    This value is optional.
                   properties:
                     certificateAuthority:
                       description: |-
@@ -152,10 +159,12 @@ spec:
                                   minLength: 1
                                   type: string
                                 name:
-                                  description: name is unique within a namespace to reference a secret resource.
+                                  description: name is unique within a namespace to
+                                    reference a secret resource.
                                   type: string
                                 namespace:
-                                  description: namespace defines the space within which the secret name must be unique.
+                                  description: namespace defines the space within which
+                                    the secret name must be unique.
                                   type: string
                               required:
                                 - keyPath
@@ -179,10 +188,12 @@ spec:
                                   minLength: 1
                                   type: string
                                 name:
-                                  description: name is unique within a namespace to reference a secret resource.
+                                  description: name is unique within a namespace to
+                                    reference a secret resource.
                                   type: string
                                 namespace:
-                                  description: namespace defines the space within which the secret name must be unique.
+                                  description: namespace defines the space within which
+                                    the secret name must be unique.
                                   type: string
                               required:
                                 - keyPath
@@ -193,7 +204,8 @@ spec:
                         - certificate
                       type: object
                     clientCertificate:
-                      description: Specifies the SSL/TLS key and private key pair used to connect to the data store.
+                      description: Specifies the SSL/TLS key and private key pair used
+                        to connect to the data store.
                       properties:
                         certificate:
                           properties:
@@ -212,10 +224,12 @@ spec:
                                   minLength: 1
                                   type: string
                                 name:
-                                  description: name is unique within a namespace to reference a secret resource.
+                                  description: name is unique within a namespace to
+                                    reference a secret resource.
                                   type: string
                                 namespace:
-                                  description: namespace defines the space within which the secret name must be unique.
+                                  description: namespace defines the space within which
+                                    the secret name must be unique.
                                   type: string
                               required:
                                 - keyPath
@@ -239,10 +253,12 @@ spec:
                                   minLength: 1
                                   type: string
                                 name:
-                                  description: name is unique within a namespace to reference a secret resource.
+                                  description: name is unique within a namespace to
+                                    reference a secret resource.
                                   type: string
                                 namespace:
-                                  description: namespace defines the space within which the secret name must be unique.
+                                  description: namespace defines the space within which
+                                    the secret name must be unique.
                                   type: string
                               required:
                                 - keyPath
@@ -255,18 +271,17 @@ spec:
                       type: object
                   required:
                     - certificateAuthority
-                    - clientCertificate
                   type: object
               required:
                 - driver
                 - endpoints
-                - tlsConfig
               type: object
             status:
               description: DataStoreStatus defines the observed state of DataStore.
               properties:
                 usedBy:
-                  description: List of the Tenant Control Planes, namespaced named, using this data store.
+                  description: List of the Tenant Control Planes, namespaced named,
+                    using this data store.
                   items:
                     type: string
                   type: array
