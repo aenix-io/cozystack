@@ -1,4 +1,4 @@
-UBUNTU_CONTAINER_DISK_TAG = v1.29.1
+UBUNTU_CONTAINER_DISK_TAG = v1.30.1
 
 include ../../../scripts/common-envs.mk
 

@@ -32,17 +32,7 @@
       }
     }
   },
-  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/yscjdwk0a8zfgvypn9gfzoeqj",
-  "containerimage.config.digest": "sha256:62f92e19bf0610f85515bef28db8465650a25346472f52360736ad3a49ce7529",
-  "containerimage.descriptor": {
-    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:f1176049da8651f438b2035c5a2cb6fd253ae868c4640e56785c91364069e0d8",
-    "size": 506,
-    "platform": {
-      "architecture": "amd64",
-      "os": "linux"
-    }
-  },
-  "containerimage.digest": "sha256:f1176049da8651f438b2035c5a2cb6fd253ae868c4640e56785c91364069e0d8",
-  "image.name": "ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.29.1,ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.29.1-v0.8.0"
+  "buildx.build.ref": "amd64/amd64/ue2wioxbkuzsgxhir5c3qgwoh",
+  "containerimage.config.digest": "sha256:363589eb47379eb7548f047aae24045278f14db0b2026022b6bec33a04370f15",
+  "containerimage.digest": "sha256:f242fd77903f5f5a94ed157e98b0c4532e5ba91734d9653eaf26cfe4b23b017b"
 }
