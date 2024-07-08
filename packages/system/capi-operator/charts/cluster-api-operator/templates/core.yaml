@@ -37,11 +37,21 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "2"
+    "argocd.argoproj.io/sync-wave": "2"
 {{- if or $coreVersion $.Values.configSecret.name }}
 spec:
 {{- end}}
 {{- if $coreVersion }}
   version: {{ $coreVersion }}
+{{- end }}
+{{- if $.Values.manager }}
+  manager:
+{{- if and $.Values.manager.featureGates $.Values.manager.featureGates.core }}
+    featureGates:
+    {{- range $key, $value := $.Values.manager.featureGates.core }}
+      {{ $key }}: {{ $value }}
+    {{- end }}
+{{- end }}
 {{- end }}
 {{- if $.Values.configSecret.name }}
   configSecret:
