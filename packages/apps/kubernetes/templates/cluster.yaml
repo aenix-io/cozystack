@@ -2,6 +2,58 @@
 {{- $etcd := index $myNS.metadata.annotations "namespace.cozystack.io/etcd" }}
 {{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
 {{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
+{{- $kubevirtmachinetemplateNames := list }}
+{{- define "kubevirtmachinetemplate" -}}
+spec:
+  virtualMachineBootstrapCheck:
+    checkStrategy: ssh
+  virtualMachineTemplate:
+    metadata:
+      namespace: {{ $.Release.Namespace }}
+      labels:
+        {{- range .group.roles }}
+        node-role.kubernetes.io/{{ . }}: ""
+        {{- end }}
+    spec:
+      runStrategy: Always
+      template:
+        spec:
+          domain:
+            cpu:
+              threads: 1
+              cores: {{ .group.resources.cpu }}
+              sockets: 1
+            devices:
+              disks:
+              - name: system
+                disk:
+                  bus: virtio
+                  pciAddress: 0000:07:00.0
+              - name: containerd
+                disk:
+                  bus: virtio
+                  pciAddress: 0000:08:00.0
+              - name: kubelet
+                disk:
+                  bus: virtio
+                  pciAddress: 0000:09:00.0
+              networkInterfaceMultiqueue: true
+            memory:
+              guest: {{ .group.resources.memory }}
+          evictionStrategy: External
+          volumes:
+          - name: system
+            containerDisk:
+              image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}@{{ index ($.Files.Get "images/ubuntu-container-disk.json" | fromJson) "containerimage.digest" }}"
+          - name: containerd
+            emptyDisk:
+              capacity: 20Gi
+          - name: kubelet
+            emptyDisk:
+              capacity: 20Gi
+{{- end }}
+
+
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
@@ -101,60 +153,20 @@ spec:
         skipPhases:
         - addon/kube-proxy
 ---
+{{- $context := deepCopy $ }}
+{{- $_ := set $context "group" $group }}
+{{- $kubevirtmachinetemplate := include "kubevirtmachinetemplate" $context }}
+{{- $kubevirtmachinetemplateHash := $kubevirtmachinetemplate | sha256sum | trunc 6 }}
+{{- $kubevirtmachinetemplateName := printf "%s-%s-%s" $.Release.Name $groupName $kubevirtmachinetemplateHash }}
+{{- $kubevirtmachinetemplateNames = append $kubevirtmachinetemplateNames $kubevirtmachinetemplateName }}
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: KubevirtMachineTemplate
 metadata:
-  name: {{ $.Release.Name }}-{{ $groupName }}
+  name: {{ $.Release.Name }}-{{ $groupName }}-{{ $kubevirtmachinetemplateHash }}
   namespace: {{ $.Release.Namespace }}
 spec:
   template:
-    spec:
-      virtualMachineBootstrapCheck:
-        checkStrategy: ssh
-      virtualMachineTemplate:
-        metadata:
-          namespace: {{ $.Release.Namespace }}
-          labels:
-            {{- range $group.roles }}
-            node-role.kubernetes.io/{{ . }}: ""
-            {{- end }}
-        spec:
-          runStrategy: Always
-          template:
-            spec:
-              domain:
-                cpu:
-                  threads: 1
-                  cores: {{ $group.resources.cpu }}
-                  sockets: 1
-                devices:
-                  disks:
-                  - name: system
-                    disk:
-                      bus: virtio
-                      pciAddress: 0000:07:00.0
-                  - name: containerd
-                    disk:
-                      bus: virtio
-                      pciAddress: 0000:08:00.0
-                  - name: kubelet
-                    disk:
-                      bus: virtio
-                      pciAddress: 0000:09:00.0
-                  networkInterfaceMultiqueue: true
-                memory:
-                  guest: {{ $group.resources.memory }}
-              evictionStrategy: External
-              volumes:
-              - name: system
-                containerDisk:
-                  image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}@{{ index ($.Files.Get "images/ubuntu-container-disk.json" | fromJson) "containerimage.digest" }}"
-              - name: containerd
-                emptyDisk:
-                  capacity: 20Gi
-              - name: kubelet
-                emptyDisk:
-                  capacity: 20Gi
+    {{- $kubevirtmachinetemplate | nindent 4 }}
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
@@ -171,6 +183,8 @@ spec:
   template:
     metadata:
       labels:
+        cluster.x-k8s.io/cluster-name: {{ $.Release.Name }}
+        cluster.x-k8s.io/deployment-name: {{ $.Release.Name }}-{{ $groupName }}
         {{- range $group.roles }}
         node-role.kubernetes.io/{{ . }}: ""
         {{- end }}
@@ -180,12 +194,42 @@ spec:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
           kind: KubeadmConfigTemplate
           name: {{ $.Release.Name }}-{{ $groupName }}
-          namespace: default
+          namespace: {{ $.Release.Namespace }}
       clusterName: {{ $.Release.Name }}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
         kind: KubevirtMachineTemplate
-        name: {{ $.Release.Name }}-{{ $groupName }}
+        name: {{ $.Release.Name }}-{{ $groupName }}-{{ $kubevirtmachinetemplateHash }}
         namespace: default
       version: v1.29.4
+{{- end }}
+---
+{{- /*
+We must preserve all previous KubevirtMachineTemplates until a MachineSet references them.
+*/ -}}
+{{- $mss := (lookup "cluster.x-k8s.io/v1beta1" "MachineSet" $.Release.Namespace "").items }}
+{{- $oldKubevirtmachinetemplates := dict }}
+{{- range $kmt := (lookup "infrastructure.cluster.x-k8s.io/v1alpha1" "KubevirtMachineTemplate" .Release.Namespace "").items }}
+{{- range $or := $kmt.metadata.ownerReferences }}
+{{- if and (eq $or.kind "Cluster") (eq $or.name $.Release.Name) }}
+{{- range $ms := $mss }}
+{{- if and (eq $ms.spec.template.spec.infrastructureRef.kind "KubevirtMachineTemplate") (eq $ms.spec.template.spec.infrastructureRef.name $kmt.metadata.name) }}
+{{- if not (has $kmt.metadata.name $kubevirtmachinetemplateNames) }}
+{{- $oldKubevirtmachinetemplates = merge $oldKubevirtmachinetemplates (dict $kmt.metadata.name $kmt) }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- range $oldKubevirtmachinetemplates }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: KubevirtMachineTemplate
+metadata:
+  name: {{ .metadata.name }}
+  namespace: {{ .metadata.Namespace }}
+spec:
+  {{- .spec | toYaml | nindent 2 }}
 {{- end }}
