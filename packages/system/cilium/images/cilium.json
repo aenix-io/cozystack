@@ -11,7 +11,7 @@
       {
         "uri": "pkg:docker/golang@1.22-bookworm?platform=linux%2Famd64",
         "digest": {
-          "sha256": "7dcf6f2084586b44844aea8615db684c9361cf6bebf235a1750595633ed021bd"
+          "sha256": "6c2780255bb7b881e904e303be0d7a079054160b2ce1efde446693c0850a39ad"
         }
       },
       {
@@ -45,17 +45,7 @@
       }
     }
   },
-  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/fsidbune5vw82lhgf2ofhwo0g",
-  "containerimage.config.digest": "sha256:79635c7d6c1f3a457406d39590ee94168caa925eae7a82bac4fed42e751f135d",
-  "containerimage.descriptor": {
-    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:3cee2f43abcc7ae34dddf589345b871d4eb6a4f0281c7758844b05c7c5ec4965",
-    "size": 2083,
-    "platform": {
-      "architecture": "amd64",
-      "os": "linux"
-    }
-  },
-  "containerimage.digest": "sha256:3cee2f43abcc7ae34dddf589345b871d4eb6a4f0281c7758844b05c7c5ec4965",
-  "image.name": "ghcr.io/aenix-io/cozystack/cilium:1.15.5,ghcr.io/aenix-io/cozystack/cilium:1.15.5-v0.8.0"
+  "buildx.build.ref": "amd64/amd64/ydz7c2pwlqaadvlo84t1spegq",
+  "containerimage.config.digest": "sha256:1f918c5f4bd8a1c90596b7d4256c8a208482141ae3363ab0b4627203b3fa3b32",
+  "containerimage.digest": "sha256:90e2235e75febcac777c0338fa93d5e7522d82d029facb0c318305ed178a42ac"
 }

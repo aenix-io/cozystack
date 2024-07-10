@@ -32,7 +32,7 @@
       }
     }
   },
-  "buildx.build.ref": "amd64/amd64/ue2wioxbkuzsgxhir5c3qgwoh",
+  "buildx.build.ref": "amd64/amd64/kk2drcq44gorgb3xwa8908pfc",
   "containerimage.config.digest": "sha256:363589eb47379eb7548f047aae24045278f14db0b2026022b6bec33a04370f15",
   "containerimage.digest": "sha256:f242fd77903f5f5a94ed157e98b0c4532e5ba91734d9653eaf26cfe4b23b017b"
 }

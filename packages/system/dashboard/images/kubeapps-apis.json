@@ -41,17 +41,7 @@
       }
     }
   },
-  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/ggf28zo7pywc734xde1oado8l",
-  "containerimage.config.digest": "sha256:62c4a42cb62f918a2e4bb295f6faaceb96a2dae7fb8cf4bd6850bc072064b4ce",
-  "containerimage.descriptor": {
-    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:a5eab0f2a900ac1963b24bbdbe35bffbee7ba146c86742d6e8bea8c070610d9c",
-    "size": 1890,
-    "platform": {
-      "architecture": "amd64",
-      "os": "linux"
-    }
-  },
-  "containerimage.digest": "sha256:a5eab0f2a900ac1963b24bbdbe35bffbee7ba146c86742d6e8bea8c070610d9c",
-  "image.name": "ghcr.io/aenix-io/cozystack/kubeapps-apis:v0.8.0"
+  "buildx.build.ref": "amd64/amd64/p2w3cwt8rnd7ivkbmg86ugjj0",
+  "containerimage.config.digest": "sha256:28621d87b70bc82caf060b33313051703456a2915e95371bcbe5c0e1e5b9daa3",
+  "containerimage.digest": "sha256:1b6826f030c6d288f9d91476b636300e544bbf55687e59f6de1765d1320faf7b"
 }
