@@ -14,6 +14,29 @@
             "items": {
                 "type": "string"
             }
+        },
+        "whitelist": {
+            "type": "object",
+            "properties": {
+                "whitelistHTTP": {
+                    "type": "boolean",
+                    "description": "Secure HTTP by enabling client networks whitelisting",
+                    "default": false
+                },
+                "whitelistSourceRange": {
+                    "type": "array",
+                    "description": "List of client IPs",
+                    "default": "[]",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "clouflareProxy": {
+            "type": "boolean",
+            "description": "Restoring original visitor IPs when Cloudflare proxied is enabled",
+            "default": false
         }
     }
 }
