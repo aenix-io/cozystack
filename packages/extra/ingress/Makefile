@@ -4,7 +4,7 @@ get-cloudflare-ips:
 	cat ips-v4.tmp ips-v6.tmp | tr '\n' ',' | sed 's/,$$//' | sed 's/^/"/;s/$$/"/' > ips-merged.tmp
 	rm ips-v4.tmp ips-v6.tmp
 	IP_LIST=$$(cat ips-merged.tmp); \
-	sed -i '' -e '/proxy-real-ip-cidr: "[^"]*"/s|proxy-real-ip-cidr: "[^"]*"|proxy-real-ip-cidr: '"$$IP_LIST"'|' templates/nginx-ingress.yaml
+	sed -i '' -e '/set_real_ip_from: "[^"]*"/s|set_real_ip_from: "[^"]*"|set_real_ip_from: '"$$IP_LIST"'|' templates/nginx-ingress.yaml
 	rm ips-merged.tmp
 
 
