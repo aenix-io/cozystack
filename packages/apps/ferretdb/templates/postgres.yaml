@@ -1,0 +1,45 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Release.Name }}-postgres
+spec:
+  instances: {{ .Values.replicas }}
+  enableSuperuserAccess: true
+
+  minSyncReplicas: {{ .Values.quorum.minSyncReplicas }}
+  maxSyncReplicas: {{ .Values.quorum.maxSyncReplicas }}
+
+  monitoring:
+    enablePodMonitor: true
+
+  storage:
+    size: {{ required ".Values.size is required" .Values.size }}
+
+  {{- if .Values.users }}
+  managed:
+    roles:
+    {{- range $user, $config := .Values.users }}
+    - name: {{ $user }}
+      ensure: present
+      passwordSecret:
+        name: {{ printf "%s-user-%s" $.Release.Name $user }}
+      login: true
+      inRoles:
+      - app
+    {{- end }}
+  {{- end }}
+
+{{- range $user, $config := .Values.users }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ printf "%s-user-%s" $.Release.Name $user }}
+  labels:
+    cnpg.io/reload: "true"
+type: kubernetes.io/basic-auth
+data:
+  username: {{ $user | b64enc }}
+  password: {{ $config.password | b64enc }}
+{{- end }}
