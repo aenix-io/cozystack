@@ -20,6 +20,8 @@ repos:
 	make -C packages/system repo
 	make -C packages/apps repo
 	make -C packages/extra repo
+	mkdir -p _out/logos
+	cp ./packages/apps/*/logos/*.svg ./packages/extra/*/logos/*.svg _out/logos/
 
 assets:
 	make -C packages/core/installer/ assets

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: clickhouse
 description: Managed ClickHouse service
-icon: https://cdn.worldvectorlogo.com/logos/clickhouse.svg
+icon: /logos/clickhouse.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

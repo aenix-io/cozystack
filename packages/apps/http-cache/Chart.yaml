@@ -1,7 +1,7 @@
 apiVersion: v2
 name: http-cache
 description: Layer7 load balacner and caching service
-icon: https://www.svgrepo.com/show/373924/nginx.svg
+icon: /logos/nginx.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: ferretdb
 description: Managed FerretDB service
-icon: ferretdb.svg
+icon: /logos/ferretdb.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #
