@@ -1,7 +1,7 @@
 ingress-nginx:
   controller:
     extraArgs:
-      enable-ssl-passthrough: true
+      enable-ssl-passthrough: ""
     image:
       registry: ghcr.io
       image: kvaps/ingress-nginx-with-protobuf-exporter/controller
@@ -32,8 +32,8 @@ ingress-nginx:
       #real-ip-header: "proxy_protocol"
       #enable-real-ip: "true"
       # keep-alive
-      proxy-connect-timeout: "10s"
-      proxy-read-timeout: "10s"
+      proxy-connect-timeout: "10"
+      proxy-read-timeout: "10"
       keep-alive-requests: "1000000"
       upstream-keepalive-requests: "100000"
       upstream-keepalive-time: '1m'

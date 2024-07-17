@@ -1,6 +1,19 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 
 releases:
+- name: fluxcd-operator
+  releaseName: fluxcd-operator
+  chart: cozy-fluxcd-operator
+  namespace: cozy-fluxcd
+  privileged: true
+  dependsOn: []
+
+- name: fluxcd
+  releaseName: fluxcd
+  chart: cozy-fluxcd
+  namespace: cozy-fluxcd
+  dependsOn: [fluxcd-operator,cilium,kubeovn]
+
 - name: cilium
   releaseName: cilium
   chart: cozy-cilium
@@ -153,8 +166,8 @@ releases:
   chart: cozy-dashboard
   namespace: cozy-dashboard
   dependsOn: [cilium,kubeovn]
-  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1beta2" }}
-  {{- with (lookup "source.toolkit.fluxcd.io/v1beta2" "HelmRepository" "cozy-public" "").items }}
+  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
+  {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
   values:
     kubeapps:
       redis:

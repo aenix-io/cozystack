@@ -9,6 +9,7 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "1"
+    "argocd.argoproj.io/sync-wave": "1"
   name: capi-kubeadm-bootstrap-system
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
@@ -19,6 +20,7 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "2"
+    "argocd.argoproj.io/sync-wave": "2"
 {{- with .Values.configSecret }}
 spec:
   configSecret:
@@ -37,6 +39,7 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "1"
+    "argocd.argoproj.io/sync-wave": "1"
   name: capi-kubeadm-control-plane-system
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
@@ -47,6 +50,7 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "2"
+    "argocd.argoproj.io/sync-wave": "2"
 {{- with .Values.configSecret }}
 spec:
   configSecret:

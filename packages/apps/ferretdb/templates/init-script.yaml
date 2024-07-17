@@ -1,0 +1,101 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-init-script
+stringData:
+  init.sh: |
+    #!/bin/bash
+    set -e
+    echo "== create users"
+    {{- if .Values.users }}
+    psql -v ON_ERROR_STOP=1 <<\EOT
+    {{- range $user, $u := .Values.users }}
+    SELECT 'CREATE ROLE {{ $user }} LOGIN INHERIT;'
+    WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ $user }}')\gexec
+    ALTER ROLE {{ $user }} WITH PASSWORD '{{ $u.password }}' LOGIN INHERIT {{ ternary "REPLICATION" "NOREPLICATION" (default false $u.replication) }};
+    COMMENT ON ROLE {{ $user }} IS 'user managed by helm';
+    {{- end }}
+    EOT
+    {{- end }}
+
+    echo "== delete users"
+    MANAGED_USERS=$(echo '\du+' | psql | awk -F'|' '$4 == " user managed by helm" {print $1}' | awk NF=NF RS= OFS=' ')
+    DEFINED_USERS="{{ join " " (keys .Values.users) }}"
+    DELETE_USERS=$(for user in $MANAGED_USERS; do case " $DEFINED_USERS " in *" $user "*) :;; *) echo $user;; esac; done)
+
+    echo "users to delete: $DELETE_USERS"
+    for user in $DELETE_USERS; do
+    # https://stackoverflow.com/a/51257346/2931267
+    psql -v ON_ERROR_STOP=1 --echo-all <<EOT
+    REASSIGN OWNED BY $user TO postgres;
+    DROP OWNED BY $user;
+    DROP USER $user;
+    EOT
+    done
+    
+    echo "== create roles"
+    psql -v ON_ERROR_STOP=1 --echo-all <<\EOT
+    SELECT 'CREATE ROLE app_admin NOINHERIT;'
+    WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'app_admin')\gexec
+    COMMENT ON ROLE app_admin IS 'role managed by helm';
+    EOT
+
+    echo "== grant privileges on databases to roles"
+    psql -v ON_ERROR_STOP=1 --echo-all -d "app" <<\EOT
+    ALTER DATABASE app OWNER TO app_admin;
+
+    DO $$
+    DECLARE
+        schema_record record;
+    BEGIN
+        -- Loop over all schemas
+        FOR schema_record IN SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema') LOOP
+            -- Changing Schema Ownership
+            EXECUTE format('ALTER SCHEMA %I OWNER TO %I', schema_record.schema_name, 'app_admin');
+    
+            -- Add rights for the admin role
+            EXECUTE format('GRANT ALL ON SCHEMA %I TO %I', schema_record.schema_name, 'app_admin');
+            EXECUTE format('GRANT ALL ON ALL TABLES IN SCHEMA %I TO %I', schema_record.schema_name, 'app_admin');
+            EXECUTE format('GRANT ALL ON ALL SEQUENCES IN SCHEMA %I TO %I', schema_record.schema_name, 'app_admin');
+            EXECUTE format('GRANT ALL ON ALL FUNCTIONS IN SCHEMA %I TO %I', schema_record.schema_name, 'app_admin');
+            EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON TABLES TO %I', schema_record.schema_name, 'app_admin');
+            EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON SEQUENCES TO %I', schema_record.schema_name, 'app_admin');
+            EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON FUNCTIONS TO %I', schema_record.schema_name, 'app_admin');
+        END LOOP;
+    END$$;
+    EOT
+
+    echo "== setup event trigger for schema creation"
+    psql -v ON_ERROR_STOP=1 --echo-all -d "app" <<\EOT
+    CREATE OR REPLACE FUNCTION auto_grant_schema_privileges()
+    RETURNS event_trigger LANGUAGE plpgsql AS $$
+    DECLARE
+      obj record;
+    BEGIN
+      FOR obj IN SELECT * FROM pg_event_trigger_ddl_commands() WHERE command_tag = 'CREATE SCHEMA' LOOP
+        -- Set owner for schema
+        EXECUTE format('ALTER SCHEMA %I OWNER TO %I', obj.object_identity, 'app_admin');
+
+        -- Set privileges for admin role
+        EXECUTE format('GRANT ALL ON SCHEMA %I TO %I', obj.object_identity, 'app_admin');
+        EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON TABLES TO %I', obj.object_identity, 'app_admin');
+        EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON SEQUENCES TO %I', obj.object_identity, 'app_admin');
+        EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON FUNCTIONS TO %I', obj.object_identity, 'app_admin');
+      END LOOP;
+    END;
+    $$;
+
+    DROP EVENT TRIGGER IF EXISTS trigger_auto_grant;
+    CREATE EVENT TRIGGER trigger_auto_grant ON ddl_command_end
+    WHEN TAG IN ('CREATE SCHEMA')
+    EXECUTE PROCEDURE auto_grant_schema_privileges();
+    EOT
+
+    echo "== assign roles to users"
+    psql -v ON_ERROR_STOP=1 --echo-all <<\EOT
+    GRANT app_admin TO app;
+    {{- range $user, $u := $.Values.users }}
+    GRANT app_admin TO {{ $user }};
+    {{- end }}
+    EOT

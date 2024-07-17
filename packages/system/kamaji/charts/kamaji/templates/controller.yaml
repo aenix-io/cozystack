@@ -34,6 +34,9 @@ spec:
         - --metrics-bind-address={{ .Values.metricsBindAddress }}
         - --tmp-directory={{ .Values.temporaryDirectoryPath }}
         - --datastore={{ include "datastore.fullname" . }}
+        {{- if .Values.telemetry.disabled }}
+        - --disable-telemetry
+        {{- end }}
         {{- if .Values.loggingDevel.enable }}
         - --zap-devel
         {{- end }}

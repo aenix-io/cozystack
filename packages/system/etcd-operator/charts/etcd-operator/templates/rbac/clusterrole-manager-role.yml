@@ -20,6 +20,22 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - list
+      - get
+      - watch
+  - apiGroups:
+      - ""
+    resources:
       - services
     verbs:
       - create

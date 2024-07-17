@@ -1,4 +1,38 @@
 {
-  "containerimage.config.digest": "sha256:24cee18d0bc9ed40e741412da86820dd99bdb9ffa4c794c81856725a4a10d86e",
-  "containerimage.digest": "sha256:6a43369905e0630bb401e1cf73084bbef3060e960756f261676cd3bea4195e9a"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/ubuntu@22.04?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "340d9b015b194dc6e2a13938944e0d016e57b9679963fdeb9ce021daac430221"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "args": {
+          "build-arg:ARCH": "amd64"
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "amd64/amd64/kk2drcq44gorgb3xwa8908pfc",
+  "containerimage.config.digest": "sha256:363589eb47379eb7548f047aae24045278f14db0b2026022b6bec33a04370f15",
+  "containerimage.digest": "sha256:f242fd77903f5f5a94ed157e98b0c4532e5ba91734d9653eaf26cfe4b23b017b"
 }

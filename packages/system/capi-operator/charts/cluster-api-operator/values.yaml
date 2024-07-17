@@ -1,10 +1,4 @@
 ---
-# Cert Manager options
-# Full list of supported values is available at https://artifacthub.io/packages/helm/cert-manager/cert-manager
-cert-manager:
-  enabled: false
-  fullnameOverride: "cert-manager"
-  namespace: "cert-manager"
 # ---
 # Cluster API provider options
 core: ""
@@ -12,6 +6,7 @@ bootstrap: ""
 controlPlane: ""
 infrastructure: ""
 addon: ""
+manager.featureGates: {}
 # ---
 # Common configuration secret options
 configSecret: {}
@@ -24,8 +19,10 @@ leaderElection:
 image:
   manager:
     repository: registry.k8s.io/capi-operator/cluster-api-operator
-    tag: v0.8.1
+    tag: v0.11.0
     pullPolicy: IfNotPresent
+env:
+  manager: []
 healthAddr: ":8081"
 metricsBindAddr: "127.0.0.1:8080"
 diagnosticsAddress: "8443"

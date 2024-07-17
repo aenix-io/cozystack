@@ -16,6 +16,47 @@
                     "default": 2
                 }
             }
+        },
+        "addons": {
+            "type": "object",
+            "properties": {
+                "certManager": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables the cert-manager",
+                            "default": false
+                        }
+                    }
+                },
+                "ingressNginx": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)",
+                            "default": false
+                        },
+                        "hosts": {
+                            "type": "array",
+                            "description": "List of domain names that should be passed through to the cluster by upper cluster",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "fluxcd": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables Flux CD",
+                            "default": false
+                        }
+                    }
+                }
+            }
         }
     }
 }

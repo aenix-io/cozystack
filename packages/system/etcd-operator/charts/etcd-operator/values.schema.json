@@ -256,14 +256,6 @@
         "replicaCount": {
             "type": "integer"
         },
-        "securityContext": {
-            "properties": {
-                "runAsNonRoot": {
-                    "type": "boolean"
-                }
-            },
-            "type": "object"
-        },
         "serviceAccount": {
             "properties": {
                 "annotations": {

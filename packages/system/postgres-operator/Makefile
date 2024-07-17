@@ -1,5 +1,5 @@
-NAME=postgres-operator
-NAMESPACE=cozy-$(NAME)
+export NAME=postgres-operator
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/package-system.mk
 

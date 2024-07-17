@@ -93,6 +93,8 @@ tolerations:
     effect: NoSchedule
 affinity: { }
 
+priorityClassName: ""
+
 podDisruptionBudget:
   enabled: true
   minAvailable: 1

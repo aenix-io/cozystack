@@ -1,5 +1,5 @@
-NAME=grafana-operator
-NAMESPACE=cozy-grafana-operator
+export NAME=grafana-operator
+export NAMESPACE=cozy-grafana-operator
 
 include ../../../scripts/package-system.mk
 

@@ -16,3 +16,36 @@ nodeGroups:
     resources:
       cpu: 2
       memory: 1024Mi
+    roles:
+    - ingress-nginx
+
+## @section Cluster Addons
+##
+addons:
+
+  ## Cert-manager: automatically creates and manages SSL/TLS certificate
+  ##
+  certManager:
+    ## @param addons.certManager.enabled Enables the cert-manager
+    enabled: false
+
+  ## Ingress-NGINX Controller
+  ##
+  ingressNginx:
+    ## @param addons.ingressNginx.enabled Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)
+    ##
+    enabled: false
+    ## @param addons.ingressNginx.hosts List of domain names that should be passed through to the cluster by upper cluster
+    ## e.g:
+    ## hosts:
+    ## - example.org
+    ## - foo.example.net
+    ##
+    hosts: []
+
+  ## Flux CD
+  ##
+  fluxcd:
+    ## @param addons.fluxcd.enabled Enables Flux CD
+    ##
+    enabled: false
