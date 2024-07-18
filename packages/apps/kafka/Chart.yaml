@@ -1,7 +1,7 @@
 apiVersion: v2
 name: kafka
 description: Managed Kafka service
-icon: https://upload.wikimedia.org/wikipedia/commons/0/05/Apache_kafka.svg
+icon: /logos/kafka.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

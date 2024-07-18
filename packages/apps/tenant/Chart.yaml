@@ -1,7 +1,7 @@
 apiVersion: v2
 name: tenant
 description: Separated tenant namespace
-icon: https://upload.wikimedia.org/wikipedia/commons/0/04/User_icon_1.svg
+icon: /logos/tenant.svg
 
 type: application
 version: 1.2.0

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: postgres
 description: Managed PostgreSQL service
-icon: https://cdn-icons-png.flaticon.com/512/5968/5968342.png
+icon: /logos/postgres.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #
