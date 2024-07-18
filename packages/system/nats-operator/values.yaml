@@ -1,0 +1,6 @@
+nats-operator:
+  clusterScoped: true
+  cluster:
+    create: true
+    metrics:
+      enabled: true

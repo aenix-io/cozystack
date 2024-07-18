@@ -1,0 +1,25 @@
+{
+  "users": [
+    {{- if and (.Values.cluster.auth.username) (not .Values.cluster.auth.users) }}
+    {
+      "username": "{{ .Values.cluster.auth.username }}",
+      "password": "{{ .Values.cluster.auth.password }}"
+    }
+    {{- end }}
+
+    {{- if .Values.cluster.auth.users }}
+    {{ $length := len .Values.cluster.auth.users }}
+    {{- range $index, $user := .Values.cluster.auth.users }}
+    {
+      "username": "{{ $user.username }}",
+      "password": "{{ $user.password }}"
+      {{- if $user.permissions }},
+      "permissions": {{ toJson $user.permissions | replace "\\u003e" ">"}}
+      {{- end}}
+    }{{- if lt (add1 $index) $length }},{{ end }}
+    {{- end}}
+    {{- end }}
+  ]{{- if .Values.cluster.auth.defaultPermissions }},
+  "default_permissions": {{ toJson .Values.cluster.auth.defaultPermissions | replace "\\u003e" ">" }}
+  {{- end}}
+}

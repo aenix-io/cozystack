@@ -1,0 +1,26 @@
+** Please be patient while the chart is being deployed **
+{{- if .Values.clusterScoped }}
+
+** WARNING ! **: You've installed a cluster-scoped NATS Operator. Make sure that there are no other deployments of NATS Operator in the Kubernetes cluster.
+{{- if not (eq .Release.Namespace "nats-io") }}
+
+** WARNING ! **: The namespace must be "nats-io" however you used "{{ .Release.Namespace }}" !
+{{- end }}
+{{- end}}
+
+NATS can be accessed via port 4222 on the following DNS name from within your cluster:
+
+   nats-cluster.{{ .Release.Namespace }}.svc.cluster.local
+
+NATS monitoring service can be accessed via port 8222 on the following DNS name from within your cluster:
+
+    nats-cluster-mgmt.{{ .Release.Namespace }}.svc.cluster.local
+
+To access the Monitoring svc from outside the cluster, follow the steps below:
+
+1. Get the name of a pod from the cluster that was deployed, then use port-forward to connect top it. For example:
+
+    kubectl get pods -l nats_cluster=nats-cluster
+    kubectl port-forward nats-cluster-1 8222
+
+2. Open a browser and access the NATS monitoring browsing to the Monitoring URL

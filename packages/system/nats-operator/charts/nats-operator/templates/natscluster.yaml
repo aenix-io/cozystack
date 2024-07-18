@@ -1,0 +1,70 @@
+---
+{{- if .Values.cluster.create }}
+apiVersion: "nats.io/v1alpha2"
+kind: "NatsCluster"
+metadata:
+  name: {{ .Values.cluster.name }}
+{{- if and .Values.clusterScoped .Values.cluster.namespace }}
+  namespace: {{ .Values.cluster.namespace }}
+{{- end }}
+spec:
+  size: {{ .Values.cluster.size }}
+  version: {{ .Values.cluster.version }}
+
+  pod:
+    {{- if .Values.cluster.annotations }}
+    annotations: {{ toYaml .Values.cluster.annotations | nindent 6 }}
+    {{- end }}
+    {{- if .Values.cluster.resources }}
+    resources: {{ toYaml .Values.cluster.resources | nindent 6 }}
+    {{- end }}
+    enableConfigReload: {{ .Values.cluster.configReload.enabled }}
+    reloaderImage: {{ .Values.cluster.configReload.repository }}
+    reloaderImageTag: {{ .Values.cluster.configReload.tag }}
+    reloaderImagePullPolicy: {{ .Values.cluster.configReload.pullPolicy }}
+    {{- if .Values.cluster.configReload.resources }}
+    reloaderResources: {{ toYaml .Values.cluster.configReload.resources | nindent 6 }}
+    {{- end }}
+    enableMetrics: {{ .Values.cluster.metrics.enabled }}
+    metricsImage: {{ .Values.cluster.metrics.repository }}
+    metricsImageTag: {{ .Values.cluster.metrics.tag }}
+    metricsImagePullPolicy: {{ .Values.cluster.metrics.pullPolicy }}
+  {{- if .Values.cluster.auth.enabled }}
+  auth:
+    enableServiceAccounts: {{ .Values.cluster.auth.enableServiceAccounts }}
+    clientsAuthSecret: {{ .Values.cluster.name }}-clients-auth
+    clientsAuthTimeout: 5
+  {{- end }}
+
+  {{- if .Values.cluster.tls.enabled }}
+  tls:
+    # Certificates to secure the NATS client connections:
+    serverSecret: {{ .Values.cluster.tls.serverSecret }}
+
+    # Certificates to secure the routes.
+    routesSecret: {{ .Values.cluster.tls.routesSecret }}
+  {{- end }}
+---
+{{- if and .Values.cluster.metrics.enabled .Values.cluster.metrics.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Values.cluster.name }}
+{{- if and .Values.clusterScoped .Values.cluster.namespace }}
+  namespace: {{ .Values.cluster.namespace }}
+{{- end }}
+  labels:
+    app: nats
+    nats_cluster: {{ .Values.cluster.name }}
+    prometheus: {{ .Values.cluster.metrics.servicemonitor.prometheusInstance }}
+spec:
+  jobLabel: nats-{{ .Values.cluster.name }}
+  selector:
+    matchLabels:
+      app: nats
+      nats_cluster: {{ .Values.cluster.name }}
+  endpoints:
+  - port: metrics
+    interval: 60s
+{{- end }}
+{{- end }}
