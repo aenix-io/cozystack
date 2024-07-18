@@ -19,6 +19,7 @@ metadata:
   namespace: {{ $x.namespace }}
   labels:
     cozystack.io/repository: system
+    cozystack.io/system-app: "true"
 spec:
   interval: 5m
   releaseName: {{ $x.releaseName | default $x.name }}
