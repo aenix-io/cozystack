@@ -10,10 +10,15 @@ metadata:
     {{- with .Values.operator.prometheus.serviceMonitor.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  {{- if or .Values.operator.prometheus.serviceMonitor.annotations .Values.operator.annotations }}
   annotations:
-    {{- with .Values.operator.prometheus.serviceMonitor.annotations }}
-    {{- toYaml . | nindent 4 }}
+    {{- with .Values.operator.annotations }}
+      {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- with .Values.operator.prometheus.serviceMonitor.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
@@ -37,4 +42,7 @@ spec:
     {{- end }}
   targetLabels:
   - io.cilium/app
+{{- if .Values.operator.prometheus.serviceMonitor.jobLabel }}
+  jobLabel: {{ .Values.operator.prometheus.serviceMonitor.jobLabel | quote }}
+{{- end }}
 {{- end }}

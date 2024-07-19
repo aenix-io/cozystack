@@ -1,9 +1,28 @@
+
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param size Persistent Volume size
+## @param haproxy.replicas Number of HAProxy replicas
+## @param nginx.replicas Number of Nginx replicas
+##
 external: false
 size: 10Gi
-endpoints:
-  - 10.100.3.1:80
-  - 10.100.3.11:80
-  - 10.100.3.2:80
-  - 10.100.3.12:80
-  - 10.100.3.3:80
-  - 10.100.3.13:80
+haproxy:
+  replicas: 2
+nginx:
+  replicas: 2
+
+## @section Configuration parameters
+
+## @param endpoints Endpoints configuration
+## Example:
+## endpoints:
+##   - 10.100.3.1:80
+##   - 10.100.3.11:80
+##   - 10.100.3.2:80
+##   - 10.100.3.12:80
+##   - 10.100.3.3:80
+##   - 10.100.3.13:80
+##
+endpoints: []

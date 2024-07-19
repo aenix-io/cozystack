@@ -15,3 +15,12 @@ kubeapps:
       #serviceaccount-selector {
         display: none;
       }
+      .login-moreinfo {
+        display: none;
+      }
+      a[href="#/docs"] {
+        display: none;
+      }
+      .login-group .clr-form-control .clr-control-label {
+        display: none;
+      }

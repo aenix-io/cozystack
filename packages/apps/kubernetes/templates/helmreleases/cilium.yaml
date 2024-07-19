@@ -1,4 +1,4 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ .Release.Name }}-cilium
@@ -6,7 +6,7 @@ metadata:
     cozystack.io/repository: system
     coztstack.io/target-cluster-name: {{ .Release.Name }}
 spec:
-  interval: 1m
+  interval: 5m
   releaseName: cilium
   chart:
     spec:
@@ -23,10 +23,17 @@ spec:
   storageNamespace: cozy-cilium
   install:
     createNamespace: true
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
   values:
     cilium:
       tunnel: disabled
-      autoDirectNodeRoutes: true
+      autoDirectNodeRoutes: false
+      bpf:
+        masquerade: true
       cgroup:
         autoMount:
           enabled: true
@@ -38,9 +45,11 @@ spec:
         chainingMode: ~
         customConf: false
         configMap: ""
-      routingMode: native
+      routingMode: tunnel
       enableIPv4Masquerade: true
-      ipv4NativeRoutingCIDR: "10.244.0.0/16"
+      ipv4NativeRoutingCIDR: ""
   dependsOn:
+  {{- if lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" .Release.Namespace .Release.Name }}
   - name: {{ .Release.Name }}
     namespace: {{ .Release.Namespace }}
+  {{- end }}

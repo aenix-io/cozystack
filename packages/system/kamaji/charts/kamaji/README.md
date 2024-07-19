@@ -1,16 +1,16 @@
 # kamaji
 
-![Version: 0.14.1](https://img.shields.io/badge/Version-0.14.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.4.1](https://img.shields.io/badge/AppVersion-v0.4.1-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.0.0](https://img.shields.io/badge/AppVersion-v1.0.0-informational?style=flat-square)
 
-Kamaji is a Kubernetes Control Plane Manager.
+Kamaji is the Hosted Control Plane Manager for Kubernetes.
 
 ## Maintainers
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Dario Tranchitella | <dario@tranchitella.eu> |  |
+| Dario Tranchitella | <dario@tranchitella.eu> | <https://clastix.io> |
 | Massimiliano Giovagnoli | <me@maxgio.it> |  |
-| Adriano Pezzuto | <me@bsctl.io> |  |
+| Adriano Pezzuto | <me@bsctl.io> | <https://clastix.io> |
 
 ## Source Code
 
@@ -66,6 +66,8 @@ Here the values you can override:
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Kubernetes affinity rules to apply to Kamaji controller pods |
+| cfssl.image.repository | string | `"cfssl/cfssl"` |  |
+| cfssl.image.tag | string | `"latest"` |  |
 | datastore.basicAuth.passwordSecret.keyPath | string | `nil` | The Secret key where the data is stored. |
 | datastore.basicAuth.passwordSecret.name | string | `nil` | The name of the Secret containing the password used to connect to the relational database. |
 | datastore.basicAuth.passwordSecret.namespace | string | `nil` | The namespace of the Secret containing the password used to connect to the relational database. |
@@ -75,7 +77,7 @@ Here the values you can override:
 | datastore.driver | string | `"etcd"` | (string) The Kamaji Datastore driver, supported: etcd, MySQL, PostgreSQL (defaults=etcd). |
 | datastore.enabled | bool | `true` | (bool) Enable the Kamaji Datastore creation (default=true) |
 | datastore.endpoints | list | `[]` | (array) List of endpoints of the selected Datastore. When letting the Chart install the etcd datastore, this field is populated automatically. |
-| datastore.nameOverride | string | `nil` | The Datastore name override, if empty and enabled=true defaults to `default`, if enabled=false, this is the name of the Datastore to connect to.  |
+| datastore.nameOverride | string | `nil` | The Datastore name override, if empty and enabled=true defaults to `default`, if enabled=false, this is the name of the Datastore to connect to. |
 | datastore.tlsConfig.certificateAuthority.certificate.keyPath | string | `nil` | Key of the Secret which contains the content of the certificate. |
 | datastore.tlsConfig.certificateAuthority.certificate.name | string | `nil` | Name of the Secret containing the CA required to establish the mandatory SSL/TLS connection to the datastore. |
 | datastore.tlsConfig.certificateAuthority.certificate.namespace | string | `nil` | Namespace of the Secret containing the CA required to establish the mandatory SSL/TLS connection to the datastore. |
@@ -88,6 +90,7 @@ Here the values you can override:
 | datastore.tlsConfig.clientCertificate.privateKey.keyPath | string | `nil` | Key of the Secret which contains the content of the private key. |
 | datastore.tlsConfig.clientCertificate.privateKey.name | string | `nil` | Name of the Secret containing the client certificate private key required to establish the mandatory SSL/TLS connection to the datastore. |
 | datastore.tlsConfig.clientCertificate.privateKey.namespace | string | `nil` | Namespace of the Secret containing the client certificate private key required to establish the mandatory SSL/TLS connection to the datastore. |
+| datastore.tlsConfig.enabled | bool | `true` |  |
 | etcd.compactionInterval | int | `0` | ETCD Compaction interval (e.g. "5m0s"). (default: "0" (disabled)) |
 | etcd.deploy | bool | `true` | Install an etcd with enabled multi-tenancy along with Kamaji |
 | etcd.image | object | `{"pullPolicy":"IfNotPresent","repository":"quay.io/coreos/etcd","tag":"v3.5.6"}` | Install specific etcd image |
@@ -131,6 +134,7 @@ Here the values you can override:
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `"kamaji-controller-manager"` |  |
 | serviceMonitor.enabled | bool | `false` | Toggle the ServiceMonitor true if you have Prometheus Operator installed and configured |
+| telemetry | object | `{"disabled":false}` | Disable the analytics traces collection |
 | temporaryDirectoryPath | string | `"/tmp/kamaji"` | Directory which will be used to work with temporary files. (default "/tmp/kamaji") |
 | tolerations | list | `[]` | Kubernetes node taints that the Kamaji controller pods would tolerate |
 

@@ -60,7 +60,7 @@ etcd:
     # -- The custom annotations to add to the PVC
     customAnnotations: {}
     #  volumeType: local
-  
+
   # -- (array) Kubernetes affinity rules to apply to Kamaji etcd pods
   tolerations: []
 
@@ -162,7 +162,7 @@ loggingDevel:
 datastore:
   # -- (bool) Enable the Kamaji Datastore creation (default=true)
   enabled: true
-  # -- (string) The Datastore name override, if empty and enabled=true defaults to `default`, if enabled=false, this is the name of the Datastore to connect to. 
+  # -- (string) The Datastore name override, if empty and enabled=true defaults to `default`, if enabled=false, this is the name of the Datastore to connect to.
   nameOverride:
   # -- (string) The Kamaji Datastore driver, supported: etcd, MySQL, PostgreSQL (defaults=etcd).
   driver: etcd
@@ -184,6 +184,7 @@ datastore:
       # -- The Secret key where the data is stored.
       keyPath:
   tlsConfig:
+    enabled: true
     certificateAuthority:
       certificate:
         # -- Name of the Secret containing the CA required to establish the mandatory SSL/TLS connection to the datastore.
@@ -214,3 +215,13 @@ datastore:
         namespace:
         # -- Key of the Secret which contains the content of the private key.
         keyPath:
+
+cfssl:
+  image:
+    repository: cfssl/cfssl
+    tag: latest
+
+# -- Disable the analytics traces collection
+telemetry:
+  disabled: false 
+  

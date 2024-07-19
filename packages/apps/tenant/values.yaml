@@ -1,3 +1,9 @@
+## @section Common parameters
+
+## @param host The hostname used to access tenant services (defaults to using the tenant name as a subdomain for it's parent tenant host).
+## @param etcd Deploy own Etcd cluster
+## @param monitoring Deploy own Monitoring Stack
+## @param ingress Deploy own Ingress Controller
 host: ""
 etcd: false
 monitoring: false

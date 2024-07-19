@@ -1,5 +1,5 @@
 diff --git a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
-index fe7ca772d..3b46afbd1 100644
+index c489cb6ca..8884a6484 100644
 --- a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
 +++ b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
 @@ -29,8 +29,10 @@ import (
@@ -25,9 +25,9 @@ index fe7ca772d..3b46afbd1 100644
  		return nil, connecterror.FromK8sError("list", "HelmRelease", namespace+"/*", err)
  	} else {
  		return relList.Items, nil
-@@ -511,6 +516,9 @@ func (s *Server) newFluxHelmRelease(chart *models.Chart, targetName types.Namesp
+@@ -512,6 +517,9 @@ func (s *Server) newFluxHelmRelease(chart *models.Chart, targetName types.Namesp
  		ObjectMeta: metav1.ObjectMeta{
- 			Name:      chart.Name + "-" + targetName.Name,
+ 			Name:      targetName.Name,
  			Namespace: targetName.Namespace,
 +			Labels: map[string]string{
 +				"cozystack.io/ui": "true",
@@ -36,7 +36,7 @@ index fe7ca772d..3b46afbd1 100644
  		Spec: helmv2.HelmReleaseSpec{
  			Chart: helmv2.HelmChartTemplate{
 diff --git a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go
-index 1ab08c074..cd7b3b9aa 100644
+index 790b21514..539276a17 100644
 --- a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go
 +++ b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go
 @@ -32,6 +32,7 @@ import (
@@ -57,3 +57,13 @@ index 1ab08c074..cd7b3b9aa 100644
  	}
  	if err := client.List(backgroundCtx, &repoList, &listOptions); err != nil {
  		return nil, connecterror.FromK8sError("list", "HelmRepository", "", err)
+@@ -927,6 +929,9 @@ func newFluxHelmRepo(
+ 		ObjectMeta: metav1.ObjectMeta{
+ 			Name:      targetName.Name,
+ 			Namespace: targetName.Namespace,
++			Labels: map[string]string{
++				"cozystack.io/ui": "true",
++			},
+ 		},
+ 		Spec: sourcev1.HelmRepositorySpec{
+ 			URL:      url,

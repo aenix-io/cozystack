@@ -1,22 +1,23 @@
-PUSH := 1
-LOAD := 0
-REGISTRY := ghcr.io/aenix-io/cozystack
 NGINX_CACHE_TAG = v0.1.0
-TAG := v0.3.1
+
+include ../../../scripts/common-envs.mk
 
 image: image-nginx
 
 image-nginx:
 	docker buildx build --platform linux/amd64 --build-arg ARCH=amd64 images/nginx-cache \
 		--provenance false \
-		--tag $(REGISTRY)/nginx-cache:$(NGINX_CACHE_TAG) \
-		--tag $(REGISTRY)/nginx-cache:$(NGINX_CACHE_TAG)-$(TAG) \
-		--cache-from type=registry,ref=$(REGISTRY)/nginx-cache:$(NGINX_CACHE_TAG) \
+		--tag $(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG)) \
+		--tag $(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG)-$(TAG)) \
+		--cache-from type=registry,ref=$(REGISTRY)/nginx-cache:latest \
 		--cache-to type=inline \
 		--metadata-file images/nginx-cache.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/nginx-cache:$(NGINX_CACHE_TAG)" > images/nginx-cache.tag
+	echo "$(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG))" > images/nginx-cache.tag
+
+generate:
+	readme-generator -v values.yaml -s values.schema.json -r README.md
 
 update:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/chrislim2888/IP2Location-C-Library | awk -F'[/^]' 'END{print $$3}') && \

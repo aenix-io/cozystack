@@ -1,6 +1,19 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 
 releases:
+- name: fluxcd-operator
+  releaseName: fluxcd-operator
+  chart: cozy-fluxcd-operator
+  namespace: cozy-fluxcd
+  privileged: true
+  dependsOn: []
+
+- name: fluxcd
+  releaseName: fluxcd
+  chart: cozy-fluxcd
+  namespace: cozy-fluxcd
+  dependsOn: [fluxcd-operator]
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
@@ -26,6 +39,12 @@ releases:
   privileged: true
   dependsOn: [victoria-metrics-operator]
 
+- name: etcd-operator
+  releaseName: etcd-operator
+  chart: cozy-etcd-operator
+  namespace: cozy-etcd-operator
+  dependsOn: [cert-manager]
+
 - name: grafana-operator
   releaseName: grafana-operator
   chart: cozy-grafana-operator
@@ -48,13 +67,13 @@ releases:
   releaseName: kafka-operator
   chart: cozy-kafka-operator
   namespace: cozy-kafka-operator
-  dependsOn: [cilium,kubeovn]
+  dependsOn: []
 
 - name: clickhouse-operator
   releaseName: clickhouse-operator
   chart: cozy-clickhouse-operator
   namespace: cozy-clickhouse-operator
-  dependsOn: [cilium,kubeovn]
+  dependsOn: []
 
 - name: rabbitmq-operator
   releaseName: rabbitmq-operator
@@ -85,8 +104,8 @@ releases:
   chart: cozy-dashboard
   namespace: cozy-dashboard
   dependsOn: []
-  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1beta2" }}
-  {{- with (lookup "source.toolkit.fluxcd.io/v1beta2" "HelmRepository" "cozy-public" "").items }}
+  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
+  {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
   values:
     kubeapps:
       redis:

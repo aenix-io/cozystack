@@ -1,33 +1,64 @@
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param size Persistent Volume size
+## @param replicas Number of Postgres replicas
+##
 external: false
 size: 10Gi
+replicas: 2
 
-users:
-  user1:
-    password: strongpassword
-  user2:
-    password: hackme
-  airflow:
-    password: qwerty123
-  debezium:
-    replication: true
+## Configuration for the quorum-based synchronous replication
+## @param quorum.minSyncReplicas Minimum number of synchronous replicas that must acknowledge a transaction before it is considered committed.
+## @param quorum.maxSyncReplicas Maximum number of synchronous replicas that can acknowledge a transaction (must be lower than the number of instances).
+quorum:
+  minSyncReplicas: 0
+  maxSyncReplicas: 0
 
-databases:
+## @section Configuration parameters
 
-  myapp:
-    roles:
-      admin:
-      - user1
-      - debezium
-      readonly:
-      - user2
+## @param users [object] Users configuration
+## Example:
+## users:
+##   user1:
+##     password: strongpassword
+##   user2:
+##     password: hackme
+##   airflow:
+##     password: qwerty123
+##   debezium:
+##     replication: true
+##
+users: {}
 
-  airflow:
-    roles:
-      admin:
-      - airflow
-    extensions:
-    - hstore
+## @param databases Databases configuration
+## Example:
+## databases:
+##   myapp:
+##     roles:
+##       admin:
+##       - user1
+##       - debezium
+##       readonly:
+##       - user2
+##   airflow:
+##     roles:
+##       admin:
+##       - airflow
+##     extensions:
+##     - hstore
+databases: {}
 
+## @section Backup parameters
+
+## @param backup.enabled Enable pereiodic backups
+## @param backup.s3Region The AWS S3 region where backups are stored
+## @param backup.s3Bucket The S3 bucket used for storing backups
+## @param backup.schedule Cron schedule for automated backups
+## @param backup.cleanupStrategy The strategy for cleaning up old backups
+## @param backup.s3AccessKey The access key for S3, used for authentication
+## @param backup.s3SecretKey The secret key for S3, used for authentication
+## @param backup.resticPassword The password for Restic backup encryption
 backup:
   enabled: false
   s3Region: us-east-1

@@ -24,4 +24,11 @@ cilium:
     configMap: cni-configuration
   routingMode: native
   enableIPv4Masquerade: false
+  enableIPv6Masquerade: false
   enableIdentityMark: false
+  enableRuntimeDeviceDetection: true
+  #enforceDeviceDetection: true
+  devices: ovn0
+  extraEnv:
+  - name: CILIUM_ENFORCE_DEVICE_DETECTION
+    value: "true"

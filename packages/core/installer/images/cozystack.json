@@ -1,4 +1,10 @@
 {
-  "containerimage.config.digest": "sha256:29b11ecbb92bae830f2e55cd4b6f7f3ada09b2f5514c0eeee395bd2dbd12fb81",
-  "containerimage.digest": "sha256:791df989ff37a76062c7c638dbfc93435df9ee0db48797f2045c80b6d6b937c0"
+  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/ta5cc9q3mqtwjyuvg8fviqhe6",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+    "digest": "sha256:bcaef325861d91b955f536bdd57ae3a6099d8657f081054a6dee3c027cfce97f",
+    "size": 685
+  },
+  "containerimage.digest": "sha256:bcaef325861d91b955f536bdd57ae3a6099d8657f081054a6dee3c027cfce97f",
+  "image.name": "ghcr.io/aenix-io/cozystack/cozystack:v0.9.0"
 }

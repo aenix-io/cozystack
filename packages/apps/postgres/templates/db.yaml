@@ -4,12 +4,15 @@ kind: Cluster
 metadata:
   name: {{ .Release.Name }}
 spec:
-  instances: 2
+  instances: {{ .Values.replicas }}
   enableSuperuserAccess: true
 
   postgresql:
     parameters:
       max_wal_senders: "30"
+
+  minSyncReplicas: {{ .Values.quorum.minSyncReplicas }}
+  maxSyncReplicas: {{ .Values.quorum.maxSyncReplicas }}
 
   monitoring:
     enablePodMonitor: true

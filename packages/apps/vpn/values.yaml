@@ -1,7 +1,18 @@
-external: false
+## @section Common parameters
 
-users:
-  user1:
-    password: hackme
-  user2:
-    password: tttt
+## @param external Enable external access from outside the cluster
+## @param replicas Number of VPN-server replicas
+##
+external: false
+replicas: 2
+
+## @section Configuration parameters
+
+## @param users [object] Users configuration
+## Example:
+## users:
+##   user1:
+##     password: hackme
+##   user2:
+##     password: tttt
+users: {}

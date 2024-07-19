@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.haproxy.replicas }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-haproxy

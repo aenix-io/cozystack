@@ -15,6 +15,12 @@ spec:
       labels:
         app: {{ .Release.Name }}-cluster-autoscaler
     spec:
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: "NoSchedule"
       containers:
       - image: ghcr.io/kvaps/test:cluster-autoscaller
         name: cluster-autoscaler

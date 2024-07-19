@@ -262,11 +262,13 @@ spec:
                                 items:
                                   type: string
                                 type: array
+                                x-kubernetes-list-type: atomic
                             required:
                             - key
                             - operator
                             type: object
                           type: array
+                          x-kubernetes-list-type: atomic
                         matchFields:
                           description: A list of node selector requirements by node's
                             fields.
@@ -294,14 +296,17 @@ spec:
                                 items:
                                   type: string
                                 type: array
+                                x-kubernetes-list-type: atomic
                             required:
                             - key
                             - operator
                             type: object
                           type: array
+                          x-kubernetes-list-type: atomic
                       type: object
                       x-kubernetes-map-type: atomic
                     type: array
+                    x-kubernetes-list-type: atomic
                 required:
                 - nodeSelectorTerms
                 type: object
@@ -814,11 +819,13 @@ spec:
                                 items:
                                   type: string
                                 type: array
+                                x-kubernetes-list-type: atomic
                             required:
                             - key
                             - operator
                             type: object
                           type: array
+                          x-kubernetes-list-type: atomic
                         matchFields:
                           description: A list of node selector requirements by node's
                             fields.
@@ -846,14 +853,17 @@ spec:
                                 items:
                                   type: string
                                 type: array
+                                x-kubernetes-list-type: atomic
                             required:
                             - key
                             - operator
                             type: object
                           type: array
+                          x-kubernetes-list-type: atomic
                       type: object
                       x-kubernetes-map-type: atomic
                     type: array
+                    x-kubernetes-list-type: atomic
                 required:
                 - nodeSelectorTerms
                 type: object
@@ -1042,6 +1052,22 @@ spec:
                             type: string
                           minItems: 1
                           type: array
+                      type: object
+                    zfsPool:
+                      description: Configures a ZFS system based storage pool, allocating
+                        zvols from the given zpool.
+                      properties:
+                        zPool:
+                          description: ZPool is the name of the ZFS zpool.
+                          type: string
+                      type: object
+                    zfsThinPool:
+                      description: Configures a ZFS system based storage pool, allocating
+                        sparse zvols from the given zpool.
+                      properties:
+                        zPool:
+                          description: ZPool is the name of the ZFS zpool.
+                          type: string
                       type: object
                   required:
                   - name
@@ -1406,6 +1432,22 @@ spec:
                             type: string
                           minItems: 1
                           type: array
+                      type: object
+                    zfsPool:
+                      description: Configures a ZFS system based storage pool, allocating
+                        zvols from the given zpool.
+                      properties:
+                        zPool:
+                          description: ZPool is the name of the ZFS zpool.
+                          type: string
+                      type: object
+                    zfsThinPool:
+                      description: Configures a ZFS system based storage pool, allocating
+                        sparse zvols from the given zpool.
+                      properties:
+                        zPool:
+                          description: ZPool is the name of the ZFS zpool.
+                          type: string
                       type: object
                   required:
                   - name

@@ -26,3 +26,23 @@ How to access to deployed cluster:
 ```
 kubectl get secret -n <namespace> kubernetes-<clusterName>-admin-kubeconfig -o go-template='{{ printf "%s\n" (index .data "super-admin.conf" | base64decode) }}' > test
 ```
+
+## Parameters
+
+### Common parameters
+
+| Name                    | Description                                                                                                                            | Value |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `host`                  | The hostname used to access the Kubernetes cluster externally (defaults to using the cluster name as a subdomain for the tenant host). | `""`  |
+| `controlPlane.replicas` | Number of replicas for Kubernetes contorl-plane components                                                                             | `2`   |
+| `nodeGroups`            | nodeGroups configuration                                                                                                               | `{}`  |
+
+### Cluster Addons
+
+| Name                          | Description                                                                        | Value   |
+| ----------------------------- | ---------------------------------------------------------------------------------- | ------- |
+| `addons.certManager.enabled`  | Enables the cert-manager                                                           | `false` |
+| `addons.ingressNginx.enabled` | Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)           | `false` |
+| `addons.ingressNginx.hosts`   | List of domain names that should be passed through to the cluster by upper cluster | `[]`    |
+| `addons.fluxcd.enabled`       | Enables Flux CD                                                                    | `false` |
+

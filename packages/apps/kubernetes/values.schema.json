@@ -1,11 +1,62 @@
 {
-  "$schema": "http://json-schema.org/schema#",
-  "type": "object",
-  "properties": {
-    "host": {
-      "type": "string",
-      "title": "Domain name for this kubernetes cluster",
-      "description": "This host will be used for all apps deployed in this tenant"
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "host": {
+            "type": "string",
+            "description": "The hostname used to access the Kubernetes cluster externally (defaults to using the cluster name as a subdomain for the tenant host).",
+            "default": ""
+        },
+        "controlPlane": {
+            "type": "object",
+            "properties": {
+                "replicas": {
+                    "type": "number",
+                    "description": "Number of replicas for Kubernetes contorl-plane components",
+                    "default": 2
+                }
+            }
+        },
+        "addons": {
+            "type": "object",
+            "properties": {
+                "certManager": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables the cert-manager",
+                            "default": false
+                        }
+                    }
+                },
+                "ingressNginx": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)",
+                            "default": false
+                        },
+                        "hosts": {
+                            "type": "array",
+                            "description": "List of domain names that should be passed through to the cluster by upper cluster",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "fluxcd": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables Flux CD",
+                            "default": false
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
 }

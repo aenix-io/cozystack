@@ -8,3 +8,15 @@ Service utilizes the Spotahome Redis Operator for efficient management and orche
 
 - Docs: https://redis.io/docs/
 - GitHub: https://github.com/spotahome/redis-operator
+
+## Parameters
+
+### Common parameters
+
+| Name       | Description                                     | Value   |
+| ---------- | ----------------------------------------------- | ------- |
+| `external` | Enable external access from outside the cluster | `false` |
+| `size`     | Persistent Volume size                          | `1Gi`   |
+| `replicas` | Number of Redis replicas                        | `2`     |
+
+

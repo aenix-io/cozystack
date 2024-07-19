@@ -1,0 +1,26 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: ferretdb
+        image: ghcr.io/ferretdb/ferretdb:1.22.0
+        ports:
+        - containerPort: 27017
+        env:
+          - name: FERRETDB_POSTGRESQL_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-postgres-app
+                key: uri

@@ -100,13 +100,13 @@ stringData:
     echo "== assign roles to users"
     psql -v ON_ERROR_STOP=1 --echo-all <<\EOT
     {{- range $database, $d := .Values.databases }}
-    {{- range $user, $u := $.Values.roles }}
-    {{- if has $user $d.users.admin }}
+    {{- range $user, $u := $.Values.users }}
+    {{- if has $user $d.roles.admin }}
     GRANT {{ $database }}_admin TO {{ $user }};
     {{- else }}
     REVOKE {{ $database }}_admin FROM {{ $user }};
     {{- end }}
-    {{- if has $user $d.users.readonly }}
+    {{- if has $user $d.roles.readonly }}
     GRANT {{ $database }}_readonly TO {{ $user }};
     {{- else }}
     REVOKE {{ $database }}_readonly FROM {{ $user }};

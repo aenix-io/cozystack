@@ -1,4 +1,45 @@
 {
-  "containerimage.config.digest": "sha256:d63ac434876b4e47c130e6b99f0c9657e718f9d97f522f5ccd878eab75844122",
-  "containerimage.digest": "sha256:9963580a02ac4ddccafb60f2411365910bcadd73f92d1c9187a278221306a4ed"
+  "buildx.build.provenance": {
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/quay.io/poseidon/matchbox@v0.10.0?platform=linux%2Famd64",
+        "digest": {
+          "sha256": "e14cc4a8f6e8f1182fce74d04fe949b6bfc91b04132b3944297661e2c38c9790"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "priceless_leavitt/priceless_leavitt0/k5n5is33n6zu6an3nmlnylejx",
+  "containerimage.config.digest": "sha256:4676a205eae74f1b16a9065921c612ee85e123ab6566a238edb4bbaf79b2e148",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:7aa044756c40c2a222668f735ad9490b52341b57dca27e57b98f5de235d87ad7",
+    "size": 1488,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:7aa044756c40c2a222668f735ad9490b52341b57dca27e57b98f5de235d87ad7",
+  "image.name": "ghcr.io/aenix-io/cozystack/matchbox:v0.9.0,ghcr.io/aenix-io/cozystack/matchbox:v1.7.1-v0.9.0"
 }

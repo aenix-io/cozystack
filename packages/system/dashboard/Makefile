@@ -1,10 +1,7 @@
-NAME=dashboard
-NAMESPACE=cozy-$(NAME)
-PUSH := 1
-LOAD := 0
-REPOSITORY := ghcr.io/aenix-io/cozystack
-TAG := v0.3.1
+export NAME=dashboard
+export NAMESPACE=cozy-$(NAME)
 
+include ../../../scripts/common-envs.mk
 include ../../../scripts/package-system.mk
 
 update: update-chart update-dockerfiles
@@ -17,11 +14,13 @@ update-chart:
 	helm pull bitnami/kubeapps --untar --untardir charts
 	rm -rf charts/kubeapps/charts/postgresql/
 	ln -s ../../images charts/kubeapps/images
+	sed -i 's/.cluster.local//g' charts/kubeapps/templates/kubeappsapis/deployment.yaml
+	patch --no-backup-if-mismatch charts/kubeapps/templates/frontend/configmap.yaml < patches/logos.patch
 
 update-dockerfiles:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/vmware-tanzu/kubeapps  | awk -F'[/^]' 'END{print $$3}') && \
 	wget https://github.com/vmware-tanzu/kubeapps/raw/$${tag}/cmd/kubeapps-apis/Dockerfile -O images/kubeapps-apis/Dockerfile && \
-	patch images/kubeapps-apis/Dockerfile < images/kubeapps-apis/dockerfile.diff && \
+	patch --no-backup-if-mismatch images/kubeapps-apis/Dockerfile < images/kubeapps-apis/dockerfile.diff && \
 	node_image=$$(wget -O- https://github.com/vmware-tanzu/kubeapps/raw/main/dashboard/Dockerfile | awk '/FROM bitnami\/node/ {print $$2}') && \
 	sed -i "s|FROM .* AS build|FROM $${node_image} AS build|" images/dashboard/Dockerfile && \
 	version=$$(echo "$$tag" | sed 's/^v//') && \
@@ -30,21 +29,21 @@ update-dockerfiles:
 image-dashboard:
 	docker buildx build images/dashboard \
 		--provenance false \
-		--tag $(REPOSITORY)/dashboard:$(TAG) \
-		--cache-from type=registry,ref=$(REPOSITORY)/dashboard:$(TAG) \
+		--tag $(REGISTRY)/dashboard:$(call settag,$(TAG)) \
+		--cache-from type=registry,ref=$(REGISTRY)/dashboard:latest \
 		--cache-to type=inline \
 		--metadata-file images/dashboard.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REPOSITORY)/dashboard:$(TAG)" > images/dashboard.tag
+	echo "$(REGISTRY)/dashboard:$(call settag,$(TAG))" > images/dashboard.tag
 
 image-kubeapps-apis:
 	docker buildx build images/kubeapps-apis \
 		--provenance false \
-		--tag $(REPOSITORY)/kubeapps-apis:$(TAG) \
-		--cache-from type=registry,ref=$(REPOSITORY)/kubeapps-apis:$(TAG) \
+		--tag $(REGISTRY)/kubeapps-apis:$(call settag,$(TAG)) \
+		--cache-from type=registry,ref=$(REGISTRY)/kubeapps-apis:latest \
 		--cache-to type=inline \
 		--metadata-file images/kubeapps-apis.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REPOSITORY)/kubeapps-apis:$(TAG)" > images/kubeapps-apis.tag
+	echo "$(REGISTRY)/kubeapps-apis:$(call settag,$(TAG))" > images/kubeapps-apis.tag

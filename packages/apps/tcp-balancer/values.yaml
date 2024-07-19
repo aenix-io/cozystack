@@ -1,18 +1,45 @@
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param replicas Number of HAProxy replicas
+##
 external: false
+replicas: 2
+
+## @section Configuration parameters
+
+## @param httpAndHttps.mode Mode for balancer. Allowed values: `tcp` and `tcp-with-proxy`
+## @param httpAndHttps.targetPorts.http HTTP port number.
+## @param httpAndHttps.targetPorts.https HTTPS port number.
+## @param httpAndHttps.endpoints Endpoint addresses list
+## Example:
+## httpAndHttps:
+##   mode: tcp
+##   targetPorts:
+##     http: 80
+##     https: 443
+##   endpoints:
+##    - 10.100.3.1
+##    - 10.100.3.11
+##    - 10.100.3.2
+##    - 10.100.3.12
+##    - 10.100.3.3
+##    - 10.100.3.13
+
 httpAndHttps:
   mode: tcp
   targetPorts:
     http: 80
     https: 443
-  endpoints:
-   - 10.100.3.1
-   - 10.100.3.11
-   - 10.100.3.2
-   - 10.100.3.12
-   - 10.100.3.3
-   - 10.100.3.13
+  endpoints: []
 
+## @param whitelistHTTP Secure HTTP by enabling  client networks whitelisting
+## @param whitelist List of client networks
+## Example:
+## whitelistHTTP: true
+## whitelist:
+## - "1.2.3.4"
+## - "10.100.0.0/16"
+##
 whitelistHTTP: false
-whitelist:
-- "1.2.3.4"
-- "10.100.0.0/16"
+whitelist: []

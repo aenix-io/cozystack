@@ -1,5 +1,5 @@
-NAME=victoria-metrics-operator
-NAMESPACE=cozy-$(NAME)
+export NAME=victoria-metrics-operator
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/package-system.mk
 

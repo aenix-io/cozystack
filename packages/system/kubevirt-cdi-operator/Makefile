@@ -1,5 +1,5 @@
-NAME=kubevirt-cdi-operator
-NAMESPACE=cozy-kubevirt-cdi
+export NAME=kubevirt-cdi-operator
+export NAMESPACE=cozy-kubevirt-cdi
 
 include ../../../scripts/package-system.mk
 

@@ -4,15 +4,17 @@ kind: MariaDB
 metadata:
   name: {{ .Release.Name }}
 spec:
+  {{- if (and .Values.users.root .Values.users.root.password) }}
   rootPasswordSecretKeyRef:
     name: {{ .Release.Name }}
     key: root-password
+  {{- end }}
 
   image: "mariadb:11.0.2"
 
   port: 3306
 
-  replicas: 2
+  replicas: {{ .Values.replicas }}
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -28,11 +30,13 @@ spec:
             - {{ .Release.Name }}
         topologyKey: "kubernetes.io/hostname"
 
+  {{- if gt (int .Values.replicas) 1 }}
   replication:
     enabled: true
     #primary:
     #  podIndex: 0
     #  automaticFailover: true
+  {{- end }}
 
   metrics:
     enabled: true

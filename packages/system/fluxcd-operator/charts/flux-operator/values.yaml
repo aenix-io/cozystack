@@ -1,0 +1,97 @@
+# Default values for flux-operator.
+
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Install and upgrade the custom resource definitions.
+installCRDs: true # @schema default: true
+
+# -- Common annotations to add to all deployed objects including pods.
+commonAnnotations: { }
+
+# -- Common labels to add to all deployed objects including pods.
+commonLabels: { }
+
+# -- Container image settings.
+# The image tag defaults to the chart appVersion.
+image:
+  repository: ghcr.io/controlplaneio-fluxcd/flux-operator # @schema required: true
+  tag: ""
+  pullSecrets: [ ] # @schema item: object ; uniqueItems: true
+
+# -- Pod priority class name.
+# Recommended value is system-cluster-critical.
+priorityClassName: "" # @schema default: "system-cluster-critical"
+
+# -- Container resources requests and limits settings.
+resources: # @schema required: true
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests: # @schema default: {"cpu":"100m","memory":"64Mi"}
+    cpu: 100m
+    memory: 64Mi
+
+# -- Container liveness probe settings.
+livenessProbe: # @schema default: {"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20}
+  httpGet:
+    path: /healthz
+    port: 8081
+  initialDelaySeconds: 15
+  periodSeconds: 20
+
+# -- Container readiness probe settings.
+readinessProbe: # @schema default: {"httpGet":{"path":"/readyz","port":8081},"initialDelaySeconds":5,"periodSeconds":10}
+  httpGet:
+    path: /readyz
+    port: 8081
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# -- Pod service account settings.
+# The name of the service account defaults to the release name.
+serviceAccount: # @schema default: {"create":true,"automount":true,"name":""}
+  create: true
+  automount: true
+  name: ""
+
+# -- Pod security context settings.
+podSecurityContext: { } # @schema default: {"fsGroup":1337}
+
+# -- Container security context settings.
+# The default is compliant with the pod security restricted profile.
+securityContext: # @schema required: true
+  runAsNonRoot: true # @schema default: true
+  readOnlyRootFilesystem: true # @schema default: true
+  allowPrivilegeEscalation: false # @schema default: false
+  capabilities: # @schema default: {"drop":["ALL"]}
+    drop: # @schema item: string ; uniqueItems: true
+      - "ALL"
+  seccompProfile: # @schema default: {"type":"RuntimeDefault"}
+    type: "RuntimeDefault"
+
+# -- Pod affinity and anti-affinity settings.
+affinity: # @schema default: {"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/os","operator":"In","values":["linux"]}]}]}}}
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - linux
+
+# -- Pod tolerations settings.
+tolerations: [ ] # @schema item: object ; uniqueItems: true
+
+# -- Marketplace settings.
+marketplace:
+  type: ""
+  license: ""
+  account: ""
+
+# -- If `true`, the container ports (`8080` and `8081`) are exposed on the host network.
+hostNetwork: false # @schema default: false
+
+# -- Container extra environment variables.
+extraEnvs: [ ] # @schema item: object ; uniqueItems: true

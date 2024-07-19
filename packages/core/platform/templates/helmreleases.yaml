@@ -12,20 +12,23 @@
 {{- range $x := $bundle.releases }}
 {{- if not (has $x.name $disabledComponents) }}
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $x.name }}
   namespace: {{ $x.namespace }}
   labels:
     cozystack.io/repository: system
+    cozystack.io/system-app: "true"
 spec:
-  interval: 1m
+  interval: 5m
   releaseName: {{ $x.releaseName | default $x.name }}
   install:
+    crds: CreateReplace
     remediation:
       retries: -1
   upgrade:
+    crds: CreateReplace
     remediation:
       retries: -1
   chart:

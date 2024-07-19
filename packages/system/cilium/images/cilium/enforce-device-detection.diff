@@ -1,0 +1,244 @@
+diff --git a/daemon/cmd/daemon_main.go b/daemon/cmd/daemon_main.go
+index 9435b2570b..416c34ed7a 100644
+--- a/daemon/cmd/daemon_main.go
++++ b/daemon/cmd/daemon_main.go
+@@ -222,6 +222,9 @@ func InitGlobalFlags(cmd *cobra.Command, vp *viper.Viper) {
+ 	flags.StringSlice(option.Devices, []string{}, "List of devices facing cluster/external network (used for BPF NodePort, BPF masquerading and host firewall); supports '+' as wildcard in device name, e.g. 'eth+'")
+ 	option.BindEnv(vp, option.Devices)
+ 
++	flags.Bool(option.EnforceDeviceDetection, false, "Enforces the auto-detection of devices, even if specific devices are explicitly listed")
++	option.BindEnv(vp, option.EnforceDeviceDetection)
++
+ 	flags.String(option.DirectRoutingDevice, "", "Device name used to connect nodes in direct routing mode (used by BPF NodePort, BPF host routing; if empty, automatically set to a device with k8s InternalIP/ExternalIP or with a default route)")
+ 	option.BindEnv(vp, option.DirectRoutingDevice)
+ 
+diff --git a/install/kubernetes/cilium/README.md b/install/kubernetes/cilium/README.md
+index 6a92a83040..bf728ce32e 100644
+--- a/install/kubernetes/cilium/README.md
++++ b/install/kubernetes/cilium/README.md
+@@ -309,6 +309,7 @@ contributors across the globe, there is almost always someone available to help.
+ | endpointHealthChecking.enabled | bool | `true` | Enable connectivity health checking between virtual endpoints. |
+ | endpointRoutes.enabled | bool | `false` | Enable use of per endpoint routes instead of routing via the cilium_host interface. |
+ | endpointStatus | object | `{"enabled":false,"status":""}` | Enable endpoint status. Status can be: policy, health, controllers, log and / or state. For 2 or more options use a space. |
++| enforceDeviceDetection | bool | `false` | Enforces the auto-detection of devices, even if specific devices are explicitly listed |
+ | eni.awsEnablePrefixDelegation | bool | `false` | Enable ENI prefix delegation |
+ | eni.awsReleaseExcessIPs | bool | `false` | Release IPs not used from the ENI |
+ | eni.ec2APIEndpoint | string | `""` | EC2 API endpoint to use |
+diff --git a/install/kubernetes/cilium/templates/cilium-configmap.yaml b/install/kubernetes/cilium/templates/cilium-configmap.yaml
+index 9531ca18a8..1ce677f8ce 100644
+--- a/install/kubernetes/cilium/templates/cilium-configmap.yaml
++++ b/install/kubernetes/cilium/templates/cilium-configmap.yaml
+@@ -688,6 +688,10 @@ data:
+   enable-runtime-device-detection: "true"
+ {{- end }}
+ 
++{{- if .Values.enforceDeviceDetection }}
++  enforce-device-detection: "true"
++{{- end }}
++
+   kube-proxy-replacement: {{ $kubeProxyReplacement | quote }}
+ 
+ {{- if ne $kubeProxyReplacement "disabled" }}
+diff --git a/install/kubernetes/cilium/values.yaml b/install/kubernetes/cilium/values.yaml
+index e81d3ebffd..2196bbb814 100644
+--- a/install/kubernetes/cilium/values.yaml
++++ b/install/kubernetes/cilium/values.yaml
+@@ -690,6 +690,9 @@ daemon:
+ # be considered.
+ enableRuntimeDeviceDetection: false
+ 
++# -- Enforces the auto-detection of devices, even if specific devices are explicitly listed
++enforceDeviceDetection: false
++
+ # -- Chains to ignore when installing feeder rules.
+ # disableIptablesFeederRules: ""
+ 
+diff --git a/install/kubernetes/cilium/values.yaml.tmpl b/install/kubernetes/cilium/values.yaml.tmpl
+index 679b4cac07..3ed0b8f88b 100644
+--- a/install/kubernetes/cilium/values.yaml.tmpl
++++ b/install/kubernetes/cilium/values.yaml.tmpl
+@@ -687,6 +687,9 @@ daemon:
+ # be considered.
+ enableRuntimeDeviceDetection: false
+ 
++# -- Enforces the auto-detection of devices, even if specific devices are explicitly listed
++enforceDeviceDetection: false
++
+ # -- Chains to ignore when installing feeder rules.
+ # disableIptablesFeederRules: ""
+ 
+diff --git a/pkg/datapath/cells.go b/pkg/datapath/cells.go
+index 69d6d71836..c0f4947d73 100644
+--- a/pkg/datapath/cells.go
++++ b/pkg/datapath/cells.go
+@@ -114,7 +114,8 @@ var Cell = cell.Module(
+ 		// This is temporary until DevicesController takes ownership of the
+ 		// device-related configuration options.
+ 		return linuxdatapath.DevicesConfig{
+-			Devices: cfg.GetDevices(),
++			Devices:                cfg.GetDevices(),
++			EnforceDeviceDetection: option.Config.EnforceDeviceDetection,
+ 		}
+ 	}),
+ 
+diff --git a/pkg/datapath/linux/devices_controller.go b/pkg/datapath/linux/devices_controller.go
+index fdfde8d4ec..cac3e44a32 100644
+--- a/pkg/datapath/linux/devices_controller.go
++++ b/pkg/datapath/linux/devices_controller.go
+@@ -84,6 +84,9 @@ type DevicesConfig struct {
+ 	// If empty the devices are auto-detected according to rules defined
+ 	// by isSelectedDevice().
+ 	Devices []string
++	// EnforceDeviceDetection forces the auto-detection of devices,
++	// even if user-specific devices are explicitly listed.
++	EnforceDeviceDetection bool
+ }
+ 
+ type devicesControllerParams struct {
+@@ -103,9 +106,10 @@ type devicesController struct {
+ 	params devicesControllerParams
+ 	log    logrus.FieldLogger
+ 
+-	initialized    chan struct{}
+-	filter         deviceFilter
+-	l3DevSupported bool
++	initialized          chan struct{}
++	filter               deviceFilter
++	enforceAutoDetection bool
++	l3DevSupported       bool
+ 
+ 	// deadLinkIndexes tracks the set of links that have been deleted. This is needed
+ 	// to avoid processing route or address updates after a link delete as they may
+@@ -121,11 +125,12 @@ func newDevicesController(lc cell.Lifecycle, p devicesControllerParams) (*device
+ 		p.RouteTable,
+ 	)
+ 	dc := &devicesController{
+-		params:          p,
+-		initialized:     make(chan struct{}),
+-		filter:          deviceFilter(p.Config.Devices),
+-		log:             p.Log,
+-		deadLinkIndexes: sets.New[int](),
++		params:               p,
++		initialized:          make(chan struct{}),
++		filter:               deviceFilter(p.Config.Devices),
++		enforceAutoDetection: p.Config.EnforceDeviceDetection,
++		log:                  p.Log,
++		deadLinkIndexes:      sets.New[int](),
+ 	}
+ 	lc.Append(dc)
+ 	return dc, p.DeviceTable, p.RouteTable
+@@ -529,12 +534,15 @@ func (dc *devicesController) isSelectedDevice(d *tables.Device, txn statedb.Writ
+ 	}
+ 
+ 	// If user specified devices or wildcards, then skip the device if it doesn't match.
+-	// If the device does match, then skip further checks.
++	// If the device does match and user not requested auto detection, then skip further checks.
++	// If the device does match and user requested auto detection, then continue to further checks.
+ 	if dc.filter.nonEmpty() {
+ 		if dc.filter.match(d.Name) {
+ 			return true, ""
+ 		}
+-		return false, fmt.Sprintf("not matching user filter %v", dc.filter)
++		if !dc.enforceAutoDetection {
++			return false, fmt.Sprintf("not matching user filter %v", dc.filter)
++		}
+ 	}
+ 
+ 	// Skip devices that have an excluded interface flag set.
+diff --git a/pkg/datapath/linux/devices_test.go b/pkg/datapath/linux/devices_test.go
+index cd9fdcc7ad..031894498f 100644
+--- a/pkg/datapath/linux/devices_test.go
++++ b/pkg/datapath/linux/devices_test.go
+@@ -254,7 +254,36 @@ func (s *DevicesSuite) TestDetect(c *C) {
+ 		c.Assert(devices, checker.DeepEquals, []string{"bond0", "dummy0", "dummy1", "dummy_v6", "veth0"})
+ 		option.Config.SetDevices([]string{})
+ 		dm.Stop()
++
++		// EnforceDeviceDetection enabled with specific devices
++		option.Config.SetDevices([]string{"dummy1"})
++		option.Config.EnforceDeviceDetection = true
++		c.Assert(createDummy("dummy0", "192.168.0.1/24", false), IsNil)
++		c.Assert(createDummy("dummy1", "192.168.1.1/24", false), IsNil)
++
++		dm, err = newDeviceManagerForTests()
++		c.Assert(err, IsNil)
++		devices, err = dm.Detect(true)
++		c.Assert(err, IsNil)
++		c.Assert(devices, checker.DeepEquals, []string{"dummy0", "dummy1"})
++		option.Config.SetDevices([]string{})
++		option.Config.DirectRoutingDevice = ""
++		dm.Stop()
++
++		// EnforceDeviceDetection disabled with specific devices
++		option.Config.SetDevices([]string{"dummy1"})
++		option.Config.EnforceDeviceDetection = false
++
++		dm, err = newDeviceManagerForTests()
++		c.Assert(err, IsNil)
++		devices, err = dm.Detect(true)
++		c.Assert(err, IsNil)
++		c.Assert(devices, checker.DeepEquals, []string{"dummy1"})
++		option.Config.SetDevices([]string{})
++		option.Config.DirectRoutingDevice = ""
++		dm.Stop()
+ 	})
++
+ }
+ 
+ func (s *DevicesSuite) TestExpandDevices(c *C) {
+diff --git a/pkg/defaults/defaults.go b/pkg/defaults/defaults.go
+index fe34caa624..f095ff9a42 100644
+--- a/pkg/defaults/defaults.go
++++ b/pkg/defaults/defaults.go
+@@ -554,6 +554,10 @@ const (
+ 	// identity in a numeric identity. Values > 255 will decrease the number of
+ 	// allocatable identities.
+ 	MaxConnectedClusters = 255
++
++	// EnforceDevicesDetection enforces the auto-detection of devices,
++	// even if specific devices are explicitly listed
++	EnforceDeviceDetection = false
+ )
+ 
+ var (
+diff --git a/pkg/option/config.go b/pkg/option/config.go
+index 27c697d9e3..9ba4367b2e 100644
+--- a/pkg/option/config.go
++++ b/pkg/option/config.go
+@@ -123,6 +123,9 @@ const (
+ 	// Devices facing cluster/external network for attaching bpf_host
+ 	Devices = "devices"
+ 
++	// Enforces the auto-detection of devices, even if specific devices are explicitly listed
++	EnforceDeviceDetection = "enforce-device-detection"
++
+ 	// DirectRoutingDevice is the name of a device used to connect nodes in
+ 	// direct routing mode (only required by BPF NodePort)
+ 	DirectRoutingDevice = "direct-routing-device"
+@@ -2447,6 +2450,10 @@ type DaemonConfig struct {
+ 
+ 	// ServiceNoBackendResponse determines how we handle traffic to a service with no backends.
+ 	ServiceNoBackendResponse string
++
++	// EnforceDeviceDetection forces the auto-detection of devices,
++	// even if specific devices are explicitly listed
++	EnforceDeviceDetection bool
+ }
+ 
+ var (
+@@ -2490,6 +2497,7 @@ var (
+ 		AllocatorListTimeout:            defaults.AllocatorListTimeout,
+ 		EnableICMPRules:                 defaults.EnableICMPRules,
+ 		UseCiliumInternalIPForIPsec:     defaults.UseCiliumInternalIPForIPsec,
++		EnforceDeviceDetection:          defaults.EnforceDeviceDetection,
+ 
+ 		K8sEnableLeasesFallbackDiscovery: defaults.K8sEnableLeasesFallbackDiscovery,
+ 
+@@ -3563,6 +3571,7 @@ func (c *DaemonConfig) Populate(vp *viper.Viper) {
+ 	c.UseCiliumInternalIPForIPsec = vp.GetBool(UseCiliumInternalIPForIPsec)
+ 	c.BypassIPAvailabilityUponRestore = vp.GetBool(BypassIPAvailabilityUponRestore)
+ 	c.EnableK8sTerminatingEndpoint = vp.GetBool(EnableK8sTerminatingEndpoint)
++	c.EnforceDeviceDetection = vp.GetBool(EnforceDeviceDetection)
+ 
+ 	// Disable Envoy version check if L7 proxy is disabled.
+ 	c.DisableEnvoyVersionCheck = vp.GetBool(DisableEnvoyVersionCheck)

@@ -1,10 +1,10 @@
 # Copyright 2018-2023 the Kubeapps contributors.
 # SPDX-License-Identifier: Apache-2.0
 
-FROM bitnami/node:20.11.0 AS build
+FROM bitnami/node:20.12.1 AS build
 WORKDIR /app
 
-ARG VERSION=2.9.0
+ARG VERSION=2.10.0
 RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/v${VERSION}.tar.gz | tar xzf - --strip-components=2 kubeapps-${VERSION}/dashboard
 
 COPY apple-touch-icon.png favicon-16x16.png favicon-32x32.png favicon.ico mstile-144x144.png mstile-150x150.png mstile-310x150.png mstile-310x310.png mstile-70x70.png safari-pinned-tab.svg public/
@@ -26,8 +26,22 @@ RUN yarn install --frozen-lockfile
 RUN yarn run prettier-check && yarn run ts-compile-check
 RUN yarn run build
 
-RUN sed -i 's/hsl(206, 25%, 25%)/hsl(225, 6%, 13%)/g' $(grep -rl 'hsl(206, 25\%, 25\%)')
-RUN sed -i 's/#304250/#202124/g' $(grep -rl "#304250")
+RUN sed -i \
+    -e 's/#2d4048/#202124/g' \
+    -e 's/#25333d/#1e2023/g'  \
+    -e 's/#fcfdfd/#f3f4f5/g' \
+    -e 's/#f1f6f8/#e7e9eb/g' \
+    -e 's/#e3eaed/#d3d6da/g' \
+    -e 's/#cbd4d8/#b7bbc1/g' \
+    -e 's/#aeb8bc/#989da3/g' \
+    -e 's/#859399/#7b7f85/g' \
+    -e 's/#6a7a81/#5b686e/g' \
+    -e 's/#4f6169/#4f5256/g' \
+    -e 's/#3a4d55/#3a3d41/g' \
+    -e 's/#2d4048/#202124/g' \
+    -e 's/#21333b/#383d44/g' \
+    -e 's/#1b2b32/#2a2d2f/g' \
+    $(grep -rl "#2d4048\|#25333d\|#fcfdfd\|#f1f6f8\|#e3eaed\|#cbd4d8\|#aeb8bc\|#859399\|#6a7a81\|#4f6169\|#3a4d55\|#2d4048\|#21333b\|#1b2b32")
 
 FROM bitnami/nginx:1.25.2
 COPY --from=build /app/build /app

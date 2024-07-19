@@ -1,0 +1,45 @@
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
+{{- if .Values.addons.ingressNginx.hosts }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress-nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+spec:
+  ingressClassName: "{{ $ingress }}"
+  rules:
+  {{- range .Values.addons.ingressNginx.hosts }}
+  - host: {{ . | quote }}
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ $.Release.Name }}-ingress-nginx
+            port:
+              number: 443
+  {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-ingress-nginx
+spec:
+  ports:
+  - appProtocol: http
+    name: http
+    port: 80
+    targetPort: 80
+  - appProtocol: https
+    name: https
+    port: 443
+    targetPort: 443
+  selector:
+    cluster.x-k8s.io/cluster-name: {{ .Release.Name }}
+    node-role.kubernetes.io/ingress-nginx: ""
+{{- end }}

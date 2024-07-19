@@ -1,0 +1,62 @@
+{
+  "title": "Chart Values",
+  "type": "object",
+  "properties": {
+    "external": {
+      "type": "boolean",
+      "description": "Enable external access from outside the cluster",
+      "default": false
+    },
+    "replicas": {
+      "type": "number",
+      "description": "Number of HAProxy replicas",
+      "default": 2
+    },
+    "httpAndHttps": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "Mode for balancer. Allowed values: `tcp` and `tcp-with-proxy`",
+          "default": "tcp",
+          "enum": [
+            "tcp",
+            "tcp-with-proxy"
+          ]
+        },
+        "targetPorts": {
+          "type": "object",
+          "properties": {
+            "http": {
+              "type": "number",
+              "description": "HTTP port number.",
+              "default": 80
+            },
+            "https": {
+              "type": "number",
+              "description": "HTTPS port number.",
+              "default": 443
+            }
+          }
+        },
+        "endpoints": {
+          "type": "array",
+          "description": "Endpoint addresses list",
+          "default": [],
+          "items": {}
+        }
+      }
+    },
+    "whitelistHTTP": {
+      "type": "boolean",
+      "description": "Secure HTTP by enabling  client networks whitelisting",
+      "default": false
+    },
+    "whitelist": {
+      "type": "array",
+      "description": "List of client networks",
+      "default": [],
+      "items": {}
+    }
+  }
+}

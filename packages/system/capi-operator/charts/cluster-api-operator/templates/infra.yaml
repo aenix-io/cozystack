@@ -28,6 +28,7 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "1"
+    "argocd.argoproj.io/sync-wave": "1"
   name: {{ $infrastructureNamespace }}
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
@@ -38,11 +39,25 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "2"
-{{- if or $infrastructureVersion $.Values.configSecret.name }}
+    "argocd.argoproj.io/sync-wave": "2"
+{{- if or $infrastructureVersion $.Values.configSecret.name $.Values.manager }}
 spec:
 {{- end }}
 {{- if $infrastructureVersion }}
   version: {{ $infrastructureVersion }}
+{{- end }}
+{{- if $.Values.manager }}
+  manager:
+{{- if and (kindIs "map" $.Values.manager.featureGates) (hasKey $.Values.manager.featureGates $infrastructureName) }}
+{{- range $key, $value := $.Values.manager.featureGates }}
+  {{- if eq $key $infrastructureName }}
+    featureGates:
+    {{- range $k, $v := $value }}
+      {{ $k }}: {{ $v }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- if $.Values.configSecret.name }}
   configSecret:

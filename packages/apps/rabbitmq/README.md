@@ -8,3 +8,12 @@ The service utilizes official RabbitMQ operator. This ensures the reliability an
 
 - Github: https://github.com/rabbitmq/cluster-operator/
 - Docs: https://www.rabbitmq.com/kubernetes/operator/operator-overview.html
+
+## Parameters
+
+### Common parameters
+
+| Name       | Description                                     | Value   |
+| ---------- | ----------------------------------------------- | ------- |
+| `external` | Enable external access from outside the cluster | `false` |
+| `replicas` | Number of RabbitMQ replicas                     | `3`     |

@@ -7,7 +7,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "kubeapps.frontend-config.fullname" . }}
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ include "common.names.namespace" . | quote }}
   {{- $versionLabel := dict "app.kubernetes.io/version" ( include "common.images.version" ( dict "imageRoot" .Values.frontend.image "chart" .Chart ) ) }}
   {{- $labels := include "common.tplvalues.merge" ( dict "values" ( list .Values.commonLabels $versionLabel ) "context" . ) }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 4 }}
@@ -136,4 +136,10 @@ data:
         proxy_pass {{ printf "http://%s:%d" (include "kubeapps.dashboard.fullname" .) (int .Values.dashboard.service.ports.http) }};
       }
     {{- end }}
+
+      location /logos {
+        # Add the Authorization header if exists
+        add_header Authorization $http_authorization;
+        proxy_pass http://cozystack.cozy-system.svc:80;
+      }
     }

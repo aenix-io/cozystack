@@ -1,8 +1,22 @@
-size: 10Gi
+## @section Common parameters
 
-users:
-  user1:
-    password: strongpassword
-  user2:
-    readonly: true
-    password: hackme
+## @param size Persistent Volume size
+## @param shards Number of Clickhouse replicas
+## @param replicas Number of Clickhouse shards
+##
+size: 10Gi
+shards: 1
+replicas: 2
+
+## @section Configuration parameters
+
+## @param users [object] Users configuration
+## Example:
+## users:
+##   user1:
+##     password: strongpassword
+##   user2:
+##     readonly: true
+##     password: hackme
+##
+users: {}

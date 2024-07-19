@@ -1,1 +1,7 @@
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param replicas Number of RabbitMQ replicas
+##
 external: false
+replicas: 3
