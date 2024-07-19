@@ -1,0 +1,83 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.12.0
+  name: managedvirtualmachines.proxmox.alperen.cloud
+spec:
+  group: proxmox.alperen.cloud
+  names:
+    kind: ManagedVirtualMachine
+    listKind: ManagedVirtualMachineList
+    plural: managedvirtualmachines
+    singular: managedvirtualmachine
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ManagedVirtualMachine is the Schema for the managedvirtualmachines
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ManagedVirtualMachineSpec defines the desired state of ManagedVirtualMachine
+            properties:
+              cores:
+                type: integer
+              disk:
+                type: integer
+              memory:
+                type: integer
+              name:
+                description: Foo is an example field of ManagedVirtualMachine. Edit
+                  managedvirtualmachine_types.go to remove/update
+                type: string
+              nodeName:
+                type: string
+            required:
+            - cores
+            - disk
+            - memory
+            - name
+            - nodeName
+            type: object
+          status:
+            description: ManagedVirtualMachineStatus defines the observed state of
+              ManagedVirtualMachine
+            properties:
+              IPAddress:
+                type: string
+              OSInfo:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+              node:
+                type: string
+              state:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
+              uptime:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
