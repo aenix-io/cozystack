@@ -1,66 +1,48 @@
 name: Lint
 
-on: # yamllint disable-line rule:truthy
-  push: null
-  pull_request: null
+on:
+  push:
+    branches: [ main ]  # Lint only on pushes to the main branch
+  pull_request:
+    branches: [ main ]  # Lint on PRs targeting the main branch
 
-permissions: {}
-
-env:
-  GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
-  FILTER_REGEX_EXCLUDE: \.git/.*
+permissions:
+  contents: read
 
 jobs:
-  build:
-    name: Lint
+  lint:
+    name: Super-Linter
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: read
-      # To report GitHub Actions status checks
-      statuses: write
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        # super-linter needs the full git history to get the
-        # list of files that changed across commits
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Super-linter
-      uses: super-linter/super-linter/slim@latest # x-release-please-version
-      env:
-        VALIDATE_ALL_CODEBASE: true
-        VALIDATE_JAVASCRIPT_ES: false
-        VALIDATE_PYTHON_BLACK: false
-        VALIDATE_HTML: false
-        VALIDATE_GO: false
-        VALIDATE_XML: false
-        VALIDATE_JAVA: false
-        # To report GitHub Actions status checks
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # by default super-linter assumes our repo default branch doesn't change
-        # and it also assumes our PRs are always against that default branch
-        # for multi-trunk (releases) repos, this get the base branch from the previous steps
-        # see issue https://github.com/github/super-linter/issues/1123
-        #DEFAULT_BRANCH: ${{ env.DEFAULT_BRANCH }}
-        # setting this to false means that only changed files will be scanned in each commit
-        #VALIDATE_ALL_CODEBASE: ${{ !contains(github.event_name, 'pull_request') }}
-        # turn off dockerfilelint, as its a dead project
-        # https://github.com/replicatedhq/dockerfilelint/issues/169
-        # hadolint will still run and is sufficient (no need for two linters)
-        VALIDATE_DOCKERFILE: false
-        # turn off JSCPD copy/paste detection, which results in lots of results for examples and devops repos
-        VALIDATE_JSCPD: false
-        # turn off shfmt shell formatter as we already have shellcheck
-        VALIDATE_SHELL_SHFMT: false
-        # editorconfig is great, but...
-        # editorconfig-linter is rather generic and file-specific linters are better
-        # turn off editorconfig-checker, which flags too many false positives
-        VALIDATE_EDITORCONFIG: false
-        # prevent Kubernetes CRD API's from causing kubeval to fail
-        # also change schema location to an up-to-date list
-        # https://github.com/yannh/kubernetes-json-schema/#kubeval
-        KUBERNETES_KUBEVAL_OPTIONS: --ignore-missing-schemas --schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/
+      - name: Run Super-Linter
+        uses: github/super-linter@v4
+        env:
+          # To report GitHub Actions status checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false  # Lint only changed files
+          VALIDATE_TERRAFORM: false     # Disable Terraform linting (remove if you need it)
+          DEFAULT_BRANCH: main          # Set your default branch
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Enable only the linters you need for your project
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_PYTHON_BLACK: true
+          VALIDATE_HTML: false
+          VALIDATE_GO: false
+          VALIDATE_XML: false
+          VALIDATE_JAVA: false
+          VALIDATE_DOCKERFILE: false
+          # turn off JSCPD copy/paste detection, which results in lots of results for examples and devops repos
+          VALIDATE_JSCPD: false
+          # turn off shfmt shell formatter as we already have shellcheck
+          VALIDATE_SHELL_SHFMT: false
+          VALIDATE_EDITORCONFIG: false
+          # prevent Kubernetes CRD API's from causing kubeval to fail
+          # also change schema location to an up-to-date list
+          # https://github.com/yannh/kubernetes-json-schema/#kubeval
+          KUBERNETES_KUBEVAL_OPTIONS: --ignore-missing-schemas --schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/
