@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ '$COZYSTACK_INSTALLER_YAML' = '' ]; then
+if [ -z "$COZYSTACK_INSTALLER_YAML" ]; then
   echo 'COZYSTACK_INSTALLER_YAML variable is not set!' >&2
   echo 'please set it with following command:' >&2
   echo >&2
