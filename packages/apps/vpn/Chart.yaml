@@ -1,7 +1,7 @@
 apiVersion: v2
 name: vpn
 description: Managed VPN service
-icon: https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Outline_VPN_icon.png/600px-Outline_VPN_icon.png
+icon: /logos/outline.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

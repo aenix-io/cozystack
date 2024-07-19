@@ -1,7 +1,7 @@
 apiVersion: v2
 name: kubernetes
 description: Managed Kubernetes service
-icon: https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Kubernetes_logo_without_workmark.svg/723px-Kubernetes_logo_without_workmark.svg.png
+icon: /logos/kubernetes.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

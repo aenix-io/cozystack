@@ -136,4 +136,10 @@ data:
         proxy_pass {{ printf "http://%s:%d" (include "kubeapps.dashboard.fullname" .) (int .Values.dashboard.service.ports.http) }};
       }
     {{- end }}
+
+      location /logos {
+        # Add the Authorization header if exists
+        add_header Authorization $http_authorization;
+        proxy_pass http://cozystack.cozy-system.svc:80;
+      }
     }

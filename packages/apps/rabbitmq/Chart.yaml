@@ -1,7 +1,7 @@
 apiVersion: v2
 name: rabbitmq
 description: Managed RabbitMQ service
-icon: https://static-00.iconduck.com/assets.00/rabbitmq-icon-484x512-s9lfaapn.png
+icon: /logos/rabbitmq.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #
