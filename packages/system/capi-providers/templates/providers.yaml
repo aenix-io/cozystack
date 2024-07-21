@@ -28,5 +28,5 @@ kind: InfrastructureProvider
 metadata:
   name: kubevirt
 spec:
-  # https://github.com/kubevirt/cloud-provider-kubevirt
-  version: v0.5.1
+  # https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt
+  version: v0.1.8
