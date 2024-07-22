@@ -15,6 +15,7 @@
 {{- end }}
 
 {{/* Add extra namespaces */}}
+{{- $_ := set $namespaces "cozy-system" true }}
 {{- $_ := set $namespaces "cozy-public" false }}
 
 {{- range $namespace, $privileged := $namespaces }}
@@ -24,9 +25,10 @@ kind: Namespace
 metadata:
   annotations:
     "helm.sh/resource-policy": keep
-  {{- if $privileged }}
   labels:
+    cozystack.io/system: "true"
+    {{- if $privileged }}
     pod-security.kubernetes.io/enforce: privileged
-  {{- end }}
+    {{- end }}
   name: {{ $namespace }}
 {{- end }}

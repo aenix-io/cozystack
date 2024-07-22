@@ -33,6 +33,9 @@ spec:
       clientTrustedCASecret: etcd-ca-tls
       clientSecret: etcd-client-tls
   podTemplate:
+    metadata:
+      labels:
+        cozystack.io/service: etcd
     spec:
       topologySpreadConstraints:
       - maxSkew: 1
@@ -41,6 +44,7 @@ spec:
         labelSelector:
           matchLabels:
             app.kubernetes.io/instance: etcd
+  podDisruptionBudgetTemplate: {}
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer

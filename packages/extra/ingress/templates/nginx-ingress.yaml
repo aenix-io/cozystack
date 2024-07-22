@@ -23,6 +23,9 @@ spec:
         ingressClassResource:
           name: {{ .Release.Namespace }}
           controllerValue: k8s.io/ingress-nginx-{{ .Release.Namespace }}
+        podLabels:
+          cozystack.io/service: ingress
+          policy.cozystack.io/allow-to-apiserver: "true"
         {{- if not (eq .Release.Namespace "tenant-root") }}
         admissionWebhooks:
           enabled: false
