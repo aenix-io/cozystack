@@ -16,22 +16,10 @@
             }
         },
         "whitelist": {
-            "type": "object",
-            "properties": {
-                "whitelistHTTP": {
-                    "type": "boolean",
-                    "description": "Secure HTTP by enabling client networks whitelisting",
-                    "default": false
-                },
-                "whitelistSourceRange": {
-                    "type": "array",
-                    "description": "List of client IPs",
-                    "default": "[]",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
+            "type": "array",
+            "description": "List of client networks",
+            "default": [],
+            "items": {}
         },
         "clouflareProxy": {
             "type": "boolean",
