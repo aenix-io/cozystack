@@ -1,0 +1,124 @@
+{{- if .Values.isolated }}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-internal-communication
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - {}
+  egress:
+  - toEndpoints:
+    - {}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-external-communication
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEntities:
+      - world
+  egress:
+  - toEntities:
+      - world
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-from-system
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEntities:
+    - cluster
+---
+{{- if ne (include "tenant.name" .) "tenant-root" }}
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-from-upper-tenants
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        "kubernetes.io/metadata.name": "tenant-root"
+    {{- if hasPrefix "tenant-" .Release.Namespace }}
+    {{- $parts := splitList "-" .Release.Namespace }}
+    {{- range $i, $v := $parts }}
+    {{- if ne $i 0 }}
+    - matchLabels:
+        "kubernetes.io/metadata.name": {{ join "-" (slice $parts 0 (add $i 1)) }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+{{- end }}
+---
+{{- if not .Values.etcd }}
+{{- $existingNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-to-etcd
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector:
+    matchLabels:
+      policy.cozystack.io/allow-to-etcd: "true"
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: "{{ index $existingNS.metadata.annotations "namespace.cozystack.io/etcd" }}"
+        cozystack.io/service: etcd
+{{- end }}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-to-apiserver
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector:
+    matchLabels:
+      policy.cozystack.io/allow-to-apiserver: "true"
+  egress:
+  - toEntities:
+    - kube-apiserver
+  - toPorts:
+    - ports:
+      - port: "6443"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-to-dns
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector: {}
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-to-ingress
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector: {}
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        cozystack.io/service: ingress
+{{- end }}
