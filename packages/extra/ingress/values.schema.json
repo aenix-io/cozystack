@@ -25,6 +25,11 @@
             "type": "boolean",
             "description": "Restoring original visitor IPs when Cloudflare proxied is enabled",
             "default": false
+        },
+        "dashboard": {
+            "type": "boolean",
+            "description": "Should ingress serve Cozystack service dashboard",
+            "default": false
         }
     }
 }
