@@ -24,3 +24,6 @@ whitelist: []
 
 ## @param clouflareProxy Restoring original visitor IPs when Cloudflare proxied is enabled
 clouflareProxy: false
+
+## @param dashboard Should ingress serve Cozystack service dashboard
+dashboard: false

@@ -113,6 +113,18 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
+  name: allow-to-dashboard
+  namespace: {{ include "tenant.name" . }}
+spec:
+  endpointSelector: {}
+  egress:
+  - toEndpoints:
+      - matchLabels:
+          io.kubernetes.pod.namespace: cozy-dashboard
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
   name: allow-to-ingress
   namespace: {{ include "tenant.name" . }}
 spec:
