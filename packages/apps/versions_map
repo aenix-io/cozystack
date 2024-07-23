@@ -6,7 +6,8 @@ http-cache 0.1.0 a956713
 http-cache 0.2.0 HEAD
 kafka 0.1.0 760f86d2
 kafka 0.2.0 a2cc83d
-kafka 0.2.1 HEAD
+kafka 0.2.1 3ac17018
+kafka 0.2.2 HEAD
 kubernetes 0.1.0 f642698
 kubernetes 0.2.0 7cd7de73
 kubernetes 0.3.0 7caccec1
