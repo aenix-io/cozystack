@@ -1,0 +1,8 @@
+
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param replicas Persistent Volume size for NATS
+##
+external: false
+replicas: 2

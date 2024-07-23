@@ -1,0 +1,7 @@
+nats:
+  statefulSet:
+    merge:
+      spec:
+        persistentVolumeClaimRetentionPolicy:
+          whenDeleted: Delete
+          whenScaled: Delete

@@ -1,0 +1,56 @@
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param size Persistent Volume size
+## @param replicas Number of Postgres replicas
+##
+external: false
+size: 10Gi
+replicas: 1
+
+## Configuration for the quorum-based synchronous replication
+## @param quorum.minSyncReplicas Minimum number of synchronous replicas that must acknowledge a transaction before it is considered committed.
+## @param quorum.maxSyncReplicas Maximum number of synchronous replicas that can acknowledge a transaction (must be lower than the number of instances).
+quorum:
+  minSyncReplicas: 0
+  maxSyncReplicas: 0
+
+## @section Configuration parameters
+
+## @param users [object] Users configuration
+## Example:
+## users:
+##   user1:
+##     password: strongpassword
+##   user2:
+##     password: hackme
+##
+users:
+  foo:
+    password: asd
+  bar:
+    password: asd
+  baz:
+    password: asd
+  boo:
+    password: asd
+
+## @section Backup parameters
+
+## @param backup.enabled Enable pereiodic backups
+## @param backup.s3Region The AWS S3 region where backups are stored
+## @param backup.s3Bucket The S3 bucket used for storing backups
+## @param backup.schedule Cron schedule for automated backups
+## @param backup.cleanupStrategy The strategy for cleaning up old backups
+## @param backup.s3AccessKey The access key for S3, used for authentication
+## @param backup.s3SecretKey The secret key for S3, used for authentication
+## @param backup.resticPassword The password for Restic backup encryption
+backup:
+  enabled: false
+  s3Region: us-east-1
+  s3Bucket: s3.example.org/postgres-backups
+  schedule: "0 2 * * *"
+  cleanupStrategy: "--keep-last=3 --keep-daily=3 --keep-within-weekly=1m"
+  s3AccessKey: oobaiRus9pah8PhohL1ThaeTa4UVa7gu
+  s3SecretKey: ju3eum4dekeich9ahM1te8waeGai0oog
+  resticPassword: ChaXoveekoh6eigh4siesheeda2quai0

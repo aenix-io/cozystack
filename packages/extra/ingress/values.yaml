@@ -14,3 +14,16 @@ replicas: 2
 ##   - "11.22.33.46"
 ##
 externalIPs: []
+
+## @param whitelist List of client networks
+## Example:
+## whitelist:
+## - "1.2.3.4"
+## - "10.100.0.0/16"
+whitelist: []
+
+## @param clouflareProxy Restoring original visitor IPs when Cloudflare proxied is enabled
+clouflareProxy: false
+
+## @param dashboard Should ingress serve Cozystack service dashboard
+dashboard: false

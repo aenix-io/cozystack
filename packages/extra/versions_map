@@ -1,9 +1,11 @@
 etcd 1.0.0 f7eaab0
 etcd 2.0.0 a6d0f7cf
 etcd 2.0.1 6fc1cc7d
-etcd 2.1.0 HEAD
+etcd 2.1.0 2b00fcf8
+etcd 2.2.0 HEAD
 ingress 1.0.0 f642698
 ingress 1.1.0 838bee5d
 ingress 1.2.0 HEAD
 monitoring 1.0.0 f642698
-monitoring 1.1.0 HEAD
+monitoring 1.1.0 15478a88
+monitoring 1.2.0 HEAD

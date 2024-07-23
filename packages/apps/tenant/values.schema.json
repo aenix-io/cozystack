@@ -21,6 +21,11 @@
             "type": "boolean",
             "description": "Deploy own Ingress Controller",
             "default": false
+        },
+        "isolated": {
+            "type": "boolean",
+            "description": "Enforce tenant namespace with network policies",
+            "default": false
         }
     }
 }
