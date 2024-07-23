@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/dashboard:v0.9.0
+ghcr.io/aenix-io/cozystack/dashboard:v0.10.0
