@@ -32,7 +32,17 @@
       }
     }
   },
-  "buildx.build.ref": "amd64/amd64/kk2drcq44gorgb3xwa8908pfc",
-  "containerimage.config.digest": "sha256:363589eb47379eb7548f047aae24045278f14db0b2026022b6bec33a04370f15",
-  "containerimage.digest": "sha256:f242fd77903f5f5a94ed157e98b0c4532e5ba91734d9653eaf26cfe4b23b017b"
+  "buildx.build.ref": "mybuild/mybuild0/o8ltjq4oxfsqoqx1j0l7kdupp",
+  "containerimage.config.digest": "sha256:c144c5f12a47af7880ee5f056b14177c07b585b8ab1e68b7e7900e1c923083cf",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:81caf89efe252ae2ca1990d08a3a314552d70ff36bcd4022b173c7150fbec805",
+    "size": 506,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:81caf89efe252ae2ca1990d08a3a314552d70ff36bcd4022b173c7150fbec805",
+  "image.name": "ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.30.1,ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.30.1-v0.10.0"
 }
