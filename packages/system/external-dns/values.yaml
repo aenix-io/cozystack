@@ -1,0 +1,9 @@
+external-dns:
+  fullnameOverride: external-dns
+  clusterDomain:
+  provider: cloudflare
+  cloudflare:
+    apiToken: ""
+    proxied: true
+    dnsRecordsPerPage: 100
+  txtOwnerId: ""  
