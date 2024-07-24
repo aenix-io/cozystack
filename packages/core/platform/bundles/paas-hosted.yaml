@@ -26,6 +26,12 @@ releases:
   namespace: cozy-cert-manager
   dependsOn: [cert-manager]
 
+- name: external-secrets-operator
+  releaseName: external-secrets-operator
+  chart: cozy-external-secrets-operator
+  namespace: cozy-external-secrets-operator
+  dependsOn: []
+  
 - name: victoria-metrics-operator
   releaseName: victoria-metrics-operator
   chart: cozy-victoria-metrics-operator
@@ -73,7 +79,7 @@ releases:
   releaseName: clickhouse-operator
   chart: cozy-clickhouse-operator
   namespace: cozy-clickhouse-operator
-  dependsOn: []
+  dependsOn: c
 
 - name: rabbitmq-operator
   releaseName: rabbitmq-operator

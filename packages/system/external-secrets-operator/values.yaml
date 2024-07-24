@@ -1,0 +1,40 @@
+external-secrets:
+  replicaCount: 1
+
+  bitwarden-sdk-server:
+    enabled: false  
+  installCRDs: true
+
+  serviceMonitor:
+    enabled: false
+    namespace: ""
+    additionalLabels: {}
+    interval: 30s
+    scrapeTimeout: 25s
+    honorLabels: false
+    metricRelabelings: []
+    # - action: replace
+    #   regex: (.*)
+    #   replacement: $1
+    #   sourceLabels:
+    #   - exported_namespace
+    #   targetLabel: namespace
+
+    # -- Relabel configs to apply to samples before ingestion. [Relabeling](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config)
+    relabelings: []
+    # - sourceLabels: [__meta_kubernetes_pod_node_name]
+    #   separator: ;
+    #   regex: ^(.*)$
+    #   targetLabel: nodename
+    #   replacement: $1
+    #   action: replace
+
+  metrics:
+
+    listen:
+      port: 8080
+
+    service:
+      enabled: false
+      port: 8080
+      annotations: {}
