@@ -155,6 +155,12 @@ releases:
   privileged: true
   dependsOn: [piraeus-operator,cilium,kubeovn,cert-manager]
 
+- name: snapshot-controller
+  releaseName: snapshot-controller
+  chart: cozy-snapshot-controller
+  namespace: cozy-snapshot-controller
+  dependsOn: [piraeus-operator,cilium,kubeovn,cert-manager,linstor]  
+
 - name: telepresence
   releaseName: traffic-manager
   chart: cozy-telepresence
