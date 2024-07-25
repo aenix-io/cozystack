@@ -17,6 +17,11 @@ spec:
     spec:
       runStrategy: Always
       template:
+        metadata:
+          labels:
+            {{- range .group.roles }}
+            node-role.kubernetes.io/{{ . }}: ""
+            {{- end }}
         spec:
           domain:
             cpu:
