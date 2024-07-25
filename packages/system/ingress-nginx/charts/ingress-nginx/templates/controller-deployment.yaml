@@ -19,7 +19,7 @@ spec:
     matchLabels:
       {{- include "ingress-nginx.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: controller
-  {{- if not (or .Values.controller.autoscaling.enabled .Values.controller.keda.enabled) }}
+  {{- if eq .Values.controller.autoscaling.enabled .Values.controller.keda.enabled }}
   replicas: {{ .Values.controller.replicaCount }}
   {{- end }}
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
@@ -80,7 +80,7 @@ spec:
       containers:
         - name: {{ .Values.controller.containerName }}
           {{- with .Values.controller.image }}
-          image: "{{- if .repository -}}{{ .repository }}{{ else }}{{ .registry }}/{{ include "ingress-nginx.image" . }}{{- end -}}:{{ .tag }}{{ include "ingress-nginx.imageDigest" . }}"
+          image: {{ if .repository }}{{ .repository }}{{ else }}{{ .registry }}/{{ include "ingress-nginx.image" . }}{{ end }}:{{ .tag }}{{ include "ingress-nginx.imageDigest" . }}
           {{- end }}
           imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
         {{- if .Values.controller.lifecycle }}
@@ -189,13 +189,13 @@ spec:
       {{- if .Values.controller.extraModules }}
         {{- range .Values.controller.extraModules }}
           {{- $containerSecurityContext := .containerSecurityContext | default $.Values.controller.containerSecurityContext }}
-          {{- include "extraModules" (dict "name" .name "image" .image "distroless" .distroless "containerSecurityContext" $containerSecurityContext "resources" .resources) | nindent 8 }}
+          {{- include "extraModules" (dict "name" .name "image" .image "containerSecurityContext" $containerSecurityContext "resources" .resources) | nindent 8 }}
         {{- end }}
       {{- end }}
       {{- if .Values.controller.opentelemetry.enabled }}
         {{- with .Values.controller.opentelemetry }}
           {{- $containerSecurityContext := .containerSecurityContext | default $.Values.controller.containerSecurityContext }}
-          {{- include "extraModules" (dict "name" .name "image" .image "distroless" .distroless "containerSecurityContext" $containerSecurityContext "resources" .resources) | nindent 8 }}
+          {{- include "extraModules" (dict "name" .name "image" .image "containerSecurityContext" $containerSecurityContext "resources" .resources) | nindent 8 }}
         {{- end }}
       {{- end }}
     {{- end }}
@@ -209,7 +209,7 @@ spec:
       tolerations: {{ toYaml .Values.controller.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.controller.affinity }}
-      affinity: {{ toYaml .Values.controller.affinity | nindent 8 }}
+      affinity: {{ tpl (toYaml .Values.controller.affinity) $ | nindent 8 }}
     {{- end }}
     {{- if .Values.controller.topologySpreadConstraints }}
       topologySpreadConstraints: {{ tpl (toYaml .Values.controller.topologySpreadConstraints) $ | nindent 8 }}
