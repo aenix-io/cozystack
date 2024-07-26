@@ -29,14 +29,10 @@ spec:
                 disk:
                   bus: virtio
                   pciAddress: 0000:07:00.0
-              - name: containerd
+              - name: ephemeral
                 disk:
                   bus: virtio
                   pciAddress: 0000:08:00.0
-              - name: kubelet
-                disk:
-                  bus: virtio
-                  pciAddress: 0000:09:00.0
               networkInterfaceMultiqueue: true
             memory:
               guest: {{ .group.resources.memory }}
@@ -45,12 +41,9 @@ spec:
           - name: system
             containerDisk:
               image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}@{{ index ($.Files.Get "images/ubuntu-container-disk.json" | fromJson) "containerimage.digest" }}"
-          - name: containerd
+          - name: ephemeral
             emptyDisk:
-              capacity: 20Gi
-          - name: kubelet
-            emptyDisk:
-              capacity: 20Gi
+              capacity: {{ .group.ephemeralStorage }}
 {{- end }}
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
@@ -133,17 +126,19 @@ spec:
         filesystems:
         - device: /dev/vdb
           filesystem: xfs
-          label: containerd
-          partition: "none"
-        - device: /dev/vdc
-          filesystem: xfs
-          label: kubelet
+          label: ephemeral
           partition: "none"
       mounts:
-      - ["LABEL=containerd", "/var/lib/containerd"]
-      - ["LABEL=kubelet", "/var/lib/kubelet"]
+      - ["LABEL=ephemeral", "/ephemeral"]
+      - ["/ephemeral/kubelet", "/var/lib/kubelet", "none", "bind,nofail"]
+      - ["/ephemeral/containerd", "/var/lib/containerd", "none", "bind,nofail"]
       preKubeadmCommands:
       - sed -i 's|root:x:|root::|' /etc/passwd
+      - systemctl stop containerd.service
+      - mkdir -p /ephemeral/kubelet /ephemeral/containerd
+      - mount -o bind /ephemeral/kubelet /var/lib/kubelet
+      - mount -o bind /ephemeral/containerd /var/lib/containerd
+      - systemctl start containerd.service
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs: {}

@@ -16,6 +16,7 @@ nodeGroups:
     resources:
       cpu: 2
       memory: 1024Mi
+    ephemeralStorage: 20Gi
     roles:
     - ingress-nginx
 
