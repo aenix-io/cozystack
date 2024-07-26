@@ -159,7 +159,7 @@ releases:
   releaseName: snapshot-controller
   chart: cozy-snapshot-controller
   namespace: cozy-snapshot-controller
-  dependsOn: [piraeus-operator,cilium,kubeovn,cert-manager,linstor]  
+  dependsOn: [cilium,kubeovn,cert-manager-issuers]  
 
 - name: telepresence
   releaseName: traffic-manager
