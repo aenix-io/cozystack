@@ -287,8 +287,7 @@ kubectl patch -n tenant-root hr/tenant-root --type=merge -p '{"spec":{ "values":
   "host": "example.org",
   "ingress": true,
   "monitoring": true,
-  "etcd": true,
-  "isolation": true
+  "etcd": true
 }}}'
 
 # Wait for HelmRelease be created
