@@ -5,8 +5,8 @@ snapshot-controller:
   webhook:
     replicaCount: 2
     revisionHistoryLimit: 10
-    hostNetwork: true
-    dnsPolicy: ClusterFirstWithHostNet
+    hostNetwork: false
+    dnsPolicy: ClusterFirst
     tls:
       certManagerIssuerRef:
         name: selfsigned-cluster-issuer
