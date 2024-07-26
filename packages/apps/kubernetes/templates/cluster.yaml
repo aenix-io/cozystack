@@ -48,7 +48,7 @@ spec:
               image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}@{{ index ($.Files.Get "images/ubuntu-container-disk.json" | fromJson) "containerimage.digest" }}"
           - name: ephemeral
             emptyDisk:
-              capacity: {{ .group.ephemeralStorage }}
+              capacity: {{ .group.ephemeralStorage | default "20Gi" }}
 {{- end }}
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
