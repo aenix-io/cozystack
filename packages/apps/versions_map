@@ -15,7 +15,8 @@ kubernetes 0.4.0 6cae6ce8
 kubernetes 0.5.0 6bd2d455
 kubernetes 0.6.0 4cbc8a2c
 kubernetes 0.7.0 ceefae03
-kubernetes 0.8.0 HEAD
+kubernetes 0.8.0 ac11056e
+kubernetes 0.8.1 HEAD
 mysql 0.1.0 f642698
 mysql 0.2.0 8b975ff0
 mysql 0.3.0 HEAD
