@@ -11,7 +11,7 @@
       {
         "uri": "pkg:docker/golang@1.22-bookworm?platform=linux%2Famd64",
         "digest": {
-          "sha256": "6c2780255bb7b881e904e303be0d7a079054160b2ce1efde446693c0850a39ad"
+          "sha256": "af9b40f2b1851be993763b85288f8434af87b5678af04355b1e33ff530b5765f"
         }
       },
       {
@@ -45,7 +45,17 @@
       }
     }
   },
-  "buildx.build.ref": "amd64/amd64/ydz7c2pwlqaadvlo84t1spegq",
-  "containerimage.config.digest": "sha256:1f918c5f4bd8a1c90596b7d4256c8a208482141ae3363ab0b4627203b3fa3b32",
-  "containerimage.digest": "sha256:90e2235e75febcac777c0338fa93d5e7522d82d029facb0c318305ed178a42ac"
+  "buildx.build.ref": "cozystack/cozystack0/3a5uyqqyj3lnwkgdniwjp341a",
+  "containerimage.config.digest": "sha256:db99b8b1e565f406af5b240b1ef76b5cc3ba1b510c6e035e1497c5089d65ee12",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:0e9fa8f6f5194b84227ea7e7b93ef77244b5550ec62671e04d398818dccfb282",
+    "size": 2083,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:0e9fa8f6f5194b84227ea7e7b93ef77244b5550ec62671e04d398818dccfb282",
+  "image.name": "ghcr.io/aenix-io/cozystack/cilium:1.15.5,ghcr.io/aenix-io/cozystack/cilium:1.15.5-v0.10.1"
 }

@@ -35,7 +35,17 @@
       }
     }
   },
-  "buildx.build.ref": "amd64/amd64/vvxs4dbzlno0vtdl1zudk54fj",
-  "containerimage.config.digest": "sha256:52a7ac58f30de8bec104f3fa9b3dcc674f37edfee184c5d4229e24f69f4ddcb2",
-  "containerimage.digest": "sha256:8906436ebd6452549f0634c6db693c7c3248c123f0c882bb8b1bde34ec05aeb6"
+  "buildx.build.ref": "cozystack/cozystack0/puq8k1x2nsc986l15a2vanb8s",
+  "containerimage.config.digest": "sha256:2c68c6ce6620a8c8afd84fed1c2265738d661a47ded0be21b2517b0309ed7307",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:fdabfe2caa3fe2d92ca4a07b60a55c91163d7db25aa12cc4c6034c32ac1dcb17",
+    "size": 703,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:fdabfe2caa3fe2d92ca4a07b60a55c91163d7db25aa12cc4c6034c32ac1dcb17",
+  "image.name": "ghcr.io/aenix-io/cozystack/dashboard:v0.10.1"
 }

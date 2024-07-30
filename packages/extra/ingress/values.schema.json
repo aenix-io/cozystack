@@ -14,6 +14,22 @@
             "items": {
                 "type": "string"
             }
+        },
+        "whitelist": {
+            "type": "array",
+            "description": "List of client networks",
+            "default": [],
+            "items": {}
+        },
+        "clouflareProxy": {
+            "type": "boolean",
+            "description": "Restoring original visitor IPs when Cloudflare proxied is enabled",
+            "default": false
+        },
+        "dashboard": {
+            "type": "boolean",
+            "description": "Should ingress serve Cozystack service dashboard",
+            "default": false
         }
     }
 }

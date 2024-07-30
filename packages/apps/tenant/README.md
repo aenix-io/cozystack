@@ -56,3 +56,4 @@ tenant-u1
 | `etcd`       | Deploy own Etcd cluster                                                                                                     | `false` |
 | `monitoring` | Deploy own Monitoring Stack                                                                                                 | `false` |
 | `ingress`    | Deploy own Ingress Controller                                                                                               | `false` |
+| `isolated`   | Enforce tenant namespace with network policies                                                                              | `false` |

@@ -9,10 +9,10 @@ metadata:
 spec:
   topicName: "{{ $topic.name }}"
   {{- with $topic.partitions }}
-  partitions: "{{ . }}"
+  partitions: {{ . }}
   {{- end }}
   {{- with $topic.replicas }}
-  replicas: "{{ . }}"
+  replicas: {{ . }}
   {{- end }}
   {{- with $topic.config }}
   config:
