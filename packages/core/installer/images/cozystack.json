@@ -1,10 +1,10 @@
 {
-  "buildx.build.ref": "cozystack/cozystack0/zk58yqp4vkrfgx3gdjumn9k70",
+  "buildx.build.ref": "cozystack/cozystack0/yrz86wtha0lfzho1mnejnjqe0",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-    "digest": "sha256:b92988122fa68adc85751384170a46895b5761cc5bf27e80b0b53b12b89b6d6c",
+    "digest": "sha256:dae1740df06a014e4014726792dac7a3c8b7eaa07e32857592e5462c92446659",
     "size": 685
   },
-  "containerimage.digest": "sha256:b92988122fa68adc85751384170a46895b5761cc5bf27e80b0b53b12b89b6d6c",
-  "image.name": "ghcr.io/aenix-io/cozystack/cozystack:latest"
+  "containerimage.digest": "sha256:dae1740df06a014e4014726792dac7a3c8b7eaa07e32857592e5462c92446659",
+  "image.name": "ghcr.io/aenix-io/cozystack/cozystack:v0.10.2"
 }
