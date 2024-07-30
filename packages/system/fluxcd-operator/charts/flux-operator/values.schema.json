@@ -293,6 +293,29 @@
             },
             "type": "object"
         },
+        "serviceMonitor": {
+            "default": {
+                "create": false,
+                "interval": "60s",
+                "scrapeTimeout": "30s"
+            },
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                },
+                "interval": {
+                    "type": "string"
+                },
+                "labels": {
+                    "properties": {},
+                    "type": "object"
+                },
+                "scrapeTimeout": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "tolerations": {
             "items": {
                 "type": "object"

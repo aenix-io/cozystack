@@ -77,6 +77,12 @@ spec:
                       NetworkPolicy restricts network access to the current namespace.
                       Defaults to true.
                     type: boolean
+                  tenantDefaultServiceAccount:
+                    description: |-
+                      TenantDefaultServiceAccount is the name of the service account
+                      to use as default when the multitenant lockdown is enabled.
+                      Defaults to the 'default' service account from the tenant namespace.
+                    type: string
                   type:
                     default: kubernetes
                     description: |-
