@@ -27,3 +27,4 @@ This list is sorted in chronological order, based on the submission date.
 | ------------ | ------- | ---- | ------------------ |
 | [Ænix](https://aenix.io/) | @kvaps | 2024-02-14 | Ænix provides consulting services for cloud providers and uses Cozystack as the main tool for organizing managed services for them. |
 | [Mediatech](https://mediatech.dev/) | @ugenk | 2024-05-01 | We're developing and hosting software for our and our custmer services. We're using cozystack as a kubernetes distribution for that. |
+| [Bootstack](https://bootstack.app/) | @mrkhachaturov | 2024-08-01| At Bootstack, we harness our specialized technology to develop a powerful Kubernetes operator uniquely optimized for constructing and managing cloud infrastructures.
