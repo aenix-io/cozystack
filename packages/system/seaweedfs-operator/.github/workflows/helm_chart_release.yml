@@ -1,0 +1,44 @@
+name: Release Helm Chart
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'deploy/helm/**'
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  release:
+    environment: helm-release
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3.5
+        id: helm-install
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run chart-releaser
+        id: helm-release
+        uses: helm/chart-releaser-action@v1.6.0
+        with:
+          charts_dir: deploy/helm
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_GENERATE_RELEASE_NOTES: true

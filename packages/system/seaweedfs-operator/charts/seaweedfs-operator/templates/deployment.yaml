@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}
+  labels:
+    app: {{ include "seaweedfs-operator.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "seaweedfs-operator.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "seaweedfs-operator.fullname" . }}
+    spec:
+      {{ if or .Values.image.credentials .Values.image.pullSecrets }}
+      imagePullSecrets:
+        - name: {{ include "seaweedfs-operator.pullSecretName" . }}
+      {{ end }}
+      containers:
+      - name: seaweedfs-operator
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - /manager
+        args:
+        - --leader-elect
+        env:
+        {{- if eq .Values.webhook.enabled false }}
+        - name: ENABLE_WEBHOOKS
+          value: "false"
+        {{- end }}
+        ports:
+        - name: {{ .Values.port.name }}
+          containerPort: {{ .Values.port.number }}
+          protocol: TCP
+        {{- if .Values.resources }}
+        resources: {{- toYaml .Values.resources | nindent 12 }}
+        {{- end }}
+        {{- if .Values.webhook.enabled }}
+        ports:
+        - name: https
+          containerPort: 443
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+        {{- end }}
+      terminationGracePeriodSeconds: 10
+      {{- if .Values.webhook.enabled }}
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: {{ include "seaweedfs-operator.fullname" . }}-webhook-server-cert
+          items:
+          - key: cert
+            path: tls.crt
+          - key: key
+            path: tls.key
+      {{- end }}

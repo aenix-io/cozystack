@@ -1,0 +1,61 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.2.0
+  hooks:
+    - id: trailing-whitespace
+    - id: end-of-file-fixer
+      exclude: "^deploy/helm/(values.schema.json|README.md)$"
+    - id: check-added-large-files
+- repo: local
+  hooks:
+    - id: make-fmt
+      name: make-fmt
+      entry: sh -c "make fmt"
+      language: system
+    - id: make-vet
+      name: make-vet
+      entry: sh -c "make vet"
+      language: system
+      require_serial: true
+    - id: make-nilaway-lint
+      name: make-nilaway-lint
+      entry: sh -c "make nilaway-lint"
+      language: system
+      require_serial: true
+#    - id: make-lint-fix
+#      name: make-lint-fix
+#      entry: sh -c "make lint-fix"
+#      language: system
+#      require_serial: true
+#    - id: make-generate-docs
+#      name: make-generate-docs
+#      entry: sh -c "make generate-docs"
+#      language: system
+#      require_serial: true
+#    - id: make-mod-tidy
+#      name: make-mod-tidy
+#      entry: sh -c "make mod-tidy"
+#      language: system
+#      require_serial: true
+#    - id: make-helm-lint
+#      name: make-helm-lint
+#      entry: sh -c "make helm-lint"
+#      language: system
+#      require_serial: true
+#    - id: make-helm-schema-run
+#      name: make-helm-schema-run
+#      entry: sh -c "make helm-schema-run"
+#      language: system
+#      require_serial: true
+#    - id: make-helm-docs-run
+#      name: make-helm-docs-run
+#      entry: sh -c "make helm-docs-run"
+#      language: system
+#      require_serial: true
+#    - id: make-helm-crd-copy
+#      name: make-helm-crd-copy
+#      entry: sh -c "make helm-crd-copy"
+#      language: system
+#      require_serial: true

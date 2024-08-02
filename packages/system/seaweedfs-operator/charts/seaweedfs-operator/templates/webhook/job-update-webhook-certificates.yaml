@@ -1,0 +1,149 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}-create-webhook-certificates
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+      containers:
+      - name: certgen
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20231011-8b53cabe0
+        args:
+          - create
+          - --host={{ include "seaweedfs-operator.fullname" . }}-webhook,{{ include "seaweedfs-operator.fullname" . }}-webhook.{{ .Release.Namespace }}.svc
+          - --namespace=$(POD_NAMESPACE)
+          - --secret-name={{ include "seaweedfs-operator.fullname" . }}-webhook-server-cert
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+      restartPolicy: OnFailure
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}-patch-mutating-webhook
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+      containers:
+      - name: certgen
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20231011-8b53cabe0
+        args:
+          - patch
+          - --webhook-name=mutating-webhook-configuration
+          - --namespace=$(POD_NAMESPACE)
+          - --patch-mutating=true
+          - --patch-validating=false
+          - --secret-name={{ include "seaweedfs-operator.fullname" . }}-webhook-server-cert
+          - --patch-failure-policy=Fail
+
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+      restartPolicy: OnFailure
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}-patch-validating-webhook
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+      containers:
+      - name: certgen
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20231011-8b53cabe0
+        args:
+          - patch
+          - --webhook-name=validating-webhook-configuration
+          - --namespace=$(POD_NAMESPACE)
+          - --patch-mutating=false
+          - --patch-validating=true
+          - --secret-name={{ include "seaweedfs-operator.fullname" . }}-webhook-server-cert
+          - --patch-failure-policy=Fail
+
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+      restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+rules:
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+      - mutatingwebhookconfigurations
+    verbs:
+      - get
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "seaweedfs-operator.fullname" . }}-update-webhook-certificates
+    namespace: {{ .Release.Namespace }}

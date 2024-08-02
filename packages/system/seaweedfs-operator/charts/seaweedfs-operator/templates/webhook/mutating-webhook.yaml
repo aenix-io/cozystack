@@ -1,0 +1,31 @@
+{{- if .Values.webhook.enabled }}
+
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  creationTimestamp: null
+  name: mutating-webhook-configuration
+webhooks:
+- clientConfig:
+    service:
+      name: {{ include "seaweedfs-operator.fullname" . }}-webhook
+      namespace: {{ .Release.Namespace }}
+      port: 443
+      path: /mutate-seaweed-seaweedfs-com-v1-seaweed
+  name: mseaweed.kb.io
+  sideEffects: None
+  admissionReviewVersions:
+  - v1
+  - v1beta1
+  rules:
+  - apiGroups:
+    - seaweed.seaweedfs.com
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - seaweeds
+
+{{- end }}

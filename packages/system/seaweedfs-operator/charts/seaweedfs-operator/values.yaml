@@ -1,0 +1,100 @@
+# -- Global Docker image parameters
+# Please, note that this will override the image parameters, including dependencies, configured to use the global value
+# Current available global Docker image parameters: imageRegistry
+global:
+  imageRegistry: "chrislusf"
+
+# -- String to partially override common.names.fullname template (will maintain the release name)
+nameOverride: ""
+
+# -- String to fully override common.names.fullname template
+fullnameOverride: ""
+
+# -- Annotations for all the deployed objects
+commonAnnotations: {}
+
+# -- Labels for all the deployed objects
+commonLabels: {}
+
+## Configure Kubernetes Rbac parameters
+rbac:
+  serviceAccount:
+    # -- name of the Kubernetes service account to create
+    name: default
+
+image:
+  registry: chrislusf
+  repository: seaweedfs-operator
+  # -- tag of image to use. Defaults to appVersion in Chart.yaml
+  tag: ""
+  # -- Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  pullPolicy: Always
+
+  ## Specify credentials to authorize in docker registry or set existing secrets in pullSecrets
+  # credentials:
+  #  registry: private-registry
+  #  username: username
+  #  password: password
+
+  ## Optionally specify imagePullSecret.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  # pullSecrets: myRegistryKeySecretName
+
+# -- Set number of pod replicas
+replicaCount: 1
+
+## Configure container port
+port:
+  # -- name of the container port to use for the Kubernete service and ingress
+  name: http
+  # -- container port number to use for the Kubernete service and ingress
+  number: 8080
+
+## Configure Service
+service:
+  # -- name of the port to use for Kubernetes service
+  portName: http
+  # -- port to use for Kubernetes service
+  port: 8080
+
+grafanaDashboard:
+  # -- Enable or disable Grafana Dashboard configmap
+  enabled: true
+
+serviceMonitor:
+  # -- Enable or disable ServiceMonitor for prometheus metrics
+  enabled: true
+  # -- Specify the interval at which metrics should be scraped
+  interval: 10s
+  # -- Specify the timeout after which the scrape is ended
+  scrapeTimeout: 10s
+  ## Specify Metric Relabellings to add to the scrape endpoint
+  # -- Specify honorLabels parameter to add the scrape endpoint
+  honorLabels: true
+  ## Specify the release for ServiceMonitor. Sometimes it should be custom for prometheus operator to work
+  # release: ""
+  ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
+  # -- Used to pass Labels that are used by the Prometheus installed in your cluster to select Service Monitors to work with
+  additionalLabels: {}
+
+webhook:
+  # -- Enable or disable webhooks
+  enabled: true
+
+## seaweedfs-operator containers' resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  limits:
+    # -- seaweedfs-operator containers' cpu limit (maximum allowes CPU)
+    cpu: 500m
+    # -- seaweedfs-operator containers' memory limit (maximum allowes memory)
+    memory: 500Mi
+  requests:
+    # -- seaweedfs-operator containers' cpu request (how much is requested by default)
+    cpu: 100m
+    # -- seaweedfs-operator containers' memory request (how much is requested by default)
+    memory: 50Mi

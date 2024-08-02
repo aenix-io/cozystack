@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "seaweedfs-operator.fullname" . }}
+  labels:
+    app: {{ include "seaweedfs-operator.fullname" . }}
+    app.kubernetes.io/component: metrics
+spec:
+  type: ClusterIP
+  ports:
+    - name: {{ .Values.service.portName }}
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.port.number }}
+  selector:
+    app: {{ include "seaweedfs-operator.fullname" . }}

@@ -1,0 +1,4 @@
+seaweedfs-operator:
+  fullnameOverride: "seaweedfs-operator"
+  image:
+    tag: "latest@sha256:f35b62f4b09043a88bbb6bee3335b5a1357df1bc7ff8124f4762c6ec833eb1e4"
