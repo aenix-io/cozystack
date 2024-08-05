@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ .Release.Name }}-csi
+  labels:
+    cozystack.io/repository: system
+    coztstack.io/target-cluster-name: {{ .Release.Name }}
+spec:
+  interval: 1m
+  releaseName: csi
+  chart:
+    spec:
+      chart: cozy-kubevirt-csi-node
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-system
+        namespace: cozy-system
+  kubeConfig:
+    secretRef:
+      name: {{ .Release.Name }}-kubeconfig
+  targetNamespace: cozy-csi
+  storageNamespace: cozy-csi
+  install:
+    createNamespace: true
+  dependsOn:
+  - name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}
