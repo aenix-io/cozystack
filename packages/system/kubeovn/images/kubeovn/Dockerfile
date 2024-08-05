@@ -1,4 +1,4 @@
-ARG VERSION=v1.13.0
+ARG VERSION=v1.12.19
 ARG BASE_TAG=$VERSION
 
 FROM golang:1.22-bookworm as builder
