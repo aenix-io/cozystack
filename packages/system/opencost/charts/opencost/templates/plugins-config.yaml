@@ -1,0 +1,16 @@
+{{- if .Values.plugins.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "opencost.fullname" . }}-plugins-config
+  labels:
+    app: {{ template "opencost.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  {{- range $key, $config := .Values.plugins.configs }}
+  {{ $key }}_config.json:
+    {{ $config | b64enc | indent 4}}
+  {{- end }}
+{{- end }}
