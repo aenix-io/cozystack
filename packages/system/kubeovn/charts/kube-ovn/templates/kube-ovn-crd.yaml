@@ -503,6 +503,31 @@ spec:
                     type: string
                 qosPolicy:
                   type: string
+                bgpSpeaker:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                    asn:
+                      type: integer
+                    remoteAsn:
+                      type: integer
+                    neighbors:
+                      type: array
+                      items:
+                        type: string
+                    holdTime:
+                      type: string
+                    routerId:
+                      type: string
+                    password:
+                      type: string
+                    enableGracefulRestart:
+                      type: boolean
+                    extraArgs:
+                      type: array
+                      items:
+                        type: string
                 tolerations:
                   type: array
                   items:
@@ -1191,6 +1216,9 @@ spec:
       - jsonPath: .status.ready
         name: Ready
         type: boolean
+      - jsonPath: .spec.externalSubnet
+        name: ExternalSubnet
+        type: string
       schema:
         openAPIV3Schema:
           type: object
@@ -1297,7 +1325,11 @@ spec:
                   type: boolean
                 v4Eip:
                   type: string
+                v6Eip:
+                  type: string
                 v4Ip:
+                  type: string
+                v6Ip:
                   type: string
                 vpc:
                   type: string
@@ -1490,7 +1522,11 @@ spec:
                   type: boolean
                 v4Eip:
                   type: string
+                v6Eip:
+                  type: string
                 v4Ip:
+                  type: string
+                v6Ip:
                   type: string
                 vpc:
                   type: string
@@ -1968,6 +2004,8 @@ spec:
                 dhcpV6OptionsUUID:
                   type: string
                 u2oInterconnectionIP:
+                  type: string
+                u2oInterconnectionMAC:
                   type: string
                 u2oInterconnectionVPC:
                   type: string

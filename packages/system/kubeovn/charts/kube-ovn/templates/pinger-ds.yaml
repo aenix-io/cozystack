@@ -29,6 +29,24 @@ spec:
           operator: Exists
       serviceAccountName: kube-ovn-app
       hostPID: true
+      initContainers:
+        - name: hostpath-init
+          image: {{ include "kubeovn.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - "chown -R nobody: /var/log/kube-ovn"
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              drop:
+                - ALL
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - name: kube-ovn-log
+              mountPath: /var/log/kube-ovn
       containers:
         - name: pinger
           image: {{ include "kubeovn.image" . }}
@@ -37,7 +55,7 @@ spec:
           args:
           - --external-address=
           {{- if eq .Values.networking.NET_STACK "dual_stack" -}}
-          {{ .Values.dual_stack.PINGER_EXTERNAL_ADDRESS }} 
+          {{ .Values.dual_stack.PINGER_EXTERNAL_ADDRESS }}
           {{- else if eq .Values.networking.NET_STACK "ipv4" -}}
           {{ .Values.ipv4.PINGER_EXTERNAL_ADDRESS }}
           {{- else if eq .Values.networking.NET_STACK "ipv6" -}}
@@ -55,12 +73,16 @@ spec:
           - --logtostderr=false
           - --alsologtostderr=true
           - --log_file=/var/log/kube-ovn/kube-ovn-pinger.log
-          - --log_file_max_size=0
+          - --log_file_max_size=200
           - --enable-metrics={{- .Values.networking.ENABLE_METRICS }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            runAsUser: 65534
             privileged: false
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+                - NET_RAW
           env:
             - name: ENABLE_SSL
               value: "{{ .Values.networking.ENABLE_SSL }}"

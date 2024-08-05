@@ -47,6 +47,24 @@ spec:
       priorityClassName: system-cluster-critical
       serviceAccountName: ovn
       hostNetwork: true
+      initContainers:
+        - name: hostpath-init
+          image: {{ include "kubeovn.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - "chown -R nobody: /var/log/kube-ovn"
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              drop:
+                - ALL
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - name: kube-ovn-log
+              mountPath: /var/log/kube-ovn
       containers:
         - name: kube-ovn-controller
           image: {{ include "kubeovn.image" . }}
@@ -84,11 +102,18 @@ spec:
           - --gc-interval={{- .Values.performance.GC_INTERVAL }}
           - --inspect-interval={{- .Values.performance.INSPECT_INTERVAL }}
           - --log_file=/var/log/kube-ovn/kube-ovn-controller.log
-          - --log_file_max_size=0
+          - --log_file_max_size=200
           - --enable-lb-svc={{- .Values.func.ENABLE_LB_SVC }}
           - --keep-vm-ip={{- .Values.func.ENABLE_KEEP_VM_IP }}
           - --enable-metrics={{- .Values.networking.ENABLE_METRICS }}
           - --node-local-dns-ip={{- .Values.networking.NODE_LOCAL_DNS_IP }}
+          - --secure-serving={{- .Values.func.SECURE_SERVING }}
+          securityContext:
+            runAsUser: 65534
+            privileged: false
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
           env:
             - name: ENABLE_SSL
               value: "{{ .Values.networking.ENABLE_SSL }}"
@@ -96,6 +121,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: KUBE_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -106,6 +135,10 @@ spec:
                   fieldPath: spec.nodeName
             - name: OVN_DB_IPS
               value: "{{ .Values.MASTER_NODES | default (include "kubeovn.nodeIPs" .) }}"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: POD_IPS
               valueFrom:
                 fieldRef:
@@ -127,12 +160,14 @@ spec:
             exec:
               command:
                 - /kube-ovn/kube-ovn-controller-healthcheck
+                - --tls={{- .Values.func.SECURE_SERVING }}
             periodSeconds: 3
             timeoutSeconds: 45
           livenessProbe:
             exec:
               command:
                 - /kube-ovn/kube-ovn-controller-healthcheck
+                - --tls={{- .Values.func.SECURE_SERVING }}
             initialDelaySeconds: 300
             periodSeconds: 7
             failureThreshold: 5
