@@ -1,0 +1,7 @@
+suite: test deployment snapshot
+templates:
+  - templates/deployment.yaml
+tests:
+  - it: pod spec should match snapshot
+    asserts:
+      - matchSnapshot: {}
