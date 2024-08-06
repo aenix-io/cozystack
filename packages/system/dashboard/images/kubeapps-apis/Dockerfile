@@ -11,9 +11,11 @@ RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/${VERSIO
 COPY fluxcd.diff /patches/fluxcd.diff
 COPY labels.diff /patches/labels.diff
 COPY reconcile-strategy.diff /patches/reconcile-strategy.diff
+COPY dashboard-resource.diff /patches/dashboard-resource.diff
 RUN patch -p1 < /patches/fluxcd.diff
 RUN patch -p1 < /patches/labels.diff
 RUN patch -p1 < /patches/reconcile-strategy.diff
+RUN patch -p1 < /patches/dashboard-resource.diff
 
 FROM bitnami/golang:1.22.2 as builder
 WORKDIR /go/src/github.com/vmware-tanzu/kubeapps
