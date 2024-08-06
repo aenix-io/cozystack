@@ -1,5 +1,5 @@
 {{/*
-Copyright VMware, Inc.
+Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
@@ -23,17 +23,20 @@ Usage:
 */}}
 {{- define "common.compatibility.renderSecurityContext" -}}
 {{- $adaptedContext := .secContext -}}
-{{- if .context.Values.global.compatibility -}}
-  {{- if .context.Values.global.compatibility.openshift -}}
-    {{- if or (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "force") (and (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "auto") (include "common.compatibility.isOpenshift" .context)) -}}
-      {{/* Remove incompatible user/group values that do not work in Openshift out of the box */}}
-      {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
-      {{- if not .secContext.seLinuxOptions -}}
-      {{/* If it is an empty object, we remove it from the resulting context because it causes validation issues */}}
-      {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
-      {{- end -}}
+
+{{- if (((.context.Values.global).compatibility).openshift) -}}
+  {{- if or (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "force") (and (eq .context.Values.global.compatibility.openshift.adaptSecurityContext "auto") (include "common.compatibility.isOpenshift" .context)) -}}
+    {{/* Remove incompatible user/group values that do not work in Openshift out of the box */}}
+    {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
+    {{- if not .secContext.seLinuxOptions -}}
+    {{/* If it is an empty object, we remove it from the resulting context because it causes validation issues */}}
+    {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
     {{- end -}}
   {{- end -}}
+{{- end -}}
+{{/* Remove fields that are disregarded when running the container in privileged mode */}}
+{{- if $adaptedContext.privileged -}}
+  {{- $adaptedContext = omit $adaptedContext "capabilities" "seLinuxOptions" -}}
 {{- end -}}
 {{- omit $adaptedContext "enabled" | toYaml -}}
 {{- end -}}

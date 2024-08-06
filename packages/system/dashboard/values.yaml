@@ -24,3 +24,12 @@ kubeapps:
       .login-group .clr-form-control .clr-control-label {
         display: none;
       }
+      .appview-separator div.appview-first-row div.center {
+        display: none;
+      }
+      .appview-separator div.appview-first-row section[aria-labelledby="app-secrets"] {
+        display: none;
+      }
+      .appview-first-row section[aria-labelledby="access-urls-title"] {
+        width: 100%;
+      }
