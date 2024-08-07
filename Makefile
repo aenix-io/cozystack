@@ -6,6 +6,7 @@ build:
 	make -C packages/system/cilium image
 	make -C packages/system/kubeovn image
 	make -C packages/system/dashboard image
+	make -C packages/system/kamaji image
 	make -C packages/core/installer image
 	make manifests
 
