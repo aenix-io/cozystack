@@ -1191,6 +1191,9 @@ spec:
       - jsonPath: .status.ready
         name: Ready
         type: boolean
+      - jsonPath: .spec.externalSubnet
+        name: ExternalSubnet
+        type: string
       schema:
         openAPIV3Schema:
           type: object
@@ -1968,6 +1971,8 @@ spec:
                 dhcpV6OptionsUUID:
                   type: string
                 u2oInterconnectionIP:
+                  type: string
+                u2oInterconnectionMAC:
                   type: string
                 u2oInterconnectionVPC:
                   type: string

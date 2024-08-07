@@ -39,9 +39,9 @@ spec:
       containers:
         - name: openvswitch
           {{- if .Values.DPDK }}
-          image: {{ include "kubeovn.image" . }}
+          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.dpdkRepository }}:{{ .Values.DPDK_VERSION }}-{{ .Values.global.images.kubeovn.tag }}
           {{- else }}
-          image: {{ include "kubeovn.image" . }}
+          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.DPDK }}
@@ -134,8 +134,7 @@ spec:
               {{- else }}
               command:
                 - bash
-                - -c
-                - LOG_ROTATE=true /kube-ovn/ovs-healthcheck.sh
+                - /kube-ovn/ovs-healthcheck.sh
               {{- end }}
             initialDelaySeconds: 10
             periodSeconds: 5

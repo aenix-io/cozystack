@@ -49,7 +49,7 @@ spec:
       hostNetwork: true
       containers:
         - name: kube-ovn-controller
-          image: {{ include "kubeovn.image" . }}
+          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
           {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
@@ -84,7 +84,7 @@ spec:
           - --gc-interval={{- .Values.performance.GC_INTERVAL }}
           - --inspect-interval={{- .Values.performance.INSPECT_INTERVAL }}
           - --log_file=/var/log/kube-ovn/kube-ovn-controller.log
-          - --log_file_max_size=0
+          - --log_file_max_size=200
           - --enable-lb-svc={{- .Values.func.ENABLE_LB_SVC }}
           - --keep-vm-ip={{- .Values.func.ENABLE_KEEP_VM_IP }}
           - --enable-metrics={{- .Values.networking.ENABLE_METRICS }}
