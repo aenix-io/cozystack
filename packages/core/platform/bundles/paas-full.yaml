@@ -161,6 +161,12 @@ releases:
   namespace: cozy-snapshot-controller
   dependsOn: [cilium,kubeovn,cert-manager-issuers]  
 
+- name: objectstorage-controller
+  releaseName: objectstorage-controller
+  chart: cozy-objectstorage-controller
+  namespace: cozy-objectstorage-controller
+  dependsOn: [cilium,kubeovn]
+
 - name: telepresence
   releaseName: traffic-manager
   chart: cozy-telepresence
