@@ -13,7 +13,6 @@ update-chart:
 	helm repo update bitnami
 	helm pull bitnami/kubeapps --untar --untardir charts
 	rm -rf charts/kubeapps/charts/postgresql/
-	ln -s ../../images charts/kubeapps/images
 	sed -i 's/.cluster.local//g' charts/kubeapps/templates/kubeappsapis/deployment.yaml
 	patch --no-backup-if-mismatch charts/kubeapps/templates/frontend/configmap.yaml < patches/logos.patch
 
@@ -35,7 +34,15 @@ image-dashboard:
 		--metadata-file images/dashboard.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/dashboard:$(call settag,$(TAG))" > images/dashboard.tag
+	REGISTRY="$(REGISTRY)" \
+		yq -i '.kubeapps.dashboard.image.registry = strenv(REGISTRY)' values.yaml
+	REPOSITORY="dashboard" \
+		yq -i '.kubeapps.dashboard.image.repository = strenv(REPOSITORY)' values.yaml
+	TAG="$(call settag,$(TAG))" \
+		yq -i '.kubeapps.dashboard.image.tag = strenv(TAG)' values.yaml
+	DIGEST=$$(yq e '."containerimage.digest"' images/dashboard.json -o json -r) \
+		yq -i '.kubeapps.dashboard.image.digest = strenv(DIGEST)' values.yaml
+	rm -f images/dashboard.json
 
 image-kubeapps-apis:
 	docker buildx build images/kubeapps-apis \
@@ -46,4 +53,12 @@ image-kubeapps-apis:
 		--metadata-file images/kubeapps-apis.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/kubeapps-apis:$(call settag,$(TAG))" > images/kubeapps-apis.tag
+	REGISTRY="$(REGISTRY)" \
+		yq -i '.kubeapps.kubeappsapis.image.registry = strenv(REGISTRY)' values.yaml
+	REPOSITORY="kubeapps-apis" \
+		yq -i '.kubeapps.kubeappsapis.image.repository = strenv(REPOSITORY)' values.yaml
+	TAG="$(call settag,$(TAG))" \
+		yq -i '.kubeapps.kubeappsapis.image.tag = strenv(TAG)' values.yaml
+	DIGEST=$$(yq e '."containerimage.digest"' images/kubeapps-apis.json -o json -r) \
+		yq -i '.kubeapps.kubeappsapis.image.digest = strenv(DIGEST)' values.yaml
+	rm -f images/kubeapps-apis.json

@@ -1,15 +1,12 @@
 kubeapps:
   fullnameOverride: dashboard
-
   postgresql:
     enabled: false
-
   packaging:
     helm:
       enabled: false
     flux:
       enabled: true
-
   dashboard:
     customStyle: |
       #serviceaccount-selector {
@@ -33,3 +30,14 @@ kubeapps:
       .appview-first-row section[aria-labelledby="access-urls-title"] {
         width: 100%;
       }
+    image:
+      registry: ghcr.io/aenix-io/cozystack
+      repository: dashboard
+      tag: latest
+      digest: sha256:4818712e9fc9c57cc321512760c3226af564a04e69d4b3ec9229ab91fd39abeb
+  kubeappsapis:
+    image:
+      registry: ghcr.io/aenix-io/cozystack
+      repository: kubeapps-apis
+      tag: latest
+      digest: sha256:bf3210e54a4522bd53487673c3da80383c09019e44874298d9b96423064ed226
