@@ -40,14 +40,14 @@ spec:
       hostNetwork: true
       containers:
         - name: kube-ovn-monitor
-          image: {{ include "kubeovn.image" . }}
+          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/kube-ovn/start-ovn-monitor.sh"]
           args:
           - --log_file=/var/log/kube-ovn/kube-ovn-monitor.log
           - --logtostderr=false
           - --alsologtostderr=true
-          - --log_file_max_size=0
+          - --log_file_max_size=200
           securityContext:
             runAsUser: 0
             privileged: false

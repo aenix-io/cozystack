@@ -11,8 +11,6 @@ update:
 	curl -sSL https://github.com/kubeovn/kube-ovn/archive/refs/heads/master.tar.gz | \
 	tar xzvf - --strip 1 kube-ovn-master/charts
 	patch --no-backup-if-mismatch -p4 < patches/cozyconfig.diff
-	ln -s ../../images charts/kube-ovn/images
-	sed -i '/image:/ s/{{.*}}/{{ include "kubeovn.image" . }}/g' `grep -rl image: charts/kube-ovn/templates/`
 
 image:
 	docker buildx build images/kubeovn \
@@ -24,4 +22,10 @@ image:
 		--metadata-file images/kubeovn.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/kubeovn:$(call settag,$(KUBEOVN_TAG))" > images/kubeovn.tag
+	REGISTRY="$(REGISTRY)" \
+		yq -i '.global.registry.address = strenv(REGISTRY)' values.yaml
+	REPOSITORY="kubeovn" \
+		yq -i '.global.images.kubeovn.repository = strenv(REPOSITORY)' values.yaml
+	TAG="$(call settag,$(KUBEOVN_TAG))@$$(yq e '."containerimage.digest"' images/kubeovn.json -o json -r)" \
+		yq -i '.global.images.kubeovn.tag = strenv(TAG)' values.yaml
+	rm -f images/kubeovn.json
