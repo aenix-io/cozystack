@@ -45,7 +45,7 @@ spec:
           volumes:
           - name: system
             containerDisk:
-              image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}@{{ index ($.Files.Get "images/ubuntu-container-disk.json" | fromJson) "containerimage.digest" }}"
+              image: "{{ $.Files.Get "images/ubuntu-container-disk.tag" | trim }}"
           - name: ephemeral
             emptyDisk:
               capacity: {{ .group.ephemeralStorage | default "20Gi" }}
