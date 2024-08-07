@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-dashboard-resources
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  resourceNames:
+  - postgres-service-r
+  - postgres-service-ro
+  - postgres-service-rw
+  verbs: ["get", "list", "watch"]

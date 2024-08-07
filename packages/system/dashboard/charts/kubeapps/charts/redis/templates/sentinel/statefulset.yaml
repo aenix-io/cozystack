@@ -1,5 +1,5 @@
 {{- /*
-Copyright VMware, Inc.
+Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
@@ -18,6 +18,7 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.replica.replicaCount }}
+  revisionHistoryLimit: {{ .Values.replica.revisionHistoryLimit }}
   {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.replica.podLabels .Values.commonLabels ) "context" . ) }}
   selector:
     matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
@@ -278,10 +279,8 @@ spec:
               mountPath: /opt/bitnami/scripts/start-scripts
             - name: health
               mountPath: /health
-            {{- if .Values.sentinel.persistence.enabled }}
             - name: sentinel-data
               mountPath: /opt/bitnami/redis-sentinel/etc
-            {{- end }}
             {{- if .Values.auth.usePasswordFiles }}
             - name: redis-password
               mountPath: /opt/bitnami/redis/secrets/
@@ -464,7 +463,7 @@ spec:
               mountPath: /opt/bitnami/scripts/start-scripts
             - name: health
               mountPath: /health
-            {{- if .Values.sentinel.service.createMaster}}
+            {{- if or .Values.sentinel.masterService.enabled .Values.sentinel.service.createMaster}}
             - name: kubectl-shared
               mountPath: /etc/shared
             {{- end }}
@@ -593,7 +592,7 @@ spec:
             {{- include "common.tplvalues.render" ( dict "value" .Values.metrics.extraVolumeMounts "context" $ ) | nindent 12 }}
             {{- end }}
         {{- end }}
-        {{- if .Values.sentinel.service.createMaster }}
+        {{- if or .Values.sentinel.masterService.enabled .Values.sentinel.service.createMaster }}
         - name: kubectl-shared
           image: {{ template "redis.kubectl.image" . }}
           imagePullPolicy: {{ .Values.kubectl.image.pullPolicy | quote }}
@@ -688,7 +687,7 @@ spec:
           configMap:
             name: {{ printf "%s-health" (include "common.names.fullname" .) }}
             defaultMode: 0755
-        {{- if .Values.sentinel.service.createMaster}}
+        {{- if or .Values.sentinel.masterService.enabled .Values.sentinel.service.createMaster}}
         - name: kubectl-shared
           emptyDir: {}
         - name: kubectl-scripts

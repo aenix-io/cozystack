@@ -1,10 +1,10 @@
 # Copyright 2018-2023 the Kubeapps contributors.
 # SPDX-License-Identifier: Apache-2.0
 
-FROM bitnami/node:20.12.1 AS build
+FROM bitnami/node:20.15.1 AS build
 WORKDIR /app
 
-ARG VERSION=2.10.0
+ARG VERSION=2.11.0
 RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/v${VERSION}.tar.gz | tar xzf - --strip-components=2 kubeapps-${VERSION}/dashboard
 
 COPY apple-touch-icon.png favicon-16x16.png favicon-32x32.png favicon.ico mstile-144x144.png mstile-150x150.png mstile-310x150.png mstile-310x310.png mstile-70x70.png safari-pinned-tab.svg public/
