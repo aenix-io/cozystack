@@ -17,15 +17,6 @@ cilium:
     mode: "kubernetes"
   k8sServiceHost: localhost
   k8sServicePort: 7445
-
-# cni:
-#   chainingMode: generic-veth
-#   customConf: true
-#   configMap: cni-configuration
-# routingMode: native
-# enableIPv4Masquerade: false
-#  enableIdentityMark: false
-
   cni:
     chainingMode: generic-veth
     customConf: true
@@ -38,5 +29,9 @@ cilium:
   #enforceDeviceDetection: true
   devices: ovn0
   extraEnv:
-  - name: CILIUM_ENFORCE_DEVICE_DETECTION
-    value: "true"
+    - name: CILIUM_ENFORCE_DEVICE_DETECTION
+      value: "true"
+  image:
+    repository: ghcr.io/aenix-io/cozystack/cilium
+    tag: latest
+    digest: "sha256:8110f6b17ec98d87d9aebf3f4b99409f020840a958166e28c74b2d4e1bfb5a51"
