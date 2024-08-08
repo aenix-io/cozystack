@@ -123,7 +123,13 @@ releases:
   releaseName: snapshot-controller
   chart: cozy-snapshot-controller
   namespace: cozy-snapshot-controller
-  dependsOn: [cilium,cert-manager-issuers]  
+  dependsOn: [cilium,cert-manager-issuers]
+
+- name: objectstorage-controller
+  releaseName: objectstorage-controller
+  chart: cozy-objectstorage-controller
+  namespace: cozy-objectstorage-controller
+  dependsOn: [cilium]
 
 - name: linstor
   releaseName: linstor
