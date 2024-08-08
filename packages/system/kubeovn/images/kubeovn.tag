@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/kubeovn:latest
+ghcr.io/aenix-io/cozystack/kubeovn:v1.13.0

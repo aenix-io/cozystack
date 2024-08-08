@@ -32,7 +32,7 @@
       }
     }
   },
-  "buildx.build.ref": "cozystack/cozystack0/xkanpm0dojuj7v0lo951qocfb",
+  "buildx.build.ref": "cozystack/cozystack0/zie1df5xk0xb5lj1fmedk76qx",
   "containerimage.config.digest": "sha256:c144c5f12a47af7880ee5f056b14177c07b585b8ab1e68b7e7900e1c923083cf",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
@@ -44,5 +44,5 @@
     }
   },
   "containerimage.digest": "sha256:81caf89efe252ae2ca1990d08a3a314552d70ff36bcd4022b173c7150fbec805",
-  "image.name": "ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.30.1,ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.30.1-v0.10.1"
+  "image.name": "ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.30.1,ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.30.1-v0.10.3"
 }

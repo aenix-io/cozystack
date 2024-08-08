@@ -11,7 +11,7 @@
       {
         "uri": "pkg:docker/golang@1.22-bookworm?platform=linux%2Famd64",
         "digest": {
-          "sha256": "af9b40f2b1851be993763b85288f8434af87b5678af04355b1e33ff530b5765f"
+          "sha256": "39b7e6ebaca464d51989858871f792f2e186dce8ce0cbdba7e88e4444b244407"
         }
       }
     ],
@@ -35,17 +35,17 @@
       }
     }
   },
-  "buildx.build.ref": "cozystack/cozystack0/e64wck0ep3sxlx32mud1oyyrz",
-  "containerimage.config.digest": "sha256:98931ff70d35bc0a275ab76f860708bb19a98a4e947ff56851e436dc197cab9c",
+  "buildx.build.ref": "cozystack/cozystack0/3kqxn3juk572lfi4come65181",
+  "containerimage.config.digest": "sha256:05764289191ef541c37c86ef63dec99e24a159fba3a657c8427627b021802a1f",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:2ab726a9a9b73ad98c8852099f8b1eb458a556804981cc3653edee7c74e7b8d0",
+    "digest": "sha256:c658f94e663d41c2f88b41e2693009a55dfeaa39a7cbc1e88f33b9f4a6bda8d5",
     "size": 5015,
     "platform": {
       "architecture": "amd64",
       "os": "linux"
     }
   },
-  "containerimage.digest": "sha256:2ab726a9a9b73ad98c8852099f8b1eb458a556804981cc3653edee7c74e7b8d0",
-  "image.name": "ghcr.io/aenix-io/cozystack/kubeovn:latest,ghcr.io/aenix-io/cozystack/kubeovn:latest"
+  "containerimage.digest": "sha256:c658f94e663d41c2f88b41e2693009a55dfeaa39a7cbc1e88f33b9f4a6bda8d5",
+  "image.name": "ghcr.io/aenix-io/cozystack/kubeovn:v1.13.0,ghcr.io/aenix-io/cozystack/kubeovn:v1.13.0-v0.10.3"
 }
