@@ -14,7 +14,9 @@ image-nginx:
 		--metadata-file images/nginx-cache.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG))" > images/nginx-cache.tag
+	echo "$(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG))@$$(yq e '."containerimage.digest"' images/nginx-cache.json -o json -r)" \
+		> images/nginx-cache.tag
+	rm -f images/nginx-cache.json
 
 generate:
 	readme-generator -v values.yaml -s values.schema.json -r README.md

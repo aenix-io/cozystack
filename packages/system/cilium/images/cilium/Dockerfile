@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:experimental
 
-ARG VERSION=v1.15.5
+ARG VERSION=v1.15.7
 
 FROM golang:1.22-bookworm as builder
 

@@ -1,0 +1,30 @@
+diff --git a/internal/kubeadm/uploadconfig.go b/internal/kubeadm/uploadconfig.go
+index 0dc9e71..e516390 100644
+--- a/internal/kubeadm/uploadconfig.go
++++ b/internal/kubeadm/uploadconfig.go
+@@ -98,21 +98,15 @@ func getKubeletConfigmapContent(kubeletConfiguration KubeletConfiguration) ([]by
+ 				CacheUnauthorizedTTL: zeroDuration,
+ 			},
+ 		},
+-		CgroupDriver:              kubeletConfiguration.TenantControlPlaneCgroupDriver,
+-		ClusterDNS:                kubeletConfiguration.TenantControlPlaneDNSServiceIPs,
+-		ClusterDomain:             kubeletConfiguration.TenantControlPlaneDomain,
+-		CPUManagerReconcilePeriod: zeroDuration,
+-		EvictionHard: map[string]string{
+-			"imagefs.available": "0%",
+-			"nodefs.available":  "0%",
+-			"nodefs.inodesFree": "0%",
+-		},
++		CgroupDriver:                     kubeletConfiguration.TenantControlPlaneCgroupDriver,
++		ClusterDNS:                       kubeletConfiguration.TenantControlPlaneDNSServiceIPs,
++		ClusterDomain:                    kubeletConfiguration.TenantControlPlaneDomain,
++		CPUManagerReconcilePeriod:        zeroDuration,
+ 		EvictionPressureTransitionPeriod: zeroDuration,
+ 		FileCheckFrequency:               zeroDuration,
+ 		HealthzBindAddress:               "127.0.0.1",
+ 		HealthzPort:                      pointer.To(int32(10248)),
+ 		HTTPCheckFrequency:               zeroDuration,
+-		ImageGCHighThresholdPercent:      pointer.To(int32(100)),
+ 		NodeStatusUpdateFrequency:        zeroDuration,
+ 		NodeStatusReportFrequency:        zeroDuration,
+ 		RotateCertificates:               true,

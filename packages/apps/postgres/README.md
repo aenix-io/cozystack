@@ -6,7 +6,7 @@ PostgreSQL is currently the leading choice among relational databases, known for
 
 This managed service is controlled by the CloudNativePG operator, ensuring efficient management and seamless operation.
 
-- Docs: https://cloudnative-pg.io/documentation/
+- Docs: https://cloudnative-pg.io/docs/
 - Github: https://github.com/cloudnative-pg/cloudnative-pg
 
 ## HowTos

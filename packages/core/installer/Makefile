@@ -30,7 +30,9 @@ image-cozystack:
 		--metadata-file images/cozystack.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/cozystack:$(call settag,$(TAG))" > images/cozystack.tag
+	IMAGE="$(REGISTRY)/cozystack:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/cozystack.json -o json -r)" \
+		yq -i '.cozystack.image = strenv(IMAGE)' values.yaml
+	rm -f images/cozystack.json
 
 image-talos:
 	test -f ../../../_out/assets/installer-amd64.tar || make talos-installer
@@ -50,7 +52,6 @@ image-matchbox:
 		--metadata-file images/matchbox.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	echo "$(REGISTRY)/matchbox:$(call settag,$(TALOS_VERSION))" > images/matchbox.tag
 
 assets: talos-iso talos-nocloud
 

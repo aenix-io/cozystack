@@ -104,7 +104,7 @@ spec:
       serviceAccountName: kube-ovn-pre-delete-hook
       containers:
         - name: remove-subnet-finalizer
-          image: "{{ include "kubeovn.image" . }}"
+          image: "{{ .Values.global.registry.address}}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}"
           env:
             - name: POD_NAMESPACE
               valueFrom:

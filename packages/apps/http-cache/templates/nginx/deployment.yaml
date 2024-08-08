@@ -52,7 +52,7 @@ spec:
       shareProcessNamespace: true
       containers:
       - name: nginx
-        image: "{{ $.Files.Get "images/nginx-cache.tag" | trim }}@{{ index ($.Files.Get "images/nginx-cache.json" | fromJson) "containerimage.digest" }}"
+        image: "{{ $.Files.Get "images/nginx-cache.tag" | trim }}"
         readinessProbe:
           httpGet:
             path: /healthz
@@ -81,7 +81,7 @@ spec:
         - mountPath: /run
           name: run
       - name: reloader
-        image: "{{ $.Files.Get "images/nginx-cache.tag" | trim }}@{{ index ($.Files.Get "images/nginx-cache.json" | fromJson) "containerimage.digest" }}"
+        image: "{{ $.Files.Get "images/nginx-cache.tag" | trim }}"
         command: ["/usr/bin/nginx-reloader.sh"]
         #command: ["sleep", "infinity"]
         volumeMounts:
