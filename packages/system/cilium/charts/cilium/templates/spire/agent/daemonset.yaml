@@ -4,9 +4,14 @@ kind: DaemonSet
 metadata:
   name: spire-agent
   namespace: {{ .Values.authentication.mutual.spire.install.namespace }}
-  {{- with .Values.authentication.mutual.spire.install.server.annotations }}
+  {{- if or .Values.authentication.mutual.spire.install.server.annotations .Values.authentication.mutual.spire.annotations }}
   annotations:
-    {{- toYaml . | nindent 8 }}
+    {{- with .Values.authentication.mutual.spire.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.authentication.mutual.spire.install.server.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- end }}
   labels:
     app: spire-agent
@@ -36,7 +41,8 @@ spec:
       {{- end }}
       initContainers:
         - name: init
-          image: docker.io/library/busybox:1.35.0@sha256:223ae047b1065bd069aac01ae3ac8088b3ca4a527827e283b85112f29385fb1b
+          image: {{ include "cilium.image" .Values.authentication.mutual.spire.install.initImage | quote }}
+          imagePullPolicy: {{ .Values.authentication.mutual.spire.install.initImage.pullPolicy }}
           command:
             - /bin/sh
             - -c
@@ -44,7 +50,12 @@ spec:
               {{- tpl (.Files.Get "files/spire/wait-for-spire.bash") . | nindent 14 }}
       containers:
         - name: spire-agent
+          {{- if eq (typeOf .Values.authentication.mutual.spire.install.agent.image) "string" }}
           image: {{ .Values.authentication.mutual.spire.install.agent.image }}
+          {{- else }}
+          image: {{ include "cilium.image" .Values.authentication.mutual.spire.install.agent.image | quote }}
+          imagePullPolicy: {{ .Values.authentication.mutual.spire.install.agent.image.pullPolicy }}
+          {{- end }}
           args: ["-config", "/run/spire/config/agent.conf"]
           {{- with .Values.authentication.mutual.spire.install.agent.securityContext }}
           securityContext:

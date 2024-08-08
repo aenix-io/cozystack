@@ -92,6 +92,7 @@ spec:
         runAsNonRoot: true
       serviceAccountName: {{ include "piraeus-operator.serviceAccountName" . }}
       terminationGracePeriodSeconds: 10
+      priorityClassName: {{ .Values.priorityClassName | default "system-cluster-critical" }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
       volumes:

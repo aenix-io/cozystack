@@ -2,7 +2,7 @@ apiVersion: v2
 #name: Virtual Machine
 name: virtual-machine
 description: Virtual machine instance
-icon: https://www.svgrepo.com/show/448273/azure-vms.svg
+icon: /logos/vm.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

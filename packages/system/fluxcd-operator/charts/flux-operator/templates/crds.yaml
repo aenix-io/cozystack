@@ -1,0 +1,704 @@
+{{- if and .Values.installCRDs }}
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+    helm.sh/resource-policy: keep
+  labels:
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ .Chart.Name }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+  name: fluxinstances.fluxcd.controlplane.io
+spec:
+  group: fluxcd.controlplane.io
+  names:
+    kind: FluxInstance
+    listKind: FluxInstanceList
+    plural: fluxinstances
+    singular: fluxinstance
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Ready")].message
+      name: Status
+      type: string
+    - jsonPath: .status.lastAttemptedRevision
+      name: Revision
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: FluxInstance is the Schema for the fluxinstances API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FluxInstanceSpec defines the desired state of FluxInstance
+            properties:
+              cluster:
+                description: Cluster holds the specification of the Kubernetes cluster.
+                properties:
+                  domain:
+                    default: cluster.local
+                    description: |-
+                      Domain is the cluster domain used for generating the FQDN of services.
+                      Defaults to 'cluster.local'.
+                    type: string
+                  multitenant:
+                    description: Multitenant enables the multitenancy lockdown.
+                    type: boolean
+                  networkPolicy:
+                    default: true
+                    description: |-
+                      NetworkPolicy restricts network access to the current namespace.
+                      Defaults to true.
+                    type: boolean
+                  type:
+                    default: kubernetes
+                    description: |-
+                      Type specifies the distro of the Kubernetes cluster.
+                      Defaults to 'kubernetes'.
+                    enum:
+                    - kubernetes
+                    - openshift
+                    - aws
+                    - azure
+                    - gcp
+                    type: string
+                required:
+                - domain
+                - networkPolicy
+                type: object
+              components:
+                description: |-
+                  Components is the list of controllers to install.
+                  Defaults to all controllers.
+                items:
+                  description: Component is the name of a controller to install.
+                  enum:
+                  - source-controller
+                  - kustomize-controller
+                  - helm-controller
+                  - notification-controller
+                  - image-reflector-controller
+                  - image-automation-controller
+                  type: string
+                type: array
+              distribution:
+                description: Distribution specifies the version and container registry
+                  to pull images from.
+                properties:
+                  artifact:
+                    description: |-
+                      Artifact is the URL to the OCI artifact containing
+                      the latest Kubernetes manifests for the distribution,
+                      e.g. 'oci://ghcr.io/controlplaneio-fluxcd/flux-operator-manifests:latest'.
+                    pattern: ^oci://.*$
+                    type: string
+                  imagePullSecret:
+                    description: |-
+                      ImagePullSecret is the name of the Kubernetes secret
+                      to use for pulling images.
+                    type: string
+                  registry:
+                    description: |-
+                      Registry address to pull the distribution images from
+                      e.g. 'ghcr.io/fluxcd'.
+                    type: string
+                  version:
+                    description: Version semver expression e.g. '2.x', '2.3.x'.
+                    type: string
+                required:
+                - registry
+                - version
+                type: object
+              kustomize:
+                description: |-
+                  Kustomize holds a set of patches that can be applied to the
+                  Flux installation, to customize the way Flux operates.
+                properties:
+                  patches:
+                    description: |-
+                      Strategic merge and JSON patches, defined as inline YAML objects,
+                      capable of targeting objects based on kind, label and annotation selectors.
+                    items:
+                      description: |-
+                        Patch contains an inline StrategicMerge or JSON6902 patch, and the target the patch should
+                        be applied to.
+                      properties:
+                        patch:
+                          description: |-
+                            Patch contains an inline StrategicMerge patch or an inline JSON6902 patch with
+                            an array of operation objects.
+                          type: string
+                        target:
+                          description: Target points to the resources that the patch
+                            document should be applied to.
+                          properties:
+                            annotationSelector:
+                              description: |-
+                                AnnotationSelector is a string that follows the label selection expression
+                                https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api
+                                It matches with the resource annotations.
+                              type: string
+                            group:
+                              description: |-
+                                Group is the API group to select resources from.
+                                Together with Version and Kind it is capable of unambiguously identifying and/or selecting resources.
+                                https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md
+                              type: string
+                            kind:
+                              description: |-
+                                Kind of the API Group to select resources from.
+                                Together with Group and Version it is capable of unambiguously
+                                identifying and/or selecting resources.
+                                https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md
+                              type: string
+                            labelSelector:
+                              description: |-
+                                LabelSelector is a string that follows the label selection expression
+                                https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api
+                                It matches with the resource labels.
+                              type: string
+                            name:
+                              description: Name to match resources with.
+                              type: string
+                            namespace:
+                              description: Namespace to select resources from.
+                              type: string
+                            version:
+                              description: |-
+                                Version of the API Group to select resources from.
+                                Together with Group and Kind it is capable of unambiguously identifying and/or selecting resources.
+                                https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md
+                              type: string
+                          type: object
+                      required:
+                      - patch
+                      type: object
+                    type: array
+                type: object
+              storage:
+                description: |-
+                  Storage holds the specification of the source-controller
+                  persistent volume claim.
+                properties:
+                  class:
+                    description: Class is the storage class to use for the PVC.
+                    type: string
+                  size:
+                    description: Size is the size of the PVC.
+                    type: string
+                required:
+                - class
+                - size
+                type: object
+              sync:
+                description: |-
+                  Sync specifies the source for the cluster sync operation.
+                  When set, a Flux source (GitRepository, OCIRepository or Bucket)
+                  and Flux Kustomization are created to sync the cluster state
+                  with the source repository.
+                properties:
+                  interval:
+                    default: 1m
+                    description: Interval is the time between syncs.
+                    pattern: ^([0-9]+(\.[0-9]+)?(ms|s|m|h))+$
+                    type: string
+                  kind:
+                    description: Kind is the kind of the source.
+                    enum:
+                    - OCIRepository
+                    - GitRepository
+                    - Bucket
+                    type: string
+                  path:
+                    description: |-
+                      Path is the path to the source directory containing
+                      the kustomize overlay or plain Kubernetes manifests.
+                    type: string
+                  pullSecret:
+                    description: |-
+                      PullSecret specifies the Kubernetes Secret containing the
+                      authentication credentials for the source.
+                      For Git over HTTP/S sources, the secret must contain username and password fields.
+                      For Git over SSH sources, the secret must contain known_hosts and identity fields.
+                      For OCI sources, the secret must be of type kubernetes.io/dockerconfigjson.
+                      For Bucket sources, the secret must contain accesskey and secretkey fields.
+                    type: string
+                  ref:
+                    description: |-
+                      Ref is the source reference, can be a Git ref name e.g. 'refs/heads/main',
+                      an OCI tag e.g. 'latest' or a bucket name e.g. 'flux'.
+                    type: string
+                  url:
+                    description: |-
+                      URL is the source URL, can be a Git repository HTTP/S or SSH address,
+                      an OCI repository address or a Bucket endpoint.
+                    type: string
+                required:
+                - kind
+                - path
+                - ref
+                - url
+                type: object
+              wait:
+                default: true
+                description: |-
+                  Wait instructs the controller to check the health of all the reconciled
+                  resources. Defaults to true.
+                type: boolean
+            required:
+            - distribution
+            - wait
+            type: object
+          status:
+            description: FluxInstanceStatus defines the observed state of FluxInstance
+            properties:
+              components:
+                description: Components contains the container images used by the
+                  components.
+                items:
+                  description: ComponentImage represents a container image used by
+                    a component.
+                  properties:
+                    digest:
+                      description: Digest of the container image.
+                      type: string
+                    name:
+                      description: Name of the component.
+                      type: string
+                    repository:
+                      description: Repository address of the container image.
+                      type: string
+                    tag:
+                      description: Tag of the container image.
+                      type: string
+                  required:
+                  - name
+                  - repository
+                  - tag
+                  type: object
+                type: array
+              conditions:
+                description: Conditions contains the readiness conditions of the object.
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource.\n---\nThis struct is intended for
+                    direct use as an array at the field path .status.conditions.  For
+                    example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the
+                    observations of a foo's current state.\n\t    // Known .status.conditions.type
+                    are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    //
+                    +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t
+                    \   // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\"
+                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t
+                    \   // other fields\n\t}"
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: |-
+                        type of condition in CamelCase or in foo.example.com/CamelCase.
+                        ---
+                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
+                        useful (see .node.status.conditions), the ability to deconflict is important.
+                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              inventory:
+                description: |-
+                  Inventory contains a list of Kubernetes resource object references
+                  last applied on the cluster.
+                properties:
+                  entries:
+                    description: Entries of Kubernetes resource object references.
+                    items:
+                      description: ResourceRef contains the information necessary
+                        to locate a resource within a cluster.
+                      properties:
+                        id:
+                          description: |-
+                            ID is the string representation of the Kubernetes resource object's metadata,
+                            in the format '<namespace>_<name>_<group>_<kind>'.
+                          type: string
+                        v:
+                          description: Version is the API version of the Kubernetes
+                            resource object's kind.
+                          type: string
+                      required:
+                      - id
+                      - v
+                      type: object
+                    type: array
+                required:
+                - entries
+                type: object
+              lastAppliedRevision:
+                description: |-
+                  LastAppliedRevision is the version and digest of the
+                  distribution config that was last reconcile.
+                type: string
+              lastAttemptedRevision:
+                description: |-
+                  LastAttemptedRevision is the version and digest of the
+                  distribution config that was last attempted to reconcile.
+                type: string
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile request value, so a change of the annotation value
+                  can be detected.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+    helm.sh/resource-policy: keep
+  labels:
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ .Chart.Name }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+  name: fluxreports.fluxcd.controlplane.io
+spec:
+  group: fluxcd.controlplane.io
+  names:
+    kind: FluxReport
+    listKind: FluxReportList
+    plural: fluxreports
+    singular: fluxreport
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.distribution.entitlement
+      name: Entitlement
+      priority: 10
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Ready")].message
+      name: Status
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Ready")].lastTransitionTime
+      name: LastUpdated
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: FluxReport is the Schema for the fluxreports API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FluxReportSpec defines the observed state of a Flux installation.
+            properties:
+              components:
+                description: ComponentsStatus is the status of the Flux controller
+                  deployments.
+                items:
+                  description: FluxComponentStatus defines the observed state of a
+                    Flux component.
+                  properties:
+                    image:
+                      description: Image is the container image of the Flux component.
+                      type: string
+                    name:
+                      description: Name is the name of the Flux component.
+                      type: string
+                    ready:
+                      description: Ready is the readiness status of the Flux component.
+                      type: boolean
+                    status:
+                      description: |-
+                        Status is a human-readable message indicating details
+                        about the Flux component observed state.
+                      type: string
+                  required:
+                  - image
+                  - name
+                  - ready
+                  - status
+                  type: object
+                type: array
+              distribution:
+                description: Distribution is the version information of the Flux installation.
+                properties:
+                  entitlement:
+                    description: Entitlement is the entitlement verification status.
+                    type: string
+                  managedBy:
+                    description: ManagedBy is the name of the operator managing the
+                      Flux instance.
+                    type: string
+                  status:
+                    description: |-
+                      Status is a human-readable message indicating details
+                      about the distribution observed state.
+                    type: string
+                  version:
+                    description: Version is the version of the Flux instance.
+                    type: string
+                required:
+                - entitlement
+                - status
+                type: object
+              reconcilers:
+                description: |-
+                  ReconcilersStatus is the list of Flux reconcilers and
+                  their statistics grouped by API kind.
+                items:
+                  description: FluxReconcilerStatus defines the observed state of
+                    a Flux reconciler.
+                  properties:
+                    apiVersion:
+                      description: APIVersion is the API version of the Flux resource.
+                      type: string
+                    kind:
+                      description: Kind is the kind of the Flux resource.
+                      type: string
+                    stats:
+                      description: Stats is the reconcile statics of the Flux resource
+                        kind.
+                      properties:
+                        failing:
+                          description: |-
+                            Failing is the number of reconciled
+                            resources in the Failing state.
+                          type: integer
+                        running:
+                          description: |-
+                            Running is the number of reconciled
+                            resources in the Running state.
+                          type: integer
+                        suspended:
+                          description: |-
+                            Suspended is the number of reconciled
+                            resources in the Suspended state.
+                          type: integer
+                        totalSize:
+                          description: TotalSize is the total size of the artifacts
+                            in storage.
+                          type: string
+                      required:
+                      - failing
+                      - running
+                      - suspended
+                      type: object
+                  required:
+                  - apiVersion
+                  - kind
+                  type: object
+                type: array
+              sync:
+                description: |-
+                  SyncStatus is the status of the cluster sync
+                  Source and Kustomization resources.
+                properties:
+                  id:
+                    description: ID is the identifier of the sync.
+                    type: string
+                  path:
+                    description: Path is the kustomize path of the sync.
+                    type: string
+                  ready:
+                    description: Ready is the readiness status of the sync.
+                    type: boolean
+                  source:
+                    description: Source is the URL of the source repository.
+                    type: string
+                  status:
+                    description: |-
+                      Status is a human-readable message indicating details
+                      about the sync observed state.
+                    type: string
+                required:
+                - id
+                - ready
+                - status
+                type: object
+            required:
+            - distribution
+            type: object
+          status:
+            description: FluxReportStatus defines the readiness of a FluxReport.
+            properties:
+              conditions:
+                description: Conditions contains the readiness conditions of the object.
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource.\n---\nThis struct is intended for
+                    direct use as an array at the field path .status.conditions.  For
+                    example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the
+                    observations of a foo's current state.\n\t    // Known .status.conditions.type
+                    are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    //
+                    +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t
+                    \   // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\"
+                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t
+                    \   // other fields\n\t}"
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: |-
+                        type of condition in CamelCase or in foo.example.com/CamelCase.
+                        ---
+                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
+                        useful (see .node.status.conditions), the ability to deconflict is important.
+                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile request value, so a change of the annotation value
+                  can be detected.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+{{- end }}

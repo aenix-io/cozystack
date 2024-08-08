@@ -1,7 +1,7 @@
 apiVersion: v2
 name: tcp-balancer
 description: Layer4 load balancer service
-icon: https://cdn.icon-icons.com/icons2/2699/PNG/512/haproxy_logo_icon_171017.png
+icon: /logos/haproxy.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

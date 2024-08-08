@@ -6,12 +6,13 @@ metadata:
   annotations:
     kubernetes.io/description: |
       This daemon set launches the openvswitch daemon.
+    chart-version: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   selector:
     matchLabels:
       app: ovs
   updateStrategy:
-    type: RollingUpdate
+    type: {{ include "kubeovn.ovs-ovn.updateStrategy" . }}
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
@@ -21,6 +22,8 @@ spec:
         app: ovs
         component: network
         type: infra
+      annotations:
+        chart-version: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
       tolerations:
         - effect: NoSchedule
@@ -36,9 +39,9 @@ spec:
       containers:
         - name: openvswitch
           {{- if .Values.DPDK }}
-          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.dpdkRepository }}:{{ .Values.DPDK_VERSION }}-{{ .Values.global.images.kubeovn.tag }}
+          image: {{ include "kubeovn.image" . }}
           {{- else }}
-          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
+          image: {{ include "kubeovn.image" . }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.DPDK }}
@@ -100,9 +103,6 @@ spec:
               name: host-run-ovs
             - mountPath: /var/run/ovn
               name: host-run-ovn
-            - mountPath: /sys
-              name: host-sys
-              readOnly: true
             - mountPath: /etc/openvswitch
               name: host-config-openvswitch
             - mountPath: /etc/ovn
@@ -185,9 +185,6 @@ spec:
         - name: host-run-ovn
           hostPath:
             path: /run/ovn
-        - name: host-sys
-          hostPath:
-            path: /sys
         - name: host-config-openvswitch
           hostPath:
             path: {{ .Values.OPENVSWITCH_DIR }}

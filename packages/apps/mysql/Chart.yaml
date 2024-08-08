@@ -1,7 +1,7 @@
 apiVersion: v2
 name: mysql
 description: Managed MariaDB service
-icon: https://static-00.iconduck.com/assets.00/mariadb-icon-512x340-txozryr2.png
+icon: /logos/mariadb.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

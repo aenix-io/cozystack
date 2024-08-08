@@ -1,5 +1,5 @@
-NAME=clickhouse-operator
-NAMESPACE=cozy-clickhouse-operator
+export NAME=clickhouse-operator
+export NAMESPACE=cozy-clickhouse-operator
 
 include ../../../scripts/package-system.mk
 

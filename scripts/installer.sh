@@ -3,7 +3,7 @@ set -o pipefail
 set -e
 
 BUNDLE=$(set -x; kubectl get configmap -n cozy-system cozystack -o 'go-template={{index .data "bundle-name"}}')
-VERSION=3
+VERSION=4
 
 run_migrations() {
   if ! kubectl get configmap -n cozy-system cozystack-version; then
@@ -19,7 +19,33 @@ run_migrations() {
 }
 
 flux_is_ok() {
-  kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=10s 
+  kubectl wait --for=condition=available -n cozy-fluxcd deploy/source-controller deploy/helm-controller --timeout=1s
+  kubectl wait --for=condition=ready -n cozy-fluxcd helmrelease/fluxcd --timeout=1s # to call "apply resume" below
+}
+
+ensure_fluxcd() {
+  if flux_is_ok; then
+    return
+  fi
+  # Install fluxcd-operator
+  if kubectl get helmreleases.helm.toolkit.fluxcd.io  -n cozy-fluxcd fluxcd-operator; then
+    make -C packages/system/fluxcd-operator apply resume
+  else
+    make -C packages/system/fluxcd-operator apply-locally
+  fi
+  wait_for_crds fluxinstances.fluxcd.controlplane.io
+
+   # Install fluxcd
+  if kubectl get helmreleases.helm.toolkit.fluxcd.io  -n cozy-fluxcd fluxcd; then
+    make -C packages/system/fluxcd apply resume
+  else
+    make -C packages/system/fluxcd apply-locally
+  fi
+  wait_for_crds helmreleases.helm.toolkit.fluxcd.io helmrepositories.source.toolkit.fluxcd.io
+}
+
+wait_for_crds() {
+  timeout 60 sh -c "until kubectl get crd $*; do sleep 1; done"
 }
 
 install_basic_charts() {
@@ -40,18 +66,23 @@ run_migrations
 make -C packages/core/platform namespaces-apply
 
 # Install fluxcd
-make -C packages/core/fluxcd apply
-
-# Reconcile Helm repositories
-kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
+ensure_fluxcd
 
 # Install platform chart
 make -C packages/core/platform apply
 
-# Install basic system charts (should be after platform chart applied)
+# Install basic charts
 if ! flux_is_ok; then
   install_basic_charts
 fi
+
+# Reconcile Helm repositories
+kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
+
+# Unsuspend all system charts
+kubectl get hr -A -l cozystack.io/system-app=true --no-headers | while read namespace name rest; do
+  kubectl patch hr -n "$namespace" "$name" -p '{"spec": {"suspend": null}}' --type=merge --field-manager=flux-client-side-apply
+done
 
 # Reconcile platform chart
 trap 'exit' INT TERM

@@ -25,7 +25,7 @@ tenant-root (example.org)
 
 Thus, you can create `tenant-u1` with a set of services like `etcd`, `ingress`, `monitoring`. And create another tenant namespace `tenant-u2` inside of `tenant-u1`.
 
-Let's see what will happen when you run Kubernetes and Postgres under `tenant-u2` namesapce.
+Let's see what will happen when you run Kubernetes and Postgres under `tenant-u2` namespace.
 
 Since `tenant-u2` does not have its own cluster services like `etcd`, `ingress`, and `monitoring`, the applications will use the cluster services of the parent tenant.  
 This in turn means:
@@ -56,3 +56,4 @@ tenant-u1
 | `etcd`       | Deploy own Etcd cluster                                                                                                     | `false` |
 | `monitoring` | Deploy own Monitoring Stack                                                                                                 | `false` |
 | `ingress`    | Deploy own Ingress Controller                                                                                               | `false` |
+| `isolated`   | Enforce tenant namespace with network policies                                                                              | `false` |

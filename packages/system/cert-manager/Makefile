@@ -1,5 +1,5 @@
-NAME=cert-manager
-NAMESPACE=cozy-$(NAME)
+export NAME=cert-manager
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/package-system.mk
 

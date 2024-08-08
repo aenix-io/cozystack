@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   data-name="Layer 1"
+   viewBox="0 0 143.508 144"
+   version="1.1"
+   sodipodi:docname="outline.svg"
+   width="143.508"
+   height="144"
+   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview852"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="1.9719816"
+     inkscape:cx="138.18587"
+     inkscape:cy="77.840481"
+     inkscape:window-width="3440"
+     inkscape:window-height="1387"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs826">
+    <style
+       id="style824">.cls-1{fill:#183729;}.cls-2{fill:#fff;}.cls-3{fill:#5bb193;}</style>
+  </defs>
+  <title
+     id="title828">Outline web assets</title>
+  <path
+     class="cls-1"
+     d="m 143.78,30.5 c 0,-1.11 0,-2.21 0,-3.31 A 48.29,48.29 0 0 0 143.1,20 24,24 0 0 0 140.87,13.17 22.94,22.94 0 0 0 136.63,7.35 l -5.8,-4.23 A 24.37,24.37 0 0 0 124,0.87 46.61,46.61 0 0 0 116.8,0.24 c -1.1,0 -88.47,0 -89.58,0 A 47.07,47.07 0 0 0 20,0.87 23.94,23.94 0 0 0 13.2,3.12 23.28,23.28 0 0 0 7.39,7.35 22.67,22.67 0 0 0 3.16,13.17 24,24 0 0 0 0.92,20 47,47 0 0 0 0.28,27.19 c 0,1.1 0,88.47 0,89.58 a 46.86,46.86 0 0 0 0.64,7.23 23.82,23.82 0 0 0 2.24,6.83 22.57,22.57 0 0 0 4.23,5.8 22.79,22.79 0 0 0 5.81,4.23 24,24 0 0 0 6.8,2.22 48.38,48.38 0 0 0 7.19,0.64 c 1.11,0 88.48,0 89.58,0 a 47.9,47.9 0 0 0 7.18,-0.64 24.4,24.4 0 0 0 6.85,-2.26 22.57,22.57 0 0 0 5.8,-4.23 22.84,22.84 0 0 0 4.24,-5.8 23.8,23.8 0 0 0 2.26,-6.79 48.17,48.17 0 0 0 0.66,-7.19 c 0.02,-1.15 0.04,-85.01 0.02,-86.31 z"
+     id="path830" />
+  <path
+     class="cls-2"
+     d="M 115.84,67.42 A 42.49,42.49 0 0 0 78.68,29.7 v 17.15 a 25.47,25.47 0 0 1 0,50 v 17.2 a 42.5,42.5 0 0 0 37.16,-46.63 z"
+     id="path832" />
+  <path
+     class="cls-3"
+     d="m 28.2,76.33 a 42.5,42.5 0 0 0 37.16,37.72 V 29.7 A 42.5,42.5 0 0 0 28.2,76.33 Z"
+     id="path834" />
+  <metadata
+     id="metadata934">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Outline web assets</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

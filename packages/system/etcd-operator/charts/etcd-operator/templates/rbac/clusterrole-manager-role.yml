@@ -20,6 +20,22 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - list
+      - get
+      - watch
+  - apiGroups:
+      - ""
+    resources:
       - services
     verbs:
       - create
@@ -41,6 +57,22 @@ rules:
       - patch
       - update
       - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - get
+    - list
+    - patch
+    - watch
+  - apiGroups:
+    - "storage.k8s.io"
+    resources:
+    - storageclasses
+    verbs:
+    - get
+    - list
   - apiGroups:
       - etcd.aenix.io
     resources:

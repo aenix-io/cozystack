@@ -16,7 +16,7 @@ index c489cb6ca..8884a6484 100644
 @@ -54,7 +56,10 @@ func (s *Server) listReleasesInCluster(ctx context.Context, headers http.Header,
  	// see any results created/updated/deleted after the first request is issued
  	// To fix this, we must make use of resourceVersion := relList.GetResourceVersion()
- 	var relList helmv2beta2.HelmReleaseList
+ 	var relList helmv2.HelmReleaseList
 -	if err = client.List(ctx, &relList); err != nil {
 +	listOptions := ctrlclient.ListOptions{
 +		LabelSelector: labels.SelectorFromSet(labels.Set{"cozystack.io/ui": "true"}),
@@ -33,8 +33,8 @@ index c489cb6ca..8884a6484 100644
 +				"cozystack.io/ui": "true",
 +			},
  		},
- 		Spec: helmv2beta2.HelmReleaseSpec{
- 			Chart: helmv2beta2.HelmChartTemplate{
+ 		Spec: helmv2.HelmReleaseSpec{
+ 			Chart: helmv2.HelmChartTemplate{
 diff --git a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go
 index 790b21514..539276a17 100644
 --- a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go
@@ -49,7 +49,7 @@ index 790b21514..539276a17 100644
  	log "k8s.io/klog/v2"
 @@ -64,7 +65,8 @@ func (s *Server) listReposInNamespace(ctx context.Context, headers http.Header,
  
- 	var repoList sourcev1beta2.HelmRepositoryList
+ 	var repoList sourcev1.HelmRepositoryList
  	listOptions := ctrlclient.ListOptions{
 -		Namespace: ns,
 +		Namespace:     ns,
@@ -65,5 +65,5 @@ index 790b21514..539276a17 100644
 +				"cozystack.io/ui": "true",
 +			},
  		},
- 		Spec: sourcev1beta2.HelmRepositorySpec{
+ 		Spec: sourcev1.HelmRepositorySpec{
  			URL:      url,

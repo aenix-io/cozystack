@@ -1,10 +1,10 @@
 {{- if .Values.oncall.enabled }}
 {{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
 {{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: grafana-oncall
+  name: grafana-oncall-system
   labels:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}

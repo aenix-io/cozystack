@@ -14,6 +14,27 @@ webhooks:
       service:
         name: {{ include "kamaji.webhookServiceName" . }}
         namespace: {{ .Release.Namespace }}
+        path: /telemetry
+    failurePolicy: Ignore
+    name: telemetry.kamaji.clastix.io
+    rules:
+      - apiGroups:
+          - kamaji.clastix.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+          - DELETE
+        resources:
+          - tenantcontrolplanes
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ include "kamaji.webhookServiceName" . }}
+        namespace: {{ .Release.Namespace }}
         path: /validate--v1-secret
     failurePolicy: Ignore
     name: vdatastoresecrets.kb.io

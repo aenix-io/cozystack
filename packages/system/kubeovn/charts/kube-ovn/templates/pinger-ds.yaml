@@ -31,7 +31,7 @@ spec:
       hostPID: true
       containers:
         - name: pinger
-          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
+          image: {{ include "kubeovn.image" . }}
           command:
           - /kube-ovn/kube-ovn-pinger
           args:

@@ -1,0 +1,16 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "external": {
+            "type": "boolean",
+            "description": "Enable external access from outside the cluster",
+            "default": false
+        },
+        "replicas": {
+            "type": "number",
+            "description": "Persistent Volume size for NATS",
+            "default": 3
+        }
+    }
+}

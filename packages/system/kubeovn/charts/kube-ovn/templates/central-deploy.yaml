@@ -42,7 +42,7 @@ spec:
       hostNetwork: true
       containers:
         - name: ovn-central
-          image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
+          image: {{ include "kubeovn.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: 
           - /kube-ovn/start-db.sh
@@ -74,12 +74,18 @@ spec:
               value: "{{- .Values.func.ENABLE_BIND_LOCAL_IP }}"
             - name: PROBE_INTERVAL
               value: "{{ .Values.networking.PROBE_INTERVAL }}"
+            - name: OVN_NORTHD_PROBE_INTERVAL
+              value: "{{ .Values.networking.OVN_NORTHD_PROBE_INTERVAL}}"
             - name: OVN_LEADER_PROBE_INTERVAL
               value: "{{ .Values.networking.OVN_LEADER_PROBE_INTERVAL }}"
             - name: OVN_NORTHD_N_THREADS
               value: "{{ .Values.networking.OVN_NORTHD_N_THREADS }}"
             - name: ENABLE_COMPACT
               value: "{{ .Values.networking.ENABLE_COMPACT }}"
+            {{- if include "kubeovn.ovs-ovn.updateStrategy" . | eq "OnDelete" }}
+            - name: OVN_VERSION_COMPATIBILITY
+              value: "21.06"
+            {{- end }}
           resources:
             requests:
               cpu: {{ index .Values "ovn-central" "requests" "cpu" }}
@@ -92,9 +98,6 @@ spec:
               name: host-run-ovs
             - mountPath: /var/run/ovn
               name: host-run-ovn
-            - mountPath: /sys
-              name: host-sys
-              readOnly: true
             - mountPath: /etc/openvswitch
               name: host-config-openvswitch
             - mountPath: /etc/ovn
@@ -136,9 +139,6 @@ spec:
         - name: host-run-ovn
           hostPath:
             path: /run/ovn
-        - name: host-sys
-          hostPath:
-            path: /sys
         - name: host-config-openvswitch
           hostPath:
             path: {{ .Values.OPENVSWITCH_DIR }}

@@ -1,5 +1,5 @@
-NAME=traffic-manager
-NAMESPACE=cozy-telepresence
+export NAME=traffic-manager
+export NAMESPACE=cozy-telepresence
 
 include ../../../scripts/package-system.mk
 

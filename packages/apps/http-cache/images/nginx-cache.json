@@ -5,7 +5,7 @@
       {
         "uri": "pkg:docker/ubuntu@22.04?platform=linux%2Famd64",
         "digest": {
-          "sha256": "a6d2b38300ce017add71440577d5b0a90460d0e57fd7aec21dd0d1b0761bbfb2"
+          "sha256": "340d9b015b194dc6e2a13938944e0d016e57b9679963fdeb9ce021daac430221"
         }
       }
     ],
@@ -32,8 +32,17 @@
       }
     }
   },
-  "buildx.build.ref": "default/default/na719vcch4rrxzkdpcgx2zo6q",
-  "containerimage.config.digest": "sha256:92851e36b025f0ac6160963d7488830dcab846c24a269dea252f2d33c2b07d04",
-  "containerimage.digest": "sha256:c51996c102fd22bbe0160e5aec2e489c4870e897e99fa8b9fa2611f0bc3ac799",
-  "image.name": "mgr.cp.if.ua/nginx-cache:v0.1.0,mgr.cp.if.ua/nginx-cache:v0.1.0-v0.6.1-2"
+  "buildx.build.ref": "cozystack/cozystack0/7j4plhjjn8onm0o8q0omik63x",
+  "containerimage.config.digest": "sha256:f30f57d817c596f7a7d0ecfe734b7b41994eca9d36d43307206314ee37bdb286",
+  "containerimage.descriptor": {
+    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+    "digest": "sha256:f7d86b1a72a12b60434a12a604e9ddd3779d9fa605205c7968fe9495e764c94c",
+    "size": 1094,
+    "platform": {
+      "architecture": "amd64",
+      "os": "linux"
+    }
+  },
+  "containerimage.digest": "sha256:f7d86b1a72a12b60434a12a604e9ddd3779d9fa605205c7968fe9495e764c94c",
+  "image.name": "ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0,ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0-v0.10.1"
 }

@@ -1,5 +1,5 @@
-NAME=mariadb-operator
-NAMESPACE=cozy-$(NAME)
+export NAME=mariadb-operator
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/package-system.mk
 

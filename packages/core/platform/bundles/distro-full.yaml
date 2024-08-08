@@ -1,6 +1,19 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 
 releases:
+- name: fluxcd-operator
+  releaseName: fluxcd-operator
+  chart: cozy-fluxcd-operator
+  namespace: cozy-fluxcd
+  privileged: true
+  dependsOn: []
+
+- name: fluxcd
+  releaseName: fluxcd
+  chart: cozy-fluxcd
+  namespace: cozy-fluxcd
+  dependsOn: [fluxcd-operator,cilium]
+
 - name: cilium
   releaseName: cilium
   chart: cozy-cilium
@@ -80,13 +93,13 @@ releases:
   releaseName: kafka-operator
   chart: cozy-kafka-operator
   namespace: cozy-kafka-operator
-  dependsOn: [cilium,kubeovn]
+  dependsOn: [cilium]
 
 - name: clickhouse-operator
   releaseName: clickhouse-operator
   chart: cozy-clickhouse-operator
   namespace: cozy-clickhouse-operator
-  dependsOn: [cilium,kubeovn]
+  dependsOn: [cilium]
 
 - name: rabbitmq-operator
   releaseName: rabbitmq-operator
@@ -105,6 +118,12 @@ releases:
   chart: cozy-piraeus-operator
   namespace: cozy-linstor
   dependsOn: [cilium,cert-manager]
+
+- name: snapshot-controller
+  releaseName: snapshot-controller
+  chart: cozy-snapshot-controller
+  namespace: cozy-snapshot-controller
+  dependsOn: [cilium,cert-manager-issuers]  
 
 - name: linstor
   releaseName: linstor

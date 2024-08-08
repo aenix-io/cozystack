@@ -35,11 +35,13 @@ more details:
 
 ### Common parameters
 
-| Name       | Description                                     | Value   |
-| ---------- | ----------------------------------------------- | ------- |
-| `external` | Enable external access from outside the cluster | `false` |
-| `size`     | Persistent Volume size                          | `10Gi`  |
-| `replicas` | Number of MariaDB replicas                      | `2`     |
+| Name                     | Description                                                                                                             | Value   |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- | ------- |
+| `external`               | Enable external access from outside the cluster                                                                         | `false` |
+| `size`                   | Persistent Volume size                                                                                                  | `10Gi`  |
+| `replicas`               | Number of Postgres replicas                                                                                             | `2`     |
+| `quorum.minSyncReplicas` | Minimum number of synchronous replicas that must acknowledge a transaction before it is considered committed.           | `0`     |
+| `quorum.maxSyncReplicas` | Maximum number of synchronous replicas that can acknowledge a transaction (must be lower than the number of instances). | `0`     |
 
 ### Configuration parameters
 

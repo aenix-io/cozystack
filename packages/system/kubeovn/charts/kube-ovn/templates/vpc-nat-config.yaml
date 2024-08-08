@@ -7,4 +7,4 @@ metadata:
     kubernetes.io/description: |
       kube-ovn vpc-nat common config
 data:
-  image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.vpcRepository }}:{{ .Values.global.images.kubeovn.tag }}
+  image: {{ include "kubeovn.image" . }}

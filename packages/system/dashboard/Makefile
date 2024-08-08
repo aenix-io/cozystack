@@ -1,5 +1,5 @@
-NAME=dashboard
-NAMESPACE=cozy-$(NAME)
+export NAME=dashboard
+export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/common-envs.mk
 include ../../../scripts/package-system.mk
@@ -15,11 +15,12 @@ update-chart:
 	rm -rf charts/kubeapps/charts/postgresql/
 	ln -s ../../images charts/kubeapps/images
 	sed -i 's/.cluster.local//g' charts/kubeapps/templates/kubeappsapis/deployment.yaml
+	patch --no-backup-if-mismatch charts/kubeapps/templates/frontend/configmap.yaml < patches/logos.patch
 
 update-dockerfiles:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/vmware-tanzu/kubeapps  | awk -F'[/^]' 'END{print $$3}') && \
 	wget https://github.com/vmware-tanzu/kubeapps/raw/$${tag}/cmd/kubeapps-apis/Dockerfile -O images/kubeapps-apis/Dockerfile && \
-	patch images/kubeapps-apis/Dockerfile < images/kubeapps-apis/dockerfile.diff && \
+	patch --no-backup-if-mismatch images/kubeapps-apis/Dockerfile < images/kubeapps-apis/dockerfile.diff && \
 	node_image=$$(wget -O- https://github.com/vmware-tanzu/kubeapps/raw/main/dashboard/Dockerfile | awk '/FROM bitnami\/node/ {print $$2}') && \
 	sed -i "s|FROM .* AS build|FROM $${node_image} AS build|" images/dashboard/Dockerfile && \
 	version=$$(echo "$$tag" | sed 's/^v//') && \

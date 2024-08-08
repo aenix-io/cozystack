@@ -20,9 +20,14 @@ spec:
       secretReference:
         {{- .Values.datastore.basicAuth.passwordSecret | toYaml | nindent 8 }}
 {{- end }}
+{{- if .Values.datastore.tlsConfig.enabled }}
   tlsConfig:
     certificateAuthority:
       {{- include "datastore.certificateAuthority" . | indent 6 }}
+
+    {{- if .Values.datastore.tlsConfig.clientCertificate }}
     clientCertificate:
       {{- include "datastore.clientCertificate" . | indent 6 }}
+    {{- end }}
+{{- end}}
 {{- end}}
