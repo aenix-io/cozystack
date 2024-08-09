@@ -1,0 +1,11 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-from-system
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+      - matchLabels:
+          "k8s:io.cilium.k8s.namespace.labels.cozystack.io/system": "true"

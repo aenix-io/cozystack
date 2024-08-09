@@ -21,6 +21,15 @@ metadata:
     namespace.cozystack.io/{{ $x }}: "{{ index $existingNS.metadata.annotations (printf "namespace.cozystack.io/%s" $x) | required (printf "namespace %s has no namespace.cozystack.io/%s annotation" $.Release.Namespace $x) }}"
     {{- end }}
     {{- end }}
+  labels:
+    {{- if hasPrefix "tenant-" .Release.Namespace }}
+    {{- $parts := splitList "-" .Release.Namespace }}
+    {{- range $i, $v := $parts }}
+    {{- if ne $i 0 }}
+    tenant.cozystack.io/{{ join "-" (slice $parts 0 (add $i 1)) }}: ""
+    {{- end }}
+    {{- end }}
+    {{- end }}
   ownerReferences:
   - apiVersion: v1
     blockOwnerDeletion: true
