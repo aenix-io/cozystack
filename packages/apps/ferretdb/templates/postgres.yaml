@@ -16,6 +16,10 @@ spec:
   storage:
     size: {{ required ".Values.size is required" .Values.size }}
 
+  inheritedMetadata:
+    labels:
+      policy.cozystack.io/allow-to-apiserver: "true"
+
   {{- if .Values.users }}
   managed:
     roles:
