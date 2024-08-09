@@ -1,0 +1,10 @@
+## @section Common parameters
+
+## @param host The hostname used to access the grafana externally (defaults to 'grafana' subdomain for the tenant host).
+host: ""
+
+## @param replicas Persistent Volume size for NATS
+## @param size Persistent Volume size
+##
+replicas: 2
+size: 10Gi

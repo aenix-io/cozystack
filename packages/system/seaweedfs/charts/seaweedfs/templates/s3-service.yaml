@@ -1,0 +1,34 @@
+{{- if or .Values.s3.enabled .Values.filer.s3.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "seaweedfs.name" . }}-s3
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ template "seaweedfs.name" . }}
+    app.kubernetes.io/component: s3
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  internalTrafficPolicy: {{ .Values.s3.internalTrafficPolicy | default "Cluster" }}
+  ports:
+  - name: "swfs-s3"
+    port: {{ if .Values.s3.enabled }}{{ .Values.s3.port }}{{ else }}{{ .Values.filer.s3.port }}{{ end }}
+    targetPort: {{ if .Values.s3.enabled }}{{ .Values.s3.port }}{{ else }}{{ .Values.filer.s3.port }}{{ end }}
+    protocol: TCP
+{{- if and .Values.s3.enabled .Values.s3.httpsPort }}
+  - name: "swfs-s3-tls"
+    port: {{ .Values.s3.httpsPort }}
+    targetPort: {{ .Values.s3.httpsPort }}
+    protocol: TCP
+{{- end }}
+{{- if and .Values.s3.enabled .Values.s3.metricsPort }}
+  - name: "metrics"
+    port: {{ .Values.s3.metricsPort }}
+    targetPort: {{ .Values.s3.metricsPort }}
+    protocol: TCP
+{{- end }}
+  selector:
+    app.kubernetes.io/name: {{ template "seaweedfs.name" . }}
+    app.kubernetes.io/component: {{ if .Values.s3.enabled }}s3{{ else }}filer{{ end }}
+{{- end }}

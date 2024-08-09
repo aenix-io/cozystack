@@ -9,3 +9,4 @@ ingress 1.2.0 HEAD
 monitoring 1.0.0 f642698
 monitoring 1.1.0 15478a88
 monitoring 1.2.0 HEAD
+seaweedfs 0.1.0 HEAD

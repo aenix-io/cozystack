@@ -4,9 +4,11 @@
 ## @param etcd Deploy own Etcd cluster
 ## @param monitoring Deploy own Monitoring Stack
 ## @param ingress Deploy own Ingress Controller
+## @param seaweedfs Deploy own SeaweedFS
 ## @param isolated Enforce tenant namespace with network policies
 host: ""
 etcd: false
 monitoring: false
 ingress: false
+seaweedfs: false
 isolated: false

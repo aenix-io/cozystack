@@ -22,6 +22,11 @@
             "description": "Deploy own Ingress Controller",
             "default": false
         },
+        "seaweedfs": {
+            "type": "boolean",
+            "description": "Deploy own SeaweedFS",
+            "default": false
+        },
         "isolated": {
             "type": "boolean",
             "description": "Enforce tenant namespace with network policies",
