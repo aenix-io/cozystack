@@ -26,7 +26,7 @@ image-cozystack:
 		--tag $(REGISTRY)/cozystack:$(call settag,$(TAG)) \
 		--cache-from type=registry,ref=$(REGISTRY)/cozystack:latest \
 		--platform linux/amd64,linux/arm64 \
-		--cache-to type=inline \
+		--cache-to type=inline,mode=max \
 		--metadata-file images/cozystack.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
@@ -46,7 +46,7 @@ image-matchbox:
 		--tag $(REGISTRY)/matchbox:$(call settag,$(TAG)) \
 		--tag $(REGISTRY)/matchbox:$(call settag,$(TALOS_VERSION)-$(TAG)) \
 		--cache-from type=registry,ref=$(REGISTRY)/matchbox:latest \
-		--cache-to type=inline \
+		--cache-to type=inline,mode=max \
 		--metadata-file images/matchbox.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)

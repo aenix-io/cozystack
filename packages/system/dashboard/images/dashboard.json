@@ -35,17 +35,17 @@
       }
     }
   },
-  "buildx.build.ref": "cozystack/cozystack0/k90p7qja1tca86jt2ozzg98a9",
-  "containerimage.config.digest": "sha256:27fc7abbe19e41a85443ae022a42f7166ef4334efba85a3e4059f92740f24620",
+  "buildx.build.ref": "buildkit/buildkit0/cwujns3lenpi0n9e0ippe836g",
+  "containerimage.config.digest": "sha256:975a58288a675b6fb7b1a8a10d52e0c6090ba0fb3185f618ade444ad0b3c9993",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:8f206c2ae2bbaed8e76db45704c4f76945176d448a310ed77d1abbe1b89f8b7b",
+    "digest": "sha256:f6a14b2291c6750cb4cb4c1b8ddefdb5d32081a2a6af661d8b3bcfad731de695",
     "size": 703,
     "platform": {
       "architecture": "amd64",
       "os": "linux"
     }
   },
-  "containerimage.digest": "sha256:8f206c2ae2bbaed8e76db45704c4f76945176d448a310ed77d1abbe1b89f8b7b",
-  "image.name": "ghcr.io/aenix-io/cozystack/dashboard:v0.10.3"
+  "containerimage.digest": "sha256:f6a14b2291c6750cb4cb4c1b8ddefdb5d32081a2a6af661d8b3bcfad731de695",
+  "image.name": "ghcr.io/aenix-io/cozystack/dashboard:v0.10.4"
 }

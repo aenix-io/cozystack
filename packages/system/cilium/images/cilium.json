@@ -45,7 +45,7 @@
       }
     }
   },
-  "buildx.build.ref": "cozystack/cozystack0/s6wdt6414bz57mu5kdltf56s1",
+  "buildx.build.ref": "buildkit/buildkit0/t1ir71rh3wc8qnuoktu7d4esj",
   "containerimage.config.digest": "sha256:e4a2ffa097cfead78a8e7623cf186d5f594e72e139e4dda5a06bcd1c58c6838e",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
@@ -57,5 +57,5 @@
     }
   },
   "containerimage.digest": "sha256:8110f6b17ec98d87d9aebf3f4b99409f020840a958166e28c74b2d4e1bfb5a51",
-  "image.name": "ghcr.io/aenix-io/cozystack/cilium:1.15.5,ghcr.io/aenix-io/cozystack/cilium:1.15.5-v0.10.3"
+  "image.name": "ghcr.io/aenix-io/cozystack/cilium:1.15.5,ghcr.io/aenix-io/cozystack/cilium:1.15.5-v0.10.4"
 }

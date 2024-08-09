@@ -32,7 +32,7 @@
       }
     }
   },
-  "buildx.build.ref": "cozystack/cozystack0/spml9ia4vkl6wxfboxgso9jnd",
+  "buildx.build.ref": "buildkit/buildkit0/u67issjnvf8mayitrr0yjhyvg",
   "containerimage.config.digest": "sha256:4bfe7bdc746d0f7db6d8fccb4ef68c8b1dc2306c27e2716f589dee951bf86a03",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
@@ -44,5 +44,5 @@
     }
   },
   "containerimage.digest": "sha256:6b5dbb5319ddcf9f545ba0f7b8b3f2117e85bc96e684b5e3adf23e0fef5dde8d",
-  "image.name": "ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0,ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0-v0.10.3"
+  "image.name": "ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0,ghcr.io/aenix-io/cozystack/nginx-cache:v0.1.0-v0.10.4"
 }

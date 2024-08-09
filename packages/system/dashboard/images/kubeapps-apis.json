@@ -11,7 +11,7 @@
       {
         "uri": "pkg:docker/bitnami/minideb@bookworm?platform=linux%2Famd64",
         "digest": {
-          "sha256": "a43a80e7ccfee2af468eb2cb7fb9ab3a38a9c6a11d98556b7218674fa1a599a9"
+          "sha256": "83bb31f8fcd1f639603350886a70a96204dc0de3368cb6b573170642c888cf82"
         }
       },
       {
@@ -41,17 +41,17 @@
       }
     }
   },
-  "buildx.build.ref": "cozystack/cozystack0/umvwwe8i6d3s3gnn71z41y2c6",
-  "containerimage.config.digest": "sha256:a39c384b5a183e506c331f2fc1a4ab1b27f620bbc596407965fa9e7190a04ae4",
+  "buildx.build.ref": "buildkit/buildkit0/p6nqttiwicifoqgamrjx2fdrq",
+  "containerimage.config.digest": "sha256:348ce29b9ea660f8f9c35d2b103cf164ce82b057935da06a79cae1822934b8f7",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:3151eb381f7b8fe6a9b9a0ee5c3d99cfda7d708b2b89931b4288d22169da67af",
-    "size": 1891,
+    "digest": "sha256:236fd33ce19599e06f3fedcc97a287880e1aab2354a6b17634e84a74d092e095",
+    "size": 1890,
     "platform": {
       "architecture": "amd64",
       "os": "linux"
     }
   },
-  "containerimage.digest": "sha256:3151eb381f7b8fe6a9b9a0ee5c3d99cfda7d708b2b89931b4288d22169da67af",
-  "image.name": "ghcr.io/aenix-io/cozystack/kubeapps-apis:v0.10.3"
+  "containerimage.digest": "sha256:236fd33ce19599e06f3fedcc97a287880e1aab2354a6b17634e84a74d092e095",
+  "image.name": "ghcr.io/aenix-io/cozystack/kubeapps-apis:v0.10.4"
 }
