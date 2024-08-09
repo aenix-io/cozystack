@@ -65,3 +65,8 @@ spec:
   entityOperator:
     topicOperator: {}
     userOperator: {}
+    template:
+      pod:
+        metadata:
+         labels:
+           policy.cozystack.io/allow-to-apiserver: "true"
