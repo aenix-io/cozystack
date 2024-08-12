@@ -1,4 +1,4 @@
-{{- if and .Values.agent (not .Values.preflight.enabled) }}
+{{- if and .Values.agent (not .Values.preflight.enabled) .Values.rbac.create }}
 {{- /*
 Keep file in sync with cilium-preflight/clusterrole.yaml
 */ -}}
@@ -41,6 +41,15 @@ rules:
   - get
   - list
   - watch
+{{- if and .Values.hubble.enabled .Values.hubble.dropEventEmitter.enabled }}
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+{{- end }}
 {{- if .Values.annotateK8sNode }}
 - apiGroups:
   - ""
@@ -139,8 +148,6 @@ rules:
 - apiGroups:
   - cilium.io
   resources:
-  - ciliumnetworkpolicies/status
-  - ciliumclusterwidenetworkpolicies/status
   - ciliumendpoints/status
   - ciliumendpoints
   - ciliuml2announcementpolicies/status

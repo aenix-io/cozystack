@@ -31,6 +31,10 @@ spec:
         {{- with .Values.hubble.relay.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if and .Values.hubble.relay.prometheus.enabled (not .Values.hubble.relay.prometheus.serviceMonitor.enabled) }}
+        prometheus.io/port: {{ .Values.hubble.relay.prometheus.port | quote }}
+        prometheus.io/scrape: "true"
+        {{- end }}
       labels:
         k8s-app: hubble-relay
         app.kubernetes.io/name: hubble-relay
@@ -64,33 +68,44 @@ spec:
           {{- end }}
           ports:
             - name: grpc
-              containerPort: {{ .Values.hubble.relay.listenPort }}
+              containerPort: {{ include "hubble-relay.config.listenPort" . }}
             {{- if .Values.hubble.relay.prometheus.enabled }}
             - name: prometheus
               containerPort: {{ .Values.hubble.relay.prometheus.port }}
               protocol: TCP
             {{- end }}
           readinessProbe:
-            {{- include "hubble-relay.probe" . | nindent 12 }}
-            {{- if semverCompare "<1.20-0" .Capabilities.KubeVersion.Version }}
-            # Starting from Kubernetes 1.20, we are using startupProbe instead
-            # of this field.
-            initialDelaySeconds: 5
-            {{- end }}
+            grpc:
+              port: 4222
+            timeoutSeconds: 3
+          # livenessProbe will kill the pod, we should be very conservative
+          # here on failures since killing the pod should be a last resort, and
+          # we should provide enough time for relay to retry before killing it.
           livenessProbe:
-            {{- include "hubble-relay.probe" . | nindent 12 }}
-            {{- if semverCompare "<1.20-0" .Capabilities.KubeVersion.Version }}
-            # Starting from Kubernetes 1.20, we are using startupProbe instead
-            # of this field.
-            initialDelaySeconds: 60
-            {{- end }}
-          {{- if semverCompare ">=1.20-0" .Capabilities.KubeVersion.Version }}
+            grpc:
+              port: 4222
+            timeoutSeconds: 10
+            # Give relay time to establish connections and make a few retries
+            # before starting livenessProbes.
+            initialDelaySeconds: 10
+            # 10 second * 12 failures = 2 minutes of failure.
+            # If relay cannot become healthy after 2 minutes, then killing it
+            # might resolve whatever issue is occurring.
+            #
+            # 10 seconds is a reasonable retry period so we can see if it's
+            # failing regularly or only sporadically.
+            periodSeconds: 10
+            failureThreshold: 12
           startupProbe:
-            # give the relay one minute to start up
-            {{- include "hubble-relay.probe" . | nindent 12 }}
+            grpc:
+              port: 4222
+            # Give relay time to get it's certs and establish connections and
+            # make a few retries before starting startupProbes.
+            initialDelaySeconds: 10
+            # 20 * 3 seconds = 1 minute of failure before we consider startup as failed.
             failureThreshold: 20
+            # Retry more frequently at startup so that it can be considered started more quickly.
             periodSeconds: 3
-          {{- end }}
           {{- with .Values.hubble.relay.extraEnv }}
           env:
             {{- toYaml . | trim | nindent 12 }}
@@ -112,9 +127,9 @@ spec:
           {{- toYaml . | nindent 10 }}
           {{- end }}
           terminationMessagePolicy: FallbackToLogsOnError
+        {{- include "hubble-relay.containers.extra" . | nindent 8 }}
       restartPolicy: Always
       priorityClassName: {{ .Values.hubble.relay.priorityClassName }}
-      serviceAccount: {{ .Values.serviceAccounts.relay.name | quote }}
       serviceAccountName: {{ .Values.serviceAccounts.relay.name | quote }}
       automountServiceAccountToken: {{ .Values.serviceAccounts.relay.automount }}
       terminationGracePeriodSeconds: {{ .Values.hubble.relay.terminationGracePeriodSeconds }}
@@ -182,20 +197,7 @@ spec:
           {{- end }}
       {{- end }}
       {{- with .Values.hubble.relay.extraVolumes }}
-      {{- toYaml . | nindent 6 }}
+      {{- toYaml . | nindent 6}}
       {{- end }}
-{{- end }}
-
-{{- define "hubble-relay.probe" }}
-{{- /* This distinction can be removed once we drop support for k8s 1.23 */}}
-{{- if semverCompare ">=1.24-0" .Capabilities.KubeVersion.Version -}}
-grpc:
-  port: 4222
-{{- else }}
-exec:
-  command:
-  - grpc_health_probe
-  - -addr=localhost:4222
-{{- end }}
-timeoutSeconds: 3
+      {{- include "hubble-relay.volumes.extra" . | nindent 6 }}
 {{- end }}
