@@ -2,13 +2,15 @@ bucket 0.1.0 HEAD
 clickhouse 0.1.0 ca79f72
 clickhouse 0.2.0 7cd7de73
 clickhouse 0.2.1 HEAD
-ferretdb 0.1.0 HEAD
+ferretdb 0.1.0 4ffa8615
+ferretdb 0.1.1 HEAD
 http-cache 0.1.0 a956713
 http-cache 0.2.0 HEAD
 kafka 0.1.0 760f86d2
 kafka 0.2.0 a2cc83d
 kafka 0.2.1 3ac17018
-kafka 0.2.2 HEAD
+kafka 0.2.2 d0758692
+kafka 0.2.3 HEAD
 kubernetes 0.1.0 f642698
 kubernetes 0.2.0 7cd7de73
 kubernetes 0.3.0 7caccec1
@@ -27,7 +29,8 @@ postgres 0.1.0 f642698
 postgres 0.2.0 7cd7de73
 postgres 0.2.1 4a97e297
 postgres 0.3.0 995dea6f
-postgres 0.4.0 HEAD
+postgres 0.4.0 ec283c33
+postgres 0.4.1 HEAD
 rabbitmq 0.1.0 f642698
 rabbitmq 0.2.0 HEAD
 redis 0.1.1 f642698

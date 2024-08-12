@@ -52,6 +52,7 @@ image-matchbox:
 		--metadata-file images/matchbox.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
+	rm -f images/matchbox.json
 
 assets: talos-iso talos-nocloud
 

@@ -68,7 +68,7 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.10.1"
+        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.11.0"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
@@ -87,7 +87,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
       - name: darkhttpd
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.10.1"
+        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.11.0"
         command:
         - /usr/bin/darkhttpd
         - /cozystack/assets
