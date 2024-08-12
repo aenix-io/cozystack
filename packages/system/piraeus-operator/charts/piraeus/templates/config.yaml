@@ -17,17 +17,17 @@ data:
     #   quay.io/piraeusdatastore/piraeus-server:v1.24.2
     components:
       linstor-controller:
-        tag: v1.27.1
+        tag: v1.28.0
         image: piraeus-server
       linstor-satellite:
         # Pin with digest to ensure we pull the version with downgraded thin-send-recv
-        tag: v1.27.1@sha256:26037f77d30d5487024e02a808d4ef913b93b745f2bb850cabc7f43a5359adff
+        tag: v1.28.0
         image: piraeus-server
       linstor-csi:
-        tag: v1.6.0
+        tag: v1.6.3
         image: piraeus-csi
       drbd-reactor:
-        tag: v1.4.0
+        tag: v1.4.1
         image: drbd-reactor
       ha-controller:
         tag: v1.2.1
@@ -36,24 +36,36 @@ data:
         tag: v1.0.0
         image: drbd-shutdown-guard
       ktls-utils:
-        tag: v0.10
+        tag: v0.11
         image: ktls-utils
       drbd-module-loader:
-        tag: v9.2.9
+        tag: v9.2.10
         # The special "match" attribute is used to select an image based on the node's reported OS.
         # The operator will first check the k8s node's ".status.nodeInfo.osImage" field, and compare it against the list
         # here. If one matches, that specific image name will be used instead of the fallback image.
         image: drbd9-noble # Fallback image: chose a recent kernel, which can hopefully compile whatever config is actually in use
         match:
+          - osImage: Red Hat Enterprise Linux 7\.
+            image: drbd9-centos7
+          - osImage: Red Hat Enterprise Linux 8\.
+            image: drbd9-almalinux8
+          - osImage: Red Hat Enterprise Linux 9\.
+            image: drbd9-almalinux9
+          - osImage: "Red Hat Enterprise Linux CoreOS 41[3-9]"
+            image: drbd9-almalinux9
+          - osImage: Red Hat Enterprise Linux CoreOS
+            image: drbd9-almalinux8
           - osImage: CentOS Linux 7
             image: drbd9-centos7
           - osImage: CentOS Linux 8
-            image: drbd9-centos8
+            image: drbd9-almalinux8
           - osImage: AlmaLinux 8
             image: drbd9-almalinux8
-          - osImage: Red Hat Enterprise Linux CoreOS
-            image: drbd9-almalinux8
           - osImage: AlmaLinux 9
+            image: drbd9-almalinux9
+          - osImage: Oracle Linux Server 8\.
+            image: drbd9-almalinux8
+          - osImage: Oracle Linux Server 9\.
             image: drbd9-almalinux9
           - osImage: Rocky Linux 8
             image: drbd9-almalinux8
@@ -78,25 +90,25 @@ data:
     base: registry.k8s.io/sig-storage
     components:
       csi-attacher:
-        tag: v4.5.1
+        tag: v4.6.1
         image: csi-attacher
       csi-livenessprobe:
-        tag: v2.12.0
+        tag: v2.13.1
         image: livenessprobe
       csi-provisioner:
-        tag: v4.0.1
+        tag: v5.0.1
         image: csi-provisioner
       csi-snapshotter:
-        tag: v7.0.2
+        tag: v8.0.1
         image: csi-snapshotter
       csi-resizer:
-        tag: v1.10.1
+        tag: v1.11.1
         image: csi-resizer
       csi-external-health-monitor-controller:
-        tag: v0.11.0
+        tag: v0.12.1
         image: csi-external-health-monitor-controller
       csi-node-driver-registrar:
-        tag: v2.10.1
+        tag: v2.11.1
         image: csi-node-driver-registrar
   {{- range $idx, $value := .Values.imageConfigOverride }}
   {{ add $idx 1 }}_helm_override.yaml: |
