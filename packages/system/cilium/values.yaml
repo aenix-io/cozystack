@@ -4,7 +4,7 @@ cilium:
   externalIPs:
     enabled: true
   autoDirectNodeRoutes: false
-  kubeProxyReplacement: strict
+  kubeProxyReplacement: true
   bpf:
     masquerade: false
   loadBalancer:
@@ -26,12 +26,14 @@ cilium:
   enableIPv6Masquerade: false
   enableIdentityMark: false
   enableRuntimeDeviceDetection: true
-  #enforceDeviceDetection: true
+  forceDeviceDetection: true
   devices: ovn0
   extraEnv:
     - name: CILIUM_ENFORCE_DEVICE_DETECTION
       value: "true"
   image:
     repository: ghcr.io/aenix-io/cozystack/cilium
-    tag: latest
-    digest: "sha256:8110f6b17ec98d87d9aebf3f4b99409f020840a958166e28c74b2d4e1bfb5a51"
+    tag: 1.16.0
+    digest: "sha256:6897e67f0ed8c7d5c27c8793a78283d6c1fa7a16e17c961ec3f2d5af7a72f645"
+  envoy:
+    enabled: false

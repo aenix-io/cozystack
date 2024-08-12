@@ -10,7 +10,7 @@ update:
 	rm -rf charts
 	helm repo add cilium https://helm.cilium.io/
 	helm repo update cilium
-	helm pull cilium/cilium --untar --untardir charts --version 1.15
+	helm pull cilium/cilium --untar --untardir charts --version 1.16
 	sed -i -e '/Used in iptables/d' -e '/SYS_MODULE/d' charts/cilium/values.yaml
 	version=$$(awk '$$1 == "version:" {print $$2}' charts/cilium/Chart.yaml) && \
 	sed -i "s/ARG VERSION=.*/ARG VERSION=v$${version}/" images/cilium/Dockerfile

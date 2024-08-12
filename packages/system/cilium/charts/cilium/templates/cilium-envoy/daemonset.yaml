@@ -1,5 +1,5 @@
-{{- if and .Values.envoy.enabled (not .Values.preflight.enabled) }}
-
+{{- $envoyDS := eq (include "envoyDaemonSetEnabled" .) "true" -}}
+{{- if (and $envoyDS (not .Values.preflight.enabled)) }}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -26,8 +26,8 @@ spec:
   template:
     metadata:
       annotations:
-        {{- if and .Values.proxy.prometheus.enabled .Values.envoy.prometheus.enabled (not .Values.envoy.prometheus.serviceMonitor.enabled) }}
-        prometheus.io/port: "{{ .Values.proxy.prometheus.port | default .Values.envoy.prometheus.port }}"
+        {{- if and .Values.envoy.prometheus.enabled (not .Values.envoy.prometheus.serviceMonitor.enabled) }}
+        prometheus.io/port: "{{ .Values.envoy.prometheus.port }}"
         prometheus.io/scrape: "true"
         {{- end }}
         {{- if .Values.envoy.rollOutPods }}
@@ -74,8 +74,12 @@ spec:
         command:
         - /usr/bin/cilium-envoy-starter
         args:
+        {{- if .Values.envoy.securityContext.capabilities.keepCapNetBindService }}
+        - '--keep-cap-net-bind-service'
+        {{- end }}
+        - '--'
         - '-c /var/run/cilium/envoy/bootstrap-config.json'
-        - '--base-id 0'
+        - '--base-id {{ int .Values.envoy.baseID }}'
         {{- if and (.Values.debug.enabled) (hasKey .Values.debug "verbose") (.Values.debug.verbose) (has "envoy" ( splitList " " .Values.debug.verbose )) }}
         - '--log-level trace'
         {{- else if and (.Values.debug.enabled) (hasKey .Values.debug "verbose") (.Values.debug.verbose) (has "flow" ( splitList " " .Values.debug.verbose )) }}
@@ -90,7 +94,6 @@ spec:
         {{- with .Values.envoy.extraArgs }}
         {{- toYaml . | trim | nindent 8 }}
         {{- end }}
-        {{- if semverCompare ">=1.20-0" .Capabilities.KubeVersion.Version }}
         startupProbe:
           httpGet:
             host: {{ .Values.ipv4.enabled | ternary "127.0.0.1" "::1" | quote }}
@@ -101,21 +104,12 @@ spec:
           periodSeconds: {{ .Values.envoy.startupProbe.periodSeconds }}
           successThreshold: 1
           initialDelaySeconds: 5
-        {{- end }}
         livenessProbe:
           httpGet:
             host: {{ .Values.ipv4.enabled | ternary "127.0.0.1" "::1" | quote }}
             path: /healthz
             port: {{ .Values.envoy.healthPort }}
             scheme: HTTP
-          {{- if semverCompare "<1.20-0" .Capabilities.KubeVersion.Version }}
-          # The initial delay for the liveness probe is intentionally large to
-          # avoid an endless kill & restart cycle if in the event that the initial
-          # bootstrapping takes longer than expected.
-          # Starting from Kubernetes 1.20, we are using startupProbe instead
-          # of this field.
-          initialDelaySeconds: 120
-          {{- end }}
           periodSeconds: {{ .Values.envoy.livenessProbe.periodSeconds }}
           successThreshold: 1
           failureThreshold: {{ .Values.envoy.livenessProbe.failureThreshold }}
@@ -126,9 +120,6 @@ spec:
             path: /healthz
             port: {{ .Values.envoy.healthPort }}
             scheme: HTTP
-          {{- if semverCompare "<1.20-0" .Capabilities.KubeVersion.Version }}
-          initialDelaySeconds: 5
-          {{- end }}
           periodSeconds: {{ .Values.envoy.readinessProbe.periodSeconds }}
           successThreshold: 1
           failureThreshold: {{ .Values.envoy.readinessProbe.failureThreshold }}
@@ -146,11 +137,9 @@ spec:
               fieldPath: metadata.namespace
         {{- if .Values.k8sServiceHost }}
         - name: KUBERNETES_SERVICE_HOST
-          value: {{ .Values.k8sServiceHost | quote }}
-        {{- end }}
-        {{- if .Values.k8sServicePort }}
+          value: {{ include "k8sServiceHost" . }}
         - name: KUBERNETES_SERVICE_PORT
-          value: {{ .Values.k8sServicePort | quote }}
+          value: {{ include "k8sServicePort" . }}
         {{- end }}
         {{- with .Values.envoy.extraEnv }}
         {{- toYaml . | trim | nindent 8 }}
@@ -159,12 +148,18 @@ spec:
         resources:
           {{- toYaml . | trim | nindent 10 }}
         {{- end }}
-        {{- if and .Values.proxy.prometheus.enabled .Values.envoy.prometheus.enabled }}
+        {{- if .Values.envoy.prometheus.enabled }}
         ports:
         - name: envoy-metrics
-          containerPort: {{ .Values.proxy.prometheus.port | default .Values.envoy.prometheus.port }}
-          hostPort: {{ .Values.proxy.prometheus.port | default .Values.envoy.prometheus.port }}
+          containerPort: {{ .Values.envoy.prometheus.port }}
+          hostPort: {{ .Values.envoy.prometheus.port }}
           protocol: TCP
+        {{- if and .Values.envoy.debug.admin.enabled .Values.envoy.debug.admin.port }}
+        - name: envoy-admin
+          containerPort: {{ .Values.envoy.debug.admin.port }}
+          hostPort: {{ .Values.envoy.debug.admin.port }}
+          protocol: TCP
+        {{- end }}
         {{- end }}
         securityContext:
           {{- if .Values.envoy.securityContext.privileged }}
@@ -214,7 +209,6 @@ spec:
       {{- end }}
       restartPolicy: Always
       priorityClassName: {{ include "cilium.priorityClass" (list $ .Values.envoy.priorityClassName "system-node-critical") }}
-      serviceAccount: {{ .Values.serviceAccounts.envoy.name | quote }}
       serviceAccountName: {{ .Values.serviceAccounts.envoy.name | quote }}
       automountServiceAccountToken: {{ .Values.serviceAccounts.envoy.automount }}
       terminationGracePeriodSeconds: {{ .Values.envoy.terminationGracePeriodSeconds }}
