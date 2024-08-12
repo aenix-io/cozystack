@@ -1,0 +1,80 @@
+{{- if .Values.global.enableSecurity }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "seaweedfs.name" . }}-security-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ template "seaweedfs.name" . }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  security.toml: |-
+    # this file is read by master, volume server, and filer
+
+    {{- if .Values.global.securityConfig.jwtSigning.volumeWrite }}
+    # the jwt signing key is read by master and volume server
+    # a jwt expires in 10 seconds
+    [jwt.signing]
+    key = "{{ randAlphaNum 10 | b64enc }}"
+    {{- end }}
+
+    {{- if .Values.global.securityConfig.jwtSigning.volumeRead }}
+    # this jwt signing key is read by master and volume server, and it is used for read operations:
+    # - the Master server generates the JWT, which can be used to read a certain file on a volume server
+    # - the Volume server validates the JWT on reading
+    [jwt.signing.read]
+    key = "{{ randAlphaNum 10 | b64enc }}"
+    {{- end }}
+
+    {{- if .Values.global.securityConfig.jwtSigning.filerWrite }}
+    # If this JWT key is configured, Filer only accepts writes over HTTP if they are signed with this JWT:
+    # - f.e. the S3 API Shim generates the JWT
+    # - the Filer server validates the JWT on writing
+    # the jwt defaults to expire after 10 seconds.
+    [jwt.filer_signing]
+    key = "{{ randAlphaNum 10 | b64enc }}"
+    {{- end }}
+
+    {{- if .Values.global.securityConfig.jwtSigning.filerRead }}
+    # If this JWT key is configured, Filer only accepts reads over HTTP if they are signed with this JWT:
+    # - f.e. the S3 API Shim generates the JWT
+    # - the Filer server validates the JWT on writing
+    # the jwt defaults to expire after 10 seconds.
+    [jwt.filer_signing.read]
+    key = "{{ randAlphaNum 10 | b64enc }}"
+    {{- end }}
+
+    # all grpc tls authentications are mutual
+    # the values for the following ca, cert, and key are paths to the PERM files.
+    [grpc]
+    ca = "/usr/local/share/ca-certificates/ca/tls.crt"
+
+    [grpc.volume]
+    cert = "/usr/local/share/ca-certificates/volume/tls.crt"
+    key  = "/usr/local/share/ca-certificates/volume/tls.key"
+
+    [grpc.master]
+    cert = "/usr/local/share/ca-certificates/master/tls.crt"
+    key  = "/usr/local/share/ca-certificates/master/tls.key"
+
+    [grpc.filer]
+    cert = "/usr/local/share/ca-certificates/filer/tls.crt"
+    key  = "/usr/local/share/ca-certificates/filer/tls.key"
+
+    # use this for any place needs a grpc client
+    # i.e., "weed backup|benchmark|filer.copy|filer.replicate|mount|s3|upload"
+    [grpc.client]
+    cert = "/usr/local/share/ca-certificates/client/tls.crt"
+    key  = "/usr/local/share/ca-certificates/client/tls.key"
+
+    # volume server https options
+    # Note: work in progress!
+    #     this does not work with other clients, e.g., "weed filer|mount" etc, yet.
+    [https.client]
+    enabled = false
+    [https.volume]
+    cert = ""
+    key  = ""
+{{- end }}

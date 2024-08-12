@@ -1,7 +1,7 @@
 {{- define "cozystack.namespace-anotations" }}
 {{- $context := index . 0 }}
 {{- $existingNS := index . 1 }}
-{{- range $x := list "etcd" "monitoring" "ingress" }}
+{{- range $x := list "etcd" "monitoring" "ingress" "seaweedfs" }}
 {{- if (index $context.Values $x) }}
 namespace.cozystack.io/{{ $x }}: "{{ include "tenant.name" $context }}"
 {{- else }}
