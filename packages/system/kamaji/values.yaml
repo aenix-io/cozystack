@@ -3,5 +3,5 @@ kamaji:
     deploy: false
   image:
     pullPolicy: IfNotPresent
-    tag: latest@sha256:f7e4036ed809176dafc671953a5c95a652dc7d637a67470142e625103f91ca3d
+    tag: v0.11.0@sha256:34a5758a02b5d3e8fc33cad672e849f3bfcc149672893ad4584bc716245332af
     repository: ghcr.io/aenix-io/cozystack/kamaji
