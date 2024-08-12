@@ -1,11 +1,47 @@
 diff --git a/internal/kubeadm/uploadconfig.go b/internal/kubeadm/uploadconfig.go
-index 0dc9e71..e516390 100644
+index 0dc9e71..158f54f 100644
 --- a/internal/kubeadm/uploadconfig.go
 +++ b/internal/kubeadm/uploadconfig.go
-@@ -98,21 +98,15 @@ func getKubeletConfigmapContent(kubeletConfiguration KubeletConfiguration) ([]by
- 				CacheUnauthorizedTTL: zeroDuration,
- 			},
- 		},
+@@ -17,7 +17,7 @@ import (
+ 	"k8s.io/kubernetes/cmd/kubeadm/app/phases/uploadconfig"
+ 	"k8s.io/kubernetes/cmd/kubeadm/app/util/apiclient"
+ 	"k8s.io/kubernetes/pkg/apis/rbac"
+-	pointer "k8s.io/utils/ptr"
++	kubeletv1beta1 "k8s.io/kubernetes/pkg/kubelet/apis/config/v1beta1"
+ 
+ 	"github.com/clastix/kamaji/internal/utilities"
+ )
+@@ -72,58 +72,16 @@ func UploadKubeletConfig(client kubernetes.Interface, config *Configuration) ([]
+ }
+ 
+ func getKubeletConfigmapContent(kubeletConfiguration KubeletConfiguration) ([]byte, error) {
+-	zeroDuration := metav1.Duration{Duration: 0}
++	var kc kubelettypes.KubeletConfiguration
+ 
+-	kc := kubelettypes.KubeletConfiguration{
+-		TypeMeta: metav1.TypeMeta{
+-			Kind:       "KubeletConfiguration",
+-			APIVersion: "kubelet.config.k8s.io/v1beta1",
+-		},
+-		Authentication: kubelettypes.KubeletAuthentication{
+-			Anonymous: kubelettypes.KubeletAnonymousAuthentication{
+-				Enabled: pointer.To(false),
+-			},
+-			Webhook: kubelettypes.KubeletWebhookAuthentication{
+-				Enabled:  pointer.To(true),
+-				CacheTTL: zeroDuration,
+-			},
+-			X509: kubelettypes.KubeletX509Authentication{
+-				ClientCAFile: "/etc/kubernetes/pki/ca.crt",
+-			},
+-		},
+-		Authorization: kubelettypes.KubeletAuthorization{
+-			Mode: kubelettypes.KubeletAuthorizationModeWebhook,
+-			Webhook: kubelettypes.KubeletWebhookAuthorization{
+-				CacheAuthorizedTTL:   zeroDuration,
+-				CacheUnauthorizedTTL: zeroDuration,
+-			},
+-		},
 -		CgroupDriver:              kubeletConfiguration.TenantControlPlaneCgroupDriver,
 -		ClusterDNS:                kubeletConfiguration.TenantControlPlaneDNSServiceIPs,
 -		ClusterDomain:             kubeletConfiguration.TenantControlPlaneDomain,
@@ -15,16 +51,31 @@ index 0dc9e71..e516390 100644
 -			"nodefs.available":  "0%",
 -			"nodefs.inodesFree": "0%",
 -		},
-+		CgroupDriver:                     kubeletConfiguration.TenantControlPlaneCgroupDriver,
-+		ClusterDNS:                       kubeletConfiguration.TenantControlPlaneDNSServiceIPs,
-+		ClusterDomain:                    kubeletConfiguration.TenantControlPlaneDomain,
-+		CPUManagerReconcilePeriod:        zeroDuration,
- 		EvictionPressureTransitionPeriod: zeroDuration,
- 		FileCheckFrequency:               zeroDuration,
- 		HealthzBindAddress:               "127.0.0.1",
- 		HealthzPort:                      pointer.To(int32(10248)),
- 		HTTPCheckFrequency:               zeroDuration,
+-		EvictionPressureTransitionPeriod: zeroDuration,
+-		FileCheckFrequency:               zeroDuration,
+-		HealthzBindAddress:               "127.0.0.1",
+-		HealthzPort:                      pointer.To(int32(10248)),
+-		HTTPCheckFrequency:               zeroDuration,
 -		ImageGCHighThresholdPercent:      pointer.To(int32(100)),
- 		NodeStatusUpdateFrequency:        zeroDuration,
- 		NodeStatusReportFrequency:        zeroDuration,
- 		RotateCertificates:               true,
+-		NodeStatusUpdateFrequency:        zeroDuration,
+-		NodeStatusReportFrequency:        zeroDuration,
+-		RotateCertificates:               true,
+-		RuntimeRequestTimeout:            zeroDuration,
+-		ShutdownGracePeriod:              zeroDuration,
+-		ShutdownGracePeriodCriticalPods:  zeroDuration,
+-		StaticPodPath:                    "/etc/kubernetes/manifests",
+-		StreamingConnectionIdleTimeout:   zeroDuration,
+-		SyncFrequency:                    zeroDuration,
+-		VolumeStatsAggPeriod:             zeroDuration,
+-	}
++	kubeletv1beta1.SetDefaults_KubeletConfiguration(&kc)
++
++	kc.Authentication.X509.ClientCAFile = "/etc/kubernetes/pki/ca.crt"
++	kc.CgroupDriver = kubeletConfiguration.TenantControlPlaneCgroupDriver
++	kc.ClusterDNS = kubeletConfiguration.TenantControlPlaneDNSServiceIPs
++	kc.ClusterDomain = kubeletConfiguration.TenantControlPlaneDomain
++	kc.RotateCertificates = true
++	kc.StaticPodPath = "/etc/kubernetes/manifests"
+ 
+ 	return utilities.EncodeToYaml(&kc)
+ }
