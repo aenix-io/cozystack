@@ -3,24 +3,24 @@
 arch: amd64
 platform: metal
 secureboot: false
-version: v1.7.1
+version: v1.7.6
 input:
   kernel:
     path: /usr/install/amd64/vmlinuz
   initramfs:
     path: /usr/install/amd64/initramfs.xz
   baseInstaller:
-    imageRef: ghcr.io/siderolabs/installer:v1.7.1
+    imageRef: ghcr.io/siderolabs/installer:v1.7.6
   systemExtensions:
-    - imageRef: ghcr.io/siderolabs/amd-ucode:20240410
-    - imageRef: ghcr.io/siderolabs/amdgpu-firmware:20240410
-    - imageRef: ghcr.io/siderolabs/bnx2-bnx2x:20240410
-    - imageRef: ghcr.io/siderolabs/i915-ucode:20240410
-    - imageRef: ghcr.io/siderolabs/intel-ice-firmware:20240410
-    - imageRef: ghcr.io/siderolabs/intel-ucode:20240312
-    - imageRef: ghcr.io/siderolabs/qlogic-firmware:20240410
-    - imageRef: ghcr.io/siderolabs/drbd:9.2.8-v1.7.1
-    - imageRef: ghcr.io/siderolabs/zfs:2.2.3-v1.7.1
+    - imageRef: ghcr.io/siderolabs/amd-ucode:20240709
+    - imageRef: ghcr.io/siderolabs/amdgpu-firmware:20240709
+    - imageRef: ghcr.io/siderolabs/bnx2-bnx2x:20240709
+    - imageRef: ghcr.io/siderolabs/i915-ucode:20240709
+    - imageRef: ghcr.io/siderolabs/intel-ice-firmware:20240709
+    - imageRef: ghcr.io/siderolabs/intel-ucode:20240531
+    - imageRef: ghcr.io/siderolabs/qlogic-firmware:20240709
+    - imageRef: ghcr.io/siderolabs/drbd:9.2.8-v1.7.6
+    - imageRef: ghcr.io/siderolabs/zfs:2.2.4-v1.7.6
 output:
   kind: iso
   imageOptions: {}
