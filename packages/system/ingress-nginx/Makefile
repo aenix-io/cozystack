@@ -1,7 +1,6 @@
-export NAME=ingress-nginx
-export NAMESPACE=cozy-$(NAME)
+NAME=ingress-nginx-system
 
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update:
 	rm -rf charts

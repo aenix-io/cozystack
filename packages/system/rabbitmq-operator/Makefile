@@ -1,7 +1,7 @@
 export NAME=rabbitmq-operator
 export NAMESPACE=cozy-$(NAME)
 
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update:
 	rm -rf templates/cluster-operator.yml

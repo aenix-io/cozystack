@@ -1,3 +1,7 @@
+NAME=ingress
+
+include ../../../scripts/package.mk
+
 update: get-cloudflare-ips
 
 get-cloudflare-ips:

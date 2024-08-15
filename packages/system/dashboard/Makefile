@@ -2,7 +2,7 @@ export NAME=dashboard
 export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/common-envs.mk
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update: update-chart update-dockerfiles
 image: image-dashboard image-kubeapps-apis

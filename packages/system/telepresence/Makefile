@@ -1,7 +1,7 @@
 export NAME=traffic-manager
 export NAMESPACE=cozy-telepresence
 
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update:
 	rm -rf charts

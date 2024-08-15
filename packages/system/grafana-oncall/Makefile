@@ -1,3 +1,7 @@
+NAME=grafana-oncall-system
+
+include ../../../scripts/package.mk
+
 update:
 	rm -rf charts
 	helm repo add grafana https://grafana.github.io/helm-charts

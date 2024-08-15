@@ -1,6 +1,7 @@
 UBUNTU_CONTAINER_DISK_TAG = v1.30.1
 
 include ../../../scripts/common-envs.mk
+include ../../../scripts/package.mk
 
 generate:
 	readme-generator -v values.yaml -s values.schema.json -r README.md
