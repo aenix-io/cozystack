@@ -6,11 +6,16 @@ metadata:
   labels:
     app: {{ .Release.Name }}-vpn
 spec:
-  type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
-  {{- if .Values.external }}
-  externalTrafficPolicy: Local
-  allocateLoadBalancerNodePorts: false
+  {{- if .Values.externalIPs }}
+  externalIPs:
+    {{- toYaml .Values.externalIPs | nindent 12 }}
+  type: ClusterIP
+  externalTrafficPolicy: Cluster
+  {{- else }}
+  type: LoadBalancer
+  externalTrafficPolicy: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
   {{- end }}
+
   ports:
     #- name: apiport-tcp
     #  protocol: TCP

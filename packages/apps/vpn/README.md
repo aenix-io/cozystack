@@ -22,6 +22,8 @@ The VPN Service is powered by the Outline Server, an advanced and user-friendly 
 
 ### Configuration parameters
 
-| Name    | Description         | Value |
-| ------- | ------------------- | ----- |
-| `users` | Users configuration | `{}`  |
+| Name          | Description                                 | Value |
+| ------------- | ------------------------------------------- | ----- |
+| `host`        | Host used to substitute into generated URLs | `""`  |
+| `users`       | Users configuration                         | `{}`  |
+| `externalIPs` | List of externalIPs for service.            | `[]`  |
