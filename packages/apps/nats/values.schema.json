@@ -10,7 +10,12 @@
         "replicas": {
             "type": "number",
             "description": "Persistent Volume size for NATS",
-            "default": 3
+            "default": 2
+        },
+        "storageClass": {
+            "type": "string",
+            "description": "StorageClass used to store the data",
+            "default": ""
         }
     }
 }

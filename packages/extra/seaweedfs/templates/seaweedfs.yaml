@@ -34,6 +34,9 @@ spec:
         - name: data1
           type: "persistentVolumeClaim"
           size: "{{ .Values.size }}"
+          {{- with .Values.stroageClass }}
+          storageClass: {{ . }}
+          {{- end }}
           maxVolumes: 0
       
       s3:

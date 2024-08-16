@@ -1,7 +1,9 @@
 ## @section Common parameters
 
 ## @param size Persistent Volume size
+## @param storageClass StorageClass used to store the data
 ## @param replicas Number of etcd replicas
 ##
 size: 4Gi
+storageClass: ""
 replicas: 3

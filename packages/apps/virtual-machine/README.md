@@ -18,6 +18,7 @@ The virtual machine is managed and hosted through KubeVirt, allowing you to harn
 | `external`         | Enable external access from outside the cluster                                                   | `false`                             |
 | `running`          | Determines if the virtual machine should be running                                               | `true`                              |
 | `image`            | The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora` | `ubuntu`                            |
+| `storageClass`     | StorageClass used to store the data                                                               | `replicated`                        |
 | `resources.cpu`    | The number of CPU cores allocated to the virtual machine                                          | `1`                                 |
 | `resources.memory` | The amount of memory allocated to the virtual machine                                             | `1024M`                             |
 | `resources.disk`   | The size of the disk allocated for the virtual machine                                            | `5Gi`                               |

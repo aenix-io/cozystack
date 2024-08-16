@@ -3,10 +3,12 @@
 ## @param external Enable external access from outside the cluster
 ## @param size Persistent Volume size
 ## @param replicas Number of Postgres replicas
+## @param storageClass StorageClass used to store the data
 ##
 external: false
 size: 10Gi
 replicas: 2
+storageClass: ""
 
 ## Configuration for the quorum-based synchronous replication
 ## @param quorum.minSyncReplicas Minimum number of synchronous replicas that must acknowledge a transaction before it is considered committed.

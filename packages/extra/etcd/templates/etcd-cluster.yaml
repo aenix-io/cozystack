@@ -25,6 +25,9 @@ spec:
         resources:
           requests:
             storage: {{ .Values.size }}
+        {{- with .Values.stroageClass }}
+        storageClassName: {{ . }}
+        {{- end }}
   security:
     tls:
       peerTrustedCASecret: etcd-peer-ca-tls

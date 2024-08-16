@@ -53,6 +53,9 @@ spec:
         {{- with .Values.kafka.size }}
         size: {{ . }}
         {{- end }}
+        {{- with .Values.kafka.stroageClass }}
+        class: {{ . }}
+        {{- end }}
         deleteClaim: true
   zookeeper:
     replicas: {{ .Values.zookeeper.replicas }}
@@ -60,6 +63,9 @@ spec:
       type: persistent-claim
       {{- with .Values.zookeeper.size }}
       size: {{ . }}
+      {{- end }}
+      {{- with .Values.kafka.stroageClass }}
+      class: {{ . }}
       {{- end }}
       deleteClaim: false
   entityOperator:

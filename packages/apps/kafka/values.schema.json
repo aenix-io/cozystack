@@ -19,6 +19,11 @@
                     "type": "number",
                     "description": "Number of Kafka replicas",
                     "default": 3
+                },
+                "storageClass": {
+                    "type": "string",
+                    "description": "StorageClass used to store the Kafka data",
+                    "default": ""
                 }
             }
         },
@@ -34,6 +39,11 @@
                     "type": "number",
                     "description": "Number of ZooKeeper replicas",
                     "default": 3
+                },
+                "storageClass": {
+                    "type": "string",
+                    "description": "StorageClass used to store the ZooKeeper data",
+                    "default": ""
                 }
             }
         },

@@ -11,3 +11,9 @@ spec:
   service:
     type: LoadBalancer
   {{- end }}
+
+  persistence:
+    {{- with .Values.stroageClass }}
+    storageClassName: {{ . }}
+    {{- end }}
+    storage: {{ .Values.size }}

@@ -31,11 +31,12 @@ kubectl get secret -n <namespace> kubernetes-<clusterName>-admin-kubeconfig -o g
 
 ### Common parameters
 
-| Name                    | Description                                                                                                                            | Value |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `host`                  | The hostname used to access the Kubernetes cluster externally (defaults to using the cluster name as a subdomain for the tenant host). | `""`  |
-| `controlPlane.replicas` | Number of replicas for Kubernetes contorl-plane components                                                                             | `2`   |
-| `nodeGroups`            | nodeGroups configuration                                                                                                               | `{}`  |
+| Name                    | Description                                                                                                                            | Value        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| `host`                  | The hostname used to access the Kubernetes cluster externally (defaults to using the cluster name as a subdomain for the tenant host). | `""`         |
+| `controlPlane.replicas` | Number of replicas for Kubernetes contorl-plane components                                                                             | `2`          |
+| `storageClass`          | StorageClass used to store user data                                                                                                   | `replicated` |
+| `nodeGroups`            | nodeGroups configuration                                                                                                               | `{}`         |
 
 ### Cluster Addons
 
