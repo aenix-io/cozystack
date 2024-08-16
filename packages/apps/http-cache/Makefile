@@ -1,6 +1,7 @@
 NGINX_CACHE_TAG = v0.1.0
 
 include ../../../scripts/common-envs.mk
+include ../../../scripts/package.mk
 
 image: image-nginx
 

@@ -1,7 +1,7 @@
 export NAME=monitoring
 export NAMESPACE=cozy-$(NAME)
 
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update:
 	rm -rf charts

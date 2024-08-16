@@ -1,7 +1,7 @@
 NAME=fluxcd-operator
 NAMESPACE=cozy-fluxcd
 
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 apply-locally:
 	helm upgrade -i -n $(NAMESPACE) $(NAME) .

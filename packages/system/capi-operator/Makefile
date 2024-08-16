@@ -1,7 +1,7 @@
 export NAME=capi-operator
 export NAMESPACE=cozy-cluster-api
 
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update:
 	rm -rf charts

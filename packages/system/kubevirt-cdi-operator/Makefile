@@ -1,7 +1,7 @@
 export NAME=kubevirt-cdi-operator
 export NAMESPACE=cozy-kubevirt-cdi
 
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update:
 	rm -rf templates
