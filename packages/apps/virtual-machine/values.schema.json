@@ -12,14 +12,9 @@
       "description": "Determines if the virtual machine should be running",
       "default": true
     },
-    "password": {
-      "type": "string",
-      "description": "The default password for the virtual machine",
-      "default": "hackme"
-    },
     "image": {
       "type": "string",
-      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora`",
+      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine`, and `fedora`",
       "default": "ubuntu",
       "enum": [
         "ubuntu",
@@ -27,11 +22,6 @@
         "alpine",
         "fedora"
       ]
-    },
-    "disk": {
-      "type": "string",
-      "description": "The size of the disk allocated for the virtual machine",
-      "default": "5Gi"
     },
     "resources": {
       "type": "object",
@@ -46,8 +36,33 @@
           "description": "The amount of memory allocated to the virtual machine",
           "default": "1024M",
           "x-display": "slider"
+        },
+        "disk": {
+          "type": "string",
+          "description": "The size of the disk allocated for the virtual machine",
+          "default": "5Gi"
         }
       }
+    },
+    "ssh_pwauth": {
+      "type": "boolean",
+      "description": "Enable password authentication for SSH. If set to `true`, users can log in using a password.",
+      "default": true
+    },
+    "disable_root": {
+      "type": "boolean",
+      "description": "Disable root login via SSH. If set to `true`, root login will be disabled.",
+      "default": true
+    },
+    "password": {
+      "type": "string",
+      "description": "The default password for the virtual machine",
+      "default": "hackme"
+    },
+    "ssh_key": {
+      "type": "string",
+      "description": "The public SSH key used for authentication. Replace with your actual SSH key.",
+      "default": "YOUR_SSH_PUB_KEY_HERE"
     }
   }
 }

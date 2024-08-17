@@ -2,17 +2,34 @@
 
 ## @param external Enable external access from outside the cluster
 ## @param running Determines if the virtual machine should be running
-## @param password The default password for the virtual machine
 ## @param image The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora`
-## @param disk The size of the disk allocated for the virtual machine
 ## @param resources.cpu The number of CPU cores allocated to the virtual machine
 ## @param resources.memory The amount of memory allocated to the virtual machine
+## @param resources.disk The size of the disk allocated for the virtual machine
+## @param ssh_pwauth Enable password authentication for SSH. If set to `true`, users can log in using a password
+## @param disable_root Disable root login via SSH. If set to `true`, root login will be disabled
+## @param password The default password for the virtual machine
+## @param ssh_key The public SSH key used for authentication. Replace with your actual SSH key
+## @param service.ports Additional ports to be exposed by the service. By default, SSH is exposed on port 22
 
 external: false
 running: true
-password: hackme
 image: ubuntu
-disk: 5Gi
 resources:
   cpu: 1
   memory: 1024M
+  disk: 5Gi
+ssh_pwauth: true
+disable_root: true
+password: hackme
+chpasswd: { expire: False }
+ssh_key: YOUR_SSH_PUB_KEY_HERE
+
+service:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+    - name: https
+      port: 443
+      targetPort: 443
