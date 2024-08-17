@@ -22,11 +22,11 @@ spec:
           {{- if eq .Values.image "cirros" }}
           url: https://download.cirros-cloud.net/0.6.2/cirros-0.6.2-x86_64-disk.img
           {{- else if eq .Values.image "ubuntu" }}
-          url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+          url: https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
           {{- else if eq .Values.image "fedora" }}
           url: https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2
           {{- else if eq .Values.image "alpine" }}
-          url: https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-virt-3.19.1-x86_64.iso
+          url: https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86_64/alpine-virt-3.20.2-x86_64.iso
           {{- end }}
 
   template:
