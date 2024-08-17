@@ -11,34 +11,21 @@ The virtual machine is managed and hosted through KubeVirt, allowing you to harn
 
 ## Parameters
 
-### Common Parameters
+### Common parameters
 
-| Name               | Description                                                                                       | Value    |
-| ------------------ | ------------------------------------------------------------------------------------------------- | -------- |
-| `external`         | Enable external access from outside the cluster                                                   | `false`  |
-| `running`          | Determines if the virtual machine should be running                                               | `true`   |
-| `image`            | The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine`, and `fedora`| `ubuntu` |
-| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                                          | `1`      |
-| `resources.memory` | The amount of memory allocated to the virtual machine                                             | `1024M`  |
-| `resources.disk`   | The size of the disk allocated for the virtual machine                                            | `5Gi`    |
-| `ssh_pwauth`       | Enable password authentication for SSH. If set to `true`, users can log in using a password       | `true`   |
-| `disable_root`     | Disable root login via SSH. If set to `true`, root login will be disabled                         | `true`   |
-| `password`         | The default password for the virtual machine                                                      | `hackme` |
-| `ssh_key`          | The public SSH key used for authentication. Replace with your actual SSH key                      | `ssh...` |
-
-### Service Parameters
-
-| Name               | Description                                                                                       | Value     |
-| ------------------ | ------------------------------------------------------------------------------------------------- | --------  |
-| `service.ports`    | Additional ports to be exposed by the service. By default, SSH is exposed on port 22              | See below |
-
-By default, the service exposes the following ports:
-
-| Name               | Port | TargetPort |
-| ------------------ | ---- | ---------- |
-| `ssh`              | 22   | 22         |
-| `http`             | 80   | 80         |
-| `https`            | 443  | 443        |
+| Name               | Description                                                                                       | Value                   |
+| ------------------ | ------------------------------------------------------------------------------------------------- | ----------------------- |
+| `external`         | Enable external access from outside the cluster                                                   | `false`                 |
+| `running`          | Determines if the virtual machine should be running                                               | `true`                  |
+| `image`            | The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora` | `ubuntu`                |
+| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                                          | `1`                     |
+| `resources.memory` | The amount of memory allocated to the virtual machine                                             | `1024M`                 |
+| `resources.disk`   | The size of the disk allocated for the virtual machine                                            | `5Gi`                   |
+| `ssh_pwauth`       | Enable password authentication for SSH. If set to `true`, users can log in using a password       | `true`                  |
+| `disable_root`     | Disable root login via SSH. If set to `true`, root login will be disabled                         | `true`                  |
+| `password`         | The default password for the virtual machine                                                      | `hackme`                |
+| `chpasswd_expire`  | Set whether the password should expire                                                            | `false`                 |
+| `ssh_key`          | The public SSH key used for authentication. Replace with your actual SSH key                      | `YOUR_SSH_PUB_KEY_HERE` |
 
 You can customize the exposed ports by specifying them under `service.ports` in the `values.yaml` file.
 
@@ -55,7 +42,7 @@ resources:
 ssh_pwauth: true
 disable_root: true
 password: hackme
-chpasswd: { expire: False }
+chpasswd_expire: false
 ssh_key: YOUR_SSH_PUB_KEY_HERE
 
 service:

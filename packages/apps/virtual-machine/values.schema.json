@@ -14,7 +14,7 @@
     },
     "image": {
       "type": "string",
-      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine`, and `fedora`",
+      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora`",
       "default": "ubuntu",
       "enum": [
         "ubuntu",
@@ -46,12 +46,12 @@
     },
     "ssh_pwauth": {
       "type": "boolean",
-      "description": "Enable password authentication for SSH. If set to `true`, users can log in using a password.",
+      "description": "Enable password authentication for SSH. If set to `true`, users can log in using a password",
       "default": true
     },
     "disable_root": {
       "type": "boolean",
-      "description": "Disable root login via SSH. If set to `true`, root login will be disabled.",
+      "description": "Disable root login via SSH. If set to `true`, root login will be disabled",
       "default": true
     },
     "password": {
@@ -59,9 +59,14 @@
       "description": "The default password for the virtual machine",
       "default": "hackme"
     },
+    "chpasswd_expire": {
+      "type": "boolean",
+      "description": "Set whether the password should expire",
+      "default": false
+    },
     "ssh_key": {
       "type": "string",
-      "description": "The public SSH key used for authentication. Replace with your actual SSH key.",
+      "description": "The public SSH key used for authentication. Replace with your actual SSH key",
       "default": "YOUR_SSH_PUB_KEY_HERE"
     }
   }

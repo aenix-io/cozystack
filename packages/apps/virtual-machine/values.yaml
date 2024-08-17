@@ -9,8 +9,8 @@
 ## @param ssh_pwauth Enable password authentication for SSH. If set to `true`, users can log in using a password
 ## @param disable_root Disable root login via SSH. If set to `true`, root login will be disabled
 ## @param password The default password for the virtual machine
+## @param chpasswd_expire Set whether the password should expire
 ## @param ssh_key The public SSH key used for authentication. Replace with your actual SSH key
-## @param service.ports Additional ports to be exposed by the service. By default, SSH is exposed on port 22
 
 external: false
 running: true
@@ -22,14 +22,5 @@ resources:
 ssh_pwauth: true
 disable_root: true
 password: hackme
-chpasswd: { expire: False }
+chpasswd_expire: false
 ssh_key: YOUR_SSH_PUB_KEY_HERE
-
-service:
-  ports:
-    - name: http
-      port: 80
-      targetPort: 80
-    - name: https
-      port: 443
-      targetPort: 443

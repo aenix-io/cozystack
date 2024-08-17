@@ -15,12 +15,14 @@ spec:
   selector:
     {{- include "virtual-machine.labels" . | nindent 4 }}
   ports:
-  - name: ssh
-    port: 22
-    targetPort: 22
-  {{- range .Values.service.ports }}
-  - name: {{ .name }}
-    port: {{ .port }}
-    targetPort: {{ .targetPort }}
-  {{- end }}
+    - name: ssh
+      port: 22
+      targetPort: 22
+    {{- if .Values.service.ports }}
+    {{- range .Values.service.ports }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      targetPort: {{ .targetPort }}
+    {{- end }}
+    {{- end }}
 {{- end }}
