@@ -13,19 +13,19 @@ The virtual machine is managed and hosted through KubeVirt, allowing you to harn
 
 ### Common parameters
 
-| Name               | Description                                                                                       | Value                   |
-| ------------------ | ------------------------------------------------------------------------------------------------- | ----------------------- |
-| `external`         | Enable external access from outside the cluster                                                   | `false`                 |
-| `running`          | Determines if the virtual machine should be running                                               | `true`                  |
-| `image`            | The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora` | `ubuntu`                |
-| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                                          | `1`                     |
-| `resources.memory` | The amount of memory allocated to the virtual machine                                             | `1024M`                 |
-| `resources.disk`   | The size of the disk allocated for the virtual machine                                            | `5Gi`                   |
-| `ssh_pwauth`       | Enable password authentication for SSH. If set to `true`, users can log in using a password       | `true`                  |
-| `disable_root`     | Disable root login via SSH. If set to `true`, root login will be disabled                         | `true`                  |
-| `password`         | The default password for the virtual machine                                                      | `hackme`                |
-| `chpasswd_expire`  | Set whether the password should expire                                                            | `false`                 |
-| `ssh_key`          | The public SSH key used for authentication. Replace with your actual SSH key                      | `YOUR_SSH_PUB_KEY_HERE` |
+| Name               | Description                                                                                       | Value                               |
+| ------------------ | ------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `external`         | Enable external access from outside the cluster                                                   | `false`                             |
+| `running`          | Determines if the virtual machine should be running                                               | `true`                              |
+| `image`            | The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora` | `ubuntu`                            |
+| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                                          | `1`                                 |
+| `resources.memory` | The amount of memory allocated to the virtual machine                                             | `1024M`                             |
+| `resources.disk`   | The size of the disk allocated for the virtual machine                                            | `5Gi`                               |
+| `sshPwauth`        | Enable password authentication for SSH. If set to `true`, users can log in using a password       | `true`                              |
+| `disableRoot`      | Disable root login via SSH. If set to `true`, root login will be disabled                         | `true`                              |
+| `password`         | The default password for the virtual machine                                                      | `hackme`                            |
+| `chpasswdExpire`   | Set whether the password should expire                                                            | `false`                             |
+| `sshKeys`          | List of SSH public keys for authentication. Can be a single key or a list of keys                 | `["ssh-rsa ...","ssh-ed25519 ..."]` |
 
 You can customize the exposed ports by specifying them under `service.ports` in the `values.yaml` file.
 
@@ -39,11 +39,13 @@ resources:
   cpu: 1
   memory: 1024M
   disk: 5Gi
-ssh_pwauth: true
-disable_root: true
+sshPwauth: true
+disableRoot: true
 password: hackme
-chpasswd_expire: false
-ssh_key: YOUR_SSH_PUB_KEY_HERE
+chpasswdExpire: false
+sshKeys: 
+  - YOUR_SSH_PUB_KEY_HERE
+  - ANOTHER_SSH_PUB_KEY_HERE
 
 service:
   ports:

@@ -28,7 +28,6 @@ spec:
           {{- else if eq .Values.image "alpine" }}
           url: https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86_64/alpine-virt-3.20.2-x86_64.iso
           {{- end }}
-
   template:
     metadata:
       annotations:
@@ -60,10 +59,18 @@ spec:
       - cloudInitNoCloud:
           userData: |-
             #cloud-config
-            ssh_pwauth: {{ if .Values.ssh_pwauth | default false }}True{{ else }}False{{ end }}
-            disable_root: {{ if .Values.disable_root | default false }}True{{ else }}False{{ end }}
+            ssh_pwauth: {{ if .Values.sshPwauth | default false }}True{{ else }}False{{ end }}
+            disable_root: {{ if .Values.disableRoot | default false }}True{{ else }}False{{ end }}
             password: {{ .Values.password }}
-            chpasswd: { expire: {{ if .Values.chpasswd_expire | default false }}True{{ else }}False{{ end }} }
+            chpasswd: { expire: {{ if .Values.chpasswdExpire | default false }}True{{ else }}False{{ end }} }
             ssh_authorized_keys:
-            - {{ .Values.ssh_key }}
+            {{- if .Values.sshKeys }}
+              {{- $keys := .Values.sshKeys }}
+              {{- if not (kindIs "slice" $keys) }}
+                {{- $keys = list $keys }}
+              {{- end }}
+              {{- range $keys }}
+              - {{ . }}
+              {{- end }}
+            {{- end }}
         name: cloudinitdisk

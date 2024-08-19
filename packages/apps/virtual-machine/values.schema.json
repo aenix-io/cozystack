@@ -44,12 +44,12 @@
         }
       }
     },
-    "ssh_pwauth": {
+    "sshPwauth": {
       "type": "boolean",
       "description": "Enable password authentication for SSH. If set to `true`, users can log in using a password",
       "default": true
     },
-    "disable_root": {
+    "disableRoot": {
       "type": "boolean",
       "description": "Disable root login via SSH. If set to `true`, root login will be disabled",
       "default": true
@@ -59,15 +59,21 @@
       "description": "The default password for the virtual machine",
       "default": "hackme"
     },
-    "chpasswd_expire": {
+    "chpasswdExpire": {
       "type": "boolean",
       "description": "Set whether the password should expire",
       "default": false
     },
-    "ssh_key": {
-      "type": "string",
-      "description": "The public SSH key used for authentication. Replace with your actual SSH key",
-      "default": "YOUR_SSH_PUB_KEY_HERE"
+    "sshKeys": {
+      "type": "array",
+      "description": "List of SSH public keys for authentication. Can be a single key or a list of keys",
+      "default": [
+        "ssh-rsa ...",
+        "ssh-ed25519 ..."
+      ],
+      "items": {
+        "type": "string"
+      }
     }
   }
 }

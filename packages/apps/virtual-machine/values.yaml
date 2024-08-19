@@ -6,11 +6,11 @@
 ## @param resources.cpu The number of CPU cores allocated to the virtual machine
 ## @param resources.memory The amount of memory allocated to the virtual machine
 ## @param resources.disk The size of the disk allocated for the virtual machine
-## @param ssh_pwauth Enable password authentication for SSH. If set to `true`, users can log in using a password
-## @param disable_root Disable root login via SSH. If set to `true`, root login will be disabled
+## @param sshPwauth Enable password authentication for SSH. If set to `true`, users can log in using a password
+## @param disableRoot Disable root login via SSH. If set to `true`, root login will be disabled
 ## @param password The default password for the virtual machine
-## @param chpasswd_expire Set whether the password should expire
-## @param ssh_key The public SSH key used for authentication. Replace with your actual SSH key
+## @param chpasswdExpire Set whether the password should expire
+## @param sshKeys List of SSH public keys for authentication. Can be a single key or a list of keys
 
 external: false
 running: true
@@ -19,8 +19,10 @@ resources:
   cpu: 1
   memory: 1024M
   disk: 5Gi
-ssh_pwauth: true
-disable_root: true
+sshPwauth: true
+disableRoot: true
 password: hackme
-chpasswd_expire: false
-ssh_key: YOUR_SSH_PUB_KEY_HERE
+chpasswdExpire: false
+sshKeys:
+  - ssh-rsa ...
+  - ssh-ed25519 ...
