@@ -12,11 +12,6 @@
       "description": "Determines if the virtual machine should be running",
       "default": true
     },
-    "password": {
-      "type": "string",
-      "description": "The default password for the virtual machine",
-      "default": "hackme"
-    },
     "image": {
       "type": "string",
       "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora`",
@@ -27,11 +22,6 @@
         "alpine",
         "fedora"
       ]
-    },
-    "disk": {
-      "type": "string",
-      "description": "The size of the disk allocated for the virtual machine",
-      "default": "5Gi"
     },
     "resources": {
       "type": "object",
@@ -46,7 +36,43 @@
           "description": "The amount of memory allocated to the virtual machine",
           "default": "1024M",
           "x-display": "slider"
+        },
+        "disk": {
+          "type": "string",
+          "description": "The size of the disk allocated for the virtual machine",
+          "default": "5Gi"
         }
+      }
+    },
+    "sshPwauth": {
+      "type": "boolean",
+      "description": "Enable password authentication for SSH. If set to `true`, users can log in using a password",
+      "default": true
+    },
+    "disableRoot": {
+      "type": "boolean",
+      "description": "Disable root login via SSH. If set to `true`, root login will be disabled",
+      "default": true
+    },
+    "password": {
+      "type": "string",
+      "description": "The default password for the virtual machine",
+      "default": "hackme"
+    },
+    "chpasswdExpire": {
+      "type": "boolean",
+      "description": "Set whether the password should expire",
+      "default": false
+    },
+    "sshKeys": {
+      "type": "array",
+      "description": "List of SSH public keys for authentication. Can be a single key or a list of keys",
+      "default": [
+        "ssh-rsa ...",
+        "ssh-ed25519 ..."
+      ],
+      "items": {
+        "type": "string"
       }
     }
   }
