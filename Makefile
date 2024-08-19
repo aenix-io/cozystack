@@ -8,6 +8,7 @@ build:
 	make -C packages/system/dashboard image
 	make -C packages/system/kamaji image
 	make -C packages/core/installer image
+	make -C packages/core/e2e image
 	make manifests
 
 manifests:
@@ -26,3 +27,7 @@ repos:
 
 assets:
 	make -C packages/core/installer/ assets
+
+test:
+	make -C packages/core/testing apply
+	make -C packages/core/testing test
