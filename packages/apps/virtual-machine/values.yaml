@@ -3,6 +3,7 @@
 ## @param external Enable external access from outside the cluster
 ## @param running Determines if the virtual machine should be running
 ## @param image The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora`
+## @param storageClass StorageClass used to store the data
 ## @param resources.cpu The number of CPU cores allocated to the virtual machine
 ## @param resources.memory The amount of memory allocated to the virtual machine
 ## @param resources.disk The size of the disk allocated for the virtual machine
@@ -15,6 +16,7 @@
 external: false
 running: true
 image: ubuntu
+storageClass: replicated
 resources:
   cpu: 1
   memory: 1024M

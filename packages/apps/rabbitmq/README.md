@@ -13,7 +13,9 @@ The service utilizes official RabbitMQ operator. This ensures the reliability an
 
 ### Common parameters
 
-| Name       | Description                                     | Value   |
-| ---------- | ----------------------------------------------- | ------- |
-| `external` | Enable external access from outside the cluster | `false` |
-| `replicas` | Number of RabbitMQ replicas                     | `3`     |
+| Name           | Description                                     | Value   |
+| -------------- | ----------------------------------------------- | ------- |
+| `external`     | Enable external access from outside the cluster | `false` |
+| `size`         | Persistent Volume size                          | `10Gi`  |
+| `replicas`     | Number of RabbitMQ replicas                     | `3`     |
+| `storageClass` | StorageClass used to store the data             | `""`    |

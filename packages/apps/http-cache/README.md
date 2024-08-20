@@ -64,6 +64,7 @@ VTS module shows wrong upstream resonse time
 | ------------------ | ----------------------------------------------- | ------- |
 | `external`         | Enable external access from outside the cluster | `false` |
 | `size`             | Persistent Volume size                          | `10Gi`  |
+| `storageClass`     | StorageClass used to store the data             | `""`    |
 | `haproxy.replicas` | Number of HAProxy replicas                      | `2`     |
 | `nginx.replicas`   | Number of Nginx replicas                        | `2`     |
 

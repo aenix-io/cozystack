@@ -62,6 +62,9 @@ spec:
     size: {{ .Values.size }}
     resizeInUseVolumes: true
     waitForVolumeResize: true
+    {{- with .Values.stroageClass }}
+    storageClassName: {{ . }}
+    {{- end }}
 
   {{- if .Values.external }}
   primaryService:

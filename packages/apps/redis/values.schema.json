@@ -16,6 +16,11 @@
             "type": "number",
             "description": "Number of Redis replicas",
             "default": 2
+        },
+        "storageClass": {
+            "type": "string",
+            "description": "StorageClass used to store the data",
+            "default": ""
         }
     }
 }

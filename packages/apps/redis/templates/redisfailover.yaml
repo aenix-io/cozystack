@@ -33,6 +33,9 @@ spec:
           resources:
             requests:
               storage: {{ . }}
+          {{- with $.Values.storageClass }}
+          storageClassName: {{ . }}
+          {{- end }}
     {{- end }}
     exporter: 
       enabled: true

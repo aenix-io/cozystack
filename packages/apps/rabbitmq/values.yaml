@@ -1,7 +1,11 @@
 ## @section Common parameters
 
 ## @param external Enable external access from outside the cluster
+## @param size Persistent Volume size
 ## @param replicas Number of RabbitMQ replicas
+## @param storageClass StorageClass used to store the data
 ##
 external: false
+size: 10Gi
 replicas: 3
+storageClass: ""

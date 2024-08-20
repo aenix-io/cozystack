@@ -114,6 +114,9 @@ spec:
   resources:
     requests:
       storage: "{{ $.Values.size }}"
+  {{- with $.Values.stroageClass }}
+  storageClassName: {{ . }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: Service

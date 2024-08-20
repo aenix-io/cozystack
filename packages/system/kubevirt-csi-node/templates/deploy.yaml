@@ -274,5 +274,5 @@ metadata:
     storageclass.kubernetes.io/is-default-class: "true"
 provisioner: csi.kubevirt.io
 parameters:
-  infraStorageClassName: replicated
+  infraStorageClassName: {{ .Values.storageClass }}
   bus: scsi

@@ -14,12 +14,15 @@ spec:
     replicaCount: 2
     extraArgs:
       search.maxUniqueTimeseries: "600000"
-      vmalert.proxyURL: http://vmalert.{{ $.Release.Namespace }}.svc:8080
+      vmalert.proxyURL: http://vmalert-{{ .name }}.{{ $.Release.Namespace }}.svc:8080
       dedup.minScrapeInterval: "15s"
     cacheMountPath: /select-cache
     storage:
       volumeClaimTemplate:
         spec:
+          {{- with .storageClassName }}
+          storageClassName: {{ . }}
+          {{- end }}
           resources:
             requests:
               storage: 2Gi
@@ -28,6 +31,9 @@ spec:
     storage:
       volumeClaimTemplate:
         spec:
+          {{- with .storageClassName }}
+          storageClassName: {{ . }}
+          {{- end }}
           resources:
             requests:
               storage: {{ .storage }}

@@ -28,6 +28,10 @@ spec:
   upgrade:
     remediation:
       retries: -1
+  {{- with .Values.stroageClass }}
+  values:
+    storageClass: "{{ . }}"
+  {{- end }}
   dependsOn:
   {{- if lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" .Release.Namespace .Release.Name }}
   - name: {{ .Release.Name }}

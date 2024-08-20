@@ -23,6 +23,11 @@
         "fedora"
       ]
     },
+    "storageClass": {
+      "type": "string",
+      "description": "StorageClass used to store the data",
+      "default": "replicated"
+    },
     "resources": {
       "type": "object",
       "properties": {

@@ -16,7 +16,9 @@ spec:
         resources:
           requests:
             storage: {{ .Values.resources.disk | quote }}
-        storageClassName: replicated
+        {{- with $.Values.storageClass }}
+        storageClassName: {{ . }}
+        {{- end }}
       source:
         http:
           {{- if eq .Values.image "cirros" }}

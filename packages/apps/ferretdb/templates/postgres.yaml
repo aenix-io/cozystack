@@ -15,6 +15,9 @@ spec:
 
   storage:
     size: {{ required ".Values.size is required" .Values.size }}
+    {{- with .Values.stroageClass }}
+    storageClass: {{ . }}
+    {{- end }}
 
   inheritedMetadata:
     labels:

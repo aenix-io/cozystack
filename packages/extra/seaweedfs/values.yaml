@@ -5,6 +5,8 @@ host: ""
 
 ## @param replicas Persistent Volume size for NATS
 ## @param size Persistent Volume size
+## @param storageClass StorageClass used to store the data
 ##
 replicas: 2
 size: 10Gi
+storageClass: ""

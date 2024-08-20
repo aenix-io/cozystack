@@ -3,11 +3,13 @@
 
 ## @param external Enable external access from outside the cluster
 ## @param size Persistent Volume size
+## @param storageClass StorageClass used to store the data
 ## @param haproxy.replicas Number of HAProxy replicas
 ## @param nginx.replicas Number of Nginx replicas
 ##
 external: false
 size: 10Gi
+storageClass: ""
 haproxy:
   replicas: 2
 nginx:

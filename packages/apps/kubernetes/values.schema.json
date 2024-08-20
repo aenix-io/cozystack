@@ -17,6 +17,11 @@
                 }
             }
         },
+        "storageClass": {
+            "type": "string",
+            "description": "StorageClass used to store user data",
+            "default": "replicated"
+        },
         "addons": {
             "type": "object",
             "properties": {

@@ -17,6 +17,11 @@
             "description": "Number of MariaDB replicas",
             "default": 2
         },
+        "storageClass": {
+            "type": "string",
+            "description": "StorageClass used to store the data",
+            "default": ""
+        },
         "databases": {
             "type": "array",
             "description": "Databases configuration",
