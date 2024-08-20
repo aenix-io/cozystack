@@ -31,3 +31,4 @@ assets:
 test:
 	make -C packages/core/testing apply
 	make -C packages/core/testing test
+	make -C packages/cort/testing delete
