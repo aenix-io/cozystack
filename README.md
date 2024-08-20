@@ -58,6 +58,8 @@ Commits are used to generate the changelog, and their author will be referenced 
 
 In case of **Feature Requests** please use the [Discussion's Feature Request section](https://github.com/aenix-io/cozystack/discussions/categories/feature-requests).
 
+You can join our weekly community meetings (just add this events to your [Google Calendar](https://calendar.google.com/calendar?cid=ZTQzZDIxZTVjOWI0NWE5NWYyOGM1ZDY0OWMyY2IxZTFmNDMzZTJlNjUzYjU2ZGJiZGE3NGNhMzA2ZjBkMGY2OEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t) or [iCal](https://calendar.google.com/calendar/ical/e43d21e5c9b45a95f28c5d649c2cb1e1f433e2e653b56dbbda74ca306f0d0f68%40group.calendar.google.com/public/basic.ics)) or [Telegram group](https://t.me/cozystack).
+
 ## License
 
 Cozystack is licensed under Apache 2.0.  
