@@ -32,6 +32,11 @@
                             "type": "boolean",
                             "description": "Enables the cert-manager",
                             "default": false
+                        },
+                        "valuesOverride": {
+                            "type": "object",
+                            "description": "Custom values to override",
+                            "default": {}
                         }
                     }
                 },
@@ -42,6 +47,11 @@
                             "type": "boolean",
                             "description": "Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)",
                             "default": false
+                        },
+                        "valuesOverride": {
+                            "type": "object",
+                            "description": "Custom values to override",
+                            "default": {}
                         },
                         "hosts": {
                             "type": "array",
@@ -58,6 +68,11 @@
                             "type": "boolean",
                             "description": "Enables Flux CD",
                             "default": false
+                        },
+                        "valuesOverride": {
+                            "type": "object",
+                            "description": "Custom values to override",
+                            "default": {}
                         }
                     }
                 }
