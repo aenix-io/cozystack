@@ -24,6 +24,7 @@ The virtual machine is managed and hosted through KubeVirt, allowing you to harn
 | `resources.disk`   | The size of the disk allocated for the virtual machine                                            | `5Gi`                               |
 | `sshPwauth`        | Enable password authentication for SSH. If set to `true`, users can log in using a password       | `true`                              |
 | `disableRoot`      | Disable root login via SSH. If set to `true`, root login will be disabled                         | `true`                              |
+| `user`             | The username to be used for the virtual machine. Default is `username`                            | `username`                          |
 | `password`         | The default password for the virtual machine                                                      | `hackme`                            |
 | `chpasswdExpire`   | Set whether the password should expire                                                            | `false`                             |
 | `sshKeys`          | List of SSH public keys for authentication. Can be a single key or a list of keys                 | `["ssh-rsa ...","ssh-ed25519 ..."]` |

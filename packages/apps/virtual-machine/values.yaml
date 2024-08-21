@@ -9,6 +9,7 @@
 ## @param resources.disk The size of the disk allocated for the virtual machine
 ## @param sshPwauth Enable password authentication for SSH. If set to `true`, users can log in using a password
 ## @param disableRoot Disable root login via SSH. If set to `true`, root login will be disabled
+## @param user The username to be used for the virtual machine. Default is `username`
 ## @param password The default password for the virtual machine
 ## @param chpasswdExpire Set whether the password should expire
 ## @param sshKeys List of SSH public keys for authentication. Can be a single key or a list of keys
@@ -23,6 +24,7 @@ resources:
   disk: 5Gi
 sshPwauth: true
 disableRoot: true
+user: username
 password: hackme
 chpasswdExpire: false
 sshKeys:

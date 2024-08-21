@@ -59,6 +59,11 @@
       "description": "Disable root login via SSH. If set to `true`, root login will be disabled",
       "default": true
     },
+    "user": {
+      "type": "string",
+      "description": "The username to be used for the virtual machine. Default is `username`",
+      "default": "username"
+    },
     "password": {
       "type": "string",
       "description": "The default password for the virtual machine",

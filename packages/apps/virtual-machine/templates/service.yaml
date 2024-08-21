@@ -18,13 +18,11 @@ spec:
     - name: ssh
       port: 22
       targetPort: 22
-    {{- with .Values.service }}
-    {{- if .ports }}
-    {{- range .ports }}
+    {{- if (.Values.service).ports }}
+    {{- range .Values.service.ports }}
     - name: {{ .name }}
       port: {{ .port }}
       targetPort: {{ .targetPort }}
-    {{- end }}
     {{- end }}
     {{- end }}
 {{- end }}

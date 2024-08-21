@@ -63,6 +63,7 @@ spec:
             #cloud-config
             ssh_pwauth: {{ if .Values.sshPwauth | default false }}True{{ else }}False{{ end }}
             disable_root: {{ if .Values.disableRoot | default false }}True{{ else }}False{{ end }}
+            user: {{ .Values.user }}
             password: {{ .Values.password }}
             chpasswd: { expire: {{ if .Values.chpasswdExpire | default false }}True{{ else }}False{{ end }} }
             ssh_authorized_keys:
