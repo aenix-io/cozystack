@@ -33,7 +33,7 @@ cilium:
       value: "true"
   image:
     repository: ghcr.io/aenix-io/cozystack/cilium
-    tag: latest
+    tag: 1.16.1
     digest: "sha256:9593dbc3bd25487b52d8f43330d4a308e450605479a8384a32117e9613289892"
   envoy:
     enabled: false
