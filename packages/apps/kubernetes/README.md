@@ -40,10 +40,13 @@ kubectl get secret -n <namespace> kubernetes-<clusterName>-admin-kubeconfig -o g
 
 ### Cluster Addons
 
-| Name                          | Description                                                                        | Value   |
-| ----------------------------- | ---------------------------------------------------------------------------------- | ------- |
-| `addons.certManager.enabled`  | Enables the cert-manager                                                           | `false` |
-| `addons.ingressNginx.enabled` | Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)           | `false` |
-| `addons.ingressNginx.hosts`   | List of domain names that should be passed through to the cluster by upper cluster | `[]`    |
-| `addons.fluxcd.enabled`       | Enables Flux CD                                                                    | `false` |
+| Name                                 | Description                                                                        | Value   |
+| ------------------------------------ | ---------------------------------------------------------------------------------- | ------- |
+| `addons.certManager.enabled`         | Enables the cert-manager                                                           | `false` |
+| `addons.certManager.valuesOverride`  | Custom values to override                                                          | `{}`    |
+| `addons.ingressNginx.enabled`        | Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)           | `false` |
+| `addons.ingressNginx.valuesOverride` | Custom values to override                                                          | `{}`    |
+| `addons.ingressNginx.hosts`          | List of domain names that should be passed through to the cluster by upper cluster | `[]`    |
+| `addons.fluxcd.enabled`              | Enables Flux CD                                                                    | `false` |
+| `addons.fluxcd.valuesOverride`       | Custom values to override                                                          | `{}`    |
 

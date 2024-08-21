@@ -39,6 +39,12 @@ spec:
           enabled: false
       nodeSelector:
         node-role.kubernetes.io/ingress-nginx: ""
+  {{- if .Values.addons.ingressNginx.valuesOverride }}
+  valuesFrom:
+  - kind: Secret
+    name: {{ .Release.Name }}-ingress-nginx-values-override
+    valuesKey: values
+  {{- end }}
   dependsOn:
   {{- if lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" .Release.Namespace .Release.Name }}
   - name: {{ .Release.Name }}
@@ -46,4 +52,15 @@ spec:
   {{- end }}
   - name: {{ .Release.Name }}-cilium
     namespace: {{ .Release.Namespace }}
+{{- end }}
+
+{{- if .Values.addons.ingressNginx.valuesOverride }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-ingress-nginx-values-override
+stringData:
+  values: |
+    {{- toYaml .Values.addons.ingressNginx.valuesOverride | nindent 4 }}
 {{- end }}

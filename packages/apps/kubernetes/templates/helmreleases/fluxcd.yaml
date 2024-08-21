@@ -72,6 +72,12 @@ spec:
   upgrade:
     remediation:
       retries: -1
+  {{- if .Values.addons.fluxcd.valuesOverride }}
+  valuesFrom:
+  - kind: Secret
+    name: {{ .Release.Name }}-fluxcd-values-override
+    valuesKey: values
+  {{- end }}
   dependsOn:
   {{- if lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" .Release.Namespace .Release.Name }}
   - name: {{ .Release.Name }}
@@ -81,4 +87,15 @@ spec:
     namespace: {{ .Release.Namespace }}
   - name: {{ .Release.Name }}-fluxcd-operator
     namespace: {{ .Release.Namespace }}
+{{- end }}
+
+{{- if .Values.addons.fluxcd.valuesOverride }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-fluxcd-values-override
+stringData:
+  values: |
+    {{- toYaml .Values.addons.fluxcd.valuesOverride | nindent 4 }}
 {{- end }}

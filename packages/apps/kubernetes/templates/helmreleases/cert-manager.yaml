@@ -29,6 +29,13 @@ spec:
   upgrade:
     remediation:
       retries: -1
+  {{- if .Values.addons.certManager.valuesOverride }}
+  valuesFrom:
+  - kind: Secret
+    name: {{ .Release.Name }}-cert-manager-values-override
+    valuesKey: values
+  {{- end }}
+
   dependsOn:
   {{- if lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" .Release.Namespace .Release.Name }}
   - name: {{ .Release.Name }}
@@ -36,4 +43,14 @@ spec:
   {{- end }}
   - name: {{ .Release.Name }}-cilium
     namespace: {{ .Release.Namespace }}
+{{- end }}
+{{- if .Values.addons.certManager.valuesOverride }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-cert-manager-values-override
+stringData:
+  values: |
+    {{- toYaml .Values.addons.certManager.valuesOverride | nindent 4 }}
 {{- end }}
