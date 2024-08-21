@@ -30,10 +30,9 @@ image-e2e-sandbox:
 		--load=$(LOAD)
 	IMAGE="$(REGISTRY)/e2e-sandbox:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/e2e-sandbox.json -o json -r)" \
 		yq -i '.e2e.image = strenv(IMAGE)' values.yaml
+	rm -f images/e2e-sandbox.json
 
-test: ## Run the end-to-end tests in existing sandbox.
-	kubectl wait deploy --for=condition=Progressing -n $(NAMESPACE) cozystack-e2e-$(NAME)
-	sleep 3
+test: wait-for-sandbox ## Run the end-to-end tests in existing sandbox.
 	cat ../../../hack/e2e.sh | kubectl exec -i -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'cat > /e2e.sh && chmod +x /e2e.sh'
 	helm template -n cozy-system installer ../installer | kubectl exec -i -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'cat > /cozystack-installer.yaml'
 	kubectl exec -ti -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'export COZYSTACK_INSTALLER_YAML=$$(cat /cozystack-installer.yaml) && /e2e.sh'
@@ -52,3 +51,7 @@ login: ## Downloads the kubeconfig into a temporary directory and runs a shell w
 
 sync-hosts:
 	kubectl exec -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'kubectl get ing -A -o go-template='\''{{ "127.0.0.1 localhost\n"}}{{ range .items }}{{ range .status.loadBalancer.ingress }}{{ .ip }}{{ end }} {{ range .spec.rules }}{{ .host }}{{ end }}{{ "\n" }}{{ end }}'\'' > /etc/hosts'
+
+wait-for-sandbox:
+	kubectl wait deploy --for=condition=Progressing -n $(NAMESPACE) cozystack-e2e-$(NAME)
+	kubectl wait pod --for=condition=Ready -n $(NAMESPACE) -l app=cozystack-e2e-$(NAME)
