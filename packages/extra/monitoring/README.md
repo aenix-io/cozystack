@@ -8,4 +8,5 @@
 | ----------------- | --------------------------------------------------------------------------------------------------------- | ------- |
 | `host`            | The hostname used to access the grafana externally (defaults to 'grafana' subdomain for the tenant host). | `""`    |
 | `metricsStorages` | Configuration of metrics storage instances                                                                | `[]`    |
+| `logsStorages`    | Configuration of logs storage instances                                                                   | `[]`    |
 | `oncall.enabled`  | Enable Grafana OnCall                                                                                     | `false` |

@@ -15,6 +15,14 @@
         "type": "object"
       }
     },
+    "logsStorages": {
+      "type": "array",
+      "description": "Configuration of logs storage instances",
+      "default": "[]",
+      "items": {
+        "type": "object"
+      }
+    },
     "oncall": {
       "type": "object",
       "properties": {

@@ -1,11 +1,23 @@
+global:
+  image:
+    registry: ""
+  imagePullSecrets: []
+  cluster:
+    dnsDomain: cluster.local
 # Default values for victoria-metrics.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 image:
+  # -- Image registry
+  registry: ""
   # -- Image repository
   repository: victoriametrics/operator
   # -- Image tag
-  tag: v0.37.0
+  # override Chart.AppVersion
+  tag: ""
+  # Variant of the image to use.
+  # e.g. scratch
+  variant: ""
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -13,11 +25,12 @@ image:
 # -- with this option, if you remove this chart, all crd resources will be deleted with it.
 createCRD: true
 
-# -- Tells helm to clean up vm cr resources when uninstalling
+# -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
 cleanupCRD: false
 cleanupImage:
-  repository: gcr.io/google_containers/hyperkube
-  tag: v1.18.0
+  repository: bitnami/kubectl
+  # use image tag that matches k8s API version by default
+  # tag: 1.29.6
   pullPolicy: IfNotPresent
 
 replicaCount: 1
@@ -38,8 +51,15 @@ logLevel: "info"
 rbac:
   # -- Specifies whether the RBAC resources should be created
   create: true
-  # Note: The PSP will only be deployed, if Kubernetes (<1.25) supports the resource.
-  pspEnabled: true
+  # -- create aggregated clusterRoles for CRD readonly and admin permissions
+  aggregatedClusterRoles:
+    enabled: true
+    # -- labels attached to according clusterRole
+    labels:
+      view:
+        rbac.authorization.k8s.io/aggregate-to-view: "true"
+      admin:
+        rbac.authorization.k8s.io/aggregate-to-admin: "true"
 
 # -- Labels to be added to the all resources
 extraLabels: {}
@@ -56,8 +76,6 @@ operator:
   disable_prometheus_converter: false
   # -- Compare-options and sync-options for prometheus objects converted by operator for properly use with ArgoCD
   prometheus_converter_add_argocd_ignore_annotations: false
-  # -- By default, operator doesn't create psp for its objects.
-  psp_auto_creation_enabled: false
   # -- Enables ownership reference for converted prometheus-operator objects,
   # it will remove corresponding victoria-metrics objects in case of deletion prometheus one.
   enable_converter_ownership: false
@@ -75,6 +93,19 @@ serviceAccount:
   create: true
   # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name: ""
+
+service:
+  annotations: {}
+  labels: {}
+  clusterIP: ""
+  externalIPs: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  type: ClusterIP
+  healthCheckNodePort: ""
+  externalTrafficPolicy: ""
+  ipFamilyPolicy: ""
+  ipFamilies: []
 
 ## See `kubectl explain poddisruptionbudget.spec` for more
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
@@ -115,6 +146,11 @@ env:
   # - name: VM_VMSINGLEDEFAULT_VERSION
   #   value: v1.43.0
 
+envFrom:
+  []
+  #- configMapRef:
+  #    name: special-config
+
 # -- Additional hostPath mounts
 extraHostPathMounts:
   []
@@ -145,28 +181,34 @@ extraContainers:
 # -- Configures resource validation
 admissionWebhooks:
   # -- Enables validation webhook.
-  enabled: false
+  enabled: true
   enabledCRDValidation:
     vmagent: true
     vmalert: true
     vmsingle: true
     vmauth: true
     vmrule: true
-    vmalertmanagerConfig: true
+    vmalertmanagerconfig: true
     vmalertmanager: true
     vmcluster: true
     vmuser: true
+    vlogs: true
   # -- What to do in case, when operator not available to validate request.
   policy: Fail
   # -- Enables custom ca bundle, if you are not using cert-manager.
   # -- in case of custom ca, you have to create secret - {{chart-name}}-validation
   # -- with keys: tls.key, tls.crt, ca.crt
-  caBundle: ""
   certManager:
     # -- Enables cert creation and injection by cert-manager.
     enabled: false
     # --If needed, provide own issuer. Operator will create self-signed if empty.
     issuer: {}
+  keepTLSSecret: true
+  # tls specifies TLS cert/key for the webhook
+  tls:
+    caCert:
+    cert:
+    key:
 
 # -- configures monitoring with serviceScrape. VMServiceScrape must be pre-installed
 serviceMonitor:
@@ -174,3 +216,33 @@ serviceMonitor:
   extraLabels: {}
   annotations: {}
   relabelings: []
+  scheme: ""
+  interval: ""
+  scrapeTimeout: ""
+  tlsConfig: {}
+  basicAuth: {}
+
+probe:
+  # Readiness probe
+  readiness:
+    httpGet:
+      path: '{{ include "vm.probe.http.path" . }}'
+      scheme: '{{ include "vm.probe.http.scheme" . }}'
+      port: probe
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+  # Liveness probe
+  liveness:
+    tcpSocket:
+      port: probe
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+  # Startup probe
+  startup: {}
+
+# -- Add extra specs dynamically to this chart
+extraObjects: []

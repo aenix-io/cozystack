@@ -1,26 +1,18 @@
 {{- if .Values.podDisruptionBudget.enabled }}
-{{- if .Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget" }}
 apiVersion: policy/v1
-{{- else -}}
-apiVersion: policy/v1beta1
-{{- end }}
 kind: PodDisruptionBudget
 metadata:
   name: {{ include "vm-operator.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "vm-operator.labels" . | nindent 4 }}
-  {{- with .Values.podDisruptionBudget.labels }}
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.podDisruptionBudget.labels) }}
+  labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
 spec:
-{{- if .Values.podDisruptionBudget.minAvailable }}
-  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
-{{- end }}
-{{- if .Values.podDisruptionBudget.maxUnavailable }}
-  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
-{{- end }}
+  {{- with .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
   selector:
-    matchLabels:
-      {{- include "vm-operator.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm-operator.selectorLabels" . | nindent 6 }}
 {{- end }}

@@ -10,7 +10,7 @@ Victoria Metrics Image
 {{- with .app.image.variant -}}
   {{- $image = (printf "%s-%s" $image .) -}}
 {{- end -}}
-{{- with .app.image.registry | default .Values.global.image.registry -}}
+{{- with .app.image.registry | default ((.Values.global).image).registry | default "" -}}
   {{- $image = (printf "%s/%s" . $image) -}}
 {{- end -}}
 {{- $image -}}

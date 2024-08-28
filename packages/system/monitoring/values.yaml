@@ -39,7 +39,7 @@ fluent-bit:
       [OUTPUT]
           Name http
           Match kube.*
-          Host vlog-generic.tenant-root.svc
+          Host vlogs-generic.tenant-root.svc
           port 9428
           compress gzip
           uri /insert/jsonline?_stream_fields=stream,kubernetes_pod_name,kubernetes_container_name,kubernetes_namespace_name&_msg_field=log&_time_field=date

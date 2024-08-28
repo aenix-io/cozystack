@@ -1,5 +1,8 @@
 annotations:
   artifacthub.io/category: monitoring-logging
+  artifacthub.io/changes: |
+    - Fixed `vm.enterprise.only` template to check if at least one of both global.licence.eula and .Values.license.eula are defined
+    - Convert `vm.args` bool `true` values to flags without values
   artifacthub.io/license: Apache-2.0
   artifacthub.io/links: |
     - name: Sources
@@ -23,4 +26,4 @@ name: victoria-metrics-common
 sources:
 - https://github.com/VictoriaMetrics/helm-charts
 type: library
-version: 0.0.1
+version: 0.0.5
