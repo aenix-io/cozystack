@@ -1,0 +1,35 @@
+{{- $app := .Values.server }}
+{{- if and $app.enabled $app.ingress.enabled  }}
+{{- $serviceName := include "victoria-logs.server.fullname" . }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  {{- with $app.ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.ingress.extraLabels) }}
+  labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
+  name: {{ $serviceName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  {{- with $app.ingress.ingressClassName }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with $app.ingress.tls }}
+  tls: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range $app.ingress.hosts }}
+    - host: {{ tpl .name $ }}
+      http:
+        paths:
+          - path: {{ .path }}
+            {{- with $app.ingress.pathType }}
+            pathType: {{ . }}
+            {{- end }}
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port: {{ include "vm.ingress.port" . | nindent 18 }}
+    {{- end }}
+{{- end }}

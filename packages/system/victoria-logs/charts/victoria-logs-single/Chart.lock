@@ -1,0 +1,9 @@
+dependencies:
+- name: fluent-bit
+  repository: https://fluent.github.io/helm-charts
+  version: 0.46.7
+- name: victoria-metrics-common
+  repository: file://../victoria-metrics-common
+  version: 0.0.1
+digest: sha256:b26a170d6343a8de4d90854332d754b4f87c67b789cbedcc96d5059324bf0e2c
+generated: "2024-08-13T12:39:53.86646+03:00"

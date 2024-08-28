@@ -1,0 +1,52 @@
+{{- $app := .Values.server }}
+{{- if $app.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  {{- with $app.service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $ctx := merge (deepCopy .) (dict "extraLabels" $app.service.labels) }}
+  labels: {{ include "victoria-logs.server.labels" $ctx | nindent 4 }}
+  name: {{ template "victoria-logs.server.fullname" . }}
+spec:
+  {{- $clusterIP := ternary "None" $app.service.clusterIP $app.statefulSet.enabled }}
+  {{- with $clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- $externalIPs := ternary (default list) $app.service.externalIPs $app.statefulSet.enabled }}
+  {{- with $externalIPs }}
+  externalIPs: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- $loadBalancerIP := ternary "" $app.service.loadBalancerIP $app.statefulSet.enabled }}
+  {{- with $loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- $loadBalancerSourceRanges := ternary (default list) $app.service.loadBalancerSourceRanges $app.statefulSet.enabled }}
+  {{- with $loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  type: {{ ternary "ClusterIP" $app.service.type $app.statefulSet.enabled }}
+  {{- with $app.service.healthCheckNodePort }}
+  healthCheckNodePort: {{ . }}
+  {{- end }}
+  {{- with $app.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
+  {{- with $app.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ . }}
+  {{- end }}
+  {{- with $app.service.ipFamilies }}
+  ipFamilies: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  ports:
+    - name: http
+      port: {{ $app.service.servicePort }}
+      protocol: TCP
+      targetPort: http
+      {{- with $app.service.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+  selector: {{ include "victoria-logs.server.matchLabels" . | nindent 4 }}
+{{- end }}

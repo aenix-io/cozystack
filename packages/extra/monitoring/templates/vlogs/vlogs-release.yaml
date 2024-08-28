@@ -1,0 +1,31 @@
+{{- range .Values.logsStorages }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vlog-{{ .name }}-system
+  labels:
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+spec:
+  chart:
+    spec:
+      chart: cozy-victoria-logs
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-system
+        namespace: cozy-system
+      version: '*'
+  interval: 1m0s
+  timeout: 5m0s
+  values:
+    global:
+      victoriaLogs:
+        server:
+          fullnameOverride: vlog-{{ .name }}
+    victoria-logs-single:
+      server:
+        persistentVolume:
+          enabled: true
+          size: 10Gi
+{{- end }}
