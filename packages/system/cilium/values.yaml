@@ -7,6 +7,7 @@ cilium:
   kubeProxyReplacement: true
   bpf:
     masquerade: false
+    hostLegacyRouting: false
   loadBalancer:
     algorithm: maglev
   cgroup:
