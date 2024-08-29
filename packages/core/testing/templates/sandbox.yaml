@@ -10,6 +10,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cozystack-e2e-{{ .Release.Name }}
+  namespace: cozy-e2e-tests
 spec:
   replicas: 1
   selector:
