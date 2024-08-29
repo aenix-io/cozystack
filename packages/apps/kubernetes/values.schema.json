@@ -22,6 +22,11 @@
             "description": "StorageClass used to store user data",
             "default": "replicated"
         },
+        "disabledDNSAddon": {
+            "type": "boolean",
+            "description": "Is addon KamajiControlPlane.spec.addons.coreDNS disabled",
+            "default": false
+        },
         "addons": {
             "type": "object",
             "properties": {
