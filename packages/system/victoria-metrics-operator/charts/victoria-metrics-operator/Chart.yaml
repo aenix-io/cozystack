@@ -1,13 +1,7 @@
 annotations:
   artifacthub.io/category: monitoring-logging
-  artifacthub.io/changes: |-
-    **Release date:** 2023-08-30
-
-    ![AppVersion: 0.37.0](https://img.shields.io/static/v1?label=AppVersion&message=0.37.0&color=success&logo=)
-    ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
-
-    - Bump operator version to [v0.37.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.37.0)
-    - `psp_auto_creation_enabled` for operator is disabled by default
+  artifacthub.io/changes: |
+    - fixes typo at clean webhook. vmlogs->vlogs.
   artifacthub.io/license: Apache-2.0
   artifacthub.io/links: |
     - name: Sources
@@ -17,8 +11,12 @@ annotations:
     - name: Docs
       url: https://docs.victoriametrics.com/operator
   artifacthub.io/operator: "true"
-apiVersion: v1
-appVersion: 0.37.0
+apiVersion: v2
+appVersion: v0.47.2
+dependencies:
+- name: victoria-metrics-common
+  repository: https://victoriametrics.github.io/helm-charts
+  version: 0.0.*
 description: Victoria Metrics Operator
 home: https://github.com/VictoriaMetrics/operator
 icon: https://avatars.githubusercontent.com/u/43720803?s=200&v=4
@@ -32,9 +30,10 @@ keywords:
 - metrics
 - metricsql
 - timeseries
-kubeVersion: '>=1.23.0-0'
+kubeVersion: '>=1.25.0-0'
 name: victoria-metrics-operator
 sources:
 - https://github.com/VictoriaMetrics/helm-charts
 - https://github.com/VictoriaMetrics/operator
-version: 0.26.0
+type: application
+version: 0.34.5

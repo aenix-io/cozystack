@@ -15,3 +15,7 @@ update:
 	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 	helm repo update metrics-server
 	helm pull metrics-server/metrics-server --untar --untardir charts
+	# Fluent-bit
+	helm repo add fluent https://fluent.github.io/helm-charts
+	helm repo update fluent
+	helm pull fluent/fluent-bit --untar --untardir charts

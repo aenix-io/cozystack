@@ -17,6 +17,14 @@ metricsStorages:
   storage: 10Gi
   storageClassName: ""
 
+## @param logsStorages [array] Configuration of logs storage instances
+##
+logsStorages:
+- name: generic
+  retentionPeriod: "1"
+  storage: 10Gi
+  storageClassName: replicated
+
 ## @param oncall.enabled Enable Grafana OnCall
 ## 
 oncall:

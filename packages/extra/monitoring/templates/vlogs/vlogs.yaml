@@ -1,0 +1,15 @@
+{{- range .Values.logsStorages }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VLogs
+metadata:
+  name: {{ .name }}
+spec:
+  storage:
+    resources:
+      requests:
+        storage: {{ .storage }}
+    storageClassName: {{ .storageClassName }}
+    accessModes: [ReadWriteOnce]
+  retentionPeriod: "{{ .retentionPeriod }}"
+  removePvcAfterDelete: true
+{{- end }}

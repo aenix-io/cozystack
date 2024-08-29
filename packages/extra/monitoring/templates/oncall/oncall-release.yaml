@@ -15,9 +15,9 @@ spec:
       reconcileStrategy: Revision
       sourceRef:
         kind: HelmRepository
-        name: cozystack-extra
-        namespace: cozy-public
-      version: 0.1.0
+        name: cozystack-system
+        namespace: cozy-system
+      version: '*'
   interval: 1m0s
   timeout: 5m0s
   values:

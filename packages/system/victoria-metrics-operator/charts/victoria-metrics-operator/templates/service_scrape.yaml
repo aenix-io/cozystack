@@ -1,11 +1,12 @@
-{{- if .Values.serviceMonitor.enabled -}}
-{{- $mergedVMServiceScrapeAnnotations := mustMerge .Values.serviceMonitor.annotations .Values.annotations -}}
-{{- $mergedVMServiceScrapeLabels := mustMerge .Values.serviceMonitor.extraLabels .Values.extraLabels -}}
+{{- $serviceMonitor := .Values.serviceMonitor }}
+{{- if $serviceMonitor.enabled -}}
+{{- $mergedVMServiceScrapeAnnotations := mustMerge $serviceMonitor.annotations .Values.annotations -}}
+{{- $mergedVMServiceScrapeLabels := mustMerge $serviceMonitor.extraLabels .Values.extraLabels -}}
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
   name: {{ template "vm-operator.fullname" . }}
-  namespace: {{ $.Release.Namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
 {{ include "vm-operator.labels" . | indent 4 }}
 {{- with $mergedVMServiceScrapeLabels }}
@@ -17,28 +18,28 @@ metadata:
 {{- end }}
 spec:
   selector:
-    matchLabels:
-      {{- include "vm-operator.selectorLabels" . | nindent 6 }}
+    matchLabels: {{ include "vm-operator.selectorLabels" . | nindent 6 }}
   endpoints:
     - port: http
-      {{- if .Values.serviceMonitor.scheme }}
-      scheme: {{ .Values.serviceMonitor.scheme }}
+      {{- with $serviceMonitor.scheme }}
+      scheme: {{ . }}
       {{- end }}
-      {{- if .Values.serviceMonitor.interval }}
-      interval: {{ .Values.serviceMonitor.interval }}
+      {{- with $serviceMonitor.interval }}
+      interval: {{ . }}
       {{- end }}
-      {{- if .Values.serviceMonitor.scrapeTimeout }}
-      scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+      {{- with $serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ . }}
       {{- end }}
-      {{- with .Values.serviceMonitor.tlsConfig }}
-      tlsConfig:
-          {{- toYaml . | nindent 8 }}
+      {{- with $serviceMonitor.tlsConfig }}
+      tlsConfig: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.serviceMonitor.relabelings }}
-      relabelings:
-          {{- toYaml . | nindent 8 }}
+      {{- with $serviceMonitor.relabelings }}
+      relabelConfigs: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $serviceMonitor.basicAuth }}
+      basicAuth: {{ toYaml . | nindent 8 }}
       {{- end }}
   namespaceSelector:
     matchNames:
-      - {{ $.Release.Namespace }}
+      - {{ .Release.Namespace }}
 {{- end }}
