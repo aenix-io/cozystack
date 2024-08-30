@@ -6,6 +6,7 @@ spec:
   config:
     featureGates:
     - HonorWaitForFirstConsumer
+    - ExpandDisks
   imagePullPolicy: IfNotPresent
   infra:
     nodeSelector:
