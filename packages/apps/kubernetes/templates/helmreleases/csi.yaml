@@ -28,7 +28,7 @@ spec:
   upgrade:
     remediation:
       retries: -1
-  {{- with .Values.stroageClass }}
+  {{- with .Values.storageClass }}
   values:
     storageClass: "{{ . }}"
   {{- end }}

@@ -62,7 +62,7 @@ spec:
     size: {{ .Values.size }}
     resizeInUseVolumes: true
     waitForVolumeResize: true
-    {{- with .Values.stroageClass }}
+    {{- with .Values.storageClass }}
     storageClassName: {{ . }}
     {{- end }}
 

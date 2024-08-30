@@ -53,7 +53,7 @@ spec:
         {{- with .Values.kafka.size }}
         size: {{ . }}
         {{- end }}
-        {{- with .Values.kafka.stroageClass }}
+        {{- with .Values.kafka.storageClass }}
         class: {{ . }}
         {{- end }}
         deleteClaim: true
@@ -64,7 +64,7 @@ spec:
       {{- with .Values.zookeeper.size }}
       size: {{ . }}
       {{- end }}
-      {{- with .Values.kafka.stroageClass }}
+      {{- with .Values.kafka.storageClass }}
       class: {{ . }}
       {{- end }}
       deleteClaim: false
