@@ -1,6 +1,8 @@
 cilium:
   hubble:
     enabled: false
+  sctp:
+    enabled: true
   externalIPs:
     enabled: true
   autoDirectNodeRoutes: false
@@ -19,6 +21,7 @@ cilium:
   k8sServicePort: 7445
   cni:
     chainingMode: generic-veth
+    chainingTarget: kube-ovn
     customConf: true
     configMap: cni-configuration
   routingMode: native
