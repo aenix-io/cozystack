@@ -18,6 +18,8 @@ spec:
       runStrategy: Always
       template:
         metadata:
+          annotations:
+            kubevirt.io/allow-pod-bridge-network-live-migration: "true"
           labels:
             {{- range .group.roles }}
             node-role.kubernetes.io/{{ . }}: ""
@@ -38,7 +40,9 @@ spec:
                 disk:
                   bus: virtio
                   pciAddress: 0000:08:00.0
-              networkInterfaceMultiqueue: true
+              interfaces:
+              - name: default
+                bridge: {}
             memory:
               guest: {{ .group.resources.memory }}
           evictionStrategy: External
@@ -49,6 +53,9 @@ spec:
           - name: ephemeral
             emptyDisk:
               capacity: {{ .group.ephemeralStorage | default "20Gi" }}
+          networks:
+          - name: default
+            pod: {}
 {{- end }}
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
