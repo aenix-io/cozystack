@@ -55,11 +55,6 @@ You can customize the exposed ports by specifying them under `service.ports` in 
 ## Example virtual machine:
 
 ```yaml
-external: true
-externalPorts:
-- 22
-- 80
-- 443
 running: true
 image: fedora
 storageClass: replicated
