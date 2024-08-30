@@ -20,14 +20,11 @@ releases:
   namespace: cozy-cilium
   privileged: true
   dependsOn: []
+  valuesFiles:
+  - values.yaml
+  - values-talos.yaml
   values:
     cilium:
-      bpf:
-        masquerade: true
-      cni:
-        chainingMode: ~
-        customConf: false
-        configMap: ""
       enableIPv4Masquerade: true
       enableIdentityMark: true
       ipv4NativeRoutingCIDR: "{{ index $cozyConfig.data "ipv4-pod-cidr" }}"

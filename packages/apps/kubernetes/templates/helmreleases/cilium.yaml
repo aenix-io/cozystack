@@ -31,20 +31,8 @@ spec:
   values:
     cilium:
       tunnel: disabled
-      autoDirectNodeRoutes: false
-      bpf:
-        masquerade: true
-      cgroup:
-        autoMount:
-          enabled: true
-        hostRoot: /run/cilium/cgroupv2
       k8sServiceHost: {{ .Release.Name }}.{{ .Release.Namespace }}.svc
       k8sServicePort: 6443
-    
-      cni:
-        chainingMode: ~
-        customConf: false
-        configMap: ""
       routingMode: tunnel
       enableIPv4Masquerade: true
       ipv4NativeRoutingCIDR: ""

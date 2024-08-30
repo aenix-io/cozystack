@@ -1,39 +1,12 @@
 cilium:
   hubble:
     enabled: false
-  sctp:
-    enabled: true
   externalIPs:
     enabled: true
-  autoDirectNodeRoutes: false
-  kubeProxyReplacement: true
-  bpf:
-    masquerade: false
   loadBalancer:
     algorithm: maglev
-  cgroup:
-    autoMount:
-      enabled: false
-    hostRoot: /sys/fs/cgroup
   ipam:
     mode: "kubernetes"
-  k8sServiceHost: localhost
-  k8sServicePort: 7445
-  cni:
-    chainingMode: generic-veth
-    chainingTarget: kube-ovn
-    customConf: true
-    configMap: cni-configuration
-  routingMode: native
-  enableIPv4Masquerade: false
-  enableIPv6Masquerade: false
-  enableIdentityMark: false
-  enableRuntimeDeviceDetection: true
-  forceDeviceDetection: true
-  devices: ovn0
-  extraEnv:
-    - name: CILIUM_ENFORCE_DEVICE_DETECTION
-      value: "true"
   image:
     repository: ghcr.io/aenix-io/cozystack/cilium
     tag: 1.16.1

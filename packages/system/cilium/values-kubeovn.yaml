@@ -1,0 +1,19 @@
+cilium:
+  sctp:
+    enabled: true
+  autoDirectNodeRoutes: false
+  kubeProxyReplacement: true
+  bpf:
+    masquerade: false
+  cni:
+    chainingMode: generic-veth
+    chainingTarget: kube-ovn
+    customConf: true
+    configMap: cni-configuration
+  routingMode: native
+  enableIPv4Masquerade: false
+  enableIPv6Masquerade: false
+  enableIdentityMark: false
+  enableRuntimeDeviceDetection: true
+  forceDeviceDetection: true
+  devices: ovn0
