@@ -3,6 +3,8 @@ cilium:
     enabled: false
   externalIPs:
     enabled: true
+  nodePort:
+    enabled: true
   loadBalancer:
     algorithm: maglev
   ipam:
