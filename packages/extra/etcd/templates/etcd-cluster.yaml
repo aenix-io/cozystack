@@ -25,7 +25,7 @@ spec:
         resources:
           requests:
             storage: {{ .Values.size }}
-        {{- with .Values.stroageClass }}
+        {{- with .Values.storageClass }}
         storageClassName: {{ . }}
         {{- end }}
   security:

@@ -15,7 +15,7 @@ spec:
 
   storage:
     size: {{ required ".Values.size is required" .Values.size }}
-    {{- with .Values.stroageClass }}
+    {{- with .Values.storageClass }}
     storageClass: {{ . }}
     {{- end }}
 

@@ -13,7 +13,7 @@ spec:
   {{- end }}
 
   persistence:
-    {{- with .Values.stroageClass }}
+    {{- with .Values.storageClass }}
     storageClassName: {{ . }}
     {{- end }}
     storage: {{ .Values.size }}

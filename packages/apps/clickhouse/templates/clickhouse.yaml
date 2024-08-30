@@ -31,7 +31,7 @@ spec:
         spec:
           accessModes:
             - ReadWriteOnce
-          {{- with .Values.stroageClass }}
+          {{- with .Values.storageClass }}
           storageClassName: {{ . }}
           {{- end }}
           resources:
