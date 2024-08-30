@@ -29,7 +29,7 @@ spec:
           {{- else if eq .Values.image "fedora" }}
           url: https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2
           {{- else if eq .Values.image "alpine" }}
-          url: https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86_64/alpine-virt-3.20.2-x86_64.iso
+          url: https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/nocloud_alpine-3.20.2-x86_64-bios-tiny-r0.qcow2
           {{- end }}
   template:
     metadata:
