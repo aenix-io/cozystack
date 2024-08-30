@@ -27,3 +27,6 @@ metadata:
 spec:
   replicaCount: 2
   configSecret: alertmanager
+  podMetadata:
+    labels:
+      policy.cozystack.io/allow-to-apiserver: "true"
