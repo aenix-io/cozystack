@@ -10,6 +10,7 @@ spec:
     developerConfiguration:
       featureGates:
       - HotplugVolumes
+      - ExpandDisks
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   workloadUpdateStrategy: {}
