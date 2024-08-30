@@ -22,13 +22,14 @@
     },
     "image": {
       "type": "string",
-      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora`",
+      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine`, `fedora` and `talos`",
       "default": "ubuntu",
       "enum": [
         "ubuntu",
         "cirros",
         "alpine",
-        "fedora"
+        "fedora",
+        "talos"
       ]
     },
     "storageClass": {

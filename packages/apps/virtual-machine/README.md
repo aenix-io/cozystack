@@ -36,18 +36,18 @@ virtctl ssh <user>@<vm>
 
 ### Common parameters
 
-| Name               | Description                                                                                       | Value            |
-| ------------------ | ------------------------------------------------------------------------------------------------- | ---------------- |
-| `external`         | Enable external access from outside the cluster                                                   | `false`          |
-| `externalPorts`    | Specify ports to forward from outside the cluster                                                 | `[]`             |
-| `running`          | Determines if the virtual machine should be running                                               | `true`           |
-| `image`            | The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora` | `ubuntu`         |
-| `storageClass`     | StorageClass used to store the data                                                               | `replicated`     |
-| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                                          | `1`              |
-| `resources.memory` | The amount of memory allocated to the virtual machine                                             | `1024M`          |
-| `resources.disk`   | The size of the disk allocated for the virtual machine                                            | `5Gi`            |
-| `sshKeys`          | List of SSH public keys for authentication. Can be a single key or a list of keys.                | `[]`             |
-| `cloudInit`        | cloud-init user data config. See cloud-init documentation for more details.                       | `#cloud-config
+| Name               | Description                                                                                                | Value            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------- | ---------------- |
+| `external`         | Enable external access from outside the cluster                                                            | `false`          |
+| `externalPorts`    | Specify ports to forward from outside the cluster                                                          | `[]`             |
+| `running`          | Determines if the virtual machine should be running                                                        | `true`           |
+| `image`            | The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine`, `fedora` and `talos` | `ubuntu`         |
+| `storageClass`     | StorageClass used to store the data                                                                        | `replicated`     |
+| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                                                   | `1`              |
+| `resources.memory` | The amount of memory allocated to the virtual machine                                                      | `1024M`          |
+| `resources.disk`   | The size of the disk allocated for the virtual machine                                                     | `5Gi`            |
+| `sshKeys`          | List of SSH public keys for authentication. Can be a single key or a list of keys.                         | `[]`             |
+| `cloudInit`        | cloud-init user data config. See cloud-init documentation for more details.                                | `#cloud-config
 ` |
 
 You can customize the exposed ports by specifying them under `service.ports` in the `values.yaml` file.
