@@ -11,8 +11,9 @@ spec:
       name: {{ include "virtual-machine.fullname" . }}
     spec:
       pvc:
+        volumeMode: Block
         accessModes:
-        - ReadWriteOnce
+        - ReadWriteMany
         resources:
           requests:
             storage: {{ .Values.resources.disk | quote }}

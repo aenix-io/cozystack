@@ -12,7 +12,7 @@
       "description": "Specify ports to forward from outside the cluster",
       "default": "[]",
       "items": {
-        "type": "string"
+        "type": "integer"
       }
     },
     "running": {
