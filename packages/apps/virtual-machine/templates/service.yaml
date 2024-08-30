@@ -8,21 +8,14 @@ metadata:
     {{- include "virtual-machine.labels" . | nindent 4 }}
 spec:
   type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
-  {{- if .Values.external }}
   externalTrafficPolicy: Local
   allocateLoadBalancerNodePorts: false
-  {{- end }}
   selector:
     {{- include "virtual-machine.labels" . | nindent 4 }}
   ports:
-    - name: ssh
-      port: 22
-      targetPort: 22
-    {{- if .Values.service.ports }}
-    {{- range .Values.service.ports }}
-    - name: {{ .name }}
-      port: {{ .port }}
-      targetPort: {{ .targetPort }}
-    {{- end }}
+    {{- range .Values.externalPorts }}
+    - name: port-{{ . }}
+      port: {{ . }}
+      targetPort: {{ . }}
     {{- end }}
 {{- end }}

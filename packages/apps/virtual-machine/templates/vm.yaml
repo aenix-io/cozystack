@@ -45,34 +45,39 @@ spec:
           - disk:
               bus: scsi
             name: systemdisk
+          {{- if or .Values.sshKeys .Values.cloudInit }}
           - disk:
               bus: virtio
             name: cloudinitdisk
+          {{- end }}
+          interfaces:
+          - name: default
+            bridge: {}
         machine:
           type: ""
         resources:
           requests:
             memory: {{ .Values.resources.memory | quote }}
+      {{- with .Values.sshKeys }}
+      accessCredentials:
+      - sshPublicKey:
+          source:
+            secret:
+              secretName: {{ include "virtual-machine.fullname" $ }}-ssh-keys
+          propagationMethod:
+            noCloud: {}
+      {{- end }}
       terminationGracePeriodSeconds: 30
       volumes:
-      - dataVolume:
+      - name: systemdisk
+        dataVolume:
           name: {{ include "virtual-machine.fullname" . }}
-        name: systemdisk
-      - cloudInitNoCloud:
-          userData: |-
-            #cloud-config
-            ssh_pwauth: {{ if .Values.sshPwauth | default false }}True{{ else }}False{{ end }}
-            disable_root: {{ if .Values.disableRoot | default false }}True{{ else }}False{{ end }}
-            password: {{ .Values.password }}
-            chpasswd: { expire: {{ if .Values.chpasswdExpire | default false }}True{{ else }}False{{ end }} }
-            ssh_authorized_keys:
-            {{- if .Values.sshKeys }}
-              {{- $keys := .Values.sshKeys }}
-              {{- if not (kindIs "slice" $keys) }}
-                {{- $keys = list $keys }}
-              {{- end }}
-              {{- range $keys }}
-              - {{ . }}
-              {{- end }}
-            {{- end }}
-        name: cloudinitdisk
+      {{- if or .Values.sshKeys .Values.cloudInit }}
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          secretRef:
+            name: {{ include "virtual-machine.fullname" . }}-cloud-init
+      {{- end }}
+      networks:
+      - name: default
+        pod: {}

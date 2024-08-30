@@ -7,6 +7,14 @@
       "description": "Enable external access from outside the cluster",
       "default": false
     },
+    "externalPorts": {
+      "type": "array",
+      "description": "Specify ports to forward from outside the cluster",
+      "default": "[]",
+      "items": {
+        "type": "string"
+      }
+    },
     "running": {
       "type": "boolean",
       "description": "Determines if the virtual machine should be running",
@@ -49,36 +57,18 @@
         }
       }
     },
-    "sshPwauth": {
-      "type": "boolean",
-      "description": "Enable password authentication for SSH. If set to `true`, users can log in using a password",
-      "default": true
-    },
-    "disableRoot": {
-      "type": "boolean",
-      "description": "Disable root login via SSH. If set to `true`, root login will be disabled",
-      "default": true
-    },
-    "password": {
-      "type": "string",
-      "description": "The default password for the virtual machine",
-      "default": "hackme"
-    },
-    "chpasswdExpire": {
-      "type": "boolean",
-      "description": "Set whether the password should expire",
-      "default": false
-    },
     "sshKeys": {
       "type": "array",
-      "description": "List of SSH public keys for authentication. Can be a single key or a list of keys",
-      "default": [
-        "ssh-rsa ...",
-        "ssh-ed25519 ..."
-      ],
+      "description": "List of SSH public keys for authentication. Can be a single key or a list of keys.",
+      "default": "[]",
       "items": {
         "type": "string"
       }
+    },
+    "cloudInit": {
+      "type": "string",
+      "description": "cloud-init user data config. See cloud-init documentation for more details.",
+      "default": "#cloud-config\n"
     }
   }
 }
