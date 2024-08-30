@@ -20,6 +20,10 @@ releases:
   namespace: cozy-cilium
   privileged: true
   dependsOn: []
+  valuesFiles:
+  - values.yaml
+  - values-talos.yaml
+  - values-kubeovn.yaml
 
 - name: kubeovn
   releaseName: kubeovn
