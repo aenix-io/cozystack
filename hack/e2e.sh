@@ -309,8 +309,9 @@ kubectl wait --timeout=5m --for=condition=available -n tenant-root deploy root-i
 kubectl wait --timeout=5m --for=jsonpath=.status.readyReplicas=3 -n tenant-root sts etcd
 
 # Wait for Victoria metrics
-kubectl wait --timeout=5m --for=condition=available deploy -n tenant-root vmalert-vmalert-longterm vmalert-vmalert-shortterm vminsert-longterm vminsert-shortterm
-kubectl wait --timeout=5m --for=jsonpath=.status.readyReplicas=2 -n tenant-root sts vmalertmanager-alertmanager vmselect-longterm vmselect-shortterm vmstorage-longterm vmstorage-shortterm
+kubectl wait --timeout=5m --for=jsonpath=.status.updateStatus=operational -n tenant-root vmalert/vmalert-longterm vmalert/vmalert-shortterm vmalertmanager/alertmanager
+kubectl wait --timeout=5m --for=jsonpath=.status.status=operational -n tenant-root vlogs/generic
+kubectl wait --timeout=5m --for=jsonpath=.status.clusterStatus=operational -n tenant-root vmcluster/shortterm vmcluster/longterm
 
 # Wait for grafana
 kubectl wait --timeout=5m --for=condition=ready -n tenant-root clusters.postgresql.cnpg.io grafana-db
