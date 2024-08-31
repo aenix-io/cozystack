@@ -1,7 +1,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: {{ .Release.Name }}-system
+  name: "{{ .Release.Name }}-system"
 spec:
   chart:
     spec:
