@@ -21,6 +21,11 @@
             "type": "string",
             "description": "StorageClass used to store the data",
             "default": ""
+        },
+        "vhosts": {
+            "type": "object",
+            "description": "Virtual Hosts configuration",
+            "default": {}
         }
     }
 }
