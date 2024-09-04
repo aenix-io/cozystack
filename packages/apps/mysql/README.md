@@ -79,7 +79,7 @@ more details:
 | Name        | Description             | Value |
 | ----------- | ----------------------- | ----- |
 | `users`     | Users configuration     | `{}`  |
-| `databases` | Databases configuration | `[]`  |
+| `databases` | Databases configuration | `{}`  |
 
 ### Backup parameters
 

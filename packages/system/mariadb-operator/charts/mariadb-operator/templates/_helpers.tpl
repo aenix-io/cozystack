@@ -71,6 +71,34 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Webhook CA path to use cert-controller issued certificates
+*/}}
+{{- define "mariadb-operator-webhook.certControllerCAPath" -}}
+{{ .Values.webhook.cert.ca.path | default "/tmp/k8s-webhook-server/certificate-authority" }}
+{{- end }}
+
+{{/*
+Webhook CA full path to use cert-controller issued certificates
+*/}}
+{{- define "mariadb-operator-webhook.certControllerFullCAPath" -}}
+{{- printf "%s/%s" (include "mariadb-operator-webhook.certControllerCAPath" .) (.Values.webhook.cert.ca.key | default "tls.crt") }}
+{{- end }}
+
+{{/*
+Webhook CA path to use cert-manager issued certificates
+*/}}
+{{- define "mariadb-operator-webhook.certManagerCAPath" -}}
+{{ .Values.webhook.cert.ca.path | default .Values.webhook.cert.path }}
+{{- end }}
+
+{{/*
+Webhook CA full path to use cert-manager issued certificates
+*/}}
+{{- define "mariadb-operator-webhook.certManagerFullCAPath" -}}
+{{- printf "%s/%s" (include "mariadb-operator-webhook.certManagerCAPath" .) (.Values.webhook.cert.ca.key | default "ca.crt") }}
+{{- end }}
+
+{{/*
 Cert-controller common labels
 */}}
 {{- define "mariadb-operator-cert-controller.labels" -}}
