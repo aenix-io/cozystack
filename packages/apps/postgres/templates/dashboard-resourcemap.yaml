@@ -8,7 +8,14 @@ rules:
   resources:
   - services
   resourceNames:
-  - postgres-service-r
-  - postgres-service-ro
-  - postgres-service-rw
+  - {{ .Release.Name }}-r
+  - {{ .Release.Name }}-ro
+  - {{ .Release.Name }}-rw
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  resourceNames:
+  - {{ .Release.Name }}-credentials
   verbs: ["get", "list", "watch"]

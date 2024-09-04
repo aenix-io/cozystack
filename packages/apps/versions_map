@@ -40,10 +40,12 @@ postgres 0.2.1 4a97e297
 postgres 0.3.0 995dea6f
 postgres 0.4.0 ec283c33
 postgres 0.4.1 5ca8823
-postgres 0.5.0 HEAD
+postgres 0.5.0 c07c4bbd
+postgres 0.6.0 HEAD
 rabbitmq 0.1.0 f642698
 rabbitmq 0.2.0 5ca8823
-rabbitmq 0.3.0 HEAD
+rabbitmq 0.3.0 9e33dc0
+rabbitmq 0.4.0 HEAD
 redis 0.1.1 f642698
 redis 0.2.0 5ca8823
 redis 0.3.0 HEAD
