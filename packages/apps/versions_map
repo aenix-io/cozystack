@@ -2,11 +2,13 @@ bucket 0.1.0 HEAD
 clickhouse 0.1.0 ca79f72
 clickhouse 0.2.0 7cd7de73
 clickhouse 0.2.1 5ca8823
-clickhouse 0.3.0 HEAD
+clickhouse 0.3.0 b00621e
+clickhouse 0.4.0 HEAD
 ferretdb 0.1.0 4ffa8615
 ferretdb 0.1.1 5ca8823
 ferretdb 0.2.0 adaf603
-ferretdb 0.3.0 HEAD
+ferretdb 0.3.0 aa2f553
+ferretdb 0.4.0 HEAD
 http-cache 0.1.0 a956713
 http-cache 0.2.0 5ca8823
 http-cache 0.3.0 HEAD
@@ -31,7 +33,8 @@ kubernetes 0.10.0 HEAD
 mysql 0.1.0 f642698
 mysql 0.2.0 8b975ff0
 mysql 0.3.0 5ca8823
-mysql 0.4.0 HEAD
+mysql 0.4.0 93018c4
+mysql 0.5.0 HEAD
 nats 0.1.0 5ca8823
 nats 0.2.0 HEAD
 postgres 0.1.0 f642698
