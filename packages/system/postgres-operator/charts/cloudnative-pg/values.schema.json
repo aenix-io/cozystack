@@ -5,6 +5,9 @@
         "additionalArgs": {
             "type": "array"
         },
+        "additionalEnv": {
+            "type": "array"
+        },
         "affinity": {
             "type": "object"
         },
@@ -72,8 +75,14 @@
                 }
             }
         },
+        "dnsPolicy": {
+            "type": "string"
+        },
         "fullnameOverride": {
             "type": "string"
+        },
+        "hostNetwork": {
+            "type": "boolean"
         },
         "image": {
             "type": "object",
@@ -98,11 +107,17 @@
                 "grafanaDashboard": {
                     "type": "object",
                     "properties": {
+                        "annotations": {
+                            "type": "object"
+                        },
                         "configMapName": {
                             "type": "string"
                         },
                         "create": {
                             "type": "boolean"
+                        },
+                        "labels": {
+                            "type": "object"
                         },
                         "namespace": {
                             "type": "string"
@@ -115,8 +130,17 @@
                         }
                     }
                 },
+                "podMonitorAdditionalLabels": {
+                    "type": "object"
+                },
                 "podMonitorEnabled": {
                     "type": "boolean"
+                },
+                "podMonitorMetricRelabelings": {
+                    "type": "array"
+                },
+                "podMonitorRelabelings": {
+                    "type": "array"
                 }
             }
         },
