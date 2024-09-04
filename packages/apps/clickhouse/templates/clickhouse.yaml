@@ -1,3 +1,32 @@
+{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace (printf "%s-credentials" .Release.Name) }}
+{{- $passwords := dict }}
+
+{{- with (index $existingSecret "data") }}
+  {{- range $k, $v := . }}
+    {{- $_ := set $passwords $k (b64dec $v) }}
+  {{- end }}
+{{- end }}
+
+{{- range $user, $u := .Values.users }}
+  {{- if $u.password }}
+    {{- $_ := set $passwords $user $u.password }}
+  {{- else if not (index $passwords $user) }}
+    {{- $_ := set $passwords $user (randAlphaNum 16) }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.users }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-credentials
+stringData:
+  {{- range $user, $u := .Values.users }}
+  {{ quote $user }}: {{ quote (index $passwords $user) }}
+  {{- end }}
+{{- end }}
+
+---
 apiVersion: "clickhouse.altinity.com/v1"
 kind: "ClickHouseInstallation"
 metadata:
@@ -12,7 +41,7 @@ spec:
     {{- with .Values.users }}
     users:
       {{- range $name, $u := . }}
-      {{ $name }}/password_sha256_hex: {{ sha256sum $u.password }}
+      {{ $name }}/password_sha256_hex: {{ sha256sum (index $passwords $name) }}
       {{ $name }}/profile: {{ ternary "readonly" "default" (index $u "readonly" | default false) }}
       {{ $name }}/networks/ip: ["::/0"]
       {{- end }}
@@ -31,7 +60,7 @@ spec:
         spec:
           accessModes:
             - ReadWriteOnce
-          {{- with .Values.storageClass }}
+          {{- with $.Values.storageClass }}
           storageClassName: {{ . }}
           {{- end }}
           resources:
