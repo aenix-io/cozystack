@@ -22,12 +22,6 @@
             "description": "StorageClass used to store the data",
             "default": ""
         },
-        "databases": {
-            "type": "array",
-            "description": "Databases configuration",
-            "default": [],
-            "items": {}
-        },
         "backup": {
             "type": "object",
             "properties": {

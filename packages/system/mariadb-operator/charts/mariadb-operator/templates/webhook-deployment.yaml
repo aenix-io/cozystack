@@ -51,9 +51,9 @@ spec:
           args:
             - webhook
             {{- if .Values.webhook.cert.certManager.enabled }}
-            - --ca-cert-path={{ .Values.webhook.cert.path }}/ca.crt
+            - --ca-cert-path={{ include "mariadb-operator-webhook.certManagerFullCAPath" . }}
             {{- else }}
-            - --ca-cert-path={{ .Values.webhook.cert.caPath }}/tls.crt
+            - --ca-cert-path={{ include "mariadb-operator-webhook.certControllerFullCAPath" . }}
             {{- end }}
             - --cert-dir={{ .Values.webhook.cert.path }}
             - --dns-name={{ $fullName }}-webhook.{{ .Release.Namespace }}.svc
@@ -76,7 +76,7 @@ spec:
               name: health
           volumeMounts:
             {{- if not .Values.webhook.cert.certManager.enabled }}
-            - mountPath: {{ .Values.webhook.cert.caPath }}
+            - mountPath: {{ include "mariadb-operator-webhook.certControllerCAPath" . }}
               name: ca
               readOnly: true
             {{- end }}

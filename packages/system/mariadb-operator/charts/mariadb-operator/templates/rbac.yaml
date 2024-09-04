@@ -57,15 +57,6 @@ rules:
   - ""
   resources:
   - endpoints
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - endpoints/restricted
   verbs:
   - create
@@ -77,6 +68,9 @@ rules:
   - ""
   resources:
   - events
+  - secrets
+  - serviceaccounts
+  - services
   verbs:
   - create
   - list
@@ -104,30 +98,9 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - secrets
+  - pods/log
   verbs:
-  - create
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - serviceaccounts
-  verbs:
-  - create
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - create
-  - list
-  - patch
-  - watch
+  - get
 - apiGroups:
   - apps
   resources:
@@ -183,6 +156,14 @@ rules:
   - k8s.mariadb.com
   resources:
   - backups
+  - connections
+  - databases
+  - grants
+  - mariadbs
+  - maxscales
+  - restores
+  - sqljobs
+  - users
   verbs:
   - create
   - delete
@@ -195,248 +176,41 @@ rules:
   - k8s.mariadb.com
   resources:
   - backups/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - backups/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - connections
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - connections
-  - grants
-  - maxscale
-  - restores
-  - users
-  verbs:
-  - create
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - connections
-  - grants
-  - users
-  verbs:
-  - create
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
   - connections/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - connections/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - databases
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
   - databases/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - databases/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - grants
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
   - grants/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - grants/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - mariadbs
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
   - mariadbs/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - mariadbs/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - maxscales
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
   - maxscales/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - maxscales/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - restores
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
   - restores/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - restores/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - sqljobs
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
   - sqljobs/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - sqljobs/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
-  - users
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.mariadb.com
-  resources:
   - users/finalizers
   verbs:
   - update
 - apiGroups:
   - k8s.mariadb.com
   resources:
+  - backups/status
+  - connections/status
+  - databases/status
+  - grants/status
+  - mariadbs/status
+  - maxscales/status
+  - restores/status
+  - sqljobs/status
   - users/status
   verbs:
   - get
   - patch
   - update
+- apiGroups:
+  - k8s.mariadb.com
+  resources:
+  - maxscale
+  verbs:
+  - create
+  - list
+  - patch
+  - watch
 - apiGroups:
   - monitoring.coreos.com
   resources:
