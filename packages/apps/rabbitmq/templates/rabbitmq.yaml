@@ -17,3 +17,81 @@ spec:
     storageClassName: {{ . }}
     {{- end }}
     storage: {{ .Values.size }}
+
+{{- range $user, $u := .Values.users }}
+
+{{- $password := $u.password }}
+{{- if not $password }}
+{{- with (dig "data" "password" "" (lookup "v1" "Secret" $.Release.Namespace (printf "%s-%s-credentials" $.Release.Name (kebabcase $user)))) }}
+{{- $password = b64dec . }}
+{{- end }}
+{{- end }}
+{{- if not $password }}
+{{- $password = (randAlphaNum 16) }}
+{{- end }}
+
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: User
+metadata:
+  name: {{ $.Release.Name }}-{{ kebabcase $user }}
+  annotations:
+    config: '{{ printf "%s %s" $user $password | sha256sum }}'
+spec:
+  importCredentialsSecret:
+    name: {{ $.Release.Name }}-{{ $user }}-credentials
+  rabbitmqClusterReference:
+    name: {{ $.Release.Name }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-{{ kebabcase $user }}-credentials
+type: Opaque
+stringData:
+  username: {{ $user }}
+  password: {{ $password }}
+{{- end }}
+
+{{- range $host, $h := .Values.vhosts }}
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Vhost
+metadata:
+  name: {{ $.Release.Name }}-{{ kebabcase $host }}
+spec:
+  name: {{ $host }}
+  rabbitmqClusterReference:
+    name: {{ $.Release.Name }}
+{{- range $user := $h.roles.admin }}
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Permission
+metadata:
+  name: {{ $.Release.Name }}-{{ kebabcase $host }}-{{ kebabcase $user }}
+spec:
+  vhost: "{{ $host }}"
+  user: "{{ $user }}"
+  permissions:
+    write: ".*"
+    configure: ".*"
+    read: ".*"
+  rabbitmqClusterReference:
+    name: {{ $.Release.Name }}
+{{- end }}
+{{- range $user := $h.roles.readonly }}
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Permission
+metadata:
+  name: {{ $.Release.Name }}-{{ kebabcase $host }}-{{ kebabcase $user }}
+spec:
+  vhost: "{{ $host }}"
+  user: "{{ $user }}"
+  permissions:
+    read: ".*"
+  rabbitmqClusterReference:
+    name: {{ $.Release.Name }}
+{{- end }}
+
+{{- end }}
