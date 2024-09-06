@@ -46,7 +46,7 @@ resolved_miss_map=$(
       # Check if the commit belongs to the main branch
       if ! git merge-base --is-ancestor "$commit" main; then
         # Find the closest parent commit that belongs to main
-        commit_in_main=$(git log --pretty=format:"%H" main -- "$chart/Chart.yaml" | head -n 1)
+        commit_in_main=$(git log --pretty=format:"%h" main -- "$chart" | head -n 1)
         if [ -n "$commit_in_main" ]; then
           commit="$commit_in_main"
         else
