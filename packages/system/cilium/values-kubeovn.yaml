@@ -2,7 +2,6 @@ cilium:
   sctp:
     enabled: true
   autoDirectNodeRoutes: false
-  kubeProxyReplacement: true
   bpf:
     masquerade: false
   cni:
