@@ -24,7 +24,7 @@ spec:
     oncall:
       fullnameOverride: grafana-oncall
       externalGrafana:
-        url: "https://{{ .Values.host | default (printf "grafana.%s" $host) }}/"
+        url: "http://grafana-service:3000"
       
       externalPostgresql:
         host: grafana-oncall-db-rw
@@ -35,6 +35,6 @@ spec:
       
       externalRedis:
         host: rfrm-grafana-oncall
-        existingSecret: {{ .Release.Name }}-oncall-redis-password
+        existingSecret: grafana-oncall-redis-password
         passwordKey: password
 {{- end }}
