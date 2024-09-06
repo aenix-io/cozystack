@@ -48,7 +48,8 @@ postgres 0.6.0 HEAD
 rabbitmq 0.1.0 f642698
 rabbitmq 0.2.0 5ca8823
 rabbitmq 0.3.0 9e33dc0
-rabbitmq 0.4.0 HEAD
+rabbitmq 0.4.0 36d8855
+rabbitmq 0.4.1 HEAD
 redis 0.1.1 f642698
 redis 0.2.0 5ca8823
 redis 0.3.0 HEAD
