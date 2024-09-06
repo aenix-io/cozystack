@@ -176,7 +176,7 @@ detached_integrations:
 # Celery workers pods configuration
 celery:
   replicaCount: 1
-  worker_queue: "default,critical,long,slack,telegram,webhook,celery,grafana"
+  worker_queue: "default,critical,long,slack,telegram,webhook,celery,grafana,retry"
   worker_concurrency: "1"
   worker_max_tasks_per_child: "100"
   worker_beat_enabled: "True"
@@ -305,8 +305,6 @@ oncall:
   slack:
     # Enable the Slack ChatOps integration for the Oncall Engine.
     enabled: false
-    # Sets the Slack bot slash-command
-    commandName: oncall
     # clientId configures the Slack app OAuth2 client ID.
     # api.slack.com/apps/<yourApp> -> Basic Information -> App Credentials -> Client ID
     clientId: ~
@@ -343,6 +341,7 @@ oncall:
     username: ~
     password: ~
     tls: ~
+    ssl: ~
     fromEmail: ~
   exporter:
     enabled: false

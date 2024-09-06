@@ -56,7 +56,7 @@ spec:
                   mountPath: /var/lib/grafana
           containers:
             - name: grafana
-              image: grafana/grafana:10.1.0
+              image: grafana/grafana:11.2.0
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: false
@@ -64,7 +64,7 @@ spec:
                 failureThreshold: 3
               env:
               - name: GF_INSTALL_PLUGINS
-                value: grafana-worldmap-panel,flant-statusmap-panel,grafana-oncall-app,natel-discrete-panel
+                value: grafana-worldmap-panel,flant-statusmap-panel,grafana-oncall-app,natel-discrete-panel,grafana-oncall-app
               - name: ONCALL_API_URL
                 value: http://grafana-oncall-engine:8080
               - name: GF_DATABASE_HOST
@@ -87,6 +87,13 @@ spec:
                   secretKeyRef:
                     key: password
                     name: grafana-admin-password
+              volumeMounts:
+              - name: grafana-plugins
+                mountPath: /usr/share/grafana/conf/provisioning/plugins/
+          volumes:
+          - name: grafana-plugins
+            configMap:
+              name: grafana-plugins-provisioning
   ingress:
     metadata:
       annotations:
@@ -109,3 +116,20 @@ spec:
       - hosts:
         - "{{ .Values.host | default (printf "grafana.%s" $host) }}"
         secretName: grafana-ingress-tls
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-plugins-provisioning
+data:
+  on-call.yaml: |
+    apiVersion: 1
+    apps:
+    - type: grafana-oncall-app
+      name: grafana-oncall-app
+      version: v1.9.0
+      disabled: false
+      jsonData:
+        grafanaUrl: "https://grafana.infra.aenix.org"
+        license: "OpenSource"
+        onCallApiUrl: "http://grafana-oncall-engine:8080"
