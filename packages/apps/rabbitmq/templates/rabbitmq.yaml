@@ -12,6 +12,14 @@ spec:
     type: LoadBalancer
   {{- end }}
 
+  override:
+    statefulSet:
+      spec:
+        template:
+          metadata:
+            labels:
+              policy.cozystack.io/allow-to-apiserver: "true"
+
   persistence:
     {{- with .Values.storageClass }}
     storageClassName: {{ . }}
