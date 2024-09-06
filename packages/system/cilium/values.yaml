@@ -1,4 +1,5 @@
 cilium:
+  kubeProxyReplacement: true
   hubble:
     enabled: false
   externalIPs:
