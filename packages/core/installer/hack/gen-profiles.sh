@@ -2,7 +2,7 @@
 set -e
 set -u
 
-PROFILES="initramfs kernel iso installer nocloud"
+PROFILES="initramfs kernel iso installer nocloud metal"
 FIRMWARES="amd-ucode amdgpu-firmware bnx2-bnx2x i915-ucode intel-ice-firmware intel-ucode qlogic-firmware"
 EXTENSIONS="drbd zfs"
 
@@ -32,10 +32,10 @@ done
 
 for profile in $PROFILES; do
   echo "writing profile images/talos/profiles/$profile.yaml"
-  if [ "$profile" = "nocloud" ]; then
+  if [ "$profile" = "nocloud" ] || [ "$profile" = "metal" ]; then
     image_options="{ diskSize: 1306525696, diskFormat: raw }"
     out_format=".xz"
-    platform="nocloud"
+    platform="$profile"
     kind="image"
   else
     image_options="{}"
