@@ -5,3 +5,11 @@ kamaji:
     pullPolicy: IfNotPresent
     tag: v0.14.1@sha256:5a1c82f19552e4ec852880b943290921ec38f4f70b1256848e335f2b96ce09e3
     repository: ghcr.io/aenix-io/cozystack/kamaji
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
