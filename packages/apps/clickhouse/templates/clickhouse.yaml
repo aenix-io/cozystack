@@ -1,5 +1,7 @@
 {{- $existingSecret := lookup "v1" "Secret" .Release.Namespace (printf "%s-credentials" .Release.Name) }}
 {{- $passwords := dict }}
+{{- $users := .Values.users }}
+{{- $_ := set $users "backup" dict }}
 
 {{- with (index $existingSecret "data") }}
   {{- range $k, $v := . }}
@@ -7,7 +9,7 @@
   {{- end }}
 {{- end }}
 
-{{- range $user, $u := .Values.users }}
+{{- range $user, $u := $users }}
   {{- if $u.password }}
     {{- $_ := set $passwords $user $u.password }}
   {{- else if not (index $passwords $user) }}
@@ -15,7 +17,6 @@
   {{- end }}
 {{- end }}
 
-{{- if .Values.users }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -24,7 +25,6 @@ stringData:
   {{- range $user, $u := .Values.users }}
   {{ quote $user }}: {{ quote (index $passwords $user) }}
   {{- end }}
-{{- end }}
 
 ---
 apiVersion: "clickhouse.altinity.com/v1"
@@ -38,7 +38,7 @@ spec:
       dataVolumeClaimTemplate: data-volume-template
   {{- end }}
   configuration:
-    {{- with .Values.users }}
+    {{- with $users }}
     users:
       {{- range $name, $u := . }}
       {{ $name }}/password_sha256_hex: {{ sha256sum (index $passwords $name) }}
