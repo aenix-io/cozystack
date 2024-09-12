@@ -17,4 +17,5 @@ image:
 		--load=$(LOAD)
 	echo "$(REGISTRY)/postgres-backup:$(call settag,$(POSTGRES_BACKUP_TAG))@$$(yq e '."containerimage.digest"' images/postgres-backup.json -o json -r)" \
 		> images/postgres-backup.tag
+	cp images/postgres-backup.tag ../ferretdb/images/
 	rm -f images/postgres-backup.json

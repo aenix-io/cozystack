@@ -26,7 +26,7 @@ spec:
           - name: {{ .Release.Name }}-regsecret
           restartPolicy: Never
           containers:
-          - name: mysqldump
+          - name: pgdump
             image: "{{ $.Files.Get "images/postgres-backup.tag" | trim }}"
             command:
             - /bin/sh
