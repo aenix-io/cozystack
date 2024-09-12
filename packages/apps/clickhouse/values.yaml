@@ -23,6 +23,8 @@ storageClass: ""
 ##
 users: {}
 
+## @section Backup parameters
+
 ## @param backup.enabled Enable pereiodic backups
 ## @param backup.s3Region The AWS S3 region where backups are stored
 ## @param backup.s3Bucket The S3 bucket used for storing backups

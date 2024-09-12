@@ -1,5 +1,20 @@
 # Managed Clickhouse Service
 
+### How to restore backup:
+
+find snapshot:
+```
+restic -r s3:s3.example.org/clickhouse-backups/table_name snapshots
+```
+
+restore:
+```
+restic -r s3:s3.example.org/clickhouse-backups/table_name restore latest --target /tmp/
+```
+
+more details:
+- https://itnext.io/restic-effective-backup-from-stdin-4bc1e8f083c1
+
 ## Parameters
 
 ### Common parameters
@@ -13,9 +28,14 @@
 
 ### Configuration parameters
 
+| Name    | Description         | Value |
+| ------- | ------------------- | ----- |
+| `users` | Users configuration | `{}`  |
+
+### Backup parameters
+
 | Name                     | Description                                    | Value                                                  |
 | ------------------------ | ---------------------------------------------- | ------------------------------------------------------ |
-| `users`                  | Users configuration                            | `{}`                                                   |
 | `backup.enabled`         | Enable pereiodic backups                       | `false`                                                |
 | `backup.s3Region`        | The AWS S3 region where backups are stored     | `us-east-1`                                            |
 | `backup.s3Bucket`        | The S3 bucket used for storing backups         | `s3.example.org/clickhouse-backups`                    |
