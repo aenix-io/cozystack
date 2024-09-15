@@ -1,7 +1,7 @@
 export NAME=clickhouse-operator
 export NAMESPACE=cozy-clickhouse-operator
 
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update:
 	rm -rf charts

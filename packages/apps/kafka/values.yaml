@@ -4,16 +4,20 @@
 ## @param external Enable external access from outside the cluster
 ## @param kafka.size Persistent Volume size for Kafka
 ## @param kafka.replicas Number of Kafka replicas
+## @param kafka.storageClass StorageClass used to store the Kafka data
 ## @param zookeeper.size Persistent Volume size for ZooKeeper
 ## @param zookeeper.replicas Number of ZooKeeper replicas
+## @param zookeeper.storageClass StorageClass used to store the ZooKeeper data
 ##
 external: false
 kafka:
   size: 10Gi
   replicas: 3
+  storageClass: ""
 zookeeper:
   size: 5Gi
   replicas: 3
+  storageClass: ""
 
 ## @section Configuration parameters
 

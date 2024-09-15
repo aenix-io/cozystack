@@ -4,11 +4,9 @@ kind: MariaDB
 metadata:
   name: {{ .Release.Name }}
 spec:
-  {{- if (and .Values.users.root .Values.users.root.password) }}
   rootPasswordSecretKeyRef:
-    name: {{ .Release.Name }}
-    key: root-password
-  {{- end }}
+    name: {{ .Release.Name }}-credentials
+    key: root
 
   image: "mariadb:11.0.2"
 
@@ -62,6 +60,9 @@ spec:
     size: {{ .Values.size }}
     resizeInUseVolumes: true
     waitForVolumeResize: true
+    {{- with .Values.storageClass }}
+    storageClassName: {{ . }}
+    {{- end }}
 
   {{- if .Values.external }}
   primaryService:

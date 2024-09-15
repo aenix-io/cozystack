@@ -1,7 +1,41 @@
 ## @section Common parameters
 
 ## @param external Enable external access from outside the cluster
+## @param size Persistent Volume size
 ## @param replicas Number of RabbitMQ replicas
+## @param storageClass StorageClass used to store the data
 ##
 external: false
+size: 10Gi
 replicas: 3
+storageClass: ""
+
+## @section Configuration parameters
+
+## @param users [object] Users configuration
+## Example:
+## users:
+##   user1:
+##     password: strongpassword
+##   user2:
+##     password: hackme
+##   user3:
+##     password: testtest
+##
+users: {}
+
+## @param vhosts Virtual Hosts configuration
+## Example:
+## vhosts:
+##   myapp:
+##     roles:
+##       admin:
+##       - user1
+##       - user2
+##       readonly:
+##       - user3
+##   test:
+##     roles:
+##       admin:
+##       - user3
+vhosts: {}

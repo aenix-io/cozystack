@@ -1,3 +1,30 @@
+{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace (printf "%s-credentials" .Release.Name) }}
+{{- $passwords := dict }}
+
+{{- with (index $existingSecret "data") }}
+  {{- range $k, $v := . }}
+    {{- $_ := set $passwords $k (b64dec $v) }}
+  {{- end }}
+{{- end }}
+
+{{- range $user, $u := .Values.users }}
+  {{- if $u.password }}
+    {{- $_ := set $passwords $user $u.password }}
+  {{- else if not (index $passwords $user) }}
+    {{- $_ := set $passwords $user (randAlphaNum 16) }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.users }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-credentials
+stringData:
+  {{- range $user, $u := .Values.users }}
+  {{ quote $user }}: {{ quote (index $passwords $user) }}
+  {{- end }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Secret
@@ -13,7 +40,7 @@ stringData:
     {{- range $user, $u := .Values.users }}
     SELECT 'CREATE ROLE {{ $user }} LOGIN INHERIT;'
     WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ $user }}')\gexec
-    ALTER ROLE {{ $user }} WITH PASSWORD '{{ $u.password }}' LOGIN INHERIT {{ ternary "REPLICATION" "NOREPLICATION" (default false $u.replication) }};
+    ALTER ROLE {{ $user }} WITH PASSWORD '{{ index $passwords $user }}' LOGIN INHERIT {{ ternary "REPLICATION" "NOREPLICATION" (default false $u.replication) }};
     COMMENT ON ROLE {{ $user }} IS 'user managed by helm';
     {{- end }}
     EOT

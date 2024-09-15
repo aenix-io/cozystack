@@ -3,37 +3,37 @@
 ## @param external Enable external access from outside the cluster
 ## @param size Persistent Volume size
 ## @param replicas Number of MariaDB replicas
+## @param storageClass StorageClass used to store the data
 ##
 external: false
 size: 10Gi
 replicas: 2
+storageClass: ""
 
 ## @section Configuration parameters
 
 ## @param users [object] Users configuration
 ## Example:
 ## users:
-##   root:
-##     password: strongpassword
 ##   user1:
-##     privileges: ['ALL']
 ##     maxUserConnections: 1000
 ##     password: hackme
 ##   user2:
-##     privileges: ['SELECT']
 ##     maxUserConnections: 1000
 ##     password: hackme
 ##
 users: {}
 
-## @param databases Databases configuration
+## @param databases [object] Databases configuration
 ## Example:
 ## databases:
-## - wordpress1
-## - wordpress2
-## - wordpress3
-## - wordpress4
-databases: []
+##   myapp1:
+##     roles:
+##       admin:
+##       - user1
+##       readonly:
+##       - user2
+databases: {}
 
 ## @section Backup parameters
 

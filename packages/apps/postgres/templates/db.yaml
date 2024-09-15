@@ -19,3 +19,10 @@ spec:
 
   storage:
     size: {{ required ".Values.size is required" .Values.size }}
+    {{- with .Values.storageClass }}
+    storageClass: {{ . }}
+    {{- end }}
+
+  inheritedMetadata:
+    labels:
+      policy.cozystack.io/allow-to-apiserver: "true"

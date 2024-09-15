@@ -39,6 +39,10 @@ spec:
         kind: HelmRepository
         name: cozystack-system
         namespace: cozy-system
+      {{- with $x.valuesFiles }}
+      valuesFiles:
+      {{- toYaml $x.valuesFiles | nindent 6 }}
+      {{- end }}
   {{- $values := dict }}
   {{- with $x.values }}
   {{- $values = merge . $values }}

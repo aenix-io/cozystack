@@ -1,6 +1,7 @@
-NGINX_CACHE_TAG = v0.1.0
+NGINX_CACHE_TAG = $(shell awk '$$1 == "version:" {print $$2}' Chart.yaml)
 
 include ../../../scripts/common-envs.mk
+include ../../../scripts/package.mk
 
 image: image-nginx
 
@@ -8,7 +9,6 @@ image-nginx:
 	docker buildx build --platform linux/amd64 --build-arg ARCH=amd64 images/nginx-cache \
 		--provenance false \
 		--tag $(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG)) \
-		--tag $(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG)-$(TAG)) \
 		--cache-from type=registry,ref=$(REGISTRY)/nginx-cache:latest \
 		--cache-to type=inline \
 		--metadata-file images/nginx-cache.json \

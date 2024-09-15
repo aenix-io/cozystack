@@ -44,7 +44,6 @@ spec:
         {{- omit . "enabled" | toYaml | nindent 8 }}
       {{- end }}
       priorityClassName: {{ .Values.hubble.ui.priorityClassName }}
-      serviceAccount: {{ .Values.serviceAccounts.ui.name | quote }}
       serviceAccountName: {{ .Values.serviceAccounts.ui.name | quote }}
       automountServiceAccountToken: {{ .Values.serviceAccounts.ui.automount }}
       {{- with .Values.imagePullSecrets }}
@@ -187,7 +186,7 @@ spec:
           defaultMode: 0400
           sources:
           - secret:
-              name: hubble-ui-client-certs
+              name: {{ .Values.hubble.ui.tls.client.existingSecret | default "hubble-ui-client-certs" }}
               items:
                 - key: tls.crt
                   path: client.crt

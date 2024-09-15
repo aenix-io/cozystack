@@ -7,6 +7,11 @@
             "description": "Persistent Volume size",
             "default": "4Gi"
         },
+        "storageClass": {
+            "type": "string",
+            "description": "StorageClass used to store the data",
+            "default": ""
+        },
         "replicas": {
             "type": "number",
             "description": "Number of etcd replicas",

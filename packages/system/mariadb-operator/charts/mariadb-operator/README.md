@@ -6,13 +6,13 @@
 <img src="https://mariadb-operator.github.io/mariadb-operator/assets/mariadb-operator_centered_whitebg.svg" alt="mariadb" width="100%"/>
 </p>
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.28.1](https://img.shields.io/badge/Version-0.28.1-informational?style=flat-square) ![AppVersion: v0.0.28](https://img.shields.io/badge/AppVersion-v0.0.28-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.30.0](https://img.shields.io/badge/Version-0.30.0-informational?style=flat-square) ![AppVersion: v0.0.30](https://img.shields.io/badge/AppVersion-v0.0.30-informational?style=flat-square)
 
 Run and operate MariaDB in a cloud native way
 
 ## Installing
 ```bash
-helm repo add mariadb-operator https://mariadb-operator.github.io/mariadb-operator
+helm repo add mariadb-operator https://helm.mariadb.com/mariadb-operator
 helm install mariadb-operator mariadb-operator/mariadb-operator
 ```
 
@@ -36,7 +36,7 @@ helm uninstall mariadb-operator
 | certController.ha.enabled | bool | `false` | Enable high availability |
 | certController.ha.replicas | int | `3` | Number of replicas |
 | certController.image.pullPolicy | string | `"IfNotPresent"` |  |
-| certController.image.repository | string | `"ghcr.io/mariadb-operator/mariadb-operator"` |  |
+| certController.image.repository | string | `"docker-registry3.mariadb.com/mariadb-operator/mariadb-operator"` |  |
 | certController.image.tag | string | `""` | Image tag to use. By default the chart appVersion is used |
 | certController.imagePullSecrets | list | `[]` |  |
 | certController.lookaheadValidity | string | `"2160h"` | Duration used to verify whether a certificate is valid or not. |
@@ -59,13 +59,14 @@ helm uninstall mariadb-operator
 | clusterName | string | `"cluster.local"` | Cluster DNS name |
 | extrArgs | list | `[]` | Extra arguments to be passed to the controller entrypoint |
 | extraEnv | list | `[]` | Extra environment variables to be passed to the controller |
+| extraEnvFrom | list | `[]` | Extra environment variables from preexiting ConfigMap / Secret objects used by the controller using envFrom |
 | extraVolumeMounts | list | `[]` | Extra volumes to mount to the container. |
 | extraVolumes | list | `[]` | Extra volumes to pass to pod. |
 | fullnameOverride | string | `""` |  |
 | ha.enabled | bool | `false` | Enable high availability |
 | ha.replicas | int | `3` | Number of replicas |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"ghcr.io/mariadb-operator/mariadb-operator"` |  |
+| image.repository | string | `"docker-registry3.mariadb.com/mariadb-operator/mariadb-operator"` |  |
 | image.tag | string | `""` | Image tag to use. By default the chart appVersion is used |
 | imagePullSecrets | list | `[]` |  |
 | logLevel | string | `"INFO"` | Controller log level |
@@ -78,6 +79,7 @@ helm uninstall mariadb-operator
 | nodeSelector | object | `{}` | Node selectors to add to controller Pod |
 | podAnnotations | object | `{}` | Annotations to add to controller Pod |
 | podSecurityContext | object | `{}` | Security context to add to controller Pod |
+| rbac.aggregation.enabled | bool | `true` | Specifies whether the cluster roles aggrate to view and edit predefinied roles |
 | rbac.enabled | bool | `true` | Specifies whether RBAC resources should be created |
 | resources | object | `{}` | Resources to add to controller container |
 | securityContext | object | `{}` | Security context to add to controller container |
@@ -89,12 +91,14 @@ helm uninstall mariadb-operator
 | tolerations | list | `[]` | Tolerations to add to controller Pod |
 | webhook.affinity | object | `{}` | Affinity to add to controller Pod |
 | webhook.annotations | object | `{}` | Annotations for webhook configurations. |
-| webhook.cert.caPath | string | `"/tmp/k8s-webhook-server/certificate-authority"` | Path where the CA certificate will be mounted. |
+| webhook.cert.ca.key | string | `""` | File under 'ca.path' that contains the full CA trust chain. |
+| webhook.cert.ca.path | string | `""` | Path that contains the full CA trust chain. |
 | webhook.cert.certManager.duration | string | `""` | Duration to be used in the Certificate resource, |
 | webhook.cert.certManager.enabled | bool | `false` | Whether to use cert-manager to issue and rotate the certificate. If set to false, mariadb-operator's cert-controller will be used instead. |
 | webhook.cert.certManager.issuerRef | object | `{}` | Issuer reference to be used in the Certificate resource. If not provided, a self-signed issuer will be used. |
 | webhook.cert.certManager.renewBefore | string | `""` | Renew before duration to be used in the Certificate resource. |
-| webhook.cert.path | string | `"/tmp/k8s-webhook-server/serving-certs"` | Path where the certificate will be mounted. |
+| webhook.cert.certManager.revisionHistoryLimit | int | `3` | The maximum number of CertificateRequest revisions that are maintained in the Certificate’s history. |
+| webhook.cert.path | string | `"/tmp/k8s-webhook-server/serving-certs"` | Path where the certificate will be mounted. 'tls.crt' and 'tls.key' certificates files should be under this path. |
 | webhook.cert.secretAnnotations | object | `{}` | Annotatioms to be added to webhook TLS secret. |
 | webhook.cert.secretLabels | object | `{}` | Labels to be added to webhook TLS secret. |
 | webhook.extrArgs | list | `[]` | Extra arguments to be passed to the webhook entrypoint |
@@ -104,7 +108,7 @@ helm uninstall mariadb-operator
 | webhook.ha.replicas | int | `3` | Number of replicas |
 | webhook.hostNetwork | bool | `false` | Expose the webhook server in the host network |
 | webhook.image.pullPolicy | string | `"IfNotPresent"` |  |
-| webhook.image.repository | string | `"ghcr.io/mariadb-operator/mariadb-operator"` |  |
+| webhook.image.repository | string | `"docker-registry3.mariadb.com/mariadb-operator/mariadb-operator"` |  |
 | webhook.image.tag | string | `""` | Image tag to use. By default the chart appVersion is used |
 | webhook.imagePullSecrets | list | `[]` |  |
 | webhook.nodeSelector | object | `{}` | Node selectors to add to controller Pod |

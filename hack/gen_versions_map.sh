@@ -24,22 +24,34 @@ resolved_miss_map=$(
       change_commit=$(git --no-pager blame -L"$line",+1 -- "$chart/Chart.yaml" | awk '{print $1}')
        
       if [ "$change_commit" = "00000000" ]; then
-        # Not commited yet, use previus commit
+        # Not committed yet, use previous commit
         line=$(git show HEAD:"./$chart/Chart.yaml" | awk '/^version:/ {print NR; exit}')
         commit=$(git --no-pager blame -L"$line",+1 HEAD -- "$chart/Chart.yaml" | awk '{print $1}')
         if [ $(echo $commit | cut -c1) = "^" ]; then
-          # Previus commit not exists
+          # Previous commit not exists
           commit=$(echo $commit | cut -c2-)
         fi
       else
-        # Commited, but version_map wasn't updated
+        # Committed, but version_map wasn't updated
         line=$(git show HEAD:"./$chart/Chart.yaml" | awk '/^version:/ {print NR; exit}')
         change_commit=$(git --no-pager blame -L"$line",+1 HEAD -- "$chart/Chart.yaml" | awk '{print $1}')
         if [ $(echo $change_commit | cut -c1) = "^" ]; then
-          # Previus commit not exists
+          # Previous commit not exists
           commit=$(echo $change_commit | cut -c2-)
         else
           commit=$(git describe --always "$change_commit~1")
+        fi
+      fi
+
+      # Check if the commit belongs to the main branch
+      if ! git merge-base --is-ancestor "$commit" main; then
+        # Find the closest parent commit that belongs to main
+        commit_in_main=$(git log --pretty=format:"%h" main -- "$chart" | head -n 1)
+        if [ -n "$commit_in_main" ]; then
+          commit="$commit_in_main"
+        else
+          # No valid commit found in main branch for $chart, skipping..."
+          continue
         fi
       fi
     fi

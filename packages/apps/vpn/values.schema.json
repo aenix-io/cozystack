@@ -11,6 +11,19 @@
             "type": "number",
             "description": "Number of VPN-server replicas",
             "default": 2
+        },
+        "host": {
+            "type": "string",
+            "description": "Host used to substitute into generated URLs",
+            "default": ""
+        },
+        "externalIPs": {
+            "type": "array",
+            "description": "List of externalIPs for service.",
+            "default": "[]",
+            "items": {
+                "type": "string"
+            }
         }
     }
 }

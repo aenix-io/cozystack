@@ -13,10 +13,11 @@ Service utilizes the Spotahome Redis Operator for efficient management and orche
 
 ### Common parameters
 
-| Name       | Description                                     | Value   |
-| ---------- | ----------------------------------------------- | ------- |
-| `external` | Enable external access from outside the cluster | `false` |
-| `size`     | Persistent Volume size                          | `1Gi`   |
-| `replicas` | Number of Redis replicas                        | `2`     |
+| Name           | Description                                     | Value   |
+| -------------- | ----------------------------------------------- | ------- |
+| `external`     | Enable external access from outside the cluster | `false` |
+| `size`         | Persistent Volume size                          | `1Gi`   |
+| `replicas`     | Number of Redis replicas                        | `2`     |
+| `storageClass` | StorageClass used to store the data             | `""`    |
 
 

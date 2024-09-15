@@ -23,9 +23,6 @@ spec:
   interval: 1m0s
   timeout: 5m0s
   values:
-    {{- with .Values.host }}
-    host: grafana.{{ . }}
-    {{- end }}
     metricsStorages:
     - name: shortterm
       retentionPeriod: "3d"

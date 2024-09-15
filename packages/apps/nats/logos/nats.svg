@@ -1,76 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Generator: Adobe Illustrator 24.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-
-<svg
-   version="1.0"
-   id="katman_1"
-   x="0px"
-   y="0px"
-   viewBox="0 0 440.79001 456.32996"
-   xml:space="preserve"
-   sodipodi:docname="NATS.io.svg"
-   width="440.79001"
-   height="456.32999"
-   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"><defs
-   id="defs843" /><sodipodi:namedview
-   id="namedview841"
-   pagecolor="#ffffff"
-   bordercolor="#666666"
-   borderopacity="1.0"
-   inkscape:pageshadow="2"
-   inkscape:pageopacity="0.0"
-   inkscape:pagecheckerboard="0"
-   showgrid="false"
-   width="440.79px"
-   height="456.32999px"
-   inkscape:zoom="0.27371294"
-   inkscape:cx="524.2719"
-   inkscape:cy="823.85584"
-   inkscape:window-width="1312"
-   inkscape:window-height="969"
-   inkscape:window-x="0"
-   inkscape:window-y="25"
-   inkscape:window-maximized="0"
-   inkscape:current-layer="katman_1" />
-<style
-   type="text/css"
-   id="style824">
-	.st0{fill:#32A574;}
-	.st1{fill:#2AAAE1;}
-	.st2{fill:#8EC044;}
-	.st3{fill:#385C93;}
-	.st4{fill:#FFFFFF;}
-</style>
-<path
-   class="st0"
-   d="M 220.4,0 H 440.79 V 178.67 H 220.4 Z"
-   id="path826" />
-<path
-   class="st1"
-   d="M 0,0 H 220.39 V 178.67 H 0 Z"
-   id="path828" />
-<path
-   class="st2"
-   d="M 220.4,178.83 H 440.79 V 357.5 H 220.4 Z"
-   id="path830" />
-<path
-   class="st3"
-   d="M 0,178.83 H 220.39 V 357.5 H 0 Z"
-   id="path832" />
-<path
-   class="st2"
-   d="m 188,356.52 107.82,99.81 v -99.81 z"
-   id="path834" />
-<path
-   class="st3"
-   d="m 220.4,356.52 1.15,31.41 -34.52,-32.23 z"
-   id="path836" />
-<path
-   class="st4"
-   d="M 311.7,231.03 V 83.12 h 52.69 V 274.39 H 284.54 L 123.37,123.86 V 274.55 H 70.52 V 83.12 h 82.63 z"
-   id="path838" />
+<svg width="144" height="144" viewBox="0 0 144 144" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="144" height="144" rx="24" fill="url(#paint0_linear_681_2821)"/>
+<rect width="144" height="144" rx="24" fill="black" fill-opacity="0.3"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M117.48 25H27V98.9693H66.0689L87.7075 119V98.9693H117.48V25Z" fill="white"/>
+<path d="M92.1352 72.4552V42.625H102.773V81.1999H86.6519L54.114 50.8414V81.2322H43.4443V42.625H60.1262L92.1352 72.4552Z" fill="black"/>
+<defs>
+<linearGradient id="paint0_linear_681_2821" x1="10" y1="15.5" x2="144" y2="131.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="#385C93"/>
+<stop offset="1" stop-color="#32A574"/>
+</linearGradient>
+</defs>
 </svg>

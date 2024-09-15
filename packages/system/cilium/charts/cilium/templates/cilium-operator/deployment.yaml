@@ -92,6 +92,10 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
+        {{- if .Values.clustermesh.enableEndpointSliceSynchronization }}
+        - name: CILIUM_CLUSTERMESH_CONFIG
+          value: /var/lib/cilium/clustermesh/
+        {{- end }}
         - name: CILIUM_DEBUG
           valueFrom:
             configMapKeyRef:
@@ -134,11 +138,9 @@ spec:
         {{- end }}
         {{- if .Values.k8sServiceHost }}
         - name: KUBERNETES_SERVICE_HOST
-          value: {{ .Values.k8sServiceHost | quote }}
-        {{- end }}
-        {{- if .Values.k8sServicePort }}
+          value: {{ include "k8sServiceHost" . }}
         - name: KUBERNETES_SERVICE_PORT
-          value: {{ .Values.k8sServicePort | quote }}
+          value: {{ include "k8sServicePort" . }}
         {{- end }}
         {{- if .Values.azure.enabled }}
         {{- if .Values.azure.subscriptionID }}
@@ -171,12 +173,16 @@ spec:
         ports:
         - name: prometheus
           containerPort: {{ .Values.operator.prometheus.port }}
+        {{- if .Values.operator.hostNetwork }}
           hostPort: {{ .Values.operator.prometheus.port }}
+        {{- end }}
           protocol: TCP
         {{- end }}
         livenessProbe:
           httpGet:
+        {{- if .Values.operator.hostNetwork }}
             host: {{ .Values.ipv4.enabled | ternary "127.0.0.1" "::1" | quote }}
+        {{- end }}
             path: /healthz
             port: 9234
             scheme: HTTP
@@ -185,7 +191,9 @@ spec:
           timeoutSeconds: 3
         readinessProbe:
           httpGet:
+        {{- if .Values.operator.hostNetwork }}
             host: {{ .Values.ipv4.enabled | ternary "127.0.0.1" "::1" | quote }}
+        {{- end }}
             path: /healthz
             port: 9234
             scheme: HTTP
@@ -201,11 +209,16 @@ spec:
         - name: etcd-config-path
           mountPath: /var/lib/etcd-config
           readOnly: true
-        {{- if or .Values.etcd.ssl .Values.etcd.managed }}
+        {{- if .Values.etcd.ssl }}
         - name: etcd-secrets
           mountPath: /var/lib/etcd-secrets
           readOnly: true
         {{- end }}
+        {{- end }}
+        {{- if .Values.clustermesh.enableEndpointSliceSynchronization }}
+        - name: clustermesh-secrets
+          mountPath: /var/lib/cilium/clustermesh
+          readOnly: true
         {{- end }}
         {{- if .Values.kubeConfigPath }}
         - name: kube-config
@@ -242,17 +255,12 @@ spec:
           {{- toYaml . | trim | nindent 10 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
-      hostNetwork: true
-      {{- if and .Values.etcd.managed (not .Values.etcd.k8sService) }}
-      # In managed etcd mode, Cilium must be able to resolve the DNS name of
-      # the etcd service
-      dnsPolicy: ClusterFirstWithHostNet
-      {{- else if .Values.operator.dnsPolicy }}
+      hostNetwork: {{ .Values.operator.hostNetwork }}
+      {{- if .Values.operator.dnsPolicy }}
       dnsPolicy: {{ .Values.operator.dnsPolicy }}
       {{- end }}
       restartPolicy: Always
       priorityClassName: {{ include "cilium.priorityClass" (list $ .Values.operator.priorityClassName "system-cluster-critical") }}
-      serviceAccount: {{ .Values.serviceAccounts.operator.name | quote }}
       serviceAccountName: {{ .Values.serviceAccounts.operator.name | quote }}
       automountServiceAccountToken: {{ .Values.serviceAccounts.operator.automount }}
       {{- with .Values.operator.affinity }}
@@ -277,6 +285,15 @@ spec:
       nodeSelector:
         {{- toYaml . | trim | nindent 8 }}
       {{- end }}
+      {{- if and .Values.clustermesh.enableEndpointSliceSynchronization .Values.clustermesh.config.enabled (not (and .Values.clustermesh.useAPIServer .Values.clustermesh.apiserver.kvstoremesh.enabled )) }}
+      hostAliases:
+      {{- range $cluster := .Values.clustermesh.config.clusters }}
+      {{- range $ip := $cluster.ips }}
+      - ip: {{ $ip }}
+        hostnames: [ "{{ $cluster.name }}.{{ $.Values.clustermesh.config.domain }}" ]
+      {{- end }}
+      {{- end }}
+      {{- end }}
       {{- with .Values.operator.tolerations }}
       tolerations:
         {{- toYaml . | trim | nindent 8 }}
@@ -296,7 +313,7 @@ spec:
           items:
           - key: etcd-config
             path: etcd.config
-      {{- if or .Values.etcd.ssl .Values.etcd.managed }}
+      {{- if .Values.etcd.ssl }}
         # To read the k8s etcd secrets in case the user might want to use TLS
       - name: etcd-secrets
         secret:
@@ -333,5 +350,39 @@ spec:
       {{- end }}
       {{- with .Values.operator.extraVolumes }}
       {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- if .Values.clustermesh.enableEndpointSliceSynchronization }}
+        # To read the clustermesh configuration
+      - name: clustermesh-secrets
+        projected:
+          # note: the leading zero means this number is in octal representation: do not remove it
+          defaultMode: 0400
+          sources:
+          - secret:
+              name: cilium-clustermesh
+              optional: true
+              # note: items are not explicitly listed here, since the entries of this secret
+              # depend on the peers configured, and that would cause a restart of all agents
+              # at every addition/removal. Leaving the field empty makes each secret entry
+              # to be automatically projected into the volume as a file whose name is the key.
+          - secret:
+              name: clustermesh-apiserver-remote-cert
+              optional: true
+              items:
+              - key: tls.key
+                path: common-etcd-client.key
+              - key: tls.crt
+                path: common-etcd-client.crt
+          {{- if not .Values.tls.caBundle.enabled }}
+              - key: ca.crt
+                path: common-etcd-client-ca.crt
+          {{- else }}
+          - {{ .Values.tls.caBundle.useSecret | ternary "secret" "configMap" }}:
+              name: {{ .Values.tls.caBundle.name }}
+              optional: true
+              items:
+              - key: {{ .Values.tls.caBundle.key }}
+                path: common-etcd-client-ca.crt
+          {{- end }}
       {{- end }}
 {{- end }}

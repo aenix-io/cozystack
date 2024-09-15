@@ -4,7 +4,7 @@ export NAME=kubeovn
 export NAMESPACE=cozy-$(NAME)
 
 include ../../../scripts/common-envs.mk
-include ../../../scripts/package-system.mk
+include ../../../scripts/package.mk
 
 update:
 	rm -rf charts && mkdir -p charts/kube-ovn

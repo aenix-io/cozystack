@@ -48,7 +48,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: INFRACLUSTER_LABELS
-              value: "csi-driver/cluster=test"
+              value: "cluster.x-k8s.io/cluster-name={{ .Release.Name }}"
             - name: INFRA_STORAGE_CLASS_ENFORCEMENT
               valueFrom:
                 configMapKeyRef:

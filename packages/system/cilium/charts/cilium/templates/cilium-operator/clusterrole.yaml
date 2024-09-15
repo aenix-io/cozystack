@@ -1,4 +1,4 @@
-{{- if and .Values.operator.enabled .Values.serviceAccounts.operator.create }}
+{{- if and .Values.operator.enabled .Values.serviceAccounts.operator.create .Values.rbac.create }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -56,6 +56,12 @@ rules:
   resources:
   - endpointslices
   verbs:
+{{- if .Values.clustermesh.enableEndpointSliceSynchronization }}
+  - create
+  - update
+  - delete
+  - deletecollection
+{{- end }}
   - get
   - list
   - watch
@@ -94,6 +100,15 @@ rules:
   - update
   - delete
   - patch
+{{- end }}
+{{- if .Values.clustermesh.enableEndpointSliceSynchronization }}
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - patch
+  - create
 {{- end }}
 - apiGroups:
   - cilium.io
@@ -215,6 +230,7 @@ rules:
   resources:
   - ciliumloadbalancerippools
   - ciliumpodippools
+  - ciliumbgppeeringpolicies
   - ciliumbgpclusterconfigs
   - ciliumbgpnodeconfigoverrides
   verbs:
@@ -290,5 +306,40 @@ rules:
   verbs:
   - update
   - patch
+{{- end }}
+{{- if or .Values.gatewayAPI.enabled .Values.clustermesh.enableMCSAPISupport }}
+- apiGroups:
+  - multicluster.x-k8s.io
+  resources:
+  - serviceimports
+  verbs:
+  - get
+  - list
+  - watch
+{{- if .Values.clustermesh.enableMCSAPISupport }}
+  - create
+  - update
+  - patch
+  - delete
+{{- end }}
+{{- end }}
+{{- if .Values.clustermesh.enableMCSAPISupport }}
+- apiGroups:
+  - multicluster.x-k8s.io
+  resources:
+  - serviceexports
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - update
+  - patch
+  - delete
 {{- end }}
 {{- end }}

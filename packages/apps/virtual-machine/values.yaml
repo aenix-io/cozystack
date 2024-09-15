@@ -1,18 +1,43 @@
 ## @section Common parameters
 
 ## @param external Enable external access from outside the cluster
+## @param externalPorts [array] Specify ports to forward from outside the cluster
 ## @param running Determines if the virtual machine should be running
-## @param password The default password for the virtual machine
-## @param image The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora`
-## @param disk The size of the disk allocated for the virtual machine
+## @param image The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine`, `fedora` and `talos`
+## @param storageClass StorageClass used to store the data
 ## @param resources.cpu The number of CPU cores allocated to the virtual machine
 ## @param resources.memory The amount of memory allocated to the virtual machine
+## @param resources.disk The size of the disk allocated for the virtual machine
 
 external: false
+externalPorts:
+- 22
+
 running: true
-password: hackme
 image: ubuntu
-disk: 5Gi
+storageClass: replicated
 resources:
   cpu: 1
   memory: 1024M
+  disk: 5Gi
+
+## @param sshKeys [array] List of SSH public keys for authentication. Can be a single key or a list of keys.
+## Example:
+## sshKeys:
+##   - ssh-rsa ...
+##   - ssh-ed25519 ...
+##
+sshKeys: []
+
+## @param cloudInit cloud-init user data config. See cloud-init documentation for more details.
+## - https://cloudinit.readthedocs.io/en/latest/explanation/format.html
+## - https://cloudinit.readthedocs.io/en/latest/reference/examples.html
+## Example:
+## cloudInit: |
+##   #cloud-config
+##   password: ubuntu
+##   chpasswd: { expire: False }
+##
+cloudInit: |
+  #cloud-config
+

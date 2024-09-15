@@ -1,3 +1,20 @@
+{{- define "cozystack.namespace-anotations" }}
+{{- $context := index . 0 }}
+{{- $existingNS := index . 1 }}
+{{- range $x := list "etcd" "monitoring" "ingress" "seaweedfs" }}
+{{- if (index $context.Values $x) }}
+namespace.cozystack.io/{{ $x }}: "{{ include "tenant.name" $context }}"
+{{- else }}
+namespace.cozystack.io/{{ $x }}: "{{ index $existingNS.metadata.annotations (printf "namespace.cozystack.io/%s" $x) | required (printf "namespace %s has no namespace.cozystack.io/%s annotation" $context.Release.Namespace $x) }}"
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- $existingNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- if not $existingNS }}
+{{- fail (printf "error lookup existing namespace: %s" .Release.Namespace) }}
+{{- end }}
+
 {{- if ne (include "tenant.name" .) "tenant-root" }}
 ---
 apiVersion: v1
@@ -5,22 +22,25 @@ kind: Namespace
 metadata:
   name: {{ include "tenant.name" . }}
   {{- if hasPrefix "tenant-" .Release.Namespace }}
-  {{- $existingNS := lookup "v1" "Namespace" "" .Release.Namespace }}
-  {{- if $existingNS }}
   annotations:
     {{- if .Values.host }}
     namespace.cozystack.io/host: "{{ .Values.host }}"
     {{- else }}
-    {{ $parentHost := index $existingNS.metadata.annotations "namespace.cozystack.io/host" | required (printf "namespace %s has no namespace.cozystack.io/host annotation" $.Release.Namespace) }}
+    {{ $parentHost := index $existingNS.metadata.annotations "namespace.cozystack.io/host" | required (printf "namespace %s has no namespace.cozystack.io/host annotation" .Release.Namespace) }}
     namespace.cozystack.io/host: "{{ splitList "-" (include "tenant.name" .) | last }}.{{ $parentHost }}"
     {{- end }}
-    {{- range $x := list "etcd" "monitoring" "ingress" }}
-    {{- if (index $.Values $x) }}
-    namespace.cozystack.io/{{ $x }}: "{{ include "tenant.name" $ }}"
-    {{- else }}
-    namespace.cozystack.io/{{ $x }}: "{{ index $existingNS.metadata.annotations (printf "namespace.cozystack.io/%s" $x) | required (printf "namespace %s has no namespace.cozystack.io/%s annotation" $.Release.Namespace $x) }}"
+    {{- include "cozystack.namespace-anotations" (list . $existingNS) | nindent 4 }}
+  labels:
+    tenant.cozystack.io/{{ include "tenant.name" $ }}: ""
+    {{- if hasPrefix "tenant-" .Release.Namespace }}
+    {{- $parts := splitList "-" .Release.Namespace }}
+    {{- range $i, $v := $parts }}
+    {{- if ne $i 0 }}
+    tenant.cozystack.io/{{ join "-" (slice $parts 0 (add $i 1)) }}: ""
     {{- end }}
     {{- end }}
+    {{- end }}
+    {{- include "cozystack.namespace-anotations" (list $ $existingNS) | nindent 4 }}
   ownerReferences:
   - apiVersion: v1
     blockOwnerDeletion: true
@@ -28,8 +48,5 @@ metadata:
     kind: Namespace
     name: {{ .Release.Namespace }}
     uid: {{ $existingNS.metadata.uid }}
-  {{- else }}
-  {{- fail (printf "error lookup exiting namespace: %s" .Release.Namespace) }}
-  {{- end }}
   {{- end }}
 {{- end }}

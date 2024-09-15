@@ -1,0 +1,129 @@
+global:
+  enableSecurity: true
+  serviceAccountName: "tenant-foo-seaweedfs"
+  extraEnvironmentVars:
+    WEED_CLUSTER_SW_MASTER: "seaweedfs-master:9333"
+    WEED_CLUSTER_SW_FILER: "seaweedfs-filer-client:8888"
+
+seaweedfs:
+  
+  master:
+    replicas: 3
+    volumeSizeLimitMB: 100
+    #  replication type is XYZ:
+    # X number of replica in other data centers
+    # Y number of replica in other racks in the same data center
+    # Z number of replica in other servers in the same rack
+    defaultReplication: "001"
+  
+    data:
+      type: "emptyDir"
+  
+    logs:
+      type: ""
+  
+  volume:
+    replicas: 2
+    # minimum free disk space(in percents). If free disk space lower this value - all volumes marks as ReadOnly
+    minFreeSpacePercent: 5
+  
+    dataDirs:
+    - name: data1
+      type: "persistentVolumeClaim"
+      size: "10Gi"
+      maxVolumes: 0
+  
+  filer:
+    replicas: 2
+    #  replication type is XYZ:
+    # X number of replica in other data centers
+    # Y number of replica in other racks in the same data center
+    # Z number of replica in other servers in the same rack
+    defaultReplicaPlacement: "001"
+    data:
+      type: "emptyDir"
+  
+    logs:
+      type: ""
+  
+    extraEnvironmentVars:
+      WEED_LEVELDB2_ENABLED: "false"
+      WEED_POSTGRES2_ENABLED: "true"
+      WEED_POSTGRES2_CREATETABLE: |
+        CREATE TABLE IF NOT EXISTS "%s" (
+          dirhash   BIGINT,
+          name      VARCHAR(65535),
+          directory VARCHAR(65535),
+          meta      bytea,
+          PRIMARY KEY (dirhash, name)
+        );
+    secretExtraEnvironmentVars:
+      WEED_POSTGRES2_HOSTNAME:
+        secretKeyRef:
+          key: host
+          name: seaweedfs-db-app
+      WEED_POSTGRES2_DATABASE:
+        secretKeyRef:
+          key: dbname
+          name: seaweedfs-db-app
+      WEED_POSTGRES2_USERNAME:
+        secretKeyRef:
+          key: username
+          name: seaweedfs-db-app
+      WEED_POSTGRES2_PASSWORD:
+        secretKeyRef:
+          key: password
+          name: seaweedfs-db-app
+
+    s3:
+      enabled: true
+      port: 8333
+      httpsPort: 0
+      # Suffix of the host name, {bucket}.{domainName}
+      domainName: ""
+      # enable user & permission to s3 (need to inject to all services)
+      enableAuth: false
+      # set to the name of an existing kubernetes Secret with the s3 json config file
+      # should have a secret key called seaweedfs_s3_config with an inline json configure
+      existingConfigSecret: null
+      auditLogConfig: {}
+  
+  s3:
+    enableAuth: true
+  
+    logs:
+      type: ""
+   
+    ingress:
+      enabled: true
+      className: "tenant-root"
+      host: "seaweedfs2.demo.cozystack.io"
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        acme.cert-manager.io/http01-ingress-class: tenant-root
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      tls:
+        - hosts:
+          - seaweedfs.demo.cozystack.io
+          secretName: seaweedfs-s3-ingress-tls
+
+  cosi:
+    enabled: true
+    podLabels:
+      policy.cozystack.io/allow-to-apiserver: "true"
+    driverName: "seaweedfs.objectstorage.k8s.io"
+    bucketClassName: "seaweedfs"
+    image: "ghcr.io/seaweedfs/seaweedfs-cosi-driver:v0.1.1"
+    region: ""
+  
+    sidecar:
+      image: "ghcr.io/kvaps/test:cosi-provisioner-sidecar-25"
+  
+  certificates:
+    commonName: "SeaweedFS CA"
+    ipAddresses: []
+    keyAlgorithm: RSA
+    keySize: 2048
+    duration: 2160h  # 90d
+    renewBefore: 360h  # 15d

@@ -53,6 +53,9 @@ spec:
         {{- with .Values.kafka.size }}
         size: {{ . }}
         {{- end }}
+        {{- with .Values.kafka.storageClass }}
+        class: {{ . }}
+        {{- end }}
         deleteClaim: true
   zookeeper:
     replicas: {{ .Values.zookeeper.replicas }}
@@ -61,7 +64,15 @@ spec:
       {{- with .Values.zookeeper.size }}
       size: {{ . }}
       {{- end }}
+      {{- with .Values.kafka.storageClass }}
+      class: {{ . }}
+      {{- end }}
       deleteClaim: false
   entityOperator:
     topicOperator: {}
     userOperator: {}
+    template:
+      pod:
+        metadata:
+         labels:
+           policy.cozystack.io/allow-to-apiserver: "true"

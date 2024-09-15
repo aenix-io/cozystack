@@ -7,31 +7,35 @@
       "description": "Enable external access from outside the cluster",
       "default": false
     },
+    "externalPorts": {
+      "type": "array",
+      "description": "Specify ports to forward from outside the cluster",
+      "default": "[]",
+      "items": {
+        "type": "integer"
+      }
+    },
     "running": {
       "type": "boolean",
       "description": "Determines if the virtual machine should be running",
       "default": true
     },
-    "password": {
-      "type": "string",
-      "description": "The default password for the virtual machine",
-      "default": "hackme"
-    },
     "image": {
       "type": "string",
-      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine` and `fedora`",
+      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine`, `fedora` and `talos`",
       "default": "ubuntu",
       "enum": [
         "ubuntu",
         "cirros",
         "alpine",
-        "fedora"
+        "fedora",
+        "talos"
       ]
     },
-    "disk": {
+    "storageClass": {
       "type": "string",
-      "description": "The size of the disk allocated for the virtual machine",
-      "default": "5Gi"
+      "description": "StorageClass used to store the data",
+      "default": "replicated"
     },
     "resources": {
       "type": "object",
@@ -46,8 +50,26 @@
           "description": "The amount of memory allocated to the virtual machine",
           "default": "1024M",
           "x-display": "slider"
+        },
+        "disk": {
+          "type": "string",
+          "description": "The size of the disk allocated for the virtual machine",
+          "default": "5Gi"
         }
       }
+    },
+    "sshKeys": {
+      "type": "array",
+      "description": "List of SSH public keys for authentication. Can be a single key or a list of keys.",
+      "default": "[]",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cloudInit": {
+      "type": "string",
+      "description": "cloud-init user data config. See cloud-init documentation for more details.",
+      "default": "#cloud-config\n"
     }
   }
 }

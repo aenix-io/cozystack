@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-dashboard-resources
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  resourceNames:
+  - {{ .Release.Name }}-default-user
+  {{- range $name, $u := .Values.users }}
+  - {{ $.Release.Name }}-{{ kebabcase $name }}-credentials
+  {{- end }}
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - services
+  resourceNames:
+  - {{ .Release.Name }}
+  verbs: ["get", "list", "watch"]

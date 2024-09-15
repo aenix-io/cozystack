@@ -1,0 +1,25 @@
+{{- if .Values.seaweedfs }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: seaweedfs
+  namespace: {{ include "tenant.name" . }}
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    cozystack.io/ui: "true"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  chart:
+    spec:
+      chart: seaweedfs
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-extra
+        namespace: cozy-public
+      version: "*"
+  interval: 1m0s
+  timeout: 5m0s
+{{- end }}

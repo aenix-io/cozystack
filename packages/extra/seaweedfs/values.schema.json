@@ -1,0 +1,26 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "host": {
+            "type": "string",
+            "description": "The hostname used to access the grafana externally (defaults to 'grafana' subdomain for the tenant host).",
+            "default": ""
+        },
+        "replicas": {
+            "type": "number",
+            "description": "Persistent Volume size for NATS",
+            "default": 2
+        },
+        "size": {
+            "type": "string",
+            "description": "Persistent Volume size",
+            "default": "10Gi"
+        },
+        "storageClass": {
+            "type": "string",
+            "description": "StorageClass used to store the data",
+            "default": ""
+        }
+    }
+}

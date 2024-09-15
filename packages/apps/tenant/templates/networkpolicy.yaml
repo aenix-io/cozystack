@@ -29,55 +29,75 @@ spec:
       - world
 ---
 apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
+kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: allow-from-system
-  namespace: {{ include "tenant.name" . }}
+  name: {{ include "tenant.name" . }}-egress
 spec:
-  endpointSelector: {}
-  ingress:
-  - fromEntities:
-    - cluster
----
-{{- if ne (include "tenant.name" .) "tenant-root" }}
-apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
-  name: allow-from-upper-tenants
-  namespace: {{ include "tenant.name" . }}
-spec:
-  endpointSelector: {}
-  ingress:
-  - fromEndpoints:
+  endpointSelector:
+    matchLabels:
+      "k8s:io.kubernetes.pod.namespace": "{{ include "tenant.name" . }}"
+  egress:
+  - toEndpoints:
     - matchLabels:
-        "kubernetes.io/metadata.name": "tenant-root"
+        "k8s:io.cilium.k8s.namespace.labels.tenant.cozystack.io/{{ include "tenant.name" . }}": ""
+  {{- if ne (include "tenant.name" .) "tenant-root" }}
+  - toEndpoints:
     {{- if hasPrefix "tenant-" .Release.Namespace }}
     {{- $parts := splitList "-" .Release.Namespace }}
     {{- range $i, $v := $parts }}
     {{- if ne $i 0 }}
     - matchLabels:
-        "kubernetes.io/metadata.name": {{ join "-" (slice $parts 0 (add $i 1)) }}
+        "k8s:io.kubernetes.pod.namespace": {{ join "-" (slice $parts 0 (add $i 1)) }}
     {{- end }}
     {{- end }}
     {{- end }}
-{{- end }}
+  {{- end }}
 ---
-{{- if not .Values.etcd }}
-{{- $existingNS := lookup "v1" "Namespace" "" .Release.Namespace }}
 apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
+kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: allow-to-etcd
-  namespace: {{ include "tenant.name" . }}
+  name: {{ include "tenant.name" . }}-ingress
 spec:
   endpointSelector:
     matchLabels:
-      policy.cozystack.io/allow-to-etcd: "true"
-  egress:
-  - toEndpoints:
+      "k8s:io.kubernetes.pod.namespace": "{{ include "tenant.name" . }}"
+  ingress:
+  - fromEntities:
+    - kube-apiserver
+  - fromEndpoints:
+      - matchLabels:
+          "k8s:io.cilium.k8s.namespace.labels.cozystack.io/system": "true"
+  - fromEndpoints:
+      - matchLabels:
+          "k8s:io.kubernetes.pod.namespace": kube-system
+  {{- if ne (include "tenant.name" .) "tenant-root" }}
+  - fromEndpoints:
+    {{- if hasPrefix "tenant-" .Release.Namespace }}
+    {{- $parts := splitList "-" .Release.Namespace }}
+    {{- range $i, $v := $parts }}
+    {{- if ne $i 0 }}
     - matchLabels:
-        io.kubernetes.pod.namespace: "{{ index $existingNS.metadata.annotations "namespace.cozystack.io/etcd" }}"
-        cozystack.io/service: etcd
+        "k8s:io.kubernetes.pod.namespace": {{ join "-" (slice $parts 0 (add $i 1)) }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+---
+{{- if .Values.etcd }}
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: {{ include "tenant.name" . }}-ingress-etcd
+spec:
+  endpointSelector:
+    matchLabels:
+      "k8s:io.kubernetes.pod.namespace": "{{ include "tenant.name" . }}"
+      cozystack.io/service: etcd
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        "k8s:io.cilium.k8s.namespace.labels.namespace.cozystack.io/etcd": "{{ include "tenant.name" . }}"
+        policy.cozystack.io/allow-to-etcd: "true"
 {{- end }}
 ---
 apiVersion: cilium.io/v2
@@ -107,7 +127,7 @@ spec:
   egress:
   - toEndpoints:
     - matchLabels:
-        io.kubernetes.pod.namespace: kube-system
+        "k8s:io.kubernetes.pod.namespace": kube-system
         k8s-app: kube-dns
 ---
 apiVersion: cilium.io/v2
@@ -120,7 +140,7 @@ spec:
   egress:
   - toEndpoints:
       - matchLabels:
-          io.kubernetes.pod.namespace: cozy-dashboard
+          "k8s:io.kubernetes.pod.namespace": cozy-dashboard
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy

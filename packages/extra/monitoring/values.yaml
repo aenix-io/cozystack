@@ -10,10 +10,20 @@ metricsStorages:
   retentionPeriod: "3d"
   deduplicationInterval: "5m"
   storage: 10Gi
+  storageClassName: ""
 - name: longterm
   retentionPeriod: "14d"
   deduplicationInterval: "15s"
   storage: 10Gi
+  storageClassName: ""
+
+## @param logsStorages [array] Configuration of logs storage instances
+##
+logsStorages:
+- name: generic
+  retentionPeriod: "1"
+  storage: 10Gi
+  storageClassName: replicated
 
 ## @param oncall.enabled Enable Grafana OnCall
 ## 

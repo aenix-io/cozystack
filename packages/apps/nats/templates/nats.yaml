@@ -30,7 +30,9 @@ spec:
             pvc:
               enabled: true
               size: 10Gi
-              storageClassName: local
+              {{- with .Values.storageClass }}
+              storageClassName: {{ . }}
+              {{- end }}
       promExporter:
         enabled: true
         podMonitor:

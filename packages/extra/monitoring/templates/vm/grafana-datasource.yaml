@@ -4,13 +4,13 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
-  name: {{ .name }}
+  name: vm-{{ .name }}
 spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
   datasource:
-    name: {{ .name }}
+    name: vm-{{ .name }}
     type: prometheus
     access: proxy
     url: http://vmselect-{{ .name }}.{{ $.Release.Namespace }}.svc:8481/select/0/prometheus/

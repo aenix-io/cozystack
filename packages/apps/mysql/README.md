@@ -67,18 +67,19 @@ more details:
 
 ### Common parameters
 
-| Name       | Description                                     | Value   |
-| ---------- | ----------------------------------------------- | ------- |
-| `external` | Enable external access from outside the cluster | `false` |
-| `size`     | Persistent Volume size                          | `10Gi`  |
-| `replicas` | Number of MariaDB replicas                      | `2`     |
+| Name           | Description                                     | Value   |
+| -------------- | ----------------------------------------------- | ------- |
+| `external`     | Enable external access from outside the cluster | `false` |
+| `size`         | Persistent Volume size                          | `10Gi`  |
+| `replicas`     | Number of MariaDB replicas                      | `2`     |
+| `storageClass` | StorageClass used to store the data             | `""`    |
 
 ### Configuration parameters
 
 | Name        | Description             | Value |
 | ----------- | ----------------------- | ----- |
 | `users`     | Users configuration     | `{}`  |
-| `databases` | Databases configuration | `[]`  |
+| `databases` | Databases configuration | `{}`  |
 
 ### Backup parameters
 

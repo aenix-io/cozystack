@@ -51,166 +51,160 @@ rules:
   - leases
 {{ if .Values.watchNamespace }}
 - apiGroups:
-    - ""
+  - ""
   resources:
-    - endpoints
-    - endpointslices
+  - endpoints
+  - endpointslices
   verbs:
-    - 'list'
-    - 'watch'
-    - 'get'
+  - list
+  - watch
+  - get
 - apiGroups:
-    - ""
+  - ""
   resources:
-    - pods
-    - configmaps
-    - configmaps/finalizers
-    - persistentvolumeclaims
-    - persistentvolumeclaims/finalizers
-    - secrets
-    - secrets/finalizers
-    - services
-    - services/finalizers
-    - serviceaccounts
-    - serviceaccounts/finalizers
+  - pods
+  - configmaps
+  - configmaps/finalizers
+  - persistentvolumeclaims
+  - persistentvolumeclaims/finalizers
+  - secrets
+  - secrets/finalizers
+  - services
+  - services/finalizers
+  - serviceaccounts
+  - serviceaccounts/finalizers
   verbs:
-    - '*'
+  - "*"
 - apiGroups:
-    - apps
+  - apps
   resources:
-    - deployments
-    - deployments/finalizers
-    - replicasets
-    - statefulsets
-    - statefulsets/finalizers
-    - statefulsets/status
+  - deployments
+  - deployments/finalizers
+  - replicasets
+  - statefulsets
+  - statefulsets/finalizers
+  - statefulsets/status
   verbs:
-    - '*'
+  - "*"
 - apiGroups:
-    - policy
+  - policy
   resources:
-    - poddisruptionbudgets
-    - poddisruptionbudgets/finalizers
+  - poddisruptionbudgets
+  - poddisruptionbudgets/finalizers
   verbs:
-    - '*'
+  - "*"
 - apiGroups:
-    - monitoring.coreos.com
+  - monitoring.coreos.com
   resources:
-    - '*'
+  - "*"
   verbs:
-    - '*'
+  - "*"
 - apiGroups:
-    - operator.victoriametrics.com
+  - operator.victoriametrics.com
   resources:
+  - vlogs
+    - vlogs/finalizers
     - vmagents
     - vmagents/finalizers
-    - vmalerts
-    - vmalerts/finalizers
     - vmalertmanagers
     - vmalertmanagers/finalizers
+    - vmalertmanagerconfigs
+    - vmalertmanagerconfigs/finalizers
+    - vmalerts
+    - vmalerts/finalizers
+    - vmauths
+    - vmauths/finalizers
+    - vmusers
+    - vmusers/finalizers
     - vmclusters
     - vmclusters/finalizers
     - vmpodscrapes
     - vmpodscrapes/finalizers
     - vmrules
     - vmrules/finalizers
-    - vmusers
-    - vmusers/finalizers
-    - vmauths
-    - vmauths/finalizers
+    - vmservicescrapes
+    - vmservicescrapes/finalizers
     - vmprobes
+    - vmprobes/finalizers
     - vmsingles
     - vmsingles/finalizers
     - vmnodescrapes
     - vmnodescrapes/finalizers
-    - vmalertmanagerconfigs
-    - vmalertmanagerconfigs/finalizers
     - vmstaticscrapes
     - vmstaticscrapes/finalizers
+    - vmscrapeconfigs
+    - vmscrapeconfigs/finalizers
   verbs:
-    - create
-    - get
-    - list
-    - patch
-    - update
-    - watch
+      - '*'
 - apiGroups:
-    - operator.victoriametrics.com
+  - operator.victoriametrics.com
   resources:
-    - vmagents/status
-    - vmalerts/status
-    - vmalertmanagers/status
-    - vmclusters/status
-    - vmpodscrapes/status
-    - vmrules/status
-    - vmusers/status
-    - vmauths/status
-    - vmservicescrapes/status
-    - vmprobes/status
-    - vmsingles/status
-    - vmnodescrapes/status
-    - vmalertmanagerconfigs/status
-    - vmstaticscrapes/status
+  - vlogs/status
+  - vmagents/status
+  - vmalertmanagers/status
+  - vmalertmanagerconfigs/status
+  - vmalerts/status
+  - vmclusters/status
+  - vmpodscrapes/status
+  - vmscrapeconfigs/status
+  - vmrules/status
+  - vmservicescrapes/status
+  - vmprobes/status
+  - vmsingles/status
+  - vmscrapeconfig/status
+  - vmusers/status
+  - vmauths/status
+  - vmstaticscrapes/status
+  - vmnodescrapes/status
   verbs:
-    - get
-    - patch
-    - update
-
+  - get
+  - patch
+  - update
 - apiGroups:
-    - operator.victoriametrics.com
+  - extensions
+  - "extensions"
+  - networking.k8s.io
+  - "networking.k8s.io"
   resources:
-    - vmservicescrapes
+  - ingresses
   verbs:
-    - '*'
+  - get
+  - list
+  - watch
+  - delete
 - apiGroups:
-    - extensions
-    - "extensions"
-    - networking.k8s.io
-    - "networking.k8s.io"
+  - "rbac.authorization.k8s.io"
   resources:
-    - ingresses
+  - roles
+  - rolebindings
   verbs:
-    - get
-    - list
-    - watch
-    - delete
+  - "*"
 - apiGroups:
-    - "rbac.authorization.k8s.io"
+  - autoscaling
   resources:
-    - roles
-    - rolebindings
+  - horizontalpodautoscalers
   verbs:
-    - get
-    - list
-    - create
-    - patch
-    - update
-    - watch
-    - delete
+  - "*"
 - apiGroups:
-    - autoscaling
+  - networking.k8s.io
+  - extensions
   resources:
-    - horizontalpodautoscalers
+  - ingresses
+  - ingresses/finalizers
   verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
+  - create
+  - get
+  - patch
+  - update
+  - watch
+  - delete
 - apiGroups:
-    - networking.k8s.io
-    - extensions
+  - discovery.k8s.io
   resources:
-    - ingresses
-    - ingresses/finalizers
+  - endpointslices
   verbs:
-    - create
-    - get
-    - patch
-    - update
-    - watch
-    - delete
+  - list
+  - watch
+  - get
 {{- end -}}
 {{- end -}}

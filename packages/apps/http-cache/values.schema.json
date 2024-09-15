@@ -12,6 +12,11 @@
             "description": "Persistent Volume size",
             "default": "10Gi"
         },
+        "storageClass": {
+            "type": "string",
+            "description": "StorageClass used to store the data",
+            "default": ""
+        },
         "haproxy": {
             "type": "object",
             "properties": {

@@ -11,21 +11,8 @@ spec:
   mariaDbRef:
     name: {{ $.Release.Name }}
   passwordSecretKeyRef:
-    name: {{ $.Release.Name }}
-    key: {{ $name }}-password
+    name: {{ $.Release.Name }}-credentials
+    key: {{ $name }}
   maxUserConnections: {{ $u.maxUserConnections }}
----
-apiVersion: k8s.mariadb.com/v1alpha1
-kind: Grant
-metadata:
-  name: {{ $.Release.Name }}-{{ $dnsName }}
-spec:
-  mariaDbRef:
-    name: {{ $.Release.Name }}
-  privileges: {{ $u.privileges | toJson }}
-  database: "*"
-  table: "*"
-  username: {{ $name }}
-  grantOption: true
 {{- end }}
 {{- end }}

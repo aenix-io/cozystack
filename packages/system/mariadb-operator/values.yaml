@@ -1,4 +1,5 @@
 mariadb-operator:
+  clusterName: cozy.local
   metrics:
     enabled: true
   webhook:
