@@ -34,6 +34,14 @@ spec:
       description: The desired number of replicas
       jsonPath: .spec.replicas
       type: integer
+    - name: Roles
+      description: Roles of the nodes in the pool
+      jsonPath: .status.roles
+      type: string
+    - name: NodeIds
+      description: Node IDs used by Kafka nodes in this pool
+      jsonPath: .status.nodeIds
+      type: string
     schema:
       openAPIV3Schema:
         type: object
@@ -66,6 +74,11 @@ spec:
                     type: integer
                     minimum: 0
                     description: Storage identification number. It is mandatory only for storage volumes defined in a storage of type 'jbod'.
+                  kraftMetadata:
+                    type: string
+                    enum:
+                    - shared
+                    description: "Specifies whether this volume should be used for storing KRaft metadata. This property is optional. When set, the only currently supported value is `shared`. At most one volume can have this property set."
                   overrides:
                     type: array
                     items:
@@ -77,7 +90,7 @@ spec:
                         broker:
                           type: integer
                           description: Id of the kafka broker (broker identifier).
-                    description: Overrides for individual brokers. The `overrides` field allows to specify a different configuration for different brokers.
+                    description: Overrides for individual brokers. The `overrides` field allows you to specify a different configuration for different brokers.
                   selector:
                     additionalProperties:
                       type: string
@@ -111,7 +124,12 @@ spec:
                         id:
                           type: integer
                           minimum: 0
-                          description: Storage identification number. It is mandatory only for storage volumes defined in a storage of type 'jbod'.
+                          description: Storage identification number. Mandatory for storage volumes defined with a `jbod` storage type configuration.
+                        kraftMetadata:
+                          type: string
+                          enum:
+                          - shared
+                          description: "Specifies whether this volume should be used for storing KRaft metadata. This property is optional. When set, the only currently supported value is `shared`. At most one volume can have this property set."
                         overrides:
                           type: array
                           items:
@@ -123,7 +141,7 @@ spec:
                               broker:
                                 type: integer
                                 description: Id of the kafka broker (broker identifier).
-                          description: Overrides for individual brokers. The `overrides` field allows to specify a different configuration for different brokers.
+                          description: Overrides for individual brokers. The `overrides` field allows you to specify a different configuration for different brokers.
                         selector:
                           additionalProperties:
                             type: string
@@ -167,10 +185,20 @@ spec:
                         name:
                           type: string
                   limits:
-                    x-kubernetes-preserve-unknown-fields: true
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
+                      x-kubernetes-int-or-string: true
                     type: object
                   requests:
-                    x-kubernetes-preserve-unknown-fields: true
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
+                      x-kubernetes-int-or-string: true
                     type: object
                 description: CPU and memory resources to reserve.
               jvmOptions:
@@ -181,14 +209,14 @@ spec:
                       type: string
                     type: object
                     description: A map of -XX options to the JVM.
-                  "-Xms":
-                    type: string
-                    pattern: "^[0-9]+[mMgG]?$"
-                    description: -Xms option to to the JVM.
                   "-Xmx":
                     type: string
                     pattern: "^[0-9]+[mMgG]?$"
                     description: -Xmx option to to the JVM.
+                  "-Xms":
+                    type: string
+                    pattern: "^[0-9]+[mMgG]?$"
+                    description: -Xms option to to the JVM.
                   gcLoggingEnabled:
                     type: boolean
                     description: Specifies whether the Garbage Collection logging is enabled. The default is false.
@@ -254,6 +282,13 @@ spec:
                       securityContext:
                         type: object
                         properties:
+                          appArmorProfile:
+                            type: object
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
                           fsGroup:
                             type: integer
                           fsGroupChangePolicy:
@@ -656,31 +691,6 @@ spec:
                             value:
                               type: string
                         description: The pod's tolerations.
-                      priorityClassName:
-                        type: string
-                        description: 'The name of the priority class used to assign priority to the pods. '
-                      schedulerName:
-                        type: string
-                        description: "The name of the scheduler used to dispatch this `Pod`. If not specified, the default scheduler will be used."
-                      hostAliases:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            hostnames:
-                              type: array
-                              items:
-                                type: string
-                            ip:
-                              type: string
-                        description: The pod's HostAliases. HostAliases is an optional list of hosts and IPs that will be injected into the Pod's hosts file if specified.
-                      tmpDirSizeLimit:
-                        type: string
-                        pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
-                        description: Defines the total amount (for example `1Gi`) of local storage required for temporary EmptyDir volume (`/tmp`). Default value is `5Mi`.
-                      enableServiceLinks:
-                        type: boolean
-                        description: Indicates whether information about services should be injected into Pod's environment variables.
                       topologySpreadConstraints:
                         type: array
                         items:
@@ -723,6 +733,110 @@ spec:
                             whenUnsatisfiable:
                               type: string
                         description: The pod's topology spread constraints.
+                      priorityClassName:
+                        type: string
+                        description: 'The name of the priority class used to assign priority to the pods. '
+                      schedulerName:
+                        type: string
+                        description: "The name of the scheduler used to dispatch this `Pod`. If not specified, the default scheduler will be used."
+                      hostAliases:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            hostnames:
+                              type: array
+                              items:
+                                type: string
+                            ip:
+                              type: string
+                        description: The pod's HostAliases. HostAliases is an optional list of hosts and IPs that will be injected into the Pod's hosts file if specified.
+                      enableServiceLinks:
+                        type: boolean
+                        description: Indicates whether information about services should be injected into Pod's environment variables.
+                      tmpDirSizeLimit:
+                        type: string
+                        pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                        description: "Defines the total amount of pod memory allocated for the temporary `EmptyDir` volume `/tmp`. Specify the allocation in memory units, for example, `100Mi` for 100 mebibytes. Default value is `5Mi`. The `/tmp` volume is backed by pod memory, not disk storage, so avoid setting a high value as it consumes pod memory resources."
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: Name to use for the volume. Required.
+                            secret:
+                              type: object
+                              properties:
+                                defaultMode:
+                                  type: integer
+                                items:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      key:
+                                        type: string
+                                      mode:
+                                        type: integer
+                                      path:
+                                        type: string
+                                optional:
+                                  type: boolean
+                                secretName:
+                                  type: string
+                              description: Secret to use populate the volume.
+                            configMap:
+                              type: object
+                              properties:
+                                defaultMode:
+                                  type: integer
+                                items:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      key:
+                                        type: string
+                                      mode:
+                                        type: integer
+                                      path:
+                                        type: string
+                                name:
+                                  type: string
+                                optional:
+                                  type: boolean
+                              description: ConfigMap to use to populate the volume.
+                            emptyDir:
+                              type: object
+                              properties:
+                                medium:
+                                  type: string
+                                sizeLimit:
+                                  type: object
+                                  properties:
+                                    amount:
+                                      type: string
+                                    format:
+                                      type: string
+                              description: EmptyDir to use to populate the volume.
+                            persistentVolumeClaim:
+                              type: object
+                              properties:
+                                claimName:
+                                  type: string
+                                readOnly:
+                                  type: boolean
+                              description: PersistentVolumeClaim object to use to populate the volume.
+                          oneOf:
+                          - properties:
+                              secret: {}
+                              configMap: {}
+                              emptyDir: {}
+                              persistentVolumeClaim: {}
+                            required: []
+                        description: Additional volumes that can be mounted to the pod.
                     description: Template for Kafka `Pods`.
                   perPodService:
                     type: object
@@ -816,6 +930,13 @@ spec:
                         properties:
                           allowPrivilegeEscalation:
                             type: boolean
+                          appArmorProfile:
+                            type: object
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
                           capabilities:
                             type: object
                             properties:
@@ -869,6 +990,26 @@ spec:
                               runAsUserName:
                                 type: string
                         description: Security context for the container.
+                      volumeMounts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            mountPath:
+                              type: string
+                            mountPropagation:
+                              type: string
+                            name:
+                              type: string
+                            readOnly:
+                              type: boolean
+                            recursiveReadOnly:
+                              type: string
+                            subPath:
+                              type: string
+                            subPathExpr:
+                              type: string
+                        description: Additional volume mounts which should be applied to the container.
                     description: Template for the Kafka broker container.
                   initContainer:
                     type: object
@@ -890,6 +1031,13 @@ spec:
                         properties:
                           allowPrivilegeEscalation:
                             type: boolean
+                          appArmorProfile:
+                            type: object
+                            properties:
+                              localhostProfile:
+                                type: string
+                              type:
+                                type: string
                           capabilities:
                             type: object
                             properties:
@@ -943,6 +1091,26 @@ spec:
                               runAsUserName:
                                 type: string
                         description: Security context for the container.
+                      volumeMounts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            mountPath:
+                              type: string
+                            mountPropagation:
+                              type: string
+                            name:
+                              type: string
+                            readOnly:
+                              type: boolean
+                            recursiveReadOnly:
+                              type: string
+                            subPath:
+                              type: string
+                            subPathExpr:
+                              type: string
+                        description: Additional volume mounts which should be applied to the container.
                     description: Template for the Kafka init container.
                 description: Template for pool resources. The template allows users to specify how the resources belonging to this pool are generated.
             required:
