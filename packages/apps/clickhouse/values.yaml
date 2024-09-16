@@ -22,3 +22,23 @@ storageClass: ""
 ##     password: hackme
 ##
 users: {}
+
+## @section Backup parameters
+
+## @param backup.enabled Enable pereiodic backups
+## @param backup.s3Region The AWS S3 region where backups are stored
+## @param backup.s3Bucket The S3 bucket used for storing backups
+## @param backup.schedule Cron schedule for automated backups
+## @param backup.cleanupStrategy The strategy for cleaning up old backups
+## @param backup.s3AccessKey The access key for S3, used for authentication
+## @param backup.s3SecretKey The secret key for S3, used for authentication
+## @param backup.resticPassword The password for Restic backup encryption
+backup:
+  enabled: false
+  s3Region: us-east-1
+  s3Bucket: s3.example.org/clickhouse-backups
+  schedule: "0 2 * * *"
+  cleanupStrategy: "--keep-last=3 --keep-daily=3 --keep-within-weekly=1m"
+  s3AccessKey: oobaiRus9pah8PhohL1ThaeTa4UVa7gu
+  s3SecretKey: ju3eum4dekeich9ahM1te8waeGai0oog
+  resticPassword: ChaXoveekoh6eigh4siesheeda2quai0

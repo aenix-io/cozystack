@@ -26,32 +26,26 @@ spec:
           - name: {{ .Release.Name }}-regsecret
           restartPolicy: Never
           containers:
-          - name: pgdump
-            image: "{{ $.Files.Get "images/postgres-backup.tag" | trim }}"
+          - name: clickhouse-backup
+            image: "{{ $.Files.Get "images/clickhouse-backup.tag" | trim }}"
             command:
             - /bin/sh
+            - -x
             - /scripts/backup.sh
             env:
             - name: REPO_PREFIX
               value: {{ required "s3Bucket is not specified!" .Values.backup.s3Bucket | quote }}
             - name: CLEANUP_STRATEGY
-              value: {{ required "cleanupStrategy is not specified!" .Values.backup.cleanupStrategy | quote }}
-            - name: PGUSER
+              value: {{ required "cleanupPolicy is not specified!" .Values.backup.cleanupStrategy | quote }}
+            - name: CLICKHOUSE_USER
+              value: backup
+            - name: CLICKHOUSE_HOST
+              value: chi-{{ .Release.Name }}-clickhouse-0-0
+            - name: CLICKHOUSE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-superuser
-                  key: username
-            - name: PGPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-superuser
-                  key: password
-            - name: PGHOST
-              value: {{ .Release.Name }}-rw
-            - name: PGPORT
-              value: "5432"
-            - name: PGDATABASE
-              value: postgres
+                  name: {{ .Release.Name }}-credentials
+                  key: backup
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:

@@ -24,8 +24,8 @@ spec:
         spec:
           restartPolicy: Never
           containers:
-          - name: mysqldump
-            image: "{{ index $image "image.name" }}@{{ index $image "containerimage.digest" }}"
+          - name: pgdump
+            image: "{{ $.Files.Get "images/postgres-backup.tag" | trim }}"
             command:
             - /bin/sh
             - /scripts/backup.sh

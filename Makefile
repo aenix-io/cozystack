@@ -2,6 +2,9 @@
 
 build:
 	make -C packages/apps/http-cache image
+	make -C packages/apps/postgres image
+	make -C packages/apps/mysql image
+	make -C packages/apps/clickhouse image
 	make -C packages/apps/kubernetes image
 	make -C packages/system/cilium image
 	make -C packages/system/kubeovn image
