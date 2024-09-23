@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: v1.3.94
+appVersion: v1.9.22
 dependencies:
 - condition: cert-manager.enabled
   name: cert-manager
@@ -36,4 +36,4 @@ dependencies:
 description: Developer-friendly incident response with brilliant Slack integration
 name: oncall
 type: application
-version: 1.3.94
+version: 1.9.22
