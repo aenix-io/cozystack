@@ -1339,11 +1339,7 @@
               },
               {
                 "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
+                "value": "none"
               },
               {
                 "id": "custom.align",
