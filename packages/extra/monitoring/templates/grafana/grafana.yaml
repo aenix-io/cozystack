@@ -64,7 +64,7 @@ spec:
                 failureThreshold: 3
               env:
               - name: GF_INSTALL_PLUGINS
-                value: grafana-worldmap-panel,flant-statusmap-panel,natel-discrete-panel
+                value: grafana-worldmap-panel,natel-discrete-panel
               - name: ONCALL_API_URL
                 value: http://grafana-oncall-engine:8080
               - name: GF_DATABASE_HOST
