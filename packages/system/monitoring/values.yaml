@@ -1,3 +1,7 @@
+global:
+  victoria-metrics-k8s-stack:
+    fullnameOverride: alerts
+
 metrics-server:
   defaultArgs:
     - --cert-dir=/tmp
@@ -62,3 +66,19 @@ fluent-bit:
           Operation lift
           Nested_under kubernetes
           Add_prefix   kubernetes_
+
+victoria-metrics-k8s-stack:
+  externalVM:
+    read:
+      url: "http://vmselect-shortterm.tenant-root.svc:8480/select/0/prometheus/api/v1/read"
+    write:
+      url: "http://vminsert-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write"
+
+  grafana:
+    enabled: false
+  kube-state-metrics:
+    enabled: false
+  prometheus-node-exporter:
+    enabled: false
+  alertmanager:
+    name: vmalertmanager-alertmanager

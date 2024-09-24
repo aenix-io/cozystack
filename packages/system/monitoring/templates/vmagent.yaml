@@ -8,6 +8,7 @@ spec:
     cluster: cozystack
   extraArgs:
     promscrape.streamParse: "true"
+    promscrape.maxScrapeSize: 32MB
   remoteWrite:
   - url: http://vminsert-shortterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write
   - url: http://vminsert-longterm.tenant-root.svc:8480/insert/0/prometheus/api/v1/write

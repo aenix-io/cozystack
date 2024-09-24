@@ -1,0 +1,214 @@
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
+{{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
+
+{{- $apiKey := randAlphaNum 32 }}
+{{- $existingSecret := lookup "v1" "Secret" .Release.Namespace "alerta" }}
+{{- if $existingSecret }}
+{{- $apiKey = index $existingSecret.data "alerta-api-key" | b64dec }}
+{{- end }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alerta
+  labels:
+    app: alerta
+type: Opaque
+data:
+  alerta-api-key: {{ $apiKey | b64enc }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alerta
+  labels:
+    app: alerta
+data:
+  config.js: |
+    // contents of config.js
+    'use strict';
+    angular.module('config', [])
+      .constant('config', {
+        'endpoint'    : "/api",
+        'provider'    : "basic"
+      })
+      .constant('colors', {});    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alerta
+  labels:
+    app: alerta
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: alerta
+    release: alerta
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alerta
+  labels:
+    app: alerta
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alerta
+      release: alerta
+  template:
+    metadata:
+      labels:
+        app: alerta
+        release: alerta
+    spec:
+      containers:
+        - name: alerta
+          image: "alerta/alerta-web:9.0.4"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ADMIN_USERS
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: grafana-admin-password
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: grafana-admin-password
+            - name: ADMIN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: alerta
+                  key: alerta-api-key
+            - name: ALERTA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: alerta
+                  key: alerta-api-key
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: alerta-db-app
+                  key: uri
+
+            - name: AUTH_REQUIRED
+              value: "True"
+
+            {{- if and .Values.alerta.alerts.telegram.chatID .Values.alerta.alerts.telegram.token }}
+            - name: "PLUGINS"
+              value: "telegram"
+            - name: TELEGRAM_CHAT_ID
+              value: "{{ .Values.alerta.alerts.telegram.chatID }}"
+            - name: TELEGRAM_TOKEN
+              value: "{{ .Values.alerta.alerts.telegram.token }}"
+            - name: TELEGRAM_WEBHOOK_URL
+              value: "https://alerta.infra.aenix.org/api/webhooks/telegram?api-key={{ $apiKey }}"
+            {{- end }}
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 300
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+          volumeMounts:
+            - name: alerta-config
+              mountPath: /app/config.js
+              subPath: config.js
+      volumes:
+        - name: alerta-config
+          configMap:
+            name: alerta
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: alerta
+  labels:
+    app: alerta
+  annotations:
+    acme.cert-manager.io/http01-ingress-class: {{ $ingress }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: {{ $ingress }}
+  tls:
+    - hosts:
+        - "{{ .Values.host | default (printf "alerta.%s" $host) }}"
+      secretName: alerta-tls
+  rules:
+    - host: "{{ .Values.host | default (printf "alerta.%s" $host) }}"
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: alerta
+                port:
+                  name: http
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager
+type: Opaque
+stringData:
+  alertmanager.yaml: |
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: [alertname, namespace, cluster]
+      group_wait: 15s
+      group_interval: 15s
+      repeat_interval: 1h
+      receiver: 'alerta'
+      routes:
+      - receiver: alerta_no_resolve
+        repeat_interval: 1m
+        matchers:
+        - 'event="Heartbeat"'
+      - receiver: blackhole
+        matchers:
+        - 'severity="none"'
+      - receiver: blackhole
+        matchers:
+        - 'alertname=~"CDIDefaultStorageClassDegraded|CDINoDefaultStorageClass"'
+    receivers:
+    - name: blackhole
+    - name: "alerta"
+      webhook_configs:
+      - url: 'http://alerta/api/webhooks/prometheus?api-key={{ $apiKey }}'
+        send_resolved: true
+    - name: "alerta_no_resolve"
+      webhook_configs:
+      - url: 'http://alerta/api/webhooks/prometheus?api-key={{ $apiKey }}'
+        send_resolved: false
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanager
+metadata:
+  name: alertmanager
+spec:
+  replicaCount: 3
+  configSecret: alertmanager
+  podMetadata:
+    labels:
+      policy.cozystack.io/allow-to-apiserver: "true"

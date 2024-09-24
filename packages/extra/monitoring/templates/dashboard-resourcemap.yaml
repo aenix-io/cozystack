@@ -9,6 +9,7 @@ rules:
   - ingresses
   resourceNames:
   - grafana-ingress
+  - alerta
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""
@@ -23,4 +24,5 @@ rules:
   - services
   resourceNames:
   - grafana-service
+  - alerta
   verbs: ["get", "list", "watch"]
