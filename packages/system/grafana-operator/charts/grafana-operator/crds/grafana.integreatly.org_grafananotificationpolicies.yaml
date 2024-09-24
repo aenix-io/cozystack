@@ -4,29 +4,23 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: grafanafolders.grafana.integreatly.org
+  name: grafananotificationpolicies.grafana.integreatly.org
 spec:
   group: grafana.integreatly.org
   names:
     categories:
     - grafana-operator
-    kind: GrafanaFolder
-    listKind: GrafanaFolderList
-    plural: grafanafolders
-    singular: grafanafolder
+    kind: GrafanaNotificationPolicy
+    listKind: GrafanaNotificationPolicyList
+    plural: grafananotificationpolicies
+    singular: grafananotificationpolicy
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .status.NoMatchingInstances
-      name: No matching instances
-      type: boolean
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
-      type: date
-    name: v1beta1
+  - name: v1beta1
     schema:
       openAPIV3Schema:
-        description: GrafanaFolder is the Schema for the grafanafolders API
+        description: GrafanaNotificationPolicy is the Schema for the GrafanaNotificationPolicy
+          API
         properties:
           apiVersion:
             description: |-
@@ -46,12 +40,9 @@ spec:
           metadata:
             type: object
           spec:
-            description: GrafanaFolderSpec defines the desired state of GrafanaFolder
+            description: GrafanaNotificationPolicySpec defines the desired state of
+              GrafanaNotificationPolicy
             properties:
-              allowCrossNamespaceImport:
-                description: allow to import this resources from an operator in a
-                  different namespace
-                type: boolean
               instanceSelector:
                 description: selects Grafanas for import
                 properties:
@@ -101,41 +92,92 @@ spec:
                 x-kubernetes-validations:
                 - message: Value is immutable
                   rule: self == oldSelf
-              parentFolderRef:
-                description: Reference to an existing GrafanaFolder CR in the same
-                  namespace
-                type: string
-              parentFolderUID:
-                description: UID of the folder in which the current folder should
-                  be created
-                type: string
-              permissions:
-                description: raw json with folder permissions
-                type: string
               resyncPeriod:
-                default: 5m
-                description: how often the folder is synced, defaults to 5m if not
-                  set
+                default: 10m
                 format: duration
                 pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
                 type: string
-              title:
-                type: string
+              route:
+                description: Routes for alerts to match against
+                properties:
+                  continue:
+                    description: continue
+                    type: boolean
+                  group_by:
+                    description: group by
+                    items:
+                      type: string
+                    type: array
+                  group_interval:
+                    description: group interval
+                    type: string
+                  group_wait:
+                    description: group wait
+                    type: string
+                  match_re:
+                    additionalProperties:
+                      type: string
+                    description: match re
+                    type: object
+                  matchers:
+                    description: matchers
+                    items:
+                      properties:
+                        isEqual:
+                          description: is equal
+                          type: boolean
+                        isRegex:
+                          description: is regex
+                          type: boolean
+                        name:
+                          description: name
+                          type: string
+                        value:
+                          description: value
+                          type: string
+                      required:
+                      - isRegex
+                      - value
+                      type: object
+                    type: array
+                  mute_time_intervals:
+                    description: mute time intervals
+                    items:
+                      type: string
+                    type: array
+                  object_matchers:
+                    description: object matchers
+                    items:
+                      description: |-
+                        ObjectMatcher ObjectMatcher is a matcher that can be used to filter alerts.
+
+
+                        swagger:model ObjectMatcher
+                      items:
+                        type: string
+                      type: array
+                    type: array
+                  provenance:
+                    description: provenance
+                    type: string
+                  receiver:
+                    description: receiver
+                    type: string
+                  repeat_interval:
+                    description: repeat interval
+                    type: string
+                  routes:
+                    description: routes
+                    x-kubernetes-preserve-unknown-fields: true
+                type: object
             required:
             - instanceSelector
+            - route
             type: object
-            x-kubernetes-validations:
-            - message: Only one of parentFolderUID or parentFolderRef can be set
-              rule: (has(self.parentFolderUID) && !(has(self.parentFolderRef))) ||
-                (has(self.parentFolderRef) && !(has(self.parentFolderUID))) || !(has(self.parentFolderRef)
-                && (has(self.parentFolderUID)))
           status:
-            description: GrafanaFolderStatus defines the observed state of GrafanaFolder
+            description: GrafanaNotificationPolicyStatus defines the observed state
+              of GrafanaNotificationPolicy
             properties:
-              NoMatchingInstances:
-                description: The folder instanceSelector can't find matching grafana
-                  instances
-                type: boolean
               conditions:
                 items:
                   description: "Condition contains details for one aspect of the current
@@ -205,15 +247,8 @@ spec:
                   - type
                   type: object
                 type: array
-              hash:
-                description: |-
-                  INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-                  Important: Run "make" to regenerate code after modifying this file
-                type: string
-              lastResync:
-                description: Last time the folder was resynced
-                format: date-time
-                type: string
+            required:
+            - conditions
             type: object
         type: object
     served: true

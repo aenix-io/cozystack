@@ -4,29 +4,23 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: grafanafolders.grafana.integreatly.org
+  name: grafanacontactpoints.grafana.integreatly.org
 spec:
   group: grafana.integreatly.org
   names:
     categories:
     - grafana-operator
-    kind: GrafanaFolder
-    listKind: GrafanaFolderList
-    plural: grafanafolders
-    singular: grafanafolder
+    kind: GrafanaContactPoint
+    listKind: GrafanaContactPointList
+    plural: grafanacontactpoints
+    singular: grafanacontactpoint
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .status.NoMatchingInstances
-      name: No matching instances
-      type: boolean
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
-      type: date
-    name: v1beta1
+  - name: v1beta1
     schema:
       openAPIV3Schema:
-        description: GrafanaFolder is the Schema for the grafanafolders API
+        description: GrafanaContactPoint is the Schema for the grafanacontactpoints
+          API
         properties:
           apiVersion:
             description: |-
@@ -46,11 +40,11 @@ spec:
           metadata:
             type: object
           spec:
-            description: GrafanaFolderSpec defines the desired state of GrafanaFolder
+            description: GrafanaContactPointSpec defines the desired state of GrafanaContactPoint
             properties:
               allowCrossNamespaceImport:
-                description: allow to import this resources from an operator in a
-                  different namespace
+                type: boolean
+              disableResolveMessage:
                 type: boolean
               instanceSelector:
                 description: selects Grafanas for import
@@ -101,42 +95,52 @@ spec:
                 x-kubernetes-validations:
                 - message: Value is immutable
                   rule: self == oldSelf
-              parentFolderRef:
-                description: Reference to an existing GrafanaFolder CR in the same
-                  namespace
-                type: string
-              parentFolderUID:
-                description: UID of the folder in which the current folder should
-                  be created
-                type: string
-              permissions:
-                description: raw json with folder permissions
+              name:
                 type: string
               resyncPeriod:
-                default: 5m
-                description: how often the folder is synced, defaults to 5m if not
-                  set
+                default: 10m
                 format: duration
                 pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
                 type: string
-              title:
+              settings:
+                x-kubernetes-preserve-unknown-fields: true
+              type:
+                enum:
+                - alertmanager
+                - prometheus-alertmanager
+                - dingding
+                - discord
+                - email
+                - googlechat
+                - kafka
+                - line
+                - opsgenie
+                - pagerduty
+                - pushover
+                - sensugo
+                - sensu
+                - slack
+                - teams
+                - telegram
+                - threema
+                - victorops
+                - webhook
+                - wecom
+                - hipchat
+                - oncall
                 type: string
             required:
             - instanceSelector
+            - name
+            - settings
             type: object
-            x-kubernetes-validations:
-            - message: Only one of parentFolderUID or parentFolderRef can be set
-              rule: (has(self.parentFolderUID) && !(has(self.parentFolderRef))) ||
-                (has(self.parentFolderRef) && !(has(self.parentFolderUID))) || !(has(self.parentFolderRef)
-                && (has(self.parentFolderUID)))
           status:
-            description: GrafanaFolderStatus defines the observed state of GrafanaFolder
+            description: GrafanaContactPointStatus defines the observed state of GrafanaContactPoint
             properties:
-              NoMatchingInstances:
-                description: The folder instanceSelector can't find matching grafana
-                  instances
-                type: boolean
               conditions:
+                description: |-
+                  INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+                  Important: Run "make" to regenerate code after modifying this file
                 items:
                   description: "Condition contains details for one aspect of the current
                     state of this API Resource.\n---\nThis struct is intended for
@@ -205,15 +209,8 @@ spec:
                   - type
                   type: object
                 type: array
-              hash:
-                description: |-
-                  INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-                  Important: Run "make" to regenerate code after modifying this file
-                type: string
-              lastResync:
-                description: Last time the folder was resynced
-                format: date-time
-                type: string
+            required:
+            - conditions
             type: object
         type: object
     served: true
