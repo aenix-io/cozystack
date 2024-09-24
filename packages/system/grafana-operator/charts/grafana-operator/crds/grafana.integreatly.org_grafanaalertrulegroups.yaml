@@ -4,29 +4,23 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: grafanafolders.grafana.integreatly.org
+  name: grafanaalertrulegroups.grafana.integreatly.org
 spec:
   group: grafana.integreatly.org
   names:
     categories:
     - grafana-operator
-    kind: GrafanaFolder
-    listKind: GrafanaFolderList
-    plural: grafanafolders
-    singular: grafanafolder
+    kind: GrafanaAlertRuleGroup
+    listKind: GrafanaAlertRuleGroupList
+    plural: grafanaalertrulegroups
+    singular: grafanaalertrulegroup
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .status.NoMatchingInstances
-      name: No matching instances
-      type: boolean
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
-      type: date
-    name: v1beta1
+  - name: v1beta1
     schema:
       openAPIV3Schema:
-        description: GrafanaFolder is the Schema for the grafanafolders API
+        description: GrafanaAlertRuleGroup is the Schema for the grafanaalertrulegroups
+          API
         properties:
           apiVersion:
             description: |-
@@ -46,12 +40,18 @@ spec:
           metadata:
             type: object
           spec:
-            description: GrafanaFolderSpec defines the desired state of GrafanaFolder
+            description: GrafanaAlertRuleGroupSpec defines the desired state of GrafanaAlertRuleGroup
             properties:
               allowCrossNamespaceImport:
-                description: allow to import this resources from an operator in a
-                  different namespace
                 type: boolean
+              folderRef:
+                description: Match GrafanaFolders CRs to infer the uid
+                type: string
+              folderUID:
+                description: |-
+                  UID of the folder containing this rule group
+                  Overrides the FolderSelector
+                type: string
               instanceSelector:
                 description: selects Grafanas for import
                 properties:
@@ -101,41 +101,137 @@ spec:
                 x-kubernetes-validations:
                 - message: Value is immutable
                   rule: self == oldSelf
-              parentFolderRef:
-                description: Reference to an existing GrafanaFolder CR in the same
-                  namespace
-                type: string
-              parentFolderUID:
-                description: UID of the folder in which the current folder should
-                  be created
-                type: string
-              permissions:
-                description: raw json with folder permissions
-                type: string
-              resyncPeriod:
-                default: 5m
-                description: how often the folder is synced, defaults to 5m if not
-                  set
+              interval:
                 format: duration
                 pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
                 type: string
-              title:
+              resyncPeriod:
+                default: 10m
+                format: duration
+                pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
                 type: string
+              rules:
+                items:
+                  description: AlertRule defines a specific rule to be evaluated.
+                    It is based on the upstream model with some k8s specific type
+                    mappings
+                  properties:
+                    annotations:
+                      additionalProperties:
+                        type: string
+                      type: object
+                    condition:
+                      type: string
+                    data:
+                      items:
+                        properties:
+                          datasourceUid:
+                            description: Grafana data source unique identifier; it
+                              should be '__expr__' for a Server Side Expression operation.
+                            type: string
+                          model:
+                            description: JSON is the raw JSON query and includes the
+                              above properties as well as custom properties.
+                            x-kubernetes-preserve-unknown-fields: true
+                          queryType:
+                            description: |-
+                              QueryType is an optional identifier for the type of query.
+                              It can be used to distinguish different types of queries.
+                            type: string
+                          refId:
+                            description: RefID is the unique identifier of the query,
+                              set by the frontend call.
+                            type: string
+                          relativeTimeRange:
+                            description: relative time range
+                            properties:
+                              from:
+                                description: from
+                                format: int64
+                                type: integer
+                              to:
+                                description: to
+                                format: int64
+                                type: integer
+                            type: object
+                        type: object
+                      type: array
+                    execErrState:
+                      enum:
+                      - OK
+                      - Alerting
+                      - Error
+                      - KeepLast
+                      type: string
+                    for:
+                      format: duration
+                      pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
+                      type: string
+                    isPaused:
+                      type: boolean
+                    labels:
+                      additionalProperties:
+                        type: string
+                      type: object
+                    noDataState:
+                      enum:
+                      - Alerting
+                      - NoData
+                      - OK
+                      - KeepLast
+                      type: string
+                    notificationSettings:
+                      properties:
+                        group_by:
+                          items:
+                            type: string
+                          type: array
+                        group_interval:
+                          type: string
+                        group_wait:
+                          type: string
+                        mute_time_intervals:
+                          items:
+                            type: string
+                          type: array
+                        receiver:
+                          type: string
+                        repeat_interval:
+                          type: string
+                      required:
+                      - receiver
+                      type: object
+                    title:
+                      example: Always firing
+                      maxLength: 190
+                      minLength: 1
+                      type: string
+                    uid:
+                      pattern: ^[a-zA-Z0-9-_]+$
+                      type: string
+                  required:
+                  - condition
+                  - data
+                  - execErrState
+                  - for
+                  - noDataState
+                  - title
+                  - uid
+                  type: object
+                type: array
             required:
             - instanceSelector
+            - interval
+            - rules
             type: object
             x-kubernetes-validations:
-            - message: Only one of parentFolderUID or parentFolderRef can be set
-              rule: (has(self.parentFolderUID) && !(has(self.parentFolderRef))) ||
-                (has(self.parentFolderRef) && !(has(self.parentFolderUID))) || !(has(self.parentFolderRef)
-                && (has(self.parentFolderUID)))
+            - message: Only one of FolderUID or FolderRef can be set
+              rule: (has(self.folderUID) && !(has(self.folderRef))) || (has(self.folderRef)
+                && !(has(self.folderUID)))
           status:
-            description: GrafanaFolderStatus defines the observed state of GrafanaFolder
+            description: GrafanaAlertRuleGroupStatus defines the observed state of
+              GrafanaAlertRuleGroup
             properties:
-              NoMatchingInstances:
-                description: The folder instanceSelector can't find matching grafana
-                  instances
-                type: boolean
               conditions:
                 items:
                   description: "Condition contains details for one aspect of the current
@@ -205,15 +301,8 @@ spec:
                   - type
                   type: object
                 type: array
-              hash:
-                description: |-
-                  INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-                  Important: Run "make" to regenerate code after modifying this file
-                type: string
-              lastResync:
-                description: Last time the folder was resynced
-                format: date-time
-                type: string
+            required:
+            - conditions
             type: object
         type: object
     served: true
