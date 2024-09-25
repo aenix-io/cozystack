@@ -2,12 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "grafana-operator.fullname" . }}
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ include "grafana-operator.namespace" . }}
   labels:
     {{- include "grafana-operator.labels" . | nindent 4 }}
-    {{- with .Values.additionalLabels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    app.kubernetes.io/component: operator
 spec:
   replicas: 1
   selector:
@@ -20,10 +18,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "grafana-operator.selectorLabels" . | nindent 8 }}
-        {{- with .Values.additionalLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- include "grafana-operator.labels" . | nindent 8 }}
+        app.kubernetes.io/component: operator
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -49,12 +45,19 @@ spec:
               {{ else }}
               value: {{ .Values.watchNamespaces }}
               {{- end }}
+            - name: WATCH_NAMESPACE_SELECTOR
+              {{- if and .Values.namespaceScope (eq .Values.watchNamespaceSelector "") }}
+              value: ""
+              {{ else }}
+              value: {{quote .Values.watchNamespaceSelector }}
+              {{- end }}
             {{- with .Values.env }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
           args:
             - --health-probe-bind-address=:8081
             - --metrics-bind-address=0.0.0.0:{{ .Values.metricsService.metricsPort }}
+            - --pprof-addr=0.0.0.0:{{ .Values.metricsService.pprofPort }}
             {{- if .Values.leaderElect }}
             - --leader-elect
             {{- end }}
@@ -64,6 +67,9 @@ spec:
           ports:
             - containerPort: {{ .Values.metricsService.metricsPort }}
               name: metrics
+              protocol: TCP
+            - containerPort: {{ .Values.metricsService.pprofPort }}
+              name: pprof
               protocol: TCP
           livenessProbe:
             httpGet:

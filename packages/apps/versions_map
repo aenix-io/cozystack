@@ -3,7 +3,7 @@ clickhouse 0.1.0 ca79f72
 clickhouse 0.2.0 7cd7de73
 clickhouse 0.2.1 5ca8823
 clickhouse 0.3.0 b00621e
-clickhouse 0.4.0 46121ce
+clickhouse 0.4.0 320fc32
 clickhouse 0.5.0 HEAD
 ferretdb 0.1.0 4ffa8615
 ferretdb 0.1.1 5ca8823
@@ -12,7 +12,7 @@ ferretdb 0.3.0 aa2f553
 ferretdb 0.4.0 HEAD
 http-cache 0.1.0 a956713
 http-cache 0.2.0 5ca8823
-http-cache 0.3.0 46121ce
+http-cache 0.3.0 fab5940
 http-cache 0.3.1 HEAD
 kafka 0.1.0 760f86d2
 kafka 0.2.0 a2cc83d
@@ -36,7 +36,7 @@ mysql 0.1.0 f642698
 mysql 0.2.0 8b975ff0
 mysql 0.3.0 5ca8823
 mysql 0.4.0 93018c4
-mysql 0.5.0 46121ce
+mysql 0.5.0 4b84798
 mysql 0.5.1 HEAD
 nats 0.1.0 5ca8823
 nats 0.2.0 HEAD
@@ -47,7 +47,7 @@ postgres 0.3.0 995dea6f
 postgres 0.4.0 ec283c33
 postgres 0.4.1 5ca8823
 postgres 0.5.0 c07c4bbd
-postgres 0.6.0 46121ce
+postgres 0.6.0 2a4768a
 postgres 0.6.2 HEAD
 rabbitmq 0.1.0 f642698
 rabbitmq 0.2.0 5ca8823

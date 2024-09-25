@@ -10,6 +10,14 @@ leaderElect: false
 # By default it's all namespaces, if you only want to listen for the same namespace as the operator is deployed to look at namespaceScope.
 watchNamespaces: ""
 
+# -- Sets the WATCH_NAMESPACE_SELECTOR environment variable,
+# it defines which namespaces the operator should be listening for based on label and key value pair added on namespace kind.
+# By default it's all namespaces.
+watchNamespaceSelector: ""
+
+# -- Determines if the target cluster is OpenShift. Additional rbac permissions for routes will be added on OpenShift
+isOpenShift: false
+
 # -- Additional environment variables
 env: []
   # -- grafana image, e.g. docker.io/grafana/grafana:9.1.6, overwrites the default grafana image defined in the operator
@@ -29,8 +37,14 @@ image:
 # -- image pull secrets
 imagePullSecrets: []
 
+# -- Overrides the name of the chart.
 nameOverride: ""
+
+# -- Overrides the fully qualified app name.
 fullnameOverride: ""
+
+# -- Overrides the namespace name.
+namespaceOverride: ""
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -41,11 +55,18 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+rbac:
+  # -- Specifies whether to create the ClusterRole and ClusterRoleBinding.
+  # If "namespaceScope" is true or "watchNamespaces" is set, this will create Role and RoleBinding instead.
+  create: true
+
 metricsService:
   # -- metrics service type
   type: ClusterIP
   # -- metrics service port
   metricsPort: 9090
+  # -- port for the pprof profiling endpoint
+  pprofPort: 8888
 
 # -- additional labels to add to all resources
 additionalLabels: {}
@@ -78,3 +99,42 @@ tolerations: []
 
 # -- pod affinity
 affinity: {}
+
+# -- Enable this to use with Prometheus Operator
+serviceMonitor:
+  # -- When set true then use a ServiceMonitor to configure scraping
+  enabled: false
+  # -- Set of labels to transfer from the Kubernetes Service onto the target
+  additionalLabels: {}
+  # -- Set how frequently Prometheus should scrape
+  interval: 1m
+  # -- Set timeout for scrape
+  scrapeTimeout: 10s
+  # -- Set path to metrics path
+  telemetryPath: /metrics
+  # -- Set of labels to transfer from the Kubernetes Service onto the target
+  targetLabels: []
+  # -- MetricRelabelConfigs to apply to samples before ingestion
+  metricRelabelings: []
+  # -- Set relabel_configs as per https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config
+  relabelings: []
+
+# -- Array of extra K8s objects to deploy
+extraObjects: []
+# - apiVersion: external-secrets.io/v1beta1
+#   kind: ExternalSecret
+#   metadata:
+#     name: grafana-operator-apikey
+#   spec:
+#     refreshInterval: 1h
+#     secretStoreRef:
+#       kind: SecretStore
+#       name: my-secret-store
+#     target:
+#       template:
+#         data:
+#           GRAFANA_CLOUD_INSTANCE_TOKEN: "{{`{{ .Token }}`}}"
+#     dataFrom:
+#     - extract:
+#         key: my-secret-store-secret
+

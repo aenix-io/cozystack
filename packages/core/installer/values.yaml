@@ -1,2 +1,2 @@
 cozystack:
-  image: harbor.cp.if.ua/cozystack/cozystack:latest@sha256:99d721e847cb28350f31459175e25c7a57dab8ac82bab7d5a5fe112eb382e343
+  image: ghcr.io/aenix-io/cozystack/cozystack:v0.15.0@sha256:aeff26a80f84b4323578e613b3bf03caa842d617ec8d9ca98706867c1e70609f

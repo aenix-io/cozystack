@@ -77,14 +77,25 @@ spec:
                       items:
                         type: object
                         properties:
-                          certificate:
-                            type: string
-                            description: The name of the file certificate in the Secret.
                           secretName:
                             type: string
                             description: The name of the Secret containing the certificate.
+                          certificate:
+                            type: string
+                            description: The name of the file certificate in the secret.
+                          pattern:
+                            type: string
+                            description: "Pattern for the certificate files in the secret. Use the link:https://en.wikipedia.org/wiki/Glob_(programming)[_glob syntax_] for the pattern. All files in the secret that match the pattern are used."
+                        oneOf:
+                          - properties:
+                              certificate: {}
+                            required:
+                              - certificate
+                          - properties:
+                              pattern: {}
+                            required:
+                              - pattern
                         required:
-                          - certificate
                           - secretName
                       description: Trusted certificates for TLS connection.
                   description: TLS configuration for connecting Kafka Bridge to the cluster.
@@ -107,26 +118,48 @@ spec:
                     accessTokenIsJwt:
                       type: boolean
                       description: Configure whether access token should be treated as JWT. This should be set to `false` if the authorization server returns opaque tokens. Defaults to `true`.
+                    accessTokenLocation:
+                      type: string
+                      description: Path to the token file containing an access token to be used for authentication.
                     audience:
                       type: string
                       description: "OAuth audience to use when authenticating against the authorization server. Some authorization servers require the audience to be explicitly set. The possible values depend on how the authorization server is configured. By default, `audience` is not specified when performing the token endpoint request."
                     certificateAndKey:
                       type: object
                       properties:
+                        secretName:
+                          type: string
+                          description: The name of the Secret containing the certificate.
                         certificate:
                           type: string
                           description: The name of the file certificate in the Secret.
                         key:
                           type: string
                           description: The name of the private key in the Secret.
-                        secretName:
-                          type: string
-                          description: The name of the Secret containing the certificate.
                       required:
+                        - secretName
                         - certificate
                         - key
-                        - secretName
                       description: Reference to the `Secret` which holds the certificate and private key pair.
+                    clientAssertion:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                          description: The key under which the secret value is stored in the Kubernetes Secret.
+                        secretName:
+                          type: string
+                          description: The name of the Kubernetes Secret containing the secret value.
+                      required:
+                        - key
+                        - secretName
+                      description: Link to Kubernetes secret containing the client assertion which was manually configured for the client.
+                    clientAssertionLocation:
+                      type: string
+                      description: Path to the file containing the client assertion to be used for authentication.
+                    clientAssertionType:
+                      type: string
+                      description: "The client assertion type. If not set, and either `clientAssertion` or `clientAssertionLocation` is configured, this value defaults to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`."
                     clientId:
                       type: string
                       description: OAuth Client ID which the Kafka client can use to authenticate against the OAuth server and use the token endpoint URI.
@@ -167,15 +200,15 @@ spec:
                     passwordSecret:
                       type: object
                       properties:
-                        password:
-                          type: string
-                          description: The name of the key in the Secret under which the password is stored.
                         secretName:
                           type: string
                           description: The name of the Secret containing the password.
+                        password:
+                          type: string
+                          description: The name of the key in the Secret under which the password is stored.
                       required:
-                        - password
                         - secretName
+                        - password
                       description: Reference to the `Secret` which holds the password.
                     readTimeoutSeconds:
                       type: integer
@@ -193,6 +226,11 @@ spec:
                         - key
                         - secretName
                       description: Link to Kubernetes Secret containing the refresh token which can be used to obtain access token from the authorization server.
+                    saslExtensions:
+                      additionalProperties:
+                        type: string
+                      type: object
+                      description: SASL extensions parameters.
                     scope:
                       type: string
                       description: OAuth scope to use when authenticating against the authorization server. Some authorization servers require this to be set. The possible values depend on how authorization server is configured. By default `scope` is not specified when doing the token endpoint request.
@@ -201,14 +239,25 @@ spec:
                       items:
                         type: object
                         properties:
-                          certificate:
-                            type: string
-                            description: The name of the file certificate in the Secret.
                           secretName:
                             type: string
                             description: The name of the Secret containing the certificate.
+                          certificate:
+                            type: string
+                            description: The name of the file certificate in the secret.
+                          pattern:
+                            type: string
+                            description: "Pattern for the certificate files in the secret. Use the link:https://en.wikipedia.org/wiki/Glob_(programming)[_glob syntax_] for the pattern. All files in the secret that match the pattern are used."
+                        oneOf:
+                          - properties:
+                              certificate: {}
+                            required:
+                              - certificate
+                          - properties:
+                              pattern: {}
+                            required:
+                              - pattern
                         required:
-                          - certificate
                           - secretName
                       description: Trusted certificates for TLS connection to the OAuth server.
                     tokenEndpointUri:
@@ -265,6 +314,12 @@ spec:
                 consumer:
                   type: object
                   properties:
+                    enabled:
+                      type: boolean
+                      description: Whether the HTTP consumer should be enabled or disabled. The default is enabled (`true`).
+                    timeoutSeconds:
+                      type: integer
+                      description: "The timeout in seconds for deleting inactive consumers, default is -1 (disabled)."
                     config:
                       x-kubernetes-preserve-unknown-fields: true
                       type: object
@@ -273,6 +328,9 @@ spec:
                 producer:
                   type: object
                   properties:
+                    enabled:
+                      type: boolean
+                      description: Whether the HTTP producer should be enabled or disabled. The default is enabled (`true`).
                     config:
                       x-kubernetes-preserve-unknown-fields: true
                       type: object
@@ -289,10 +347,20 @@ spec:
                           name:
                             type: string
                     limits:
-                      x-kubernetes-preserve-unknown-fields: true
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
+                        x-kubernetes-int-or-string: true
                       type: object
                     requests:
-                      x-kubernetes-preserve-unknown-fields: true
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
+                        x-kubernetes-int-or-string: true
                       type: object
                   description: CPU and memory resources to reserve.
                 jvmOptions:
@@ -303,14 +371,14 @@ spec:
                         type: string
                       type: object
                       description: A map of -XX options to the JVM.
-                    "-Xms":
-                      type: string
-                      pattern: "^[0-9]+[mMgG]?$"
-                      description: -Xms option to to the JVM.
                     "-Xmx":
                       type: string
                       pattern: "^[0-9]+[mMgG]?$"
                       description: -Xmx option to to the JVM.
+                    "-Xms":
+                      type: string
+                      pattern: "^[0-9]+[mMgG]?$"
+                      description: -Xms option to to the JVM.
                     gcLoggingEnabled:
                       type: boolean
                       description: Specifies whether the Garbage Collection logging is enabled. The default is false.
@@ -377,14 +445,14 @@ spec:
                 livenessProbe:
                   type: object
                   properties:
-                    failureThreshold:
-                      type: integer
-                      minimum: 1
-                      description: Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.
                     initialDelaySeconds:
                       type: integer
                       minimum: 0
                       description: The initial delay before first the health is first checked. Default to 15 seconds. Minimum value is 0.
+                    timeoutSeconds:
+                      type: integer
+                      minimum: 1
+                      description: The timeout for each attempted health check. Default to 5 seconds. Minimum value is 1.
                     periodSeconds:
                       type: integer
                       minimum: 1
@@ -393,22 +461,22 @@ spec:
                       type: integer
                       minimum: 1
                       description: Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1. Must be 1 for liveness. Minimum value is 1.
-                    timeoutSeconds:
+                    failureThreshold:
                       type: integer
                       minimum: 1
-                      description: The timeout for each attempted health check. Default to 5 seconds. Minimum value is 1.
+                      description: Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.
                   description: Pod liveness checking.
                 readinessProbe:
                   type: object
                   properties:
-                    failureThreshold:
-                      type: integer
-                      minimum: 1
-                      description: Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.
                     initialDelaySeconds:
                       type: integer
                       minimum: 0
                       description: The initial delay before first the health is first checked. Default to 15 seconds. Minimum value is 0.
+                    timeoutSeconds:
+                      type: integer
+                      minimum: 1
+                      description: The timeout for each attempted health check. Default to 5 seconds. Minimum value is 1.
                     periodSeconds:
                       type: integer
                       minimum: 1
@@ -417,10 +485,10 @@ spec:
                       type: integer
                       minimum: 1
                       description: Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1. Must be 1 for liveness. Minimum value is 1.
-                    timeoutSeconds:
+                    failureThreshold:
                       type: integer
                       minimum: 1
-                      description: The timeout for each attempted health check. Default to 5 seconds. Minimum value is 1.
+                      description: Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.
                   description: Pod readiness checking.
                 template:
                   type: object
@@ -477,6 +545,13 @@ spec:
                         securityContext:
                           type: object
                           properties:
+                            appArmorProfile:
+                              type: object
+                              properties:
+                                localhostProfile:
+                                  type: string
+                                type:
+                                  type: string
                             fsGroup:
                               type: integer
                             fsGroupChangePolicy:
@@ -879,31 +954,6 @@ spec:
                               value:
                                 type: string
                           description: The pod's tolerations.
-                        priorityClassName:
-                          type: string
-                          description: 'The name of the priority class used to assign priority to the pods. '
-                        schedulerName:
-                          type: string
-                          description: "The name of the scheduler used to dispatch this `Pod`. If not specified, the default scheduler will be used."
-                        hostAliases:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              hostnames:
-                                type: array
-                                items:
-                                  type: string
-                              ip:
-                                type: string
-                          description: The pod's HostAliases. HostAliases is an optional list of hosts and IPs that will be injected into the Pod's hosts file if specified.
-                        tmpDirSizeLimit:
-                          type: string
-                          pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
-                          description: Defines the total amount (for example `1Gi`) of local storage required for temporary EmptyDir volume (`/tmp`). Default value is `5Mi`.
-                        enableServiceLinks:
-                          type: boolean
-                          description: Indicates whether information about services should be injected into Pod's environment variables.
                         topologySpreadConstraints:
                           type: array
                           items:
@@ -946,6 +996,110 @@ spec:
                               whenUnsatisfiable:
                                 type: string
                           description: The pod's topology spread constraints.
+                        priorityClassName:
+                          type: string
+                          description: 'The name of the priority class used to assign priority to the pods. '
+                        schedulerName:
+                          type: string
+                          description: "The name of the scheduler used to dispatch this `Pod`. If not specified, the default scheduler will be used."
+                        hostAliases:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              hostnames:
+                                type: array
+                                items:
+                                  type: string
+                              ip:
+                                type: string
+                          description: The pod's HostAliases. HostAliases is an optional list of hosts and IPs that will be injected into the Pod's hosts file if specified.
+                        enableServiceLinks:
+                          type: boolean
+                          description: Indicates whether information about services should be injected into Pod's environment variables.
+                        tmpDirSizeLimit:
+                          type: string
+                          pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                          description: "Defines the total amount of pod memory allocated for the temporary `EmptyDir` volume `/tmp`. Specify the allocation in memory units, for example, `100Mi` for 100 mebibytes. Default value is `5Mi`. The `/tmp` volume is backed by pod memory, not disk storage, so avoid setting a high value as it consumes pod memory resources."
+                        volumes:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                description: Name to use for the volume. Required.
+                              secret:
+                                type: object
+                                properties:
+                                  defaultMode:
+                                    type: integer
+                                  items:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key:
+                                          type: string
+                                        mode:
+                                          type: integer
+                                        path:
+                                          type: string
+                                  optional:
+                                    type: boolean
+                                  secretName:
+                                    type: string
+                                description: Secret to use populate the volume.
+                              configMap:
+                                type: object
+                                properties:
+                                  defaultMode:
+                                    type: integer
+                                  items:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key:
+                                          type: string
+                                        mode:
+                                          type: integer
+                                        path:
+                                          type: string
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                description: ConfigMap to use to populate the volume.
+                              emptyDir:
+                                type: object
+                                properties:
+                                  medium:
+                                    type: string
+                                  sizeLimit:
+                                    type: object
+                                    properties:
+                                      amount:
+                                        type: string
+                                      format:
+                                        type: string
+                                description: EmptyDir to use to populate the volume.
+                              persistentVolumeClaim:
+                                type: object
+                                properties:
+                                  claimName:
+                                    type: string
+                                  readOnly:
+                                    type: boolean
+                                description: PersistentVolumeClaim object to use to populate the volume.
+                            oneOf:
+                              - properties:
+                                  secret: {}
+                                  configMap: {}
+                                  emptyDir: {}
+                                  persistentVolumeClaim: {}
+                                required: []
+                          description: Additional volumes that can be mounted to the pod.
                       description: Template for Kafka Bridge `Pods`.
                     apiService:
                       type: object
@@ -1022,6 +1176,13 @@ spec:
                           properties:
                             allowPrivilegeEscalation:
                               type: boolean
+                            appArmorProfile:
+                              type: object
+                              properties:
+                                localhostProfile:
+                                  type: string
+                                type:
+                                  type: string
                             capabilities:
                               type: object
                               properties:
@@ -1075,6 +1236,26 @@ spec:
                                 runAsUserName:
                                   type: string
                           description: Security context for the container.
+                        volumeMounts:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              mountPath:
+                                type: string
+                              mountPropagation:
+                                type: string
+                              name:
+                                type: string
+                              readOnly:
+                                type: boolean
+                              recursiveReadOnly:
+                                type: string
+                              subPath:
+                                type: string
+                              subPathExpr:
+                                type: string
+                          description: Additional volume mounts which should be applied to the container.
                       description: Template for the Kafka Bridge container.
                     clusterRoleBinding:
                       type: object
@@ -1132,6 +1313,13 @@ spec:
                           properties:
                             allowPrivilegeEscalation:
                               type: boolean
+                            appArmorProfile:
+                              type: object
+                              properties:
+                                localhostProfile:
+                                  type: string
+                                type:
+                                  type: string
                             capabilities:
                               type: object
                               properties:
@@ -1185,6 +1373,26 @@ spec:
                                 runAsUserName:
                                   type: string
                           description: Security context for the container.
+                        volumeMounts:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              mountPath:
+                                type: string
+                              mountPropagation:
+                                type: string
+                              name:
+                                type: string
+                              readOnly:
+                                type: boolean
+                              recursiveReadOnly:
+                                type: string
+                              subPath:
+                                type: string
+                              subPathExpr:
+                                type: string
+                          description: Additional volume mounts which should be applied to the container.
                       description: Template for the Kafka Bridge init container.
                   description: Template for Kafka Bridge resources. The template allows users to specify how a `Deployment` and `Pod` is generated.
                 tracing:
@@ -1232,10 +1440,10 @@ spec:
                 url:
                   type: string
                   description: The URL at which external client applications can access the Kafka Bridge.
-                labelSelector:
-                  type: string
-                  description: Label selector for pods providing this resource.
                 replicas:
                   type: integer
                   description: The current number of pods being used to provide this resource.
+                labelSelector:
+                  type: string
+                  description: Label selector for pods providing this resource.
               description: The status of the Kafka Bridge.
