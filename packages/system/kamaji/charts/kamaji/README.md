@@ -1,6 +1,6 @@
 # kamaji
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.0.0](https://img.shields.io/badge/AppVersion-v1.0.0-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.0.0](https://img.shields.io/badge/AppVersion-v1.0.0-informational?style=flat-square)
 
 Kamaji is the Hosted Control Plane Manager for Kubernetes.
 
@@ -19,6 +19,10 @@ Kamaji is the Hosted Control Plane Manager for Kubernetes.
 ## Requirements
 
 Kubernetes: `>=1.21.0-0`
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://clastix.github.io/charts | kamaji-etcd | >=0.7.0 |
 
 [Kamaji](https://github.com/clastix/kamaji) requires a [multi-tenant `etcd`](https://github.com/clastix/kamaji-internal/blob/master/deploy/getting-started-with-kamaji.md#setup-internal-multi-tenant-etcd) cluster.
 This Helm Chart starting from v0.1.1 provides the installation of an internal `etcd` in order to streamline the local test. If you'd like to use an externally managed etcd instance, you can specify the overrides and by setting the value `etcd.deploy=false`.
@@ -66,49 +70,7 @@ Here the values you can override:
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Kubernetes affinity rules to apply to Kamaji controller pods |
-| cfssl.image.repository | string | `"cfssl/cfssl"` |  |
-| cfssl.image.tag | string | `"latest"` |  |
-| datastore.basicAuth.passwordSecret.keyPath | string | `nil` | The Secret key where the data is stored. |
-| datastore.basicAuth.passwordSecret.name | string | `nil` | The name of the Secret containing the password used to connect to the relational database. |
-| datastore.basicAuth.passwordSecret.namespace | string | `nil` | The namespace of the Secret containing the password used to connect to the relational database. |
-| datastore.basicAuth.usernameSecret.keyPath | string | `nil` | The Secret key where the data is stored. |
-| datastore.basicAuth.usernameSecret.name | string | `nil` | The name of the Secret containing the username used to connect to the relational database. |
-| datastore.basicAuth.usernameSecret.namespace | string | `nil` | The namespace of the Secret containing the username used to connect to the relational database. |
-| datastore.driver | string | `"etcd"` | (string) The Kamaji Datastore driver, supported: etcd, MySQL, PostgreSQL (defaults=etcd). |
-| datastore.enabled | bool | `true` | (bool) Enable the Kamaji Datastore creation (default=true) |
-| datastore.endpoints | list | `[]` | (array) List of endpoints of the selected Datastore. When letting the Chart install the etcd datastore, this field is populated automatically. |
-| datastore.nameOverride | string | `nil` | The Datastore name override, if empty and enabled=true defaults to `default`, if enabled=false, this is the name of the Datastore to connect to. |
-| datastore.tlsConfig.certificateAuthority.certificate.keyPath | string | `nil` | Key of the Secret which contains the content of the certificate. |
-| datastore.tlsConfig.certificateAuthority.certificate.name | string | `nil` | Name of the Secret containing the CA required to establish the mandatory SSL/TLS connection to the datastore. |
-| datastore.tlsConfig.certificateAuthority.certificate.namespace | string | `nil` | Namespace of the Secret containing the CA required to establish the mandatory SSL/TLS connection to the datastore. |
-| datastore.tlsConfig.certificateAuthority.privateKey.keyPath | string | `nil` | Key of the Secret which contains the content of the private key. |
-| datastore.tlsConfig.certificateAuthority.privateKey.name | string | `nil` | Name of the Secret containing the CA private key required to establish the mandatory SSL/TLS connection to the datastore. |
-| datastore.tlsConfig.certificateAuthority.privateKey.namespace | string | `nil` | Namespace of the Secret containing the CA private key required to establish the mandatory SSL/TLS connection to the datastore. |
-| datastore.tlsConfig.clientCertificate.certificate.keyPath | string | `nil` | Key of the Secret which contains the content of the certificate. |
-| datastore.tlsConfig.clientCertificate.certificate.name | string | `nil` | Name of the Secret containing the client certificate required to establish the mandatory SSL/TLS connection to the datastore. |
-| datastore.tlsConfig.clientCertificate.certificate.namespace | string | `nil` | Namespace of the Secret containing the client certificate required to establish the mandatory SSL/TLS connection to the datastore. |
-| datastore.tlsConfig.clientCertificate.privateKey.keyPath | string | `nil` | Key of the Secret which contains the content of the private key. |
-| datastore.tlsConfig.clientCertificate.privateKey.name | string | `nil` | Name of the Secret containing the client certificate private key required to establish the mandatory SSL/TLS connection to the datastore. |
-| datastore.tlsConfig.clientCertificate.privateKey.namespace | string | `nil` | Namespace of the Secret containing the client certificate private key required to establish the mandatory SSL/TLS connection to the datastore. |
-| datastore.tlsConfig.enabled | bool | `true` |  |
-| etcd.compactionInterval | int | `0` | ETCD Compaction interval (e.g. "5m0s"). (default: "0" (disabled)) |
-| etcd.deploy | bool | `true` | Install an etcd with enabled multi-tenancy along with Kamaji |
-| etcd.image | object | `{"pullPolicy":"IfNotPresent","repository":"quay.io/coreos/etcd","tag":"v3.5.6"}` | Install specific etcd image |
-| etcd.livenessProbe | object | `{"failureThreshold":8,"httpGet":{"path":"/health?serializable=true","port":2381,"scheme":"HTTP"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":15}` | The livenessProbe for the etcd container |
-| etcd.overrides.caSecret.name | string | `"etcd-certs"` | Name of the secret which contains CA's certificate and private key. (default: "etcd-certs") |
-| etcd.overrides.caSecret.namespace | string | `"kamaji-system"` | Namespace of the secret which contains CA's certificate and private key. (default: "kamaji-system") |
-| etcd.overrides.clientSecret.name | string | `"root-client-certs"` | Name of the secret which contains ETCD client certificates. (default: "root-client-certs") |
-| etcd.overrides.clientSecret.namespace | string | `"kamaji-system"` | Name of the namespace where the secret which contains ETCD client certificates is. (default: "kamaji-system") |
-| etcd.overrides.endpoints | object | `{"etcd-0":"etcd-0.etcd.kamaji-system.svc.cluster.local","etcd-1":"etcd-1.etcd.kamaji-system.svc.cluster.local","etcd-2":"etcd-2.etcd.kamaji-system.svc.cluster.local"}` | (map) Dictionary of the endpoints for the etcd cluster's members, key is the name of the etcd server. Don't define the protocol (TLS is automatically inflected), or any port, inflected from .etcd.peerApiPort value. |
-| etcd.peerApiPort | int | `2380` | The peer API port which servers are listening to. |
-| etcd.persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
-| etcd.persistence.customAnnotations | object | `{}` | The custom annotations to add to the PVC |
-| etcd.persistence.size | string | `"10Gi"` |  |
-| etcd.persistence.storageClassName | string | `""` |  |
-| etcd.port | int | `2379` | The client request port. |
-| etcd.serviceAccount.create | bool | `true` | Create a ServiceAccount, required to install and provision the etcd backing storage (default: true) |
-| etcd.serviceAccount.name | string | `""` | Define the ServiceAccount name to use during the setup and provision of the etcd backing storage (default: "") |
-| etcd.tolerations | list | `[]` | (array) Kubernetes affinity rules to apply to Kamaji etcd pods |
+| defaultDatastoreName | string | `"default"` | Specify the default DataStore name for the Kamaji instance. |
 | extraArgs | list | `[]` | A list of extra arguments to add to the kamaji controller default ones |
 | fullnameOverride | string | `""` |  |
 | healthProbeBindAddress | string | `":8081"` | The address the probe endpoint binds to. (default ":8081") |
@@ -116,9 +78,13 @@ Here the values you can override:
 | image.repository | string | `"clastix/kamaji"` | The container image of the Kamaji controller. |
 | image.tag | string | `nil` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` |  |
+| kamaji-etcd.datastore.enabled | bool | `true` |  |
+| kamaji-etcd.datastore.name | string | `"default"` |  |
+| kamaji-etcd.deploy | bool | `true` |  |
+| kamaji-etcd.fullnameOverride | string | `"kamaji-etcd"` |  |
 | livenessProbe | object | `{"httpGet":{"path":"/healthz","port":"healthcheck"},"initialDelaySeconds":15,"periodSeconds":20}` | The livenessProbe for the controller container |
-| loggingDevel.enable | bool | `false` | (string) Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error) (default false) |
-| metricsBindAddress | string | `":8080"` | (string) The address the metric endpoint binds to. (default ":8080") |
+| loggingDevel.enable | bool | `false` | Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error) (default false) |
+| metricsBindAddress | string | `":8080"` | The address the metric endpoint binds to. (default ":8080") |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | Kubernetes node selector rules to schedule Kamaji controller |
 | podAnnotations | object | `{}` | The annotations to apply to the Kamaji controller pods. |
