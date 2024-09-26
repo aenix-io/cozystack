@@ -10,6 +10,12 @@ size: 10Gi
 replicas: 2
 storageClass: ""
 
+## Server Configuration
+## @param postgresql.parameters.max_connections Determines the maximum number of concurrent connections to the database server. The default is typically 100 connections
+postgresql:
+  parameters:
+    max_connections: "100"
+
 ## Configuration for the quorum-based synchronous replication
 ## @param quorum.minSyncReplicas Minimum number of synchronous replicas that must acknowledge a transaction before it is considered committed.
 ## @param quorum.maxSyncReplicas Maximum number of synchronous replicas that can acknowledge a transaction (must be lower than the number of instances).

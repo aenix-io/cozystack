@@ -22,6 +22,21 @@
             "description": "StorageClass used to store the data",
             "default": ""
         },
+        "postgresql": {
+            "type": "object",
+            "properties": {
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "max_connections": {
+                            "type": "string",
+                            "description": "Determines the maximum number of concurrent connections to the database server. The default is typically 100 connections",
+                            "default": "100"
+                        }
+                    }
+                }
+            }
+        },
         "quorum": {
             "type": "object",
             "properties": {
