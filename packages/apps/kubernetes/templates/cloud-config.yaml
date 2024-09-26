@@ -7,4 +7,6 @@ data:
     loadBalancer:
       creationPollInterval: 5
       creationPollTimeout: 60
+      enableEPSController: true
+      selectorless: true
     namespace: {{ .Release.Namespace }}
