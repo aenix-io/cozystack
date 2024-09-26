@@ -1,0 +1,153 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "properties": {
+        "commonAnnotations": {
+            "properties": {},
+            "type": "object"
+        },
+        "commonLabels": {
+            "properties": {},
+            "type": "object"
+        },
+        "fullnameOverride": {
+            "type": "string"
+        },
+        "instance": {
+            "properties": {
+                "cluster": {
+                    "properties": {
+                        "domain": {
+                            "type": "string"
+                        },
+                        "multitenant": {
+                            "type": "boolean"
+                        },
+                        "networkPolicy": {
+                            "type": "boolean"
+                        },
+                        "tenantDefaultServiceAccount": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "enum": [
+                                "kubernetes",
+                                "openshift",
+                                "aws",
+                                "azure",
+                                "gcp"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "components": {
+                    "items": {
+                        "enum": [
+                            "source-controller",
+                            "kustomize-controller",
+                            "helm-controller",
+                            "notification-controller",
+                            "image-reflector-controller",
+                            "image-automation-controller"
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                },
+                "distribution": {
+                    "properties": {
+                        "artifact": {
+                            "type": "string"
+                        },
+                        "imagePullSecret": {
+                            "type": "string"
+                        },
+                        "registry": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "version",
+                        "registry"
+                    ],
+                    "type": "object"
+                },
+                "kustomize": {
+                    "properties": {
+                        "patches": {
+                            "items": {
+                                "type": "object"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "sharding": {
+                    "properties": {
+                        "key": {
+                            "type": "string"
+                        },
+                        "shards": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "storage": {
+                    "properties": {
+                        "class": {
+                            "type": "string"
+                        },
+                        "size": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "sync": {
+                    "properties": {
+                        "kind": {
+                            "enum": [
+                                "GitRepository",
+                                "OCIRepository",
+                                "Bucket"
+                            ],
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "pullSecret": {
+                            "type": "string"
+                        },
+                        "ref": {
+                            "type": "string"
+                        },
+                        "url": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "required": [
+                "distribution",
+                "cluster"
+            ],
+            "type": "object"
+        },
+        "nameOverride": {
+            "type": "string"
+        }
+    },
+    "type": "object"
+}

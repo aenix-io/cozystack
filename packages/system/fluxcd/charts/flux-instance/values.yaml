@@ -1,0 +1,49 @@
+# Default values for flux-instance.
+
+nameOverride: ""
+fullnameOverride: "flux"
+
+instance:
+  # -- Distribution https://fluxcd.control-plane.io/operator/fluxinstance/#distribution-configuration
+  distribution: # @schema required: true
+    version: "2.x" # @schema required: true
+    registry: "ghcr.io/fluxcd" # @schema required: true
+    artifact: "oci://ghcr.io/controlplaneio-fluxcd/flux-operator-manifests:latest"
+    imagePullSecret: ""
+  # -- Components https://fluxcd.control-plane.io/operator/fluxinstance/#components-configuration
+  components: # @schema item: string; uniqueItems: true; itemEnum: [source-controller,kustomize-controller,helm-controller,notification-controller,image-reflector-controller,image-automation-controller]
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+  # -- Cluster https://fluxcd.control-plane.io/operator/fluxinstance/#cluster-configuration
+  cluster: # @schema required: true
+    type: kubernetes # @schema enum:[kubernetes,openshift,aws,azure,gcp]
+    domain: "cluster.local"
+    networkPolicy: true
+    multitenant: false
+    tenantDefaultServiceAccount: "default"
+  # -- Storage https://fluxcd.control-plane.io/operator/fluxinstance/#storage-configuration
+  storage: # @schema required: false
+    class: ""
+    size: ""
+  # -- Sharding https://fluxcd.control-plane.io/operator/fluxinstance/#sharding-configuration
+  sharding: # @schema required: false
+    key: "sharding.fluxcd.io/key"
+    shards: [] # @schema item: string
+  # -- Sync https://fluxcd.control-plane.io/operator/fluxinstance/#sync-configuration
+  sync: # @schema required: false
+    kind: "GitRepository" # @schema enum:[GitRepository,OCIRepository,Bucket]
+    url: ""
+    ref: ""
+    path: ""
+    pullSecret: ""
+  kustomize: # @schema required: false
+    # -- Kustomize patches https://fluxcd.control-plane.io/operator/fluxinstance/#kustomize-patches
+    patches: [] # @schema item: object
+
+# -- Common annotations to add to all deployed objects including pods.
+commonAnnotations: { }
+
+# -- Common labels to add to all deployed objects including pods.
+commonLabels: { }
