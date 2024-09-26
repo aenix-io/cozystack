@@ -1,9 +1,9 @@
 # flux-operator
 
-![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.6.0](https://img.shields.io/badge/AppVersion-v0.6.0-informational?style=flat-square)
+![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.9.0](https://img.shields.io/badge/AppVersion-v0.9.0-informational?style=flat-square)
 
-The [Flux Operator](https://github.com/controlplaneio-fluxcd) provides a declarative API
-for the installation and upgrade of CNCF [Flux](https://fluxcd.io) and the
+The [Flux Operator](https://github.com/controlplaneio-fluxcd/flux-operator) provides a
+declarative API for the installation and upgrade of CNCF [Flux](https://fluxcd.io) and the
 ControlPlane [enterprise distribution](https://control-plane.io/enterprise-for-flux-cd/).
 
 The operator automates the patching for hotfixes and CVEs affecting the Flux controllers container images
@@ -49,6 +49,7 @@ see the Flux Operator [documentation](https://fluxcd.control-plane.io/operator/)
 | resources | object | `{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"64Mi"}}` | Container resources requests and limits settings. |
 | securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Container security context settings. The default is compliant with the pod security restricted profile. |
 | serviceAccount | object | `{"automount":true,"create":true,"name":""}` | Pod service account settings. The name of the service account defaults to the release name. |
+| serviceMonitor | object | `{"create":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Prometheus Operator scraping settings. |
 | tolerations | list | `[]` | Pod tolerations settings. |
 
 ## Source Code

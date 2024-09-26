@@ -8,7 +8,7 @@ annotations:
     - name: Upstream Project
       url: https://github.com/controlplaneio-fluxcd/flux-operator
 apiVersion: v2
-appVersion: v0.6.0
+appVersion: v0.9.0
 description: 'A Helm chart for deploying the Flux Operator. '
 home: https://github.com/controlplaneio-fluxcd
 icon: https://raw.githubusercontent.com/cncf/artwork/main/projects/flux/icon/color/flux-icon-color.png
@@ -18,13 +18,11 @@ keywords:
 - gitops
 kubeVersion: '>=1.22.0-0'
 maintainers:
-- email: stefan.prodan@control-plane.io
-  name: Stefan Prodan
-- name: Soule Ba
-  url: soule.ba@control-plane.io
+- email: flux-enterprise@control-plane.io
+  name: ControlPlane Flux Team
 name: flux-operator
 sources:
 - https://github.com/controlplaneio-fluxcd/flux-operator
 - https://github.com/controlplaneio-fluxcd/charts
 type: application
-version: 0.6.0
+version: 0.9.0
