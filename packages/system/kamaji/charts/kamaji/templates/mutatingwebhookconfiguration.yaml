@@ -8,23 +8,4 @@ metadata:
     {{- include "kamaji.labels" $data | nindent 4 }}
   name: kamaji-mutating-webhook-configuration
 webhooks:
-  - admissionReviewVersions:
-      - v1
-    clientConfig:
-      service:
-        name: {{ include "kamaji.webhookServiceName" . }}
-        namespace: {{ .Release.Namespace }}
-        path: /mutate-kamaji-clastix-io-v1alpha1-tenantcontrolplane
-    failurePolicy: Fail
-    name: mtenantcontrolplane.kb.io
-    rules:
-      - apiGroups:
-          - kamaji.clastix.io
-        apiVersions:
-          - v1alpha1
-        operations:
-          - CREATE
-          - UPDATE
-        resources:
-          - tenantcontrolplanes
-    sideEffects: None
+{{ tpl (.Files.Get "controller-gen/mutating-webhook.yaml") . }}
