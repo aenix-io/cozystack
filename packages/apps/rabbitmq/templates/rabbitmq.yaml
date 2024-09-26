@@ -47,7 +47,7 @@ metadata:
     config: '{{ printf "%s %s" $user $password | sha256sum }}'
 spec:
   importCredentialsSecret:
-    name: {{ $.Release.Name }}-{{ $user }}-credentials
+    name: {{ $.Release.Name }}-{{ kebabcase $user }}-credentials
   rabbitmqClusterReference:
     name: {{ $.Release.Name }}
 ---
