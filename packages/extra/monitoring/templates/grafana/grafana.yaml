@@ -56,7 +56,7 @@ spec:
                   mountPath: /var/lib/grafana
           containers:
             - name: grafana
-              image: grafana/grafana:10.1.0
+              image: grafana/grafana:11.2.0
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: false
@@ -64,7 +64,7 @@ spec:
                 failureThreshold: 3
               env:
               - name: GF_INSTALL_PLUGINS
-                value: grafana-worldmap-panel,flant-statusmap-panel,grafana-oncall-app,natel-discrete-panel
+                value: grafana-worldmap-panel,flant-statusmap-panel,natel-discrete-panel
               - name: ONCALL_API_URL
                 value: http://grafana-oncall-engine:8080
               - name: GF_DATABASE_HOST

@@ -1,0 +1,113 @@
+condition: '{{ true }}'
+name: kubernetes-resources
+rules:
+- alert: KubeCPUOvercommit
+  annotations:
+    description: 'Cluster {{`{{`}} $labels.cluster {{`}}`}} has overcommitted CPU resource requests for Pods by {{`{{`}} $value {{`}}`}} CPU shares and cannot tolerate node failure.'
+    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubecpuovercommit'
+    summary: 'Cluster has overcommitted CPU resource requests.'
+  condition: '{{ true }}'
+  expr: |-
+    sum(namespace_cpu:kube_pod_container_resource_requests:sum{}) by ({{ .Values.global.clusterLabel }}) - (sum(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ .Values.global.clusterLabel }}) - max(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ .Values.global.clusterLabel }})) > 0
+    and
+    (sum(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ .Values.global.clusterLabel }}) - max(kube_node_status_allocatable{job="kube-state-metrics",resource="cpu"}) by ({{ .Values.global.clusterLabel }})) > 0
+  for: 10m
+  labels:
+    severity: warning
+- alert: KubeMemoryOvercommit
+  annotations:
+    description: 'Cluster {{`{{`}} $labels.cluster {{`}}`}} has overcommitted memory resource requests for Pods by {{`{{`}} $value | humanize {{`}}`}} bytes and cannot tolerate node failure.'
+    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubememoryovercommit'
+    summary: 'Cluster has overcommitted memory resource requests.'
+  condition: '{{ true }}'
+  expr: |-
+    sum(namespace_memory:kube_pod_container_resource_requests:sum{}) by ({{ .Values.global.clusterLabel }}) - (sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ .Values.global.clusterLabel }}) - max(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ .Values.global.clusterLabel }})) > 0
+    and
+    (sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ .Values.global.clusterLabel }}) - max(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ .Values.global.clusterLabel }})) > 0
+  for: 10m
+  labels:
+    severity: warning
+- alert: KubeCPUQuotaOvercommit
+  annotations:
+    description: 'Cluster {{`{{`}} $labels.cluster {{`}}`}}  has overcommitted CPU resource requests for Namespaces.'
+    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubecpuquotaovercommit'
+    summary: 'Cluster has overcommitted CPU resource requests.'
+  condition: '{{ true }}'
+  expr: |-
+    sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(cpu|requests.cpu)"})) by ({{ .Values.global.clusterLabel }})
+      /
+    sum(kube_node_status_allocatable{resource="cpu", job="kube-state-metrics"}) by ({{ .Values.global.clusterLabel }})
+      > 1.5
+  for: 5m
+  labels:
+    severity: warning
+- alert: KubeMemoryQuotaOvercommit
+  annotations:
+    description: 'Cluster {{`{{`}} $labels.cluster {{`}}`}}  has overcommitted memory resource requests for Namespaces.'
+    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubememoryquotaovercommit'
+    summary: 'Cluster has overcommitted memory resource requests.'
+  condition: '{{ true }}'
+  expr: |-
+    sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(memory|requests.memory)"})) by ({{ .Values.global.clusterLabel }})
+      /
+    sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"}) by ({{ .Values.global.clusterLabel }})
+      > 1.5
+  for: 5m
+  labels:
+    severity: warning
+- alert: KubeQuotaAlmostFull
+  annotations:
+    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota.'
+    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubequotaalmostfull'
+    summary: 'Namespace quota is going to be full.'
+  condition: '{{ true }}'
+  expr: |-
+    kube_resourcequota{job="kube-state-metrics", type="used"}
+      / ignoring(instance, job, type)
+    (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
+      > 0.9 < 1
+  for: 15m
+  labels:
+    severity: informational
+- alert: KubeQuotaFullyUsed
+  annotations:
+    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota.'
+    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubequotafullyused'
+    summary: 'Namespace quota is fully used.'
+  condition: '{{ true }}'
+  expr: |-
+    kube_resourcequota{job="kube-state-metrics", type="used"}
+      / ignoring(instance, job, type)
+    (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
+      == 1
+  for: 15m
+  labels:
+    severity: informational
+- alert: KubeQuotaExceeded
+  annotations:
+    description: 'Namespace {{`{{`}} $labels.namespace {{`}}`}} is using {{`{{`}} $value | humanizePercentage {{`}}`}} of its {{`{{`}} $labels.resource {{`}}`}} quota.'
+    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/kubequotaexceeded'
+    summary: 'Namespace quota has exceeded the limits.'
+  condition: '{{ true }}'
+  expr: |-
+    kube_resourcequota{job="kube-state-metrics", type="used"}
+      / ignoring(instance, job, type)
+    (kube_resourcequota{job="kube-state-metrics", type="hard"} > 0)
+      > 1
+  for: 15m
+  labels:
+    severity: warning
+- alert: CPUThrottlingHigh
+  annotations:
+    description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'
+    runbook_url: '{{ .Values.defaultRules.runbookUrl }}/kubernetes/cputhrottlinghigh'
+    summary: 'Processes experience elevated CPU throttling.'
+  condition: '{{ true }}'
+  expr: |-
+    sum(increase(container_cpu_cfs_throttled_periods_total{container!="", }[5m])) by (container,pod,namespace,{{ .Values.global.clusterLabel }})
+      /
+    sum(increase(container_cpu_cfs_periods_total{}[5m])) by (container,pod,namespace,{{ .Values.global.clusterLabel }})
+      > ( 25 / 100 )
+  for: 15m
+  labels:
+    severity: informational

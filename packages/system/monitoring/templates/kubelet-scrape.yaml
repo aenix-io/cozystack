@@ -21,6 +21,8 @@ spec:
   relabelConfigs:
   - action: labelmap
     regex: __meta_kubernetes_node_label_(.+)
+  - action: labeldrop
+    regex: '.*node_kubevirt_io.*'
   - sourceLabels: [__metrics_path__]
     targetLabel: metrics_path
   - replacement: kubelet
@@ -51,6 +53,8 @@ spec:
   relabelConfigs:
   - action: labelmap
     regex: __meta_kubernetes_node_label_(.+)
+  - action: labeldrop
+    regex: '.*node_kubevirt_io.*'
   - sourceLabels:
     - __metrics_path__
     targetLabel: metrics_path

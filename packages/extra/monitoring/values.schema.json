@@ -23,13 +23,38 @@
         "type": "object"
       }
     },
-    "oncall": {
+    "alerta": {
       "type": "object",
       "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Enable Grafana OnCall",
-          "default": false
+        "storage": {
+          "type": "string",
+          "description": "Persistent Volume size for alerta database",
+          "default": "10Gi"
+        },
+        "storageClassName": {
+          "type": "string",
+          "description": "StorageClass used to store the data",
+          "default": ""
+        },
+        "alerts": {
+          "type": "object",
+          "properties": {
+            "telegram": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "telegram token for your bot",
+                  "default": "7262461387:AAGtwq16iwuVtWtzoN6TUEMpF00fpC9Xz34"
+                },
+                "chatID": {
+                  "type": "string",
+                  "description": "specify multiple ID's separated by comma. Get yours in https://t.me/chatid_echo_bot",
+                  "default": "-4520856007"
+                }
+              }
+            }
+          }
         }
       }
     }

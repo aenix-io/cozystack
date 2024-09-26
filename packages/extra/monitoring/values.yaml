@@ -25,7 +25,22 @@ logsStorages:
   storage: 10Gi
   storageClassName: replicated
 
-## @param oncall.enabled Enable Grafana OnCall
-## 
-oncall:
-  enabled: false
+## Configuration for Alerta
+## @param alerta.storage Persistent Volume size for alerta database
+## @param alerta.storageClassName StorageClass used to store the data
+##
+alerta:
+  storage: 10Gi
+  storageClassName: ""
+
+  alerts:
+    ## @param alerta.alerts.telegram.token telegram token for your bot
+    ## @param alerta.alerts.telegram.chatID specify multiple ID's separated by comma. Get yours in https://t.me/chatid_echo_bot
+    ## example:
+    ##   telegram:
+    ##     token: "7262461387:AAGtwq16iwuVtWtzoN6TUEMpF00fpC9Xz34"
+    ##     chatID: "-4520856007"
+    ##
+    telegram:
+      token: ""
+      chatID: ""
