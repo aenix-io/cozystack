@@ -1,0 +1,21 @@
+# Source: https://github.com/kubevirt/cloud-provider-kubevirt/blob/main/build/images/kubevirt-cloud-controller-manager/Dockerfile
+FROM --platform=linux/amd64 golang:1.20.6 AS builder
+
+RUN git clone https://github.com/kubevirt/cloud-provider-kubevirt /go/src/kubevirt.io/cloud-provider-kubevirt \
+ && cd /go/src/kubevirt.io/cloud-provider-kubevirt \
+ && git checkout adbd6c27468b86b020cf38490e84f124ef24ab62
+
+WORKDIR /go/src/kubevirt.io/cloud-provider-kubevirt
+
+# see: https://github.com/kubevirt/cloud-provider-kubevirt/pull/291
+ADD patches /patches
+RUN git apply /patches/external-traffic-policy-local.diff
+RUN go get 'k8s.io/endpointslice/util@v0.28' 'k8s.io/apiserver@v0.28'
+RUN go mod tidy
+RUN go mod vendor
+
+RUN	CGO_ENABLED=0 GOOS=linux go build -mod=vendor -ldflags="-s -w" -o bin/kubevirt-cloud-controller-manager ./cmd/kubevirt-cloud-controller-manager
+
+FROM registry.access.redhat.com/ubi9/ubi-micro
+COPY --from=builder /go/src/kubevirt.io/cloud-provider-kubevirt/bin/kubevirt-cloud-controller-manager /bin/kubevirt-cloud-controller-manager
+ENTRYPOINT [ "/bin/kubevirt-cloud-controller-manager" ]

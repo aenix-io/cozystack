@@ -23,7 +23,7 @@ spec:
           operator: Exists
           effect: "NoSchedule"
       containers:
-      - image: ghcr.io/kvaps/test:cluster-autoscaller
+      - image: "{{ $.Files.Get "images/cluster-autoscaler.tag" | trim }}"
         name: cluster-autoscaler
         command:
         - /cluster-autoscaler

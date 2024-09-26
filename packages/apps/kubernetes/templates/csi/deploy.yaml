@@ -26,7 +26,7 @@ spec:
       containers:
         - name: csi-driver
           imagePullPolicy: Always
-          image: ghcr.io/kvaps/test:kubevirt-csi-driver
+          image: "{{ $.Files.Get "images/kubevirt-csi-driver.tag" | trim }}"
           args:
             - "--endpoint=$(CSI_ENDPOINT)"
             - "--infra-cluster-namespace=$(INFRACLUSTER_NAMESPACE)"

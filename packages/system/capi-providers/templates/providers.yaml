@@ -5,7 +5,7 @@ metadata:
   name: cluster-api
 spec:
   # https://github.com/kubernetes-sigs/cluster-api
-  version: v1.7.3
+  version: v1.8.3
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
 kind: ControlPlaneProvider
@@ -13,7 +13,7 @@ metadata:
   name: kamaji
 spec:
   # https://github.com/clastix/cluster-api-control-plane-provider-kamaji
-  version: v0.10.0
+  version: v0.11.0
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
 kind: BootstrapProvider
@@ -21,7 +21,7 @@ metadata:
   name: kubeadm
 spec:
   # https://github.com/kubernetes-sigs/cluster-api
-  version: v1.7.3
+  version: v1.8.3
 ---
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
 kind: InfrastructureProvider
@@ -29,4 +29,4 @@ metadata:
   name: kubevirt
 spec:
   # https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt
-  version: v0.1.8
+  version: v0.1.9
