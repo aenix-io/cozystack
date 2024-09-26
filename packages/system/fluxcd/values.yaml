@@ -2,7 +2,7 @@ flux-instance:
   instance:
     cluster:
       networkPolicy: true
-      # domain:
+      # domain: -- default value is overriden in patches
     distribution:
       version: 2.3.x
       registry: ghcr.io/fluxcd
