@@ -6,7 +6,7 @@ ingress-nginx:
       registry: ghcr.io
       image: kvaps/ingress-nginx-with-protobuf-exporter/controller
       tag: v1.11.2
-      digest: sha256:f4194edb06a43c82405167427ebd552b90af9698bd295845418680aebc13f600
+      digest: sha256:e80856ece4e30e9646d65c8d92c25a3446a0bba1c2468cd026f17df9e60d2c0f
     allowSnippetAnnotations: true
     replicaCount: 2
     admissionWebhooks:
