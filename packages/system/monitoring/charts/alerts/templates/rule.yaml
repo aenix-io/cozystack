@@ -1,0 +1,9 @@
+{{- range $path, $file := .Files.Glob "files/rules/**/*.yaml" }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: {{ toString $path | trimPrefix "files/rules/" | replace "/" "-" | replace ".yaml" "" }}
+spec:
+  {{- toString $file | nindent 2 }}
+---
+{{- end }}

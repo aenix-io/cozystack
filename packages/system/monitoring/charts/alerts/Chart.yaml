@@ -1,0 +1,3 @@
+apiVersion: v1
+name: alerts
+version: v0.0.0

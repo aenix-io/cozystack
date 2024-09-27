@@ -1,0 +1,23 @@
+groups:
+- name: vertical-pod-autoscaler
+  rules:
+
+  # These rules provide metrics to be consumed by Kubernetes' VPA. The VPA only needs a tiny fraction
+  # of the labels available on the container_* metrics, so we reduce them with the inner query to
+  # only contain pod name, namespace and name.
+  # Because the VPA does not allow to change the metric name it queries, but only the job selector,
+  # we "cheat" by re-using the same metric name and injecting a custom job ("cadvisor-vpa") label.
+
+  - record: container_cpu_usage_seconds_total
+    expr: |
+      label_replace(
+        sum(container_cpu_usage_seconds_total{job="cadvisor", pod=~".+", name!="POD", name!=""}) by (pod, namespace, name),
+        "job", "cadvisor-vpa", "", ""
+      )
+
+  - record: container_memory_usage_bytes
+    expr: |
+      label_replace(
+        sum(container_memory_usage_bytes{job="cadvisor", pod=~".+", name!="POD", name!=""}) by (pod, namespace, name),
+        "job", "cadvisor-vpa", "", ""
+      )

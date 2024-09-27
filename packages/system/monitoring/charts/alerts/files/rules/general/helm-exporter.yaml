@@ -1,0 +1,20 @@
+groups:
+- name: helm-exporter
+  rules:
+  - alert: HelmReleaseNotDeployed
+    annotations:
+      message:
+        The Helm release `{{ $labels.release }}` (`{{ $labels.chart }}` chart in namespace `{{ $labels.exported_namespace }}`)
+        in version {{ $labels.version }} has not been ready for more than 15 minutes.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-helmreleasenotdeployed
+    expr: helm_chart_info != 1
+    for: 15m
+    labels:
+      severity: warning
+      resource: '{{ $labels.release }}'
+      service: helm-exporter
+    runbook:
+      steps:
+      - Check the installed Helm releases via `helm --namespace monitoring ls --all`.
+      - If Helm cannot repair the chart automatically, delete/purge the chart (`helm delete --purge [RELEASE]`) and
+        re-install the chart again.

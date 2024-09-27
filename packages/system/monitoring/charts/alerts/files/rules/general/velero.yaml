@@ -1,0 +1,34 @@
+groups:
+- name: velero
+  rules:
+  - alert: VeleroBackupTakesTooLong
+    annotations:
+      message: Last backup with schedule {{ $labels.schedule }} has not finished successfully within 60min.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-velerobackuptakestoolong
+    expr: time() - velero_backup_last_successful_timestamp{schedule!=""} > 3600
+    for: 5m
+    labels:
+      severity: warning
+      resource: '{{ $labels.schedule }}'
+      service: 'velero'
+    runbook:
+      steps:
+      - Check if a backup is really in "InProgress" state via `velero -n velero backup get`.
+      - Check the backup logs via `velero -n velero backup logs [BACKUP_NAME]`.
+      - Depending on the backup, find the pod and check the processes inside that pod or any sidecar containers.
+
+  - alert: VeleroNoRecentBackup
+    annotations:
+      message: There has not been a successful backup for schedule {{ $labels.schedule }} in the last 24 hours.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-veleronorecentbackup
+    expr: time() - velero_backup_last_successful_timestamp{schedule!=""} > 3600*25
+    labels:
+      severity: critical
+      resource: '{{ $labels.schedule }}'
+      service: 'velero'
+    runbook:
+      steps:
+      - Check if really no backups happened via `velero -n velero backup get`.
+      - If a backup failed, check its logs via `velero -n velero backup logs [BACKUP_NAME]`.
+      - If a backup was not even triggered, check the Velero server's logs via `kubectl -n velero logs -l 'name=velero-server'`.
+      - Make sure the Velero server pod has not been rescheduled and possibly opt to schedule it on a stable node using a node affinity.

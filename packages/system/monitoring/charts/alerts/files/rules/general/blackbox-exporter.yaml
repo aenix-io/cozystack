@@ -1,0 +1,48 @@
+groups:
+- name: blackbox-exporter
+  rules:
+  - alert: HttpProbeFailed
+    annotations:
+      message: Probing the blackbox-exporter target {{ $labels.instance }} failed.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-httpprobefailed
+    expr: probe_success != 1
+    for: 5m
+    labels:
+      severity: warning
+      resource: '{{ $labels.instance }}'
+      service: blackbox-exporter
+
+  - alert: HttpProbeSlow
+    annotations:
+      message: '{{ $labels.instance }} takes {{ $value }} seconds to respond.'
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-httpprobeslow
+    expr: sum by (instance) (probe_http_duration_seconds) > 3
+    for: 15m
+    labels:
+      severity: warning
+      resource: '{{ $labels.instance }}'
+      service: blackbox-exporter
+    runbook:
+      steps:
+      - Check the target system's resource usage for anomalias.
+      - Check if the target application has been recently rescheduled and is still settling.
+
+  - alert: HttpCertExpiresSoon
+    annotations:
+      message: The certificate for {{ $labels.instance }} expires in less than 3 days.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-httpcertexpiressoon
+    expr: probe_ssl_earliest_cert_expiry - time() < 3*24*3600
+    labels:
+      severity: warning
+      resource: '{{ $labels.instance }}'
+      service: blackbox-exporter
+
+  - alert: HttpCertExpiresVerySoon
+    annotations:
+      message: The certificate for {{ $labels.instance }} expires in less than 24 hours.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-httpcertexpiresverysoon
+    expr: probe_ssl_earliest_cert_expiry - time() < 24*3600
+    labels:
+      severity: critical
+      resource: '{{ $labels.instance }}'
+      service: blackbox-exporter

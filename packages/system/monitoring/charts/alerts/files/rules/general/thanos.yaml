@@ -1,0 +1,85 @@
+groups:
+- name: thanos
+  rules:
+  - alert: ThanosSidecarDown
+    annotations:
+      message: The Thanos sidecar in `{{ $labels.namespace }}/{{ $labels.pod }}` is down.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-thanossidecardown
+    expr: thanos_sidecar_prometheus_up != 1
+    for: 5m
+    labels:
+      severity: warning
+      resource: '{{ $labels.namespace }}/{{ $labels.pod }}'
+      service: thanos
+
+  - alert: ThanosSidecarNoHeartbeat
+    annotations:
+      message: The Thanos sidecar in `{{ $labels.namespace }}/{{ $labels.pod }}` didn't send a heartbeat in {{ $value }} seconds.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-thanossidecardown
+    expr: time() - thanos_sidecar_last_heartbeat_success_time_seconds > 60
+    for: 3m
+    labels:
+      severity: warning
+      resource: '{{ $labels.namespace }}/{{ $labels.pod }}'
+      service: thanos
+
+  - alert: ThanosCompactorManyRetries
+    annotations:
+      message: The Thanos compactor in `{{ $labels.namespace }}` is experiencing a high retry rate.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-thanoscompactormanyretries
+    expr: sum(rate(thanos_compact_retries_total[5m])) > 0.01
+    for: 10m
+    labels:
+      severity: warning
+      resource: '{{ $labels.namespace }}/{{ $labels.pod }}'
+      service: thanos
+    runbook:
+      steps:
+      - Check the `thanos-compact` pod's logs.
+
+  - alert: ThanosShipperManyDirSyncFailures
+    annotations:
+      message: The Thanos shipper in `{{ $labels.namespace }}/{{ $labels.pod }}` is experiencing a high dir-sync failure rate.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-thanosshippermanydirsyncfailures
+    expr: sum(rate(thanos_shipper_dir_sync_failures_total[5m])) > 0.01
+    for: 10m
+    labels:
+      severity: warning
+      resource: '{{ $labels.namespace }}/{{ $labels.pod }}'
+      service: thanos
+    runbook:
+      steps:
+      - Check the `thanos` containers's logs inside the Prometheus pod.
+
+  - alert: ThanosManyPanicRecoveries
+    annotations:
+      message: The Thanos component in `{{ $labels.namespace }}/{{ $labels.pod }}` is experiencing a panic recovery rate.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-thanosmanypanicrecoveries
+    expr: sum(rate(thanos_grpc_req_panics_recovered_total[5m])) > 0.01
+    for: 10m
+    labels:
+      severity: warning
+      resource: '{{ $labels.namespace }}/{{ $labels.pod }}'
+      service: thanos
+
+  - alert: ThanosManyBlockLoadFailures
+    annotations:
+      message: The Thanos store in `{{ $labels.namespace }}/{{ $labels.pod }}` is experiencing a many failed block loads.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-thanosmanyblockloadfailures
+    expr: sum(rate(thanos_bucket_store_block_load_failures_total[5m])) > 0.01
+    for: 10m
+    labels:
+      severity: warning
+      resource: '{{ $labels.namespace }}/{{ $labels.pod }}'
+      service: thanos
+
+  - alert: ThanosManyBlockDropFailures
+    annotations:
+      message: The Thanos store in `{{ $labels.namespace }}/{{ $labels.pod }}` is experiencing a many failed block drops.
+      runbook_url: https://docs.kubermatic.com/kubermatic/master/cheat_sheets/alerting_runbook/#alert-thanosmanyblockdropfailures
+    expr: sum(rate(thanos_bucket_store_block_drop_failures_total[5m])) > 0.01
+    for: 10m
+    labels:
+      severity: warning
+      resource: '{{ $labels.namespace }}/{{ $labels.pod }}'
+      service: thanos
