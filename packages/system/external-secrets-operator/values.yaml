@@ -1,0 +1,4 @@
+external-secrets:
+  bitwarden-sdk-server:
+    enabled: false  
+  installCRDs: true

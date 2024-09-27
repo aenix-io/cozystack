@@ -140,3 +140,9 @@ releases:
   chart: cozy-telepresence
   namespace: cozy-telepresence
   dependsOn: []
+
+- name: external-secrets-operator
+  releaseName: external-secrets-operator
+  chart: cozy-external-secrets-operator
+  namespace: cozy-external-secrets-operator
+  dependsOn: [cilium]
