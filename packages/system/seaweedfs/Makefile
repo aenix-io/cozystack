@@ -1,3 +1,7 @@
+NAME=seaweedfs-system
+
+include ../../../scripts/package.mk
+
 update:
 	rm -rf charts
 	mkdir -p charts
