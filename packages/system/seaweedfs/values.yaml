@@ -114,7 +114,6 @@ seaweedfs:
       policy.cozystack.io/allow-to-apiserver: "true"
     driverName: "seaweedfs.objectstorage.k8s.io"
     bucketClassName: "seaweedfs"
-    image: "ghcr.io/seaweedfs/seaweedfs-cosi-driver:v0.1.1"
     region: ""
   
     sidecar:
