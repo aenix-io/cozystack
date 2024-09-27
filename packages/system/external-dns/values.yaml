@@ -18,5 +18,6 @@ external-dns:
   ## -- Intentionally exclude domains from being managed.
   excludeDomains: []
 
-  provider: 
+  # -- Specify the DNS provider (e.g., "aws", "google", "azure", etc.)
+  provider:
     name: ""
