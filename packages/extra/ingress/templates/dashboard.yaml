@@ -12,7 +12,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod  
     {{- if eq $issuerType "cloudflare" }} 
     {{- else }}  
-    acme.cert-manager.io/http01-ingress-class: tenant-root  
+    acme.cert-manager.io/http01-ingress-class: {{ .Release.Namespace }}  
     {{- end }}  
   name: dashboard-{{ .Release.Namespace }}  
   namespace: cozy-dashboard  
