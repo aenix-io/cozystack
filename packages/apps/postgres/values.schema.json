@@ -29,9 +29,9 @@
                     "type": "object",
                     "properties": {
                         "max_connections": {
-                            "type": "string",
+                            "type": "number",
                             "description": "Determines the maximum number of concurrent connections to the database server. The default is typically 100 connections",
-                            "default": "100"
+                            "default": 100
                         }
                     }
                 }
