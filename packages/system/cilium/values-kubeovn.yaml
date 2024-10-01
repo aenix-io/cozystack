@@ -15,4 +15,4 @@ cilium:
   enableIdentityMark: false
   enableRuntimeDeviceDetection: true
   forceDeviceDetection: true
-  devices: ovn0
+  devices: "ovn0 genev_sys_6081"
