@@ -3,24 +3,24 @@
 arch: amd64
 platform: nocloud
 secureboot: false
-version: v1.7.6
+version: v1.8.0
 input:
   kernel:
     path: /usr/install/amd64/vmlinuz
   initramfs:
     path: /usr/install/amd64/initramfs.xz
   baseInstaller:
-    imageRef: ghcr.io/siderolabs/installer:v1.7.6
+    imageRef: ghcr.io/siderolabs/installer:v1.8.0
   systemExtensions:
-    - imageRef: ghcr.io/siderolabs/amd-ucode:20240811
-    - imageRef: ghcr.io/siderolabs/amdgpu-firmware:20240811
-    - imageRef: ghcr.io/siderolabs/bnx2-bnx2x:20240811
-    - imageRef: ghcr.io/siderolabs/i915-ucode:20240811
-    - imageRef: ghcr.io/siderolabs/intel-ice-firmware:20240811
-    - imageRef: ghcr.io/siderolabs/intel-ucode:20240813
-    - imageRef: ghcr.io/siderolabs/qlogic-firmware:20240811
-    - imageRef: ghcr.io/siderolabs/drbd:9.2.8-v1.7.6
-    - imageRef: ghcr.io/siderolabs/zfs:2.2.4-v1.7.6
+    - imageRef: ghcr.io/siderolabs/amd-ucode:20240909
+    - imageRef: ghcr.io/siderolabs/amdgpu-firmware:20240909
+    - imageRef: ghcr.io/siderolabs/bnx2-bnx2x:20240909
+    - imageRef: ghcr.io/siderolabs/i915-ucode:20240909
+    - imageRef: ghcr.io/siderolabs/intel-ice-firmware:20240909
+    - imageRef: ghcr.io/siderolabs/intel-ucode:20240910
+    - imageRef: ghcr.io/siderolabs/qlogic-firmware:20240909
+    - imageRef: ghcr.io/siderolabs/drbd:9.2.11-v1.8.0
+    - imageRef: ghcr.io/siderolabs/zfs:2.2.6-v1.8.0
 output:
   kind: image
   imageOptions: { diskSize: 1306525696, diskFormat: raw }
