@@ -29,6 +29,7 @@ releases:
       enableIdentityMark: true
       ipv4NativeRoutingCIDR: "{{ index $cozyConfig.data "ipv4-pod-cidr" }}"
       autoDirectNodeRoutes: true
+      routingMode: native
 
 - name: cert-manager
   releaseName: cert-manager
