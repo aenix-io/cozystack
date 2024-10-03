@@ -71,6 +71,13 @@
             "properties": {},
             "type": "object"
         },
+        "extraArgs": {
+            "items": {
+                "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+        },
         "extraEnvs": {
             "items": {
                 "type": "object"
@@ -139,6 +146,14 @@
                 }
             },
             "type": "object"
+        },
+        "logLevel": {
+            "enum": [
+                "debug",
+                "info",
+                "error"
+            ],
+            "type": "string"
         },
         "marketplace": {
             "properties": {
