@@ -215,16 +215,19 @@ releases:
   chart: cozy-capi-providers
   namespace: cozy-cluster-api
   privileged: true
+  optional: true
   dependsOn: [cilium,kubeovn,capi-operator]
 
 - name: external-dns
   releaseName: external-dns
   chart: cozy-external-dns
   namespace: cozy-external-dns
+  optional: true
   dependsOn: [cilium,kubeovn]
 
 - name: external-secrets-operator
   releaseName: external-secrets-operator
   chart: cozy-external-secrets-operator
   namespace: cozy-external-secrets-operator
+  optional: true
   dependsOn: [cilium,kubeovn]
