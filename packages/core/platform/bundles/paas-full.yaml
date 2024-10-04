@@ -175,6 +175,7 @@ releases:
   releaseName: traffic-manager
   chart: cozy-telepresence
   namespace: cozy-telepresence
+  optional: true
   dependsOn: [cilium,kubeovn]
 
 - name: dashboard
@@ -215,7 +216,6 @@ releases:
   chart: cozy-capi-providers
   namespace: cozy-cluster-api
   privileged: true
-  optional: true
   dependsOn: [cilium,kubeovn,capi-operator]
 
 - name: external-dns
