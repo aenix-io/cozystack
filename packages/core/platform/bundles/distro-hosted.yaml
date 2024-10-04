@@ -97,4 +97,4 @@ releases:
   releaseName: external-dns
   chart: cozy-external-dns
   namespace: cozy-external-dns
-  dependsOn: []  
+  dependsOn: [] 

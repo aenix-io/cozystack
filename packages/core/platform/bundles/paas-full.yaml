@@ -221,4 +221,4 @@ releases:
   releaseName: external-dns
   chart: cozy-external-dns
   namespace: cozy-external-dns
-  dependsOn: [cilium,kubeovn,cert-manager]  
+  dependsOn: [cilium,kubeovn]
