@@ -48,6 +48,11 @@ spec:
       {{- end }}
       containers:
         - name: manager
+          args:
+            - --log-level={{ .Values.logLevel }}
+            {{- range .Values.extraArgs }}
+            - {{ . }}
+            {{- end }}
           env:
             - name: RUNTIME_NAMESPACE
               valueFrom:

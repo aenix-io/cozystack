@@ -90,6 +90,12 @@ hostNetwork: false # @schema default: false
 # -- Container extra environment variables.
 extraEnvs: [ ] # @schema item: object ; uniqueItems: true
 
+# -- Container extra arguments.
+extraArgs: [ ] # @schema item: string ; uniqueItems: true
+
+# -- Container logging level flag.
+logLevel: "info" # @schema enum:[debug,info,error]
+
 # -- Prometheus Operator scraping settings.
 serviceMonitor: # @schema default: {"create":false,"interval":"60s","scrapeTimeout":"30s"}
   create: false
