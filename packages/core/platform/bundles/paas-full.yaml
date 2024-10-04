@@ -216,3 +216,9 @@ releases:
   namespace: cozy-cluster-api
   privileged: true
   dependsOn: [cilium,kubeovn,capi-operator]
+
+- name: external-secrets-operator
+  releaseName: external-secrets-operator
+  chart: cozy-external-secrets-operator
+  namespace: cozy-external-secrets-operator
+  dependsOn: [cilium,kubeovn]
