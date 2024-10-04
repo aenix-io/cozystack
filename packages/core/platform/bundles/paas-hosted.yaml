@@ -99,6 +99,12 @@ releases:
   namespace: cozy-telepresence
   dependsOn: []
 
+- name: external-dns
+  releaseName: external-dns
+  chart: cozy-external-dns
+  namespace: cozy-external-dns
+  dependsOn: [cilium,kubeovn]
+
 - name: external-secrets-operator
   releaseName: external-secrets-operator
   chart: cozy-external-secrets-operator

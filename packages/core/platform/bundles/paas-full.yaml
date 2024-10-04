@@ -217,6 +217,12 @@ releases:
   privileged: true
   dependsOn: [cilium,kubeovn,capi-operator]
 
+- name: external-dns
+  releaseName: external-dns
+  chart: cozy-external-dns
+  namespace: cozy-external-dns
+  dependsOn: [cilium,kubeovn]
+
 - name: external-secrets-operator
   releaseName: external-secrets-operator
   chart: cozy-external-secrets-operator
