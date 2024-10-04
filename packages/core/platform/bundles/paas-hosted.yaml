@@ -105,6 +105,12 @@ releases:
   namespace: cozy-external-dns
   dependsOn: [cilium,kubeovn]
 
+- name: external-secrets-operator
+  releaseName: external-secrets-operator
+  chart: cozy-external-secrets-operator
+  namespace: cozy-external-secrets-operator
+  dependsOn: []
+
 - name: dashboard
   releaseName: dashboard
   chart: cozy-dashboard

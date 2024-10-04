@@ -3,7 +3,7 @@ kamaji:
     deploy: false
   image:
     pullPolicy: IfNotPresent
-    tag: latest@sha256:bb45d953a8ba46a19c8941ccc9fc8498d91435c77db439d8b1d6bde9fea8802a
+    tag: v0.16.1@sha256:95a9658cbbe1cbfbc42b9ab1df4f2a39342d7a8f1ff10a10b81b8656f3744c39
     repository: ghcr.io/aenix-io/cozystack/kamaji
   resources:
     limits:

@@ -29,6 +29,7 @@ releases:
       enableIdentityMark: true
       ipv4NativeRoutingCIDR: "{{ index $cozyConfig.data "ipv4-pod-cidr" }}"
       autoDirectNodeRoutes: true
+      routingMode: native
 
 - name: cert-manager
   releaseName: cert-manager
@@ -145,4 +146,10 @@ releases:
   releaseName: external-dns
   chart: cozy-external-dns
   namespace: cozy-external-dns
+  dependsOn: [cilium]
+
+- name: external-secrets-operator
+  releaseName: external-secrets-operator
+  chart: cozy-external-secrets-operator
+  namespace: cozy-external-secrets-operator
   dependsOn: [cilium]

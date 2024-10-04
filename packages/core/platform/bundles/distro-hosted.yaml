@@ -98,3 +98,9 @@ releases:
   chart: cozy-external-dns
   namespace: cozy-external-dns
   dependsOn: [] 
+
+- name: external-secrets-operator
+  releaseName: external-secrets-operator
+  chart: cozy-external-secrets-operator
+  namespace: cozy-external-secrets-operator
+  dependsOn: []
