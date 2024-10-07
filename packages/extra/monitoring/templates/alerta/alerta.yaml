@@ -148,18 +148,18 @@ metadata:
   labels:
     app: alerta
   annotations:
-    acme.cert-manager.io/http01-ingress-class: {{ $ingress }}
     {{- if ne $issuerType "cloudflare" }} 
-    acme.cert-manager.io/http01-ingress-class: {{ $ingress }}  
+    acme.cert-manager.io/http01-ingress-class: {{ $ingress }}
     {{- end }} 
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: {{ $ingress }}
   tls:
     - hosts:
-        - "{{ .Values.host | default (printf "alerta.%s" $host) }}"
+        - "{{ printf "alerta.%s" (.Values.host | default $host) }}"
       secretName: alerta-tls
   rules:
-    - host: "{{ .Values.host | default (printf "alerta.%s" $host) }}"
+    - host: "{{ printf "alerta.%s" (.Values.host | default $host) }}"
       http:
         paths:
           - path: /
