@@ -3,7 +3,7 @@ ARG builder_image=docker.io/library/golang:1.22.5
 FROM ${builder_image} AS builder
 RUN git clone https://github.com/kubevirt/csi-driver /src/kubevirt-csi-driver \
  && cd /src/kubevirt-csi-driver \
- && git checkout 35836e0c8b68d9916d29a838ea60cdd3fc6199cf
+ && git checkout fa92820448e583c7fd722dc20270544e0c3eca53
 
 WORKDIR /src/kubevirt-csi-driver
 RUN make build
