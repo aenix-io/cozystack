@@ -210,6 +210,26 @@ spec:
         name: {{ $.Release.Name }}-{{ $groupName }}-{{ $kubevirtmachinetemplateHash }}
         namespace: default
       version: v1.30.1
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineHealthCheck
+metadata:
+  name: {{ $.Release.Name }}-{{ $groupName }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  clusterName: {{ $.Release.Name }}
+  nodeStartupTimeout: 10m
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: {{ $.Release.Name }}
+      cluster.x-k8s.io/deployment-name: {{ $.Release.Name }}-{{ $groupName }}
+  unhealthyConditions:
+  - type: Ready
+    status: Unknown
+    timeout: 30s
+  - type: Ready
+    status: "False"
+    timeout: 30s
 {{- end }}
 ---
 {{- /*
