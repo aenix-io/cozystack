@@ -22,7 +22,7 @@ spec:
       password: ${GF_DATABASE_PASSWORD}
       #ssl_mode: require
     server:
-      root_url: "https://{{ .Values.host | default (printf "grafana.%s" $host) }}"
+      root_url: "https://{{ printf "grafana.%s" (.Values.host | default $host) }}"
     security:
       admin_user: user
       admin_password: ${GF_PASSWORD}
@@ -95,7 +95,7 @@ spec:
     spec:
       ingressClassName: "{{ $ingress }}"
       rules:
-        - host: "{{ .Values.host | default (printf "grafana.%s" $host) }}"
+        - host: "{{ printf "grafana.%s" (.Values.host | default $host) }}"
           http:
             paths:
               - backend:
@@ -107,5 +107,5 @@ spec:
                 pathType: Prefix
       tls:
       - hosts:
-        - "{{ .Values.host | default (printf "grafana.%s" $host) }}"
+        - "{{ printf "grafana.%s" (.Values.host | default $host) }}"
         secretName: grafana-ingress-tls
