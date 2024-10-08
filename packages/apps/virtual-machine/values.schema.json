@@ -20,41 +20,146 @@
       "description": "Determines if the virtual machine should be running",
       "default": true
     },
-    "image": {
+    "instanceType": {
       "type": "string",
-      "description": "The base image for the virtual machine. Allowed values: `ubuntu`, `cirros`, `alpine`, `fedora` and `talos`",
-      "default": "ubuntu",
+      "description": "Virtual Machine instance type",
+      "default": "u1.medium",
+      "optional": true,
       "enum": [
-        "ubuntu",
-        "cirros",
-        "alpine",
-        "fedora",
-        "talos"
+        "cx1.2xlarge",
+        "cx1.4xlarge",
+        "cx1.8xlarge",
+        "cx1.large",
+        "cx1.medium",
+        "cx1.xlarge",
+        "gn1.2xlarge",
+        "gn1.4xlarge",
+        "gn1.8xlarge",
+        "gn1.xlarge",
+        "m1.2xlarge",
+        "m1.4xlarge",
+        "m1.8xlarge",
+        "m1.large",
+        "m1.xlarge",
+        "n1.2xlarge",
+        "n1.4xlarge",
+        "n1.8xlarge",
+        "n1.large",
+        "n1.medium",
+        "n1.xlarge",
+        "o1.2xlarge",
+        "o1.4xlarge",
+        "o1.8xlarge",
+        "o1.large",
+        "o1.medium",
+        "o1.micro",
+        "o1.nano",
+        "o1.small",
+        "o1.xlarge",
+        "rt1.2xlarge",
+        "rt1.4xlarge",
+        "rt1.8xlarge",
+        "rt1.large",
+        "rt1.medium",
+        "rt1.micro",
+        "rt1.small",
+        "rt1.xlarge",
+        "u1.2xlarge",
+        "u1.2xmedium",
+        "u1.4xlarge",
+        "u1.8xlarge",
+        "u1.large",
+        "u1.medium",
+        "u1.micro",
+        "u1.nano",
+        "u1.small",
+        "u1.xlarge",
+        ""
       ]
     },
-    "storageClass": {
+    "instanceProfile": {
       "type": "string",
-      "description": "StorageClass used to store the data",
-      "default": "replicated"
+      "description": "Virtual Machine prefferences profile",
+      "default": "ubuntu",
+      "optional": true,
+      "enum": [
+        "alpine",
+        "centos.7",
+        "centos.7.desktop",
+        "centos.stream10",
+        "centos.stream10.desktop",
+        "centos.stream8",
+        "centos.stream8.desktop",
+        "centos.stream8.dpdk",
+        "centos.stream9",
+        "centos.stream9.desktop",
+        "centos.stream9.dpdk",
+        "cirros",
+        "fedora",
+        "fedora.arm64",
+        "opensuse.leap",
+        "opensuse.tumbleweed",
+        "rhel.10",
+        "rhel.10.arm64",
+        "rhel.7",
+        "rhel.7.desktop",
+        "rhel.8",
+        "rhel.8.desktop",
+        "rhel.8.dpdk",
+        "rhel.9",
+        "rhel.9.arm64",
+        "rhel.9.desktop",
+        "rhel.9.dpdk",
+        "rhel.9.realtime",
+        "sles",
+        "ubuntu",
+        "windows.10",
+        "windows.10.virtio",
+        "windows.11",
+        "windows.11.virtio",
+        "windows.2k16",
+        "windows.2k16.virtio",
+        "windows.2k19",
+        "windows.2k19.virtio",
+        "windows.2k22",
+        "windows.2k22.virtio",
+        "windows.2k25",
+        "windows.2k25.virtio",
+        ""
+      ]
+    },
+    "systemDisk": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "The HTTP URL for source image",
+          "default": ""
+        },
+        "storage": {
+          "type": "string",
+          "description": "The size of the disk allocated for the virtual machine",
+          "default": "5Gi"
+        },
+        "storageClass": {
+          "type": "string",
+          "description": "StorageClass used to store the data",
+          "default": "replicated"
+        }
+      }
     },
     "resources": {
       "type": "object",
       "properties": {
         "cpu": {
-          "type": "number",
+          "type": "string",
           "description": "The number of CPU cores allocated to the virtual machine",
-          "default": 1
+          "default": ""
         },
         "memory": {
           "type": "string",
           "description": "The amount of memory allocated to the virtual machine",
-          "default": "1024M",
-          "x-display": "slider"
-        },
-        "disk": {
-          "type": "string",
-          "description": "The size of the disk allocated for the virtual machine",
-          "default": "5Gi"
+          "default": ""
         }
       }
     },

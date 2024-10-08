@@ -15,6 +15,11 @@ spec:
         node-role.kubernetes.io/{{ . }}: ""
         {{- end }}
     spec:
+      {{- with .group.instanceType }}
+      instancetype:
+        kind: VirtualMachineClusterInstancetype
+        name: {{ . }}
+      {{- end }}
       runStrategy: Always
       template:
         metadata:
@@ -26,10 +31,12 @@ spec:
             {{- end }}
         spec:
           domain:
+            {{- if and .group.resources .group.resources.cpu }}
             cpu:
               threads: 1
               cores: {{ .group.resources.cpu }}
               sockets: 1
+            {{- end }}
             devices:
               disks:
               - name: system
@@ -43,8 +50,10 @@ spec:
               interfaces:
               - name: default
                 bridge: {}
+            {{- if and .group.resources .group.resources.memory }}
             memory:
               guest: {{ .group.resources.memory }}
+            {{- end }}
           evictionStrategy: External
           volumes:
           - name: system
@@ -176,6 +185,14 @@ spec:
   template:
     {{- $kubevirtmachinetemplate | nindent 4 }}
 ---
+{{- $instanceType := dict }}
+{{- if $group.instanceType }}
+{{-   $instanceType = (lookup "instancetype.kubevirt.io/v1beta1" "VirtualMachineClusterInstancetype" "" $group.instanceType) }}
+{{-   if not $instanceType }}
+{{-     fail (printf "Specified instancetype not exists in cluster: %s" $group.instanceType) }}
+{{-   end }}
+{{- end }}
+
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
 metadata:
@@ -184,8 +201,16 @@ metadata:
   annotations:
     cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: "{{ $group.minReplicas }}"
     cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: "{{ $group.maxReplicas }}"
+    {{- if and $group.resources $group.resources.memory }}
     capacity.cluster-autoscaler.kubernetes.io/memory: "{{ $group.resources.memory }}"
+    {{- else }}
+    capacity.cluster-autoscaler.kubernetes.io/memory: "{{ $instanceType.spec.memory.guest }}"
+    {{- end }}
+    {{- if and $group.resources $group.resources.cpu }}
     capacity.cluster-autoscaler.kubernetes.io/cpu: "{{ $group.resources.cpu }}"
+    {{- else }}
+    capacity.cluster-autoscaler.kubernetes.io/cpu: "{{ $instanceType.spec.cpu.guest }}"
+    {{- end }}
 spec:
   clusterName: {{ $.Release.Name }}
   template:
