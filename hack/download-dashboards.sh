@@ -1,6 +1,6 @@
 #https://github.com/deckhouse/deckhouse/blob/main/modules/340-monitoring-kubernetes-control-plane/monitoring/grafana-dashboards/kubernetes-cluster/control-plane-status.json
 base=https://github.com/deckhouse/deckhouse/raw/main/
-dir="grafana-dashboards"
+dir="dashboards"
 mkdir -p "$dir"
 
 

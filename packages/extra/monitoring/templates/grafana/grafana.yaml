@@ -1,3 +1,6 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}  
+{{- $issuerType := (index $cozyConfig.data "clusterissuer") | default "http01" }} 
+
 {{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
 {{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
 {{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
@@ -22,7 +25,7 @@ spec:
       password: ${GF_DATABASE_PASSWORD}
       #ssl_mode: require
     server:
-      root_url: "https://{{ .Values.host | default (printf "grafana.%s" $host) }}"
+      root_url: "https://{{ printf "grafana.%s" (.Values.host | default $host) }}"
     security:
       admin_user: user
       admin_password: ${GF_PASSWORD}
@@ -56,7 +59,7 @@ spec:
                   mountPath: /var/lib/grafana
           containers:
             - name: grafana
-              image: grafana/grafana:10.1.0
+              image: grafana/grafana:11.2.0
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: false
@@ -64,7 +67,7 @@ spec:
                 failureThreshold: 3
               env:
               - name: GF_INSTALL_PLUGINS
-                value: grafana-worldmap-panel,flant-statusmap-panel,grafana-oncall-app,natel-discrete-panel
+                value: grafana-worldmap-panel,natel-discrete-panel
               - name: ONCALL_API_URL
                 value: http://grafana-oncall-engine:8080
               - name: GF_DATABASE_HOST
@@ -90,12 +93,14 @@ spec:
   ingress:
     metadata:
       annotations:
-        acme.cert-manager.io/http01-ingress-class: "{{ $ingress }}"
+        {{- if ne $issuerType "cloudflare" }}
+        acme.cert-manager.io/http01-ingress-class: "{{ $ingress }}"  
+        {{- end }}
         cert-manager.io/cluster-issuer: letsencrypt-prod
     spec:
       ingressClassName: "{{ $ingress }}"
       rules:
-        - host: "{{ .Values.host | default (printf "grafana.%s" $host) }}"
+        - host: "{{ printf "grafana.%s" (.Values.host | default $host) }}"
           http:
             paths:
               - backend:
@@ -107,5 +112,5 @@ spec:
                 pathType: Prefix
       tls:
       - hosts:
-        - "{{ .Values.host | default (printf "grafana.%s" $host) }}"
+        - "{{ printf "grafana.%s" (.Values.host | default $host) }}"
         secretName: grafana-ingress-tls

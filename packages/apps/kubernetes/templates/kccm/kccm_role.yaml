@@ -35,6 +35,12 @@ rules:
   verbs:
   - "*"
 - apiGroups:
+  - "discovery.k8s.io"
+  resources:
+  - "endpointslices"
+  verbs:
+  - "*"
+- apiGroups:
   - ""
   resources:
   - nodes

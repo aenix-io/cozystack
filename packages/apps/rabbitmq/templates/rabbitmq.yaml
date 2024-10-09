@@ -16,6 +16,8 @@ spec:
     statefulSet:
       spec:
         template:
+          spec:
+            enableServiceLinks: false
           metadata:
             labels:
               policy.cozystack.io/allow-to-apiserver: "true"
@@ -47,7 +49,7 @@ metadata:
     config: '{{ printf "%s %s" $user $password | sha256sum }}'
 spec:
   importCredentialsSecret:
-    name: {{ $.Release.Name }}-{{ $user }}-credentials
+    name: {{ $.Release.Name }}-{{ kebabcase $user }}-credentials
   rabbitmqClusterReference:
     name: {{ $.Release.Name }}
 ---

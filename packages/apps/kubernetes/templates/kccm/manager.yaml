@@ -15,6 +15,7 @@ spec:
         k8s-app: {{ .Release.Name }}-kccm
         policy.cozystack.io/allow-to-apiserver: "true"
     spec:
+      enableServiceLinks: false
       tolerations:
         - key: CriticalAddonsOnly
           operator: Exists
@@ -30,7 +31,7 @@ spec:
         - --cluster-name={{ .Release.Name }}
         command:
         - /bin/kubevirt-cloud-controller-manager
-        image: ghcr.io/kvaps/test:kubevirt-cloud-provider
+        image: "{{ $.Files.Get "images/kubevirt-cloud-provider.tag" | trim }}"
         imagePullPolicy: Always
         #securityContext:
         #  privileged: true

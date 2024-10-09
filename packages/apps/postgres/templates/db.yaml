@@ -10,6 +10,9 @@ spec:
   postgresql:
     parameters:
       max_wal_senders: "30"
+      {{- with .Values.postgresql.parameters.max_connections }}
+      max_connections: "{{ . }}"
+      {{- end }}
 
   minSyncReplicas: {{ .Values.quorum.minSyncReplicas }}
   maxSyncReplicas: {{ .Values.quorum.maxSyncReplicas }}

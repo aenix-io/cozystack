@@ -3,6 +3,7 @@
 {{- $bundle := tpl (.Files.Get (printf "bundles/%s.yaml" $bundleName)) . | fromYaml }}
 {{- $dependencyNamespaces := dict }}
 {{- $disabledComponents := splitList "," ((index $cozyConfig.data "bundle-disable") | default "") }}
+{{- $enabledComponents := splitList "," ((index $cozyConfig.data "bundle-enable") | default "") }}
 
 {{/* collect dependency namespaces from releases */}}
 {{- range $x := $bundle.releases }}
@@ -11,6 +12,7 @@
 
 {{- range $x := $bundle.releases }}
 {{- if not (has $x.name $disabledComponents) }}
+{{- if or (not $x.optional) (and ($x.optional) (has $x.name $enabledComponents)) }}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -63,5 +65,6 @@ spec:
   {{- end }}
   {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

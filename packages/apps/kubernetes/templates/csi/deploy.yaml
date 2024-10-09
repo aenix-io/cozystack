@@ -15,6 +15,7 @@ spec:
         app: {{ .Release.Name }}-kcsi-driver
         policy.cozystack.io/allow-to-apiserver: "true"
     spec:
+      enableServiceLinks: false
       serviceAccountName: {{ .Release.Name }}-kcsi
       priorityClassName: system-cluster-critical
       tolerations:
@@ -26,7 +27,7 @@ spec:
       containers:
         - name: csi-driver
           imagePullPolicy: Always
-          image: ghcr.io/kvaps/test:kubevirt-csi-driver
+          image: "{{ $.Files.Get "images/kubevirt-csi-driver.tag" | trim }}"
           args:
             - "--endpoint=$(CSI_ENDPOINT)"
             - "--infra-cluster-namespace=$(INFRACLUSTER_NAMESPACE)"

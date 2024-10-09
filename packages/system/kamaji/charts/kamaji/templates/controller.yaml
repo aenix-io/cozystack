@@ -33,7 +33,8 @@ spec:
         - --leader-elect
         - --metrics-bind-address={{ .Values.metricsBindAddress }}
         - --tmp-directory={{ .Values.temporaryDirectoryPath }}
-        - --datastore={{ include "datastore.fullname" . }}
+        {{- $datastoreName := .Values.defaultDatastoreName | required ".Values.defaultDatastoreName is required!" }}
+        - --datastore={{ $datastoreName }}
         {{- if .Values.telemetry.disabled }}
         - --disable-telemetry
         {{- end }}
@@ -43,8 +44,6 @@ spec:
         {{- with .Values.extraArgs }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        command:
-        - /kamaji
         env:
           - name: POD_NAMESPACE
             valueFrom:

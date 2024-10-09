@@ -16,6 +16,7 @@ spec:
         app: {{ .Release.Name }}-cluster-autoscaler
         policy.cozystack.io/allow-to-apiserver: "true"
     spec:
+      enableServiceLinks: false
       tolerations:
         - key: CriticalAddonsOnly
           operator: Exists
@@ -23,7 +24,7 @@ spec:
           operator: Exists
           effect: "NoSchedule"
       containers:
-      - image: ghcr.io/kvaps/test:cluster-autoscaller
+      - image: "{{ $.Files.Get "images/cluster-autoscaler.tag" | trim }}"
         name: cluster-autoscaler
         command:
         - /cluster-autoscaler
