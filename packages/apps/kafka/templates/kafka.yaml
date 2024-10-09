@@ -79,7 +79,7 @@ spec:
   kafkaExporter:
     groupRegex: ".*"
     topicRegex: ".*"
-    resources: (4)
+    resources:
       requests:
         cpu: 200m
         memory: 64Mi
