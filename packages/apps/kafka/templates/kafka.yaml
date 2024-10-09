@@ -76,3 +76,6 @@ spec:
         metadata:
          labels:
            policy.cozystack.io/allow-to-apiserver: "true"
+  kafkaExporter:
+    groupRegex: ".*"
+    topicRegex: ".*"
