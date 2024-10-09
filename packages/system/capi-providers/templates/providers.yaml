@@ -29,8 +29,7 @@ metadata:
   name: kubevirt
 spec:
   # https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt
-  version: v0.1.8
-{{- end }}
+  version: v0.1.9
 
 {{- if .Values.providers.proxmox }}
 ---
