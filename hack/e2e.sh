@@ -217,6 +217,10 @@ timeout 60 sh -c 'until kubectl get hr -A | grep cozy; do sleep 1; done'
 sleep 5
 
 kubectl get hr -A | awk 'NR>1 {print "kubectl wait --timeout=15m --for=condition=ready -n " $1 " hr/" $2 " &"} END{print "wait"}' | sh -x
+
+# Wait for Cluster-API providers
+kubectl wait deploy --timeout=30s --for=condition=available -n cozy-cluster-api capi-controller-manager capi-kamaji-controller-manager capi-kubeadm-bootstrap-controller-manager capi-operator-cluster-api-operator capk-controller-manager
+
 # Wait for linstor controller
 kubectl wait deploy --timeout=5m --for=condition=available -n cozy-linstor linstor-controller
 
