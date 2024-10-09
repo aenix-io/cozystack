@@ -36,7 +36,7 @@ mkdir -p srv1 srv2 srv3
 
 # Prepare cloud-init
 for i in 1 2 3; do
-  echo "local-hostname: srv$i" > "srv$i/meta-data"
+  echo "hostname: srv$i" > "srv$i/meta-data"
   echo '#cloud-config' > "srv$i/user-data"
   cat > "srv$i/network-config" <<EOT
 version: 2
@@ -182,7 +182,7 @@ timeout 60 sh -c 'until nc -nzv 192.168.123.11 50000 && nc -nzv 192.168.123.12 5
 talosctl bootstrap -n 192.168.123.11 -e 192.168.123.11
 
 # Wait for etcd
-timeout 120 sh -c 'while talosctl etcd members -n 192.168.123.11,192.168.123.12,192.168.123.13 -e 192.168.123.10 2>&1 | grep "rpc error"; do sleep 1; done'
+timeout 180 sh -c 'while talosctl etcd members -n 192.168.123.11,192.168.123.12,192.168.123.13 -e 192.168.123.10 2>&1 | grep "rpc error"; do sleep 1; done'
 
 rm -f kubeconfig
 talosctl kubeconfig kubeconfig -e 192.168.123.10 -n 192.168.123.10
