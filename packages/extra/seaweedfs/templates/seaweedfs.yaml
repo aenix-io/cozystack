@@ -38,6 +38,10 @@ spec:
           storageClass: {{ . }}
           {{- end }}
           maxVolumes: 0
+
+      filer:
+        s3:
+          domainName: {{ .Values.host | default (printf "s3.%s" $host) }}
       
       s3:
         ingress:
