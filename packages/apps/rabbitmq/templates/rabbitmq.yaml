@@ -16,6 +16,8 @@ spec:
     statefulSet:
       spec:
         template:
+          spec:
+            enableServiceLinks: false
           metadata:
             labels:
               policy.cozystack.io/allow-to-apiserver: "true"
