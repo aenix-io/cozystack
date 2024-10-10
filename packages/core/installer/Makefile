@@ -1,5 +1,8 @@
 NAME=installer
 NAMESPACE=cozy-system
+YQ_VERSION=v4.35.1
+RED = \033[31m
+RESET = \033[0m
 
 TALOS_VERSION=$(shell awk '/^version:/ {print $$2}' images/talos/profiles/installer.yaml)
 
@@ -17,7 +20,21 @@ diff:
 update:
 	hack/gen-profiles.sh
 
-image: image-cozystack image-talos image-matchbox
+image: check-yq-version image-cozystack image-talos image-matchbox
+
+check-yq-version:
+	@current_version=$$(yq -V | grep -oP 'v[0-9]+\.[0-9]+\.[0-9]+') ; \
+	if [ -z "$$current_version" ]; then \
+	    echo "yq is not installed or version cannot be determined." ; \
+	    exit 1 ; \
+	fi ; \
+	echo "Current yq version: $$current_version" ; \
+	if [ "$$(printf '%s\n' "$(YQ_VERSION)" "$$current_version" | sort -V | head -n1)" = "$(YQ_VERSION)" ]; then \
+	    echo "Greater than or equal to $(YQ_VERSION)" ; \
+	else \
+	    echo "$(RED)ERROR: yq version less than $(YQ_VERSION)$(RESET)" ; \
+	    exit 1 ; \
+	fi
 
 image-cozystack:
 	make -C ../../.. repos

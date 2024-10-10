@@ -6,7 +6,7 @@
 [![Support](https://img.shields.io/badge/$-support-12a0df.svg?style=flat)](https://aenix.io/contact-us/#meet)
 [![Active](http://img.shields.io/badge/Status-Active-green.svg)](https://aenix.io/cozystack/)
 [![GitHub Release](https://img.shields.io/github/release/aenix-io/cozystack.svg?style=flat)](https://github.com/aenix-io/cozystack)
-[![GitHub Commit](https://img.shields.io/github/commit-activity/y/aenix-io/cozystack)](https://github.com/aenix-io/cozystack) 
+[![GitHub Commit](https://img.shields.io/github/commit-activity/y/aenix-io/cozystack)](https://github.com/aenix-io/cozystack)
 
 # Cozystack
 
@@ -14,17 +14,17 @@
 
 With Cozystack, you can transform your bunch of servers into an intelligent system with a simple REST API for spawning Kubernetes clusters, Database-as-a-Service, virtual machines, load balancers, HTTP caching services, and other services with ease.
 
-You can use Cozystack to build your own cloud or to provide a cost-effective development environments.  
+You can use Cozystack to build your own cloud or to provide a cost-effective development environments.
 
 ## Use-Cases
 
-* [**Using Cozystack to build public cloud**](https://cozystack.io/docs/use-cases/public-cloud/)  
+* [**Using Cozystack to build public cloud**](https://cozystack.io/docs/use-cases/public-cloud/)
 You can use Cozystack as backend for a public cloud
 
-* [**Using Cozystack to build private cloud**](https://cozystack.io/docs/use-cases/private-cloud/)  
+* [**Using Cozystack to build private cloud**](https://cozystack.io/docs/use-cases/private-cloud/)
 You can use Cozystack as platform to build a private cloud powered by Infrastructure-as-Code approach
 
-* [**Using Cozystack as Kubernetes distribution**](https://cozystack.io/docs/use-cases/kubernetes-distribution/)  
+* [**Using Cozystack as Kubernetes distribution**](https://cozystack.io/docs/use-cases/kubernetes-distribution/)
 You can use Cozystack as Kubernetes distribution for Bare Metal
 
 ## Screenshot
@@ -41,10 +41,10 @@ If you encounter any difficulties, start with the [troubleshooting guide](https:
 
 ## Versioning
 
-Versioning adheres to the [Semantic Versioning](http://semver.org/) principles.  
+Versioning adheres to the [Semantic Versioning](http://semver.org/) principles.
 A full list of the available releases is available in the GitHub repository's [Release](https://github.com/aenix-io/cozystack/releases) section.
 
-- [Roadmap](https://github.com/orgs/aenix-io/projects/2)
+* [Roadmap](https://github.com/orgs/aenix-io/projects/2)
 
 ## Contributions
 
@@ -62,7 +62,7 @@ You can join our weekly community meetings (just add this events to your [Google
 
 ## License
 
-Cozystack is licensed under Apache 2.0.  
+Cozystack is licensed under Apache 2.0.
 The code is provided as-is with no warranties.
 
 ## Commercial Support

@@ -6,30 +6,34 @@ PostgreSQL is currently the leading choice among relational databases, known for
 
 This managed service is controlled by the CloudNativePG operator, ensuring efficient management and seamless operation.
 
-- Docs: https://cloudnative-pg.io/docs/
-- Github: https://github.com/cloudnative-pg/cloudnative-pg
+- Docs: <https://cloudnative-pg.io/docs/>
+- Github: <https://github.com/cloudnative-pg/cloudnative-pg>
 
 ## HowTos
 
 ### How to switch master/slave replica
 
 See:
-- https://cloudnative-pg.io/documentation/1.15/rolling_update/#manual-updates-supervised
 
-### How to restore backup:
+- <https://cloudnative-pg.io/documentation/1.15/rolling_update/#manual-updates-supervised>
+
+### How to restore backup
 
 find snapshot:
-```
+
+```bash
 restic -r s3:s3.example.org/postgres-backups/database_name snapshots
 ```
 
 restore:
-```
+
+```bash
 restic -r s3:s3.example.org/postgres-backups/database_name restore latest --target /tmp/
 ```
 
 more details:
-- https://itnext.io/restic-effective-backup-from-stdin-4bc1e8f083c1
+
+- <https://itnext.io/restic-effective-backup-from-stdin-4bc1e8f083c1>
 
 ## Parameters
 
@@ -64,5 +68,3 @@ more details:
 | `backup.s3AccessKey`     | The access key for S3, used for authentication | `oobaiRus9pah8PhohL1ThaeTa4UVa7gu`                     |
 | `backup.s3SecretKey`     | The secret key for S3, used for authentication | `ju3eum4dekeich9ahM1te8waeGai0oog`                     |
 | `backup.resticPassword`  | The password for Restic backup encryption      | `ChaXoveekoh6eigh4siesheeda2quai0`                     |
-
-
