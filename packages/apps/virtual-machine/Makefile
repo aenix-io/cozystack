@@ -1,10 +1,9 @@
 include ../../../scripts/package.mk
 
 generate:
-	readme-generator -v values.yaml -s values.schema.json.tmp -r README.md
-	cat values.schema.json.tmp | \
-		jq '.properties.image.enum = ["ubuntu", "cirros", "alpine", "fedora", "talos"]' | \
-		jq '.properties.resources.properties.memory["x-display"] = "slider"' | \
-		jq '.properties.externalPorts.items.type = "integer"' \
-		> values.schema.json
-	rm -f values.schema.json.tmp
+	readme-generator -v values.yaml -s values.schema.json -r README.md
+	INSTANCE_TYPES=$$(yq e '.metadata.name' -o=json -r ../../system/kubevirt-common-instancetypes/templates/instancetypes.yaml | yq 'split(" ") | . + [""]' -o json) \
+	  && yq -i -o json ".properties.instanceType.optional=true | .properties.instanceType.enum = $${INSTANCE_TYPES}" values.schema.json
+	PREFERENCES=$$(yq e '.metadata.name' -o=json -r ../../system/kubevirt-common-instancetypes/templates/preferences.yaml | yq 'split(" ") | . + [""]' -o json) \
+	  && yq -i -o json ".properties.instanceProfile.optional=true | .properties.instanceProfile.enum = $${PREFERENCES}" values.schema.json
+	yq -i -o json '.properties.externalPorts.items.type = "integer"' values.schema.json
