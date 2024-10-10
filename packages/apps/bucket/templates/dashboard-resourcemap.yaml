@@ -9,4 +9,12 @@ rules:
   - secrets
   resourceNames:
   - {{ .Release.Name }}
+  - {{ .Release.Name }}-credentials
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  resourceNames:
+  - {{ .Release.Name }}-ui
   verbs: ["get", "list", "watch"]

@@ -1,0 +1,28 @@
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
+{{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.bucketName }}-ui
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: "basic"
+    nginx.ingress.kubernetes.io/auth-secret: "{{ .Values.bucketName }}-ui-auth"
+    nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "99999"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "99999"
+spec:
+  ingressClassName: {{ $ingress }}
+  rules:
+  - host: {{ .Values.bucketName }}.{{ $host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.bucketName }}-ui
+            port:
+              number: 8080
