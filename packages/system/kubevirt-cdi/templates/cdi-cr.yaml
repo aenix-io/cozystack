@@ -4,6 +4,7 @@ metadata:
   name: cdi
 spec:
   config:
+    scratchSpaceStorageClass: "local"
     featureGates:
     - HonorWaitForFirstConsumer
     - ExpandDisks
