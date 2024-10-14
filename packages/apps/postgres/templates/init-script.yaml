@@ -34,6 +34,9 @@ stringData:
   init.sh: |
     #!/bin/bash
     set -e
+
+    until pg_isready ; do sleep 5; done
+
     echo "== create users"
     {{- if .Values.users }}
     psql -v ON_ERROR_STOP=1 <<\EOT
@@ -60,7 +63,7 @@ stringData:
     DROP USER $user;
     EOT
     done
-    
+
     echo "== create databases and roles"
     {{- if .Values.databases }}
     psql -v ON_ERROR_STOP=1 --echo-all <<\EOT
@@ -92,7 +95,7 @@ stringData:
         FOR schema_record IN SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema') LOOP
             -- Changing Schema Ownership
             EXECUTE format('ALTER SCHEMA %I OWNER TO %I', schema_record.schema_name, '{{ $database }}_admin');
-    
+
             -- Add rights for the admin role
             EXECUTE format('GRANT ALL ON SCHEMA %I TO %I', schema_record.schema_name, '{{ $database }}_admin');
             EXECUTE format('GRANT ALL ON ALL TABLES IN SCHEMA %I TO %I', schema_record.schema_name, '{{ $database }}_admin');
@@ -101,7 +104,7 @@ stringData:
             EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON TABLES TO %I', schema_record.schema_name, '{{ $database }}_admin');
             EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON SEQUENCES TO %I', schema_record.schema_name, '{{ $database }}_admin');
             EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT ALL ON FUNCTIONS TO %I', schema_record.schema_name, '{{ $database }}_admin');
-    
+
             -- Add rights for the readonly role
             EXECUTE format('GRANT USAGE ON SCHEMA %I TO %I', schema_record.schema_name, '{{ $database }}_readonly');
             EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO %I', schema_record.schema_name, '{{ $database }}_readonly');
@@ -119,9 +122,9 @@ stringData:
     CREATE OR REPLACE FUNCTION auto_grant_schema_privileges()
     RETURNS event_trigger LANGUAGE plpgsql AS $$
     DECLARE
-      obj record;
+        obj record;
     BEGIN
-      FOR obj IN SELECT * FROM pg_event_trigger_ddl_commands() WHERE command_tag = 'CREATE SCHEMA' LOOP
+        FOR obj IN SELECT * FROM pg_event_trigger_ddl_commands() WHERE command_tag = 'CREATE SCHEMA' LOOP
         EXECUTE format('ALTER SCHEMA %I OWNER TO %I', obj.object_identity, '{{ $database }}_admin');
         EXECUTE format('GRANT ALL ON SCHEMA %I TO %I', obj.object_identity, '{{ $database }}_admin');
         EXECUTE format('GRANT USAGE ON SCHEMA %I TO %I', obj.object_identity, '{{ $database }}_readonly');
@@ -146,7 +149,7 @@ stringData:
         EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT SELECT ON TABLES TO %I', obj.object_identity, '{{ $database }}_readonly');
         EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT USAGE ON SEQUENCES TO %I', obj.object_identity, '{{ $database }}_readonly');
         EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT EXECUTE ON FUNCTIONS TO %I', obj.object_identity, '{{ $database }}_readonly');
-      END LOOP;
+        END LOOP;
     END;
     $$;
 

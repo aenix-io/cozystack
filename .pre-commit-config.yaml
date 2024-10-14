@@ -1,0 +1,16 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.5.0
+  hooks:
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: mixed-line-ending
+      args: [--fix=lf]
+    - id: check-yaml
+      exclude: packages/apps/postgres/templates/init-script.yaml
+      args: [--unsafe]
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.41.0
+  hooks:
+  - id: markdownlint
+    args: [--fix, --disable, MD013, MD041, --]
