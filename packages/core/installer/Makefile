@@ -5,6 +5,9 @@ TALOS_VERSION=$(shell awk '/^version:/ {print $$2}' images/talos/profiles/instal
 
 include ../../../scripts/common-envs.mk
 
+pre-checks:
+	../../../hack/pre-checks.sh
+
 show:
 	helm template -n $(NAMESPACE) $(NAME) .
 
@@ -17,7 +20,7 @@ diff:
 update:
 	hack/gen-profiles.sh
 
-image: image-cozystack image-talos image-matchbox
+image: pre-checks image-cozystack image-talos image-matchbox
 
 image-cozystack:
 	make -C ../../.. repos
