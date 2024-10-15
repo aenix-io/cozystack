@@ -63,7 +63,7 @@ stringData:
     DROP USER $user;
     EOT
     done
-    
+
     echo "== create roles"
     psql -v ON_ERROR_STOP=1 --echo-all <<\EOT
     SELECT 'CREATE ROLE app_admin NOINHERIT;'
@@ -83,7 +83,7 @@ stringData:
         FOR schema_record IN SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema') LOOP
             -- Changing Schema Ownership
             EXECUTE format('ALTER SCHEMA %I OWNER TO %I', schema_record.schema_name, 'app_admin');
-    
+
             -- Add rights for the admin role
             EXECUTE format('GRANT ALL ON SCHEMA %I TO %I', schema_record.schema_name, 'app_admin');
             EXECUTE format('GRANT ALL ON ALL TABLES IN SCHEMA %I TO %I', schema_record.schema_name, 'app_admin');
