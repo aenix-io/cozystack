@@ -79,9 +79,9 @@ releases:
   privileged: true
   dependsOn: [cilium,kubeovn,kubevirt-operator]
 
-- name: kubevirt-common-instancetypes
-  releaseName: kubevirt-common-instancetypes
-  chart: cozy-kubevirt-common-instancetypes
+- name: kubevirt-instancetypes
+  releaseName: kubevirt-instancetypes
+  chart: cozy-kubevirt-instancetypes
   namespace: cozy-kubevirt
   dependsOn: [cilium,kubeovn,kubevirt-operator,kubevirt]
 

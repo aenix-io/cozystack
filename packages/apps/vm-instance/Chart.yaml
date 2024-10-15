@@ -1,6 +1,6 @@
 apiVersion: v2
 #name: Virtual Machine
-name: virtual-machine
+name: vm-instance
 description: Virtual machine instance
 icon: /logos/vm.svg
 
