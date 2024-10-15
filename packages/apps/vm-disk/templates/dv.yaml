@@ -8,8 +8,16 @@ metadata:
 spec:
   contentType: kubevirt
   {{- if .Values.source }}
+  {{- if gt (len .Values.source) 1 }}
+    {{- fail "Exactly one type of source is expected!" }}
+  {{- end }}
   source:
-    {{- toYaml .Values.source | nindent 4 }}
+    {{- if hasKey .Values.source "http" }}
+    http:
+      url: {{ required "A valid .Values.source.http.url entry required!" .Values.source.http.url }}
+    {{- else if hasKey .Values.source "upload" }}
+    upload: {}
+    {{- end }}
   {{- else }}
   source:
     blank: {}

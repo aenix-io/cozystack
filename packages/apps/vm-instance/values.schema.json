@@ -80,7 +80,7 @@
     "instanceProfile": {
       "type": "string",
       "description": "Virtual Machine prefferences profile",
-      "default": "ubuntu",
+      "default": "windows.10.virtio",
       "optional": true,
       "enum": [
         "alpine",
@@ -128,24 +128,12 @@
         ""
       ]
     },
-    "systemDisk": {
-      "type": "object",
-      "properties": {
-        "origin": {
-          "type": "string",
-          "description": "The HTTP URL for source image",
-          "default": ""
-        },
-        "storage": {
-          "type": "string",
-          "description": "The size of the disk allocated for the virtual machine",
-          "default": "5Gi"
-        },
-        "storageClass": {
-          "type": "string",
-          "description": "StorageClass used to store the data",
-          "default": "replicated"
-        }
+    "disks": {
+      "type": "array",
+      "description": "List of disks to attach",
+      "default": [],
+      "items": {
+        "type": "object"
       }
     },
     "resources": {
