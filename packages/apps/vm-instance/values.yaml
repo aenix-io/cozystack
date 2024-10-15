@@ -13,16 +13,15 @@ running: true
 ## @param instanceProfile Virtual Machine prefferences profile
 ##
 instanceType: "u1.medium"
-instanceProfile: ubuntu
+instanceProfile: windows.10.virtio
 
 ## @param systemDisk.origin The HTTP URL for source image
 ## @param systemDisk.storage The size of the disk allocated for the virtual machine
 ## @param systemDisk.storageClass StorageClass used to store the data
 ## 
-systemDisk:
-  origin: ""
-  storage: 5Gi
-  storageClass: replicated
+disks:
+  - name: "win10-iso"
+  - name: "win10-system"
 
 ## @param resources.cpu The number of CPU cores allocated to the virtual machine
 ## @param resources.memory The amount of memory allocated to the virtual machine

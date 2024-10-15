@@ -1,0 +1,23 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: ""
+    vm-disk.cozystack.io/optical: "{{ .Values.optical }}"
+  name: {{ .Release.Name }}
+spec:
+  contentType: kubevirt
+  {{- if .Values.source }}
+  source:
+    {{- toYaml .Values.source | nindent 4 }}
+  {{- else }}
+  source:
+    blank: {}
+  {{- end }}
+  storage:
+    resources:
+      requests:
+        storage: {{ .Values.storage }}
+    {{- with .Values.storageClass }}
+    storageClassName: {{ . }}
+    {{- end }}

@@ -1,0 +1,13 @@
+## @section Common parameters
+
+## @param source [object] The source image location used to create a disk
+## @param optical Defines is disk should be considered as optical
+## @param storage The size of the disk allocated for the virtual machine
+## @param storageClass StorageClass used to store the data
+## 
+source:
+  #http: {}
+  #upload: {}
+optical: false
+storage: 5Gi
+storageClass: replicated

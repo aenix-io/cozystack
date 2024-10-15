@@ -23,27 +23,6 @@ spec:
     kind: VirtualMachineClusterPreference
     name: {{ . }}
   {{- end }}
-  dataVolumeTemplates:
-  - metadata:
-      name: {{ include "virtual-machine.fullname" . }}
-    spec:
-      pvc:
-        volumeMode: Block
-        accessModes:
-        - ReadWriteMany
-        resources:
-          requests:
-            storage: {{ $.Values.systemDisk.storage | quote }}
-        {{- with $.Values.systemDisk.storageClass }}
-        storageClassName: {{ . }}
-        {{- end }}
-      source:
-        {{- if $.Values.systemDisk.origin }}
-        http:
-          url: {{ $.Values.systemDisk.origin }}
-        {{- else }}
-        blank: {}
-        {{- end }}
 
   template:
     metadata:
@@ -64,13 +43,26 @@ spec:
         {{- end }}
         devices:
           disks:
-          - disk:
-              bus: scsi
-            name: systemdisk
+          {{- range $i, $disk := .Values.disks }}
+          - name: disk-{{ .name }}
+            {{- $disk := (lookup "cdi.kubevirt.io/v1beta1" "DataVolume" $.Release.Namespace (printf "vm-disk-%s" .name)) }}
+            {{- if $disk }}
+            {{- if and (hasKey $disk.metadata.annotations "vm-disk.cozystack.io/optical") (eq (index $disk.metadata.annotations "vm-disk.cozystack.io/optical") "true") }}
+            cdrom: {}
+            {{- else }}
+            disk: {}
+            {{- end }}
+            {{- if eq $i 0 }}
+            bootOrder: 1
+            {{- end }}
+            {{- else }}
+            {{-   fail (printf "Specified disk not exists in cluster: %s" .name) }}
+            {{- end }}
+          {{- end }}
           {{- if or .Values.sshKeys .Values.cloudInit }}
-          - disk:
+          - name: cloudinitdisk
+            disk:
               bus: virtio
-            name: cloudinitdisk
           {{- end }}
           interfaces:
           - name: default
@@ -88,9 +80,11 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: 30
       volumes:
-      - name: systemdisk
+      {{- range .Values.disks }}
+      - name: disk-{{ .name }}
         dataVolume:
-          name: {{ include "virtual-machine.fullname" . }}
+          name: vm-disk-{{ .name }}
+      {{- end }}
       {{- if or .Values.sshKeys .Values.cloudInit }}
       - name: cloudinitdisk
         cloudInitNoCloud:
