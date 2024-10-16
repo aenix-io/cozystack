@@ -4,8 +4,8 @@ metadata:
   name: cdi
 spec:
   config:
-    {{- with .Values.uploadProxyHost }}
-    uploadProxyURLOverride: "https://{{ . }}"
+    {{- with .Values.uploadProxyURL }}
+    uploadProxyURLOverride: {{ quote . }}
     {{- end }}
     featureGates:
     - HonorWaitForFirstConsumer
