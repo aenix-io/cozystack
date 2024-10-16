@@ -79,6 +79,12 @@ releases:
   privileged: true
   dependsOn: [cilium,kubeovn,kubevirt-operator]
 
+- name: kubevirt-instancetypes
+  releaseName: kubevirt-instancetypes
+  chart: cozy-kubevirt-instancetypes
+  namespace: cozy-kubevirt
+  dependsOn: [cilium,kubeovn,kubevirt-operator,kubevirt]
+
 - name: kubevirt-cdi-operator
   releaseName: kubevirt-cdi-operator
   chart: cozy-kubevirt-cdi-operator
