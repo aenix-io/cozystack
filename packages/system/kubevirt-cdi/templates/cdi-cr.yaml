@@ -4,6 +4,9 @@ metadata:
   name: cdi
 spec:
   config:
+    {{- with .Values.uploadProxyHost }}
+    uploadProxyURLOverride: "https://{{ . }}"
+    {{- end }}
     featureGates:
     - HonorWaitForFirstConsumer
     - ExpandDisks

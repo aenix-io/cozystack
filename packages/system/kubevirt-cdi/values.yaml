@@ -1,0 +1,2 @@
+uploadProxyHost: "cdi.infra.aenix.org"
+ingressClass: "tenant-root"
