@@ -1,3 +1,4 @@
+{{- $existingDV := lookup "cdi.kubevirt.io/v1beta1" "DataVolume" .Release.Namespace .Release.Name }}
 apiVersion: cdi.kubevirt.io/v1beta1
 kind: DataVolume
 metadata:
@@ -6,6 +7,9 @@ metadata:
     vm-disk.cozystack.io/optical: "{{ .Values.optical }}"
   name: {{ .Release.Name }}
 spec:
+  {{- if $existingDV }}
+    {{- toYaml $existingDV.spec | nindent 2 }}
+  {{- else }} 
   contentType: kubevirt
   {{- if .Values.source }}
   {{- if gt (len .Values.source) 1 }}
@@ -29,3 +33,4 @@ spec:
     {{- with .Values.storageClass }}
     storageClassName: {{ . }}
     {{- end }}
+  {{- end }}
