@@ -4,33 +4,34 @@
 {{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
 {{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
 
-{{- if .Values.dashboard }}
+{{- if .Values.cdiUploadProxy }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     cert-manager.io/cluster-issuer: letsencrypt-prod
     {{- if eq $issuerType "cloudflare" }} 
     {{- else }}
     acme.cert-manager.io/http01-ingress-class: {{ .Release.Namespace }}
     {{- end }}
-  name: dashboard-{{ .Release.Namespace }}
-  namespace: cozy-dashboard
+  name: cdi-uploadproxy-{{ .Release.Namespace }}
+  namespace: cozy-kubevirt-cdi
 spec:
   ingressClassName: {{ .Release.Namespace }}
   rules:
-  - host: dashboard.{{ $host }}
+  - host: cdi-uploadproxy.{{ $host }}
     http:
       paths:
       - backend:
           service:
-            name: dashboard
+            name: cdi-uploadproxy
             port:
-              number: 80
+              number: 443
         path: /
         pathType: Prefix
   tls:
   - hosts:
-    - dashboard.{{ $host }}
-    secretName: dashboard-{{ .Release.Namespace }}-tls
+    - cdi-uploadproxy.{{ $host }}
+    secretName: cdi-uploadproxy-{{ .Release.Namespace }}-tls
 {{- end }}

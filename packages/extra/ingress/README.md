@@ -11,4 +11,5 @@
 | `whitelist`      | List of client networks                                           | `[]`    |
 | `clouflareProxy` | Restoring original visitor IPs when Cloudflare proxied is enabled | `false` |
 | `dashboard`      | Should ingress serve Cozystack service dashboard                  | `false` |
+| `cdiUploadProxy` | Should ingress serve CDI upload proxy                             | `false` |
 
