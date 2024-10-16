@@ -1,47 +1,54 @@
-# Managed Kubernetes Service
+# Virtual Machine
 
-## Overview
-
-The Managed Kubernetes Service offers a streamlined solution for efficiently managing server workloads. Kubernetes has emerged as the industry standard, providing a unified and accessible API, primarily utilizing YAML for configuration. This means that teams can easily understand and work with Kubernetes, streamlining infrastructure management.
-
-The Kubernetes leverages robust software design patterns, enabling continuous recovery in any scenario through the reconciliation method. Additionally, it ensures seamless scaling across a multitude of servers, addressing the challenges posed by complex and outdated APIs found in traditional virtualization platforms. This managed service eliminates the need for developing custom solutions or modifying source code, saving valuable time and effort.
+A Virtual Machine (VM) simulates computer hardware, enabling various operating systems and applications to run in an isolated environment.
 
 ## Deployment Details
 
-The managed Kubernetes service deploys a standard Kubernetes cluster utilizing the Cluster API, Kamaji as control-plane provicer and the KubeVirt infrastructure provider. This ensures a consistent and reliable setup for workloads.
+The virtual machine is managed and hosted through KubeVirt, allowing you to harness the benefits of virtualization within your Kubernetes ecosystem.
 
-Within this cluster, users can take advantage of LoadBalancer services and easily provision physical volumes as needed. The control-plane operates within containers, while the worker nodes are deployed as virtual machines, all seamlessly managed by the application.
+- Docs: [KubeVirt User Guide](https://kubevirt.io/user-guide/)
+- GitHub: [KubeVirt Repository](https://github.com/kubevirt/kubevirt)
 
-- Docs: https://github.com/clastix/kamaji
-- Docs: https://cluster-api.sigs.k8s.io/
-- GitHub: https://github.com/clastix/kamaji
-- GitHub: https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt
-- GitHub: https://github.com/kubevirt/csi-driver
+## Accessing virtual machine
 
+You can access the virtual machine using the virtctl tool:
+- [KubeVirt User Guide - Virtctl Client Tool](https://kubevirt.io/user-guide/user_workloads/virtctl_client_tool/)
 
-## How-Tos
-
-How to access to deployed cluster:
+To access the serial console:
 
 ```
-kubectl get secret -n <namespace> kubernetes-<clusterName>-admin-kubeconfig -o go-template='{{ printf "%s\n" (index .data "super-admin.conf" | base64decode) }}' > test
+virtctl console <vm>
 ```
 
-# Series
+To access the VM using VNC:
 
-<!-- source: https://github.com/kubevirt/common-instancetypes/blob/main/README.md -->
+```
+virtctl vnc <vm>
+```
 
-.                           |  U  |  O  |  CX  |  M  |  RT
-----------------------------|-----|-----|------|-----|------
-*Has GPUs*                  |     |     |      |     |
-*Hugepages*                 |     |     |  ✓   |  ✓  |  ✓
-*Overcommitted Memory*      |     |  ✓  |      |     |
-*Dedicated CPU*             |     |     |  ✓   |     |  ✓
-*Burstable CPU performance* |  ✓  |  ✓  |      |  ✓  |
-*Isolated emulator threads* |     |     |  ✓   |     |  ✓
-*vNUMA*                     |     |     |  ✓   |     |  ✓
-*vCPU-To-Memory Ratio*      | 1:4 | 1:4 |  1:2 | 1:8 | 1:4
+To SSH into the VM:
 
+```
+virtctl ssh <user>@<vm>
+```
+
+## Parameters
+
+### Common parameters
+
+| Name               | Description                                                                        | Value               |
+| ------------------ | ---------------------------------------------------------------------------------- | ------------------- |
+| `external`         | Enable external access from outside the cluster                                    | `false`             |
+| `externalPorts`    | Specify ports to forward from outside the cluster                                  | `[]`                |
+| `running`          | Determines if the virtual machine should be running                                | `true`              |
+| `instanceType`     | Virtual Machine instance type                                                      | `u1.medium`         |
+| `instanceProfile`  | Virtual Machine prefferences profile                                               | `windows.10.virtio` |
+| `disks`            | List of disks to attach                                                            | `[]`                |
+| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                           | `""`                |
+| `resources.memory` | The amount of memory allocated to the virtual machine                              | `""`                |
+| `sshKeys`          | List of SSH public keys for authentication. Can be a single key or a list of keys. | `[]`                |
+| `cloudInit`        | cloud-init user data config. See cloud-init documentation for more details.        | `#cloud-config
+`    |
 
 ## U Series
 
@@ -151,6 +158,11 @@ Specific characteristics of this series are:
 - *vCPU-To-Memory Ratio (1:4)* - A vCPU-to-Memory ratio of 1:4 starting from
   the medium size.
 
+## Development
+
+To get started with customizing or creating your own instancetypes and preferences
+see [DEVELOPMENT.md](./DEVELOPMENT.md).
+
 ## Resources
 
 The following instancetype resources are provided by Cozystack:
@@ -205,3 +217,50 @@ u1.micro  |  1  |  1Gi
 u1.nano  |  1  |  512Mi
 u1.small  |  1  |  2Gi
 u1.xlarge  |  4  |  16Gi
+
+The following preference resources are provided by Cozystack:
+
+Name | Guest OS
+-----|---------
+alpine | Alpine
+centos.7 | CentOS 7
+centos.7.desktop | CentOS 7
+centos.stream10 | CentOS Stream 10
+centos.stream10.desktop | CentOS Stream 10
+centos.stream8 | CentOS Stream 8
+centos.stream8.desktop | CentOS Stream 8
+centos.stream8.dpdk | CentOS Stream 8
+centos.stream9 | CentOS Stream 9
+centos.stream9.desktop | CentOS Stream 9
+centos.stream9.dpdk | CentOS Stream 9
+cirros | Cirros
+fedora | Fedora (amd64)
+fedora.arm64 | Fedora (arm64)
+opensuse.leap | OpenSUSE Leap
+opensuse.tumbleweed | OpenSUSE Tumbleweed
+rhel.10 | Red Hat Enterprise Linux 10 Beta (amd64)
+rhel.10.arm64 | Red Hat Enterprise Linux 10 Beta (arm64)
+rhel.7 | Red Hat Enterprise Linux 7
+rhel.7.desktop | Red Hat Enterprise Linux 7
+rhel.8 | Red Hat Enterprise Linux 8
+rhel.8.desktop | Red Hat Enterprise Linux 8
+rhel.8.dpdk | Red Hat Enterprise Linux 8
+rhel.9 | Red Hat Enterprise Linux 9 (amd64)
+rhel.9.arm64 | Red Hat Enterprise Linux 9 (arm64)
+rhel.9.desktop | Red Hat Enterprise Linux 9 Desktop (amd64)
+rhel.9.dpdk | Red Hat Enterprise Linux 9 DPDK (amd64)
+rhel.9.realtime | Red Hat Enterprise Linux 9 Realtime (amd64)
+sles | SUSE Linux Enterprise Server
+ubuntu | Ubuntu
+windows.10 | Microsoft Windows 10
+windows.10.virtio | Microsoft Windows 10 (virtio)
+windows.11 | Microsoft Windows 11
+windows.11.virtio | Microsoft Windows 11 (virtio)
+windows.2k16 | Microsoft Windows Server 2016
+windows.2k16.virtio | Microsoft Windows Server 2016 (virtio)
+windows.2k19 | Microsoft Windows Server 2019
+windows.2k19.virtio | Microsoft Windows Server 2019 (virtio)
+windows.2k22 | Microsoft Windows Server 2022
+windows.2k22.virtio | Microsoft Windows Server 2022 (virtio)
+windows.2k25 | Microsoft Windows Server 2025
+windows.2k25.virtio | Microsoft Windows Server 2025 (virtio)

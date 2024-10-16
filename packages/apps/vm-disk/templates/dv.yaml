@@ -1,0 +1,36 @@
+{{- $existingDV := lookup "cdi.kubevirt.io/v1beta1" "DataVolume" .Release.Namespace .Release.Name }}
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: ""
+    vm-disk.cozystack.io/optical: "{{ .Values.optical }}"
+  name: {{ .Release.Name }}
+spec:
+  {{- if $existingDV }}
+    {{- toYaml $existingDV.spec | nindent 2 }}
+  {{- else }} 
+  contentType: kubevirt
+  {{- if .Values.source }}
+  {{- if gt (len .Values.source) 1 }}
+    {{- fail "Exactly one type of source is expected!" }}
+  {{- end }}
+  source:
+    {{- if hasKey .Values.source "http" }}
+    http:
+      url: {{ required "A valid .Values.source.http.url entry required!" .Values.source.http.url }}
+    {{- else if hasKey .Values.source "upload" }}
+    upload: {}
+    {{- end }}
+  {{- else }}
+  source:
+    blank: {}
+  {{- end }}
+  storage:
+    resources:
+      requests:
+        storage: {{ .Values.storage }}
+    {{- with .Values.storageClass }}
+    storageClassName: {{ . }}
+    {{- end }}
+  {{- end }}

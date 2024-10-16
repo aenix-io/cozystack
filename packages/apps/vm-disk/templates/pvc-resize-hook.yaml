@@ -1,0 +1,68 @@
+{{- $existingPVC := lookup "v1" "PersistentVolumeClaim" .Release.Namespace .Release.Name }}
+{{- if and $existingPVC (ne ($existingPVC.spec.resources.requests.storage | toString) .Values.storage) -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-volume-resize-hook"
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation
+spec:
+  template:
+    metadata:
+      labels:
+        policy.cozystack.io/allow-to-apiserver: "true"
+    spec:
+      serviceAccountName: {{ .Release.Name }}-volume-resize-hook
+      restartPolicy: Never
+      backoffLimit: 1
+      containers:
+        - name: resize
+          image: bitnami/kubectl
+          command: ["sh", "-xec"]
+          args:
+            - |
+              kubectl patch pvc {{ .Release.Name }} -p '{"spec":{"resources":{"requests":{"storage":"{{ .Values.storage }}"}}}}'
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-volume-resize-hook
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-volume-resize-hook
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation
+rules:
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["delete", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["patch", "get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Name }}-volume-resize-hook
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Release.Name }}-volume-resize-hook
+roleRef:
+  kind: Role
+  name: {{ .Release.Name }}-volume-resize-hook
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
