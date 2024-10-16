@@ -254,7 +254,7 @@ spec:
     timeout: 30s
   - type: Ready
     status: "False"
-    timeout: 30s
+    timeout: 300s
 {{- end }}
 ---
 {{- /*
