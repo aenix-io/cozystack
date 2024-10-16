@@ -2,6 +2,11 @@
     "title": "Chart Values",
     "type": "object",
     "properties": {
+        "source": {
+            "type": "object",
+            "description": "The source image location used to create a disk",
+            "default": {}
+        },
         "optical": {
             "type": "boolean",
             "description": "Defines is disk should be considered as optical",

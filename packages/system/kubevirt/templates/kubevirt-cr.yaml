@@ -7,12 +7,10 @@ metadata:
 spec:
   certificateRotateStrategy: {}
   configuration:
-    vmStateStorageClass: "replicated"
     developerConfiguration:
       featureGates:
       - HotplugVolumes
       - ExpandDisks
-      - VMPersistentState
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   workloadUpdateStrategy: {}
