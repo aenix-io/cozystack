@@ -7,6 +7,11 @@
             "description": "Persistent Volume size",
             "default": "10Gi"
         },
+        "logStorageSize": {
+            "type": "string",
+            "description": "logStorageSize Persistent Volume for logs size",
+            "default": "2Gi"
+        },
         "shards": {
             "type": "number",
             "description": "Number of Clickhouse replicas",
@@ -20,7 +25,7 @@
         "storageClass": {
             "type": "string",
             "description": "StorageClass used to store the data",
-            "default": ""
+            "default": "local"
         },
         "backup": {
             "type": "object",
