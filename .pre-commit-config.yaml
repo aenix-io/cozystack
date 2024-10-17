@@ -7,10 +7,19 @@ repos:
     - id: mixed-line-ending
       args: [--fix=lf]
     - id: check-yaml
-      exclude: packages/apps/postgres/templates/init-script.yaml
+      exclude: '^.*templates/.*\.yaml$'
       args: [--unsafe]
 - repo: https://github.com/igorshubovych/markdownlint-cli
   rev: v0.41.0
   hooks:
   - id: markdownlint
     args: [--fix, --disable, MD013, MD041, --]
+-   repo: local
+    hooks:
+    - id: gen-versions-map
+      name: Generate versions map and check for changes
+      entry: bash -c 'cd packages/apps && make check-version-map'
+      language: system
+      types: [file]
+      pass_filenames: false
+      description: Run the script and fail if it generates changes

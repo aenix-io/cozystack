@@ -32,11 +32,12 @@ kind: "ClickHouseInstallation"
 metadata:
   name: "{{ .Release.Name }}"
 spec:
-  {{- with .Values.size }}
+  namespaceDomainPattern:  "%s.svc.cozy.local"
   defaults:
     templates:
       dataVolumeClaimTemplate: data-volume-template
-  {{- end }}
+      podTemplate: clickhouse-per-host
+      serviceTemplate: svc-template
   configuration:
     {{- with $users }}
     users:
@@ -46,6 +47,40 @@ spec:
       {{ $name }}/networks/ip: ["::/0"]
       {{- end }}
     {{- end }}
+    files:
+      config.d/z_log_disable.xml: |
+        <clickhouse>
+            <asynchronous_metric_log remove="1"/>
+            <metric_log remove="1"/>
+            <query_views_log remove="1" />
+            <part_log remove="1"/>
+            <session_log remove="1"/>
+            <text_log remove="1" />
+            <trace_log remove="1"/>
+            <crash_log remove="1"/>
+            <opentelemetry_span_log remove="1"/>
+        </clickhouse>
+      config.d/query_log_ttl.xml: |
+        <clickhouse>
+            <query_log replace="1">
+                <database>system</database>
+                <table>query_log</table>
+                <engine>ENGINE = MergeTree PARTITION BY (event_date)
+                        ORDER BY (event_time)
+                        TTL event_date + INTERVAL 14 DAY DELETE
+                </engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </query_log>
+            <query_thread_log replace="1">
+                <database>system</database>
+                <table>query_thread_log</table>
+                <engine>ENGINE = MergeTree PARTITION BY (event_date)
+                        ORDER BY (event_time)
+                        TTL event_date + INTERVAL 14 DAY DELETE
+                </engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </query_thread_log>
+        </clickhouse>
     profiles:
       readonly/readonly: "1"
     clusters:
@@ -53,17 +88,50 @@ spec:
         layout:
           shardsCount: {{ .Values.shards }}
           replicasCount: {{ .Values.replicas }}
-  {{- with .Values.size }}
   templates:
     volumeClaimTemplates:
       - name: data-volume-template
         spec:
           accessModes:
             - ReadWriteOnce
-          {{- with $.Values.storageClass }}
-          storageClassName: {{ . }}
-          {{- end }}
           resources:
             requests:
-              storage: {{ . }}
-  {{- end }}
+              storage: {{ .Values.size }}
+      - name: log-volume-template
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ .Values.logStorageSize }}
+    podTemplates:
+      - name: clickhouse-per-host
+        spec:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: "clickhouse.altinity.com/chi"
+                        operator: In
+                        values:
+                          - "{{ .Release.Name }}"
+                  topologyKey: "kubernetes.io/hostname"
+          containers:
+            - name: clickhouse
+              imagePullPolicy: Always
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              volumeMounts:
+                - name: data-volume-template
+                  mountPath: /var/lib/clickhouse
+                - name: log-volume-template
+                  mountPath: /var/log/clickhouse-server
+    serviceTemplates:
+      - name: svc-template
+        generateName: chendpoint-{chi}
+        spec:
+          ports:
+            - name: http
+              port: 8123
+            - name: tcp
+              port: 9000
