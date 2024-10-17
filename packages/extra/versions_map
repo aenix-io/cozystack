@@ -6,7 +6,8 @@ etcd 2.2.0 5ca8823
 etcd 2.3.0 HEAD
 ingress 1.0.0 f642698
 ingress 1.1.0 838bee5d
-ingress 1.2.0 HEAD
+ingress 1.2.0 ced8e5b
+ingress 1.3.0 HEAD
 monitoring 1.0.0 f642698
 monitoring 1.1.0 15478a88
 monitoring 1.2.0 c9e0d63b

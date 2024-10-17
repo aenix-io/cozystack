@@ -1,0 +1,21 @@
+{{- if .Values.external }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "virtual-machine.fullname" . }}
+  labels:
+    {{- include "virtual-machine.labels" . | nindent 4 }}
+spec:
+  type: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
+  externalTrafficPolicy: Local
+  allocateLoadBalancerNodePorts: false
+  selector:
+    {{- include "virtual-machine.labels" . | nindent 4 }}
+  ports:
+    {{- range .Values.externalPorts }}
+    - name: port-{{ . }}
+      port: {{ . }}
+      targetPort: {{ . }}
+    {{- end }}
+{{- end }}
