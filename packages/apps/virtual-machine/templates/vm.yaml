@@ -1,0 +1,108 @@
+{{- if and .Values.instanceType (not (lookup "instancetype.kubevirt.io/v1beta1" "VirtualMachineClusterInstancetype" "" .Values.instanceType)) }}
+{{-   fail (printf "Specified instancetype not exists in cluster: %s" .Values.instanceType) }}
+{{- end }}
+{{- if and .Values.instanceProfile (not (lookup "instancetype.kubevirt.io/v1beta1" "VirtualMachineClusterPreference" "" .Values.instanceProfile)) }}
+{{-   fail (printf "Specified profile not exists in cluster: %s" .Values.instanceProfile) }}
+{{- end }}
+
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: {{ include "virtual-machine.fullname" . }}
+  labels:
+    {{- include "virtual-machine.labels" . | nindent 4 }}
+spec:
+  running: {{ .Values.running | default "true" }}
+  {{- with .Values.instanceType }}
+  instancetype:
+    kind: VirtualMachineClusterInstancetype
+    name: {{ . }}
+  {{- end }}
+  {{- with .Values.instanceProfile }}
+  preference:
+    kind: VirtualMachineClusterPreference
+    name: {{ . }}
+  {{- end }}
+  dataVolumeTemplates:
+  - metadata:
+      name: {{ include "virtual-machine.fullname" . }}
+    spec:
+      pvc:
+        volumeMode: Block
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: {{ .Values.systemDisk.storage | quote }}
+        {{- with .Values.systemDisk.storageClass }}
+        storageClassName: {{ . }}
+        {{- end }}
+      source:
+        http:
+          {{- if eq .Values.systemDisk.image "cirros" }}
+          url: https://download.cirros-cloud.net/0.6.2/cirros-0.6.2-x86_64-disk.img
+          {{- else if eq .Values.systemDisk.image "ubuntu" }}
+          url: https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+          {{- else if eq .Values.systemDisk.image "fedora" }}
+          url: https://download.fedoraproject.org/pub/fedora/linux/releases/40/Cloud/x86_64/images/Fedora-Cloud-Base-Generic.x86_64-40-1.14.qcow2
+          {{- else if eq .Values.systemDisk.image "alpine" }}
+          url: https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/cloud/nocloud_alpine-3.20.2-x86_64-bios-tiny-r0.qcow2
+          {{- else if eq .Values.systemDisk.image "talos" }}
+          url: https://github.com/siderolabs/talos/releases/download/v1.7.6/nocloud-amd64.raw.xz
+          {{- end }}
+
+  template:
+    metadata:
+      annotations:
+        kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+      labels:
+        {{- include "virtual-machine.labels" . | nindent 8 }}
+    spec:
+      domain:
+        {{- if and .Values.resources .Values.resources.cpu }}
+        cpu:
+          cores: {{ .Values.resources.cpu }}
+        {{- end }}
+        {{- if and .Values.resources .Values.resources.memory }}
+        resources:
+          requests:
+            memory: {{ .Values.resources.memory | quote }}
+        {{- end }}
+        devices:
+          disks:
+          - disk:
+              bus: scsi
+            name: systemdisk
+          {{- if or .Values.sshKeys .Values.cloudInit }}
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          {{- end }}
+          interfaces:
+          - name: default
+            bridge: {}
+        machine:
+          type: ""
+      {{- with .Values.sshKeys }}
+      accessCredentials:
+      - sshPublicKey:
+          source:
+            secret:
+              secretName: {{ include "virtual-machine.fullname" $ }}-ssh-keys
+          propagationMethod:
+            noCloud: {}
+      {{- end }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: systemdisk
+        dataVolume:
+          name: {{ include "virtual-machine.fullname" . }}
+      {{- if or .Values.sshKeys .Values.cloudInit }}
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          secretRef:
+            name: {{ include "virtual-machine.fullname" . }}-cloud-init
+      {{- end }}
+      networks:
+      - name: default
+        pod: {}
