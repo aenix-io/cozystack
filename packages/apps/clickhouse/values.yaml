@@ -1,14 +1,18 @@
 ## @section Common parameters
 
 ## @param size Persistent Volume size
+## @param logStorageSize Persistent Volume for logs size
 ## @param shards Number of Clickhouse replicas
 ## @param replicas Number of Clickhouse shards
 ## @param storageClass StorageClass used to store the data
+## @param logTTL for query_log and query_thread_log
 ##
 size: 10Gi
+logStorageSize: 2Gi
 shards: 1
 replicas: 2
-storageClass: ""
+storageClass: "local"
+logTTL: 15
 
 ## @section Configuration parameters
 
@@ -42,3 +46,7 @@ backup:
   s3AccessKey: oobaiRus9pah8PhohL1ThaeTa4UVa7gu
   s3SecretKey: ju3eum4dekeich9ahM1te8waeGai0oog
   resticPassword: ChaXoveekoh6eigh4siesheeda2quai0
+
+image:
+  repository: clickhouse/clickhouse-server
+  tag: "24.2.2.71"
