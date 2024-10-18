@@ -36,8 +36,8 @@ function is_chart_ignored() {
 function install_all_apps() {
     local charts_dir="$1"
     local namespace="$2"
-    local gitrepo_name="$3"
-    local flux_ns="$4"
+    local repo_name="$3"
+    local repo_ns="$4"
 
     local ignore_file="./modules/ignored_charts"
     local ignored_charts
@@ -53,12 +53,12 @@ function install_all_apps() {
                 continue
             fi
 
-            chart_name="$chart_name-e2e"
-            echo "Installing chart: $chart_name"
-            install_helmrelease "$chart_name" "$namespace" "$chart_path" "$gitrepo_name" "$flux_ns"
+            release_name="$chart_name-e2e"
+            echo "Installing release: $release_name"
+            install_helmrelease "$release_name" "$namespace" "$chart_name" "$repo_name" "$repo_ns"
 
-            echo "Checking status for HelmRelease: $chart_name"
-            check_helmrelease_status "$chart_name" "$namespace"
+            echo "Checking status for HelmRelease: $release_name"
+            check_helmrelease_status "$release_name" "$namespace"
         else
             echo "$chart_path is not a directory. Skipping."
         fi

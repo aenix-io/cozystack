@@ -5,17 +5,11 @@ done
 ROOT_NS="tenant-root"
 TEST_TENANT="tenant-e2e"
 
-FLUX_NS="cozy-fluxcd"
-GITREPO_NAME="e2e-repo"
-BRANCH="main"
-
 function test() {
-    create_git_repo $GITREPO_NAME $FLUX_NS $BRANCH
-
-    install_tenant $TEST_TENANT $ROOT_NS $GITREPO_NAME $FLUX_NS
+    install_tenant $TEST_TENANT $ROOT_NS
     check_helmrelease_status $TEST_TENANT $ROOT_NS
 
-    install_all_apps "../packages/apps" "$TEST_TENANT" $GITREPO_NAME $FLUX_NS
+    install_all_apps "../packages/apps" "$TEST_TENANT" cozystack-apps cozy-public
 
     if true; then
         echo -e "${GREEN}All tests passed!${RESET}"
@@ -27,7 +21,6 @@ function test() {
 }
 
 function clean() {
-    kubectl delete gitrepository.source.toolkit.fluxcd.io $GITREPO_NAME -n $FLUX_NS
     kubectl delete helmrelease.helm.toolkit.fluxcd.io $TEST_TENANT -n $ROOT_NS
     if true; then
         echo -e "${GREEN}Cleanup successful!${RESET}"
