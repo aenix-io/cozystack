@@ -27,6 +27,11 @@
             "description": "StorageClass used to store the data",
             "default": "local"
         },
+        "logTTL": {
+            "type": "number",
+            "description": "logTTL for query_log and query_thread_log",
+            "default": 15
+        },
         "backup": {
             "type": "object",
             "properties": {

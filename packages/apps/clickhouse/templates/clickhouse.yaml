@@ -59,6 +59,7 @@ spec:
             <trace_log remove="1"/>
             <crash_log remove="1"/>
             <opentelemetry_span_log remove="1"/>
+            <processors_profile_log remove="1"/>
         </clickhouse>
       config.d/query_log_ttl.xml: |
         <clickhouse>
@@ -67,7 +68,7 @@ spec:
                 <table>query_log</table>
                 <engine>ENGINE = MergeTree PARTITION BY (event_date)
                         ORDER BY (event_time)
-                        TTL event_date + INTERVAL 14 DAY DELETE
+                        TTL event_date + INTERVAL {{ .Values.logTTL }} DAY DELETE
                 </engine>
                 <flush_interval_milliseconds>7500</flush_interval_milliseconds>
             </query_log>
@@ -76,7 +77,7 @@ spec:
                 <table>query_thread_log</table>
                 <engine>ENGINE = MergeTree PARTITION BY (event_date)
                         ORDER BY (event_time)
-                        TTL event_date + INTERVAL 14 DAY DELETE
+                        TTL event_date + INTERVAL {{ .Values.logTTL }} DAY DELETE
                 </engine>
                 <flush_interval_milliseconds>7500</flush_interval_milliseconds>
             </query_thread_log>
