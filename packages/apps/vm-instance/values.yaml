@@ -13,7 +13,7 @@ running: true
 ## @param instanceProfile Virtual Machine prefferences profile
 ##
 instanceType: "u1.medium"
-instanceProfile: windows.10.virtio
+instanceProfile: ubuntu
 
 ## @param disks [array] List of disks to attach
 ## Example:
