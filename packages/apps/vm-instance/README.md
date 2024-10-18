@@ -36,19 +36,19 @@ virtctl ssh <user>@<vm>
 
 ### Common parameters
 
-| Name               | Description                                                                        | Value               |
-| ------------------ | ---------------------------------------------------------------------------------- | ------------------- |
-| `external`         | Enable external access from outside the cluster                                    | `false`             |
-| `externalPorts`    | Specify ports to forward from outside the cluster                                  | `[]`                |
-| `running`          | Determines if the virtual machine should be running                                | `true`              |
-| `instanceType`     | Virtual Machine instance type                                                      | `u1.medium`         |
-| `instanceProfile`  | Virtual Machine prefferences profile                                               | `windows.10.virtio` |
-| `disks`            | List of disks to attach                                                            | `[]`                |
-| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                           | `""`                |
-| `resources.memory` | The amount of memory allocated to the virtual machine                              | `""`                |
-| `sshKeys`          | List of SSH public keys for authentication. Can be a single key or a list of keys. | `[]`                |
+| Name               | Description                                                                        | Value            |
+| ------------------ | ---------------------------------------------------------------------------------- | ---------------- |
+| `external`         | Enable external access from outside the cluster                                    | `false`          |
+| `externalPorts`    | Specify ports to forward from outside the cluster                                  | `[]`             |
+| `running`          | Determines if the virtual machine should be running                                | `true`           |
+| `instanceType`     | Virtual Machine instance type                                                      | `u1.medium`      |
+| `instanceProfile`  | Virtual Machine prefferences profile                                               | `ubuntu`         |
+| `disks`            | List of disks to attach                                                            | `[]`             |
+| `resources.cpu`    | The number of CPU cores allocated to the virtual machine                           | `""`             |
+| `resources.memory` | The amount of memory allocated to the virtual machine                              | `""`             |
+| `sshKeys`          | List of SSH public keys for authentication. Can be a single key or a list of keys. | `[]`             |
 | `cloudInit`        | cloud-init user data config. See cloud-init documentation for more details.        | `#cloud-config
-`    |
+` |
 
 ## U Series
 

@@ -80,7 +80,7 @@
     "instanceProfile": {
       "type": "string",
       "description": "Virtual Machine prefferences profile",
-      "default": "windows.10.virtio",
+      "default": "ubuntu",
       "optional": true,
       "enum": [
         "alpine",
