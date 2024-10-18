@@ -23,6 +23,11 @@ metrics-server:
         size: 10Gi
 
 fluent-bit:
+
+  readinessProbe:
+    httpGet:
+      path: /
+
   daemonSetVolumes:
     - name: varlog
       hostPath:
