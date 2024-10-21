@@ -5,7 +5,7 @@ RED='\033[31m'
 RESET='\033[0m'
 
 check-yq-version() {
-    current_version=$(yq -V | grep -oP 'v[0-9]+\.[0-9]+\.[0-9]+')
+    current_version=$(yq -V | awk '$(NF-1) == "version" {print $NF}')
     if [ -z "$current_version" ]; then
         echo "yq is not installed or version cannot be determined."
         exit 1
