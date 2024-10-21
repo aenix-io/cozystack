@@ -120,6 +120,7 @@ spec:
                   topologyKey: "kubernetes.io/hostname"
           containers:
             - name: clickhouse
+              image: clickhouse/clickhouse-server:24.9.2.42
               volumeMounts:
                 - name: data-volume-template
                   mountPath: /var/lib/clickhouse
