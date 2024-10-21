@@ -44,7 +44,8 @@ mysql 0.2.0 8b975ff0
 mysql 0.3.0 5ca8823
 mysql 0.4.0 93018c4
 mysql 0.5.0 4b84798
-mysql 0.5.1 HEAD
+mysql 0.5.1 fab5940b
+mysql 0.5.2 HEAD
 nats 0.1.0 5ca8823
 nats 0.2.0 HEAD
 postgres 0.1.0 f642698
@@ -63,7 +64,8 @@ rabbitmq 0.2.0 5ca8823
 rabbitmq 0.3.0 9e33dc0
 rabbitmq 0.4.0 36d8855
 rabbitmq 0.4.1 35536bb
-rabbitmq 0.4.2 HEAD
+rabbitmq 0.4.2 00b2834e
+rabbitmq 0.4.3 HEAD
 redis 0.1.1 f642698
 redis 0.2.0 5ca8823
 redis 0.3.0 HEAD
@@ -89,4 +91,5 @@ vm-disk 0.1.0 HEAD
 vm-instance 0.1.0 HEAD
 vpn 0.1.0 f642698
 vpn 0.2.0 7151424
-vpn 0.3.0 HEAD
+vpn 0.3.0 a2bcf100
+vpn 0.3.1 HEAD
