@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: linstorclusters.piraeus.io
 spec:
   group: piraeus.io
@@ -43,7 +43,6 @@ spec:
               apiTLS:
                 description: |-
                   ApiTLS secures the LINSTOR API.
-
 
                   This configures the TLS key and certificate used to secure the LINSTOR API.
                 nullable: true
@@ -128,7 +127,6 @@ spec:
                     description: |-
                       Template to apply to Pods of the component.
 
-
                       The template is applied as a patch to the default deployment, so it can be "sparse", not listing any
                       containers or volumes that should remain unchanged.
                       See https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates
@@ -148,7 +146,6 @@ spec:
                     description: |-
                       Template to apply to Pods of the component.
 
-
                       The template is applied as a patch to the default deployment, so it can be "sparse", not listing any
                       containers or volumes that should remain unchanged.
                       See https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates
@@ -166,7 +163,6 @@ spec:
                   podTemplate:
                     description: |-
                       Template to apply to Pods of the component.
-
 
                       The template is applied as a patch to the default deployment, so it can be "sparse", not listing any
                       containers or volumes that should remain unchanged.
@@ -200,7 +196,6 @@ spec:
                     description: |-
                       Template to apply to Pods of the component.
 
-
                       The template is applied as a patch to the default deployment, so it can be "sparse", not listing any
                       containers or volumes that should remain unchanged.
                       See https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates
@@ -211,7 +206,6 @@ spec:
               internalTLS:
                 description: |-
                   InternalTLS secures the connection between LINSTOR Controller and Satellite.
-
 
                   This configures the client certificate used when the Controller connects to a Satellite. This only has an effect
                   when the Satellite is configured to for secure connections using `LinstorSatellite.spec.internalTLS`.
@@ -272,7 +266,6 @@ spec:
               linstorPassphraseSecret:
                 description: |-
                   LinstorPassphraseSecret used to configure the LINSTOR master passphrase.
-
 
                   The referenced secret must contain a single key "MASTER_PASSPHRASE". The master passphrase is used to
                   * Derive encryption keys for volumes using the LUKS layer.
@@ -380,7 +373,6 @@ spec:
                 description: |-
                   Patches is a list of kustomize patches to apply.
 
-
                   See https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/ for how to create patches.
                 items:
                   description: Patch represent either a Strategic Merge Patch or a
@@ -425,12 +417,13 @@ spec:
                         version:
                           type: string
                       type: object
+                  required:
+                  - patch
                   type: object
                 type: array
               properties:
                 description: |-
                   Properties to apply on the cluster level.
-
 
                   Use to create default settings for DRBD that should apply to all resources or to configure some other cluster
                   wide default.
@@ -460,16 +453,8 @@ spec:
               conditions:
                 description: Current LINSTOR Cluster state
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource.\n---\nThis struct is intended for
-                    direct use as an array at the field path .status.conditions.  For
-                    example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the
-                    observations of a foo's current state.\n\t    // Known .status.conditions.type
-                    are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    //
-                    +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t
-                    \   // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\"
-                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t
-                    \   // other fields\n\t}"
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
                   properties:
                     lastTransitionTime:
                       description: |-
@@ -510,12 +495,7 @@ spec:
                       - Unknown
                       type: string
                     type:
-                      description: |-
-                        type of condition in CamelCase or in foo.example.com/CamelCase.
-                        ---
-                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
-                        useful (see .node.status.conditions), the ability to deconflict is important.
-                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
                       maxLength: 316
                       pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                       type: string
@@ -541,7 +521,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: linstornodeconnections.piraeus.io
 spec:
   group: piraeus.io
@@ -600,7 +580,6 @@ spec:
               properties:
                 description: |-
                   Properties to apply for the node connection.
-
 
                   Use to create default settings for DRBD that should apply to all resources connections between a set of
                   cluster nodes.
@@ -664,6 +643,8 @@ spec:
                         - key
                         type: object
                       type: array
+                  required:
+                  - matchLabels
                   type: object
                 type: array
             type: object
@@ -674,16 +655,8 @@ spec:
               conditions:
                 description: Current LINSTOR Node Connection state
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource.\n---\nThis struct is intended for
-                    direct use as an array at the field path .status.conditions.  For
-                    example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the
-                    observations of a foo's current state.\n\t    // Known .status.conditions.type
-                    are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    //
-                    +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t
-                    \   // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\"
-                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t
-                    \   // other fields\n\t}"
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
                   properties:
                     lastTransitionTime:
                       description: |-
@@ -724,12 +697,7 @@ spec:
                       - Unknown
                       type: string
                     type:
-                      description: |-
-                        type of condition in CamelCase or in foo.example.com/CamelCase.
-                        ---
-                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
-                        useful (see .node.status.conditions), the ability to deconflict is important.
-                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
                       maxLength: 316
                       pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                       type: string
@@ -755,7 +723,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: linstorsatelliteconfigurations.piraeus.io
 spec:
   group: piraeus.io
@@ -793,14 +761,12 @@ spec:
             description: |-
               LinstorSatelliteConfigurationSpec defines a partial, desired state of a LinstorSatelliteSpec.
 
-
               All the LinstorSatelliteConfiguration resources with matching NodeSelector will
               be merged into a single LinstorSatelliteSpec.
             properties:
               internalTLS:
                 description: |-
                   InternalTLS configures secure communication for the LINSTOR Satellite.
-
 
                   If set, the control traffic between LINSTOR Controller and Satellite will be encrypted using mTLS.
                 nullable: true
@@ -859,7 +825,6 @@ spec:
                   tlsHandshakeDaemon:
                     description: |-
                       TLSHandshakeDaemon enables tlshd for establishing TLS sessions for use by DRBD.
-
 
                       If enabled, adds a new sidecar to the LINSTOR Satellite that runs the tlshd handshake daemon.
                       The daemon uses the TLS certificate and key to establish secure connections on behalf of DRBD.
@@ -966,7 +931,6 @@ spec:
                 description: |-
                   Patches is a list of kustomize patches to apply.
 
-
                   See https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/ for how to create patches.
                 items:
                   description: Patch represent either a Strategic Merge Patch or a
@@ -1011,12 +975,13 @@ spec:
                         version:
                           type: string
                       type: object
+                  required:
+                  - patch
                   type: object
                 type: array
               podTemplate:
                 description: |-
                   Template to apply to Satellite Pods.
-
 
                   The template is applied as a patch to the default resource, so it can be "sparse", not listing any
                   containers or volumes that should remain unchanged.
@@ -1028,6 +993,38 @@ spec:
                 description: Properties is a list of properties to set on the node.
                 items:
                   properties:
+                    expandFrom:
+                      description: |-
+                        ExpandFrom can reference multiple resource fields at once.
+                        It either sets the property to an aggregate value based on matched resource fields, or expands to multiple
+                        properties.
+                      properties:
+                        delimiter:
+                          description: Delimiter used to join multiple key and value
+                            pairs together.
+                          type: string
+                        nameTemplate:
+                          description: |-
+                            NameTemplate defines how the property key is expanded.
+                            If set, the template is appended to the defined property name, creating multiple properties instead of one
+                            aggregate.
+                            * $1 is replaced with the matched key.
+                            * $2 is replaced with the matched value.
+                          type: string
+                        nodeFieldRef:
+                          description: Select a field of the node. Supports `metadata.name`,
+                            `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`.
+                          minLength: 1
+                          type: string
+                        valueTemplate:
+                          description: |-
+                            ValueTemplate defines how the property value is expanded.
+                            * $1 is replaced with the matched key.
+                            * $2 is replaced with the matched value.
+                          type: string
+                      required:
+                      - nodeFieldRef
+                      type: object
                     name:
                       description: Name of the property to set.
                       minLength: 1
@@ -1047,6 +1044,8 @@ spec:
                             `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`.
                           minLength: 1
                           type: string
+                      required:
+                      - nodeFieldRef
                       type: object
                   required:
                   - name
@@ -1102,6 +1101,38 @@ spec:
                       description: Properties to set on the storage pool.
                       items:
                         properties:
+                          expandFrom:
+                            description: |-
+                              ExpandFrom can reference multiple resource fields at once.
+                              It either sets the property to an aggregate value based on matched resource fields, or expands to multiple
+                              properties.
+                            properties:
+                              delimiter:
+                                description: Delimiter used to join multiple key and
+                                  value pairs together.
+                                type: string
+                              nameTemplate:
+                                description: |-
+                                  NameTemplate defines how the property key is expanded.
+                                  If set, the template is appended to the defined property name, creating multiple properties instead of one
+                                  aggregate.
+                                  * $1 is replaced with the matched key.
+                                  * $2 is replaced with the matched value.
+                                type: string
+                              nodeFieldRef:
+                                description: Select a field of the node. Supports
+                                  `metadata.name`, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`.
+                                minLength: 1
+                                type: string
+                              valueTemplate:
+                                description: |-
+                                  ValueTemplate defines how the property value is expanded.
+                                  * $1 is replaced with the matched key.
+                                  * $2 is replaced with the matched value.
+                                type: string
+                            required:
+                            - nodeFieldRef
+                            type: object
                           name:
                             description: Name of the property to set.
                             minLength: 1
@@ -1122,6 +1153,8 @@ spec:
                                   `metadata.name`, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`.
                                 minLength: 1
                                 type: string
+                            required:
+                            - nodeFieldRef
                             type: object
                         required:
                         - name
@@ -1168,16 +1201,8 @@ spec:
               conditions:
                 description: Current LINSTOR Satellite Config state
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource.\n---\nThis struct is intended for
-                    direct use as an array at the field path .status.conditions.  For
-                    example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the
-                    observations of a foo's current state.\n\t    // Known .status.conditions.type
-                    are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    //
-                    +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t
-                    \   // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\"
-                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t
-                    \   // other fields\n\t}"
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
                   properties:
                     lastTransitionTime:
                       description: |-
@@ -1218,12 +1243,7 @@ spec:
                       - Unknown
                       type: string
                     type:
-                      description: |-
-                        type of condition in CamelCase or in foo.example.com/CamelCase.
-                        ---
-                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
-                        useful (see .node.status.conditions), the ability to deconflict is important.
-                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
                       maxLength: 316
                       pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                       type: string
@@ -1249,7 +1269,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.1
   name: linstorsatellites.piraeus.io
 spec:
   group: piraeus.io
@@ -1343,7 +1363,6 @@ spec:
                 description: |-
                   InternalTLS configures secure communication for the LINSTOR Satellite.
 
-
                   If set, the control traffic between LINSTOR Controller and Satellite will be encrypted using mTLS.
                   The Controller will use the client key from `LinstorCluster.spec.internalTLS` when connecting.
                 nullable: true
@@ -1403,7 +1422,6 @@ spec:
                     description: |-
                       TLSHandshakeDaemon enables tlshd for establishing TLS sessions for use by DRBD.
 
-
                       If enabled, adds a new sidecar to the LINSTOR Satellite that runs the tlshd handshake daemon.
                       The daemon uses the TLS certificate and key to establish secure connections on behalf of DRBD.
                     type: boolean
@@ -1411,7 +1429,6 @@ spec:
               patches:
                 description: |-
                   Patches is a list of kustomize patches to apply.
-
 
                   See https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/ for how to create patches.
                 items:
@@ -1457,12 +1474,46 @@ spec:
                         version:
                           type: string
                       type: object
+                  required:
+                  - patch
                   type: object
                 type: array
               properties:
                 description: Properties is a list of properties to set on the node.
                 items:
                   properties:
+                    expandFrom:
+                      description: |-
+                        ExpandFrom can reference multiple resource fields at once.
+                        It either sets the property to an aggregate value based on matched resource fields, or expands to multiple
+                        properties.
+                      properties:
+                        delimiter:
+                          description: Delimiter used to join multiple key and value
+                            pairs together.
+                          type: string
+                        nameTemplate:
+                          description: |-
+                            NameTemplate defines how the property key is expanded.
+                            If set, the template is appended to the defined property name, creating multiple properties instead of one
+                            aggregate.
+                            * $1 is replaced with the matched key.
+                            * $2 is replaced with the matched value.
+                          type: string
+                        nodeFieldRef:
+                          description: Select a field of the node. Supports `metadata.name`,
+                            `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`.
+                          minLength: 1
+                          type: string
+                        valueTemplate:
+                          description: |-
+                            ValueTemplate defines how the property value is expanded.
+                            * $1 is replaced with the matched key.
+                            * $2 is replaced with the matched value.
+                          type: string
+                      required:
+                      - nodeFieldRef
+                      type: object
                     name:
                       description: Name of the property to set.
                       minLength: 1
@@ -1482,6 +1533,8 @@ spec:
                             `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`.
                           minLength: 1
                           type: string
+                      required:
+                      - nodeFieldRef
                       type: object
                   required:
                   - name
@@ -1540,6 +1593,38 @@ spec:
                       description: Properties to set on the storage pool.
                       items:
                         properties:
+                          expandFrom:
+                            description: |-
+                              ExpandFrom can reference multiple resource fields at once.
+                              It either sets the property to an aggregate value based on matched resource fields, or expands to multiple
+                              properties.
+                            properties:
+                              delimiter:
+                                description: Delimiter used to join multiple key and
+                                  value pairs together.
+                                type: string
+                              nameTemplate:
+                                description: |-
+                                  NameTemplate defines how the property key is expanded.
+                                  If set, the template is appended to the defined property name, creating multiple properties instead of one
+                                  aggregate.
+                                  * $1 is replaced with the matched key.
+                                  * $2 is replaced with the matched value.
+                                type: string
+                              nodeFieldRef:
+                                description: Select a field of the node. Supports
+                                  `metadata.name`, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`.
+                                minLength: 1
+                                type: string
+                              valueTemplate:
+                                description: |-
+                                  ValueTemplate defines how the property value is expanded.
+                                  * $1 is replaced with the matched key.
+                                  * $2 is replaced with the matched value.
+                                type: string
+                            required:
+                            - nodeFieldRef
+                            type: object
                           name:
                             description: Name of the property to set.
                             minLength: 1
@@ -1560,6 +1645,8 @@ spec:
                                   `metadata.name`, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`.
                                 minLength: 1
                                 type: string
+                            required:
+                            - nodeFieldRef
                             type: object
                         required:
                         - name
@@ -1607,16 +1694,8 @@ spec:
               conditions:
                 description: Current LINSTOR Satellite state
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource.\n---\nThis struct is intended for
-                    direct use as an array at the field path .status.conditions.  For
-                    example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the
-                    observations of a foo's current state.\n\t    // Known .status.conditions.type
-                    are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    //
-                    +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t
-                    \   // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\"
-                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t
-                    \   // other fields\n\t}"
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
                   properties:
                     lastTransitionTime:
                       description: |-
@@ -1657,12 +1736,7 @@ spec:
                       - Unknown
                       type: string
                     type:
-                      description: |-
-                        type of condition in CamelCase or in foo.example.com/CamelCase.
-                        ---
-                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
-                        useful (see .node.status.conditions), the ability to deconflict is important.
-                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
                       maxLength: 316
                       pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                       type: string
