@@ -13,7 +13,7 @@ spec:
   externalTrafficPolicy: Cluster
   {{- else }}
   type: LoadBalancer
-  externalTrafficPolicy: {{ ternary "LoadBalancer" "ClusterIP" .Values.external }}
+  externalTrafficPolicy: {{ ternary "Local" "Cluster" .Values.external }}
   {{- end }}
 
   ports:
