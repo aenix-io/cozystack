@@ -7,7 +7,7 @@ repos:
     - id: mixed-line-ending
       args: [--fix=lf]
     - id: check-yaml
-      exclude: packages/apps/postgres/templates/init-script.yaml
+      exclude: '^.*templates/.*\.yaml$'
       args: [--unsafe]
 - repo: https://github.com/igorshubovych/markdownlint-cli
   rev: v0.41.0
