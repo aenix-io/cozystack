@@ -9,7 +9,7 @@
 {{- range $x := $bundle.releases }}
   {{- if not (hasKey $namespaces $x.namespace) }}
     {{- if not (has $x.name $disabledComponents) }}
-      {{- if and ($x.optional) (has $x.name $enabledComponents) }}
+      {{- if or (not $x.optional) (and ($x.optional) (has $x.name $enabledComponents)) }}
         {{- $_ := set $namespaces $x.namespace false }}
       {{- end }}
     {{- end }}
