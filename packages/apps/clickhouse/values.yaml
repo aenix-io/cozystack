@@ -11,7 +11,7 @@ size: 10Gi
 logStorageSize: 2Gi
 shards: 1
 replicas: 2
-storageClass: "local"
+storageClass: ""
 logTTL: 15
 
 ## @section Configuration parameters
@@ -46,7 +46,3 @@ backup:
   s3AccessKey: oobaiRus9pah8PhohL1ThaeTa4UVa7gu
   s3SecretKey: ju3eum4dekeich9ahM1te8waeGai0oog
   resticPassword: ChaXoveekoh6eigh4siesheeda2quai0
-
-image:
-  repository: clickhouse/clickhouse-server
-  tag: "24.2.2.71"

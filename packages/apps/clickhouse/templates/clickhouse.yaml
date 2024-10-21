@@ -120,8 +120,6 @@ spec:
                   topologyKey: "kubernetes.io/hostname"
           containers:
             - name: clickhouse
-              imagePullPolicy: Always
-              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
               volumeMounts:
                 - name: data-volume-template
                   mountPath: /var/lib/clickhouse

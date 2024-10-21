@@ -19,12 +19,14 @@ more details:
 
 ### Common parameters
 
-| Name           | Description                         | Value  |
-| -------------- | ----------------------------------- | ------ |
-| `size`         | Persistent Volume size              | `10Gi` |
-| `shards`       | Number of Clickhouse replicas       | `1`    |
-| `replicas`     | Number of Clickhouse shards         | `2`    |
-| `storageClass` | StorageClass used to store the data | `""`   |
+| Name             | Description                         | Value  |
+| ---------------- | ----------------------------------- | ------ |
+| `size`           | Persistent Volume size              | `10Gi` |
+| `logStorageSize` | Persistent Volume for logs size     | `2Gi`  |
+| `shards`         | Number of Clickhouse replicas       | `1`    |
+| `replicas`       | Number of Clickhouse shards         | `2`    |
+| `storageClass`   | StorageClass used to store the data | `""`   |
+| `logTTL`         | for query_log and query_thread_log  | `15`   |
 
 ### Configuration parameters
 

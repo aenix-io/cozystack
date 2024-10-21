@@ -9,7 +9,7 @@
         },
         "logStorageSize": {
             "type": "string",
-            "description": "logStorageSize Persistent Volume for logs size",
+            "description": "Persistent Volume for logs size",
             "default": "2Gi"
         },
         "shards": {
@@ -25,11 +25,11 @@
         "storageClass": {
             "type": "string",
             "description": "StorageClass used to store the data",
-            "default": "local"
+            "default": ""
         },
         "logTTL": {
             "type": "number",
-            "description": "logTTL for query_log and query_thread_log",
+            "description": "for query_log and query_thread_log",
             "default": 15
         },
         "backup": {
