@@ -1,0 +1,14 @@
+diff --git a/pkg/daemon/controller_linux.go b/pkg/daemon/controller_linux.go
+index 07014d11..7ff19ae0 100644
+--- a/pkg/daemon/controller_linux.go
++++ b/pkg/daemon/controller_linux.go
+@@ -118,9 +118,6 @@ func (c *Controller) initRuntime() error {
+ 		c.k8siptables[kubeovnv1.ProtocolIPv6] = k8siptables.New(c.k8sExec, k8siptables.ProtocolIPv6)
+ 	}
+ 
+-	c.nmSyncer = newNetworkManagerSyncer()
+-	c.nmSyncer.Run(c.transferAddrsAndRoutes)
+-
+ 	return nil
+ }
+ 
