@@ -7,7 +7,9 @@ ARG COMMIT_REF=e1310e1
 
 WORKDIR /source
 
+COPY patches /patches
 RUN wget -O- https://github.com/kubeovn/kube-ovn/archive/${COMMIT_REF}.tar.gz | tar xzf - --strip-components=1
+RUN git apply /patches/*.diff
 RUN sed -i 's|-z now|-z now -static|' Makefile
 RUN make build-go
 
