@@ -18,6 +18,7 @@ spec:
         template:
           spec:
             enableServiceLinks: false
+            containers: []
           metadata:
             labels:
               policy.cozystack.io/allow-to-apiserver: "true"
