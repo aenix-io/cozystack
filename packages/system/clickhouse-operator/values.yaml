@@ -4,3 +4,7 @@ altinity-clickhouse-operator:
       config.yaml:
         watch:
           namespaces: [".*"]
+        clickhouse:
+          configuration:
+            network:
+              hostRegexpTemplate: "(chi-{chi}-[^.]+\\d+-\\d+|clickhouse\\-{chi})\\.{namespace}\\.svc\\.cozy\\.local$"
