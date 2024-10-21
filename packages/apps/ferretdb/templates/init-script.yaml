@@ -34,6 +34,9 @@ stringData:
   init.sh: |
     #!/bin/bash
     set -e
+
+    until pg_isready ; do sleep 5; done
+
     echo "== create users"
     {{- if .Values.users }}
     psql -v ON_ERROR_STOP=1 <<\EOT
