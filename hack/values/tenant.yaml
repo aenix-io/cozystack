@@ -1,0 +1,6 @@
+host: ""
+etcd: false
+monitoring: false
+ingress: false
+seaweedfs: false
+isolated: true
