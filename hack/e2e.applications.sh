@@ -1,4 +1,4 @@
-for file in ./modules/*.sh; do
+for file in /hack/modules/*.sh; do
     source "$file"
 done
 
@@ -6,10 +6,36 @@ ROOT_NS="tenant-root"
 TEST_TENANT="tenant-e2e"
 
 function test() {
+    local charts=("${!1}")
+    local ignore=("${!2}")
+
+    if [ ${#charts[@]} -eq 0 ]; then
+        echo -e "${RED}No chart names provided for processing.${RED}"
+        exit 1
+    fi
+
     install_tenant $TEST_TENANT $ROOT_NS
     check_helmrelease_status $TEST_TENANT $ROOT_NS
 
-    install_all_apps "../packages/apps" "$TEST_TENANT" cozystack-apps cozy-public
+    local repo_name="cozystack-apps"
+    local repo_ns="cozy-public"
+
+    for chart_name in "${charts[@]}"; do
+        if [[ -d "$chart_path" ]]; then
+            if [[ " ${ignore[@]} " =~ " ${chart} " ]]; then
+              echo "Skipping ignored chart: $chart"
+              continue
+            fi
+            release_name="$chart_name-e2e"
+            echo "Installing release: $release_name"
+            install_helmrelease "$release_name" "$TEST_TENANT" "$chart_name" "$repo_name" "$repo_ns"
+
+            echo "Checking status for HelmRelease: $release_name"
+            check_helmrelease_status "$release_name" "$TEST_TENANT"
+        else
+            echo "$chart_path is not a directory. Skipping."
+        fi
+    done
 
     if true; then
         echo -e "${GREEN}All tests passed!${RESET}"
@@ -19,6 +45,7 @@ function test() {
         return 1
     fi
 }
+
 
 function clean() {
     kubectl delete helmrelease.helm.toolkit.fluxcd.io $TEST_TENANT -n $ROOT_NS
