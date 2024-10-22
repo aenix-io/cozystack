@@ -41,7 +41,6 @@ test: wait-for-sandbox ## Run the end-to-end tests in existing sandbox.
 	kubectl exec -ti -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'export COZYSTACK_INSTALLER_YAML=$$(cat /cozystack-installer.yaml) && /e2e.sh'
 
 test-applications: wait-for-sandbox copy-hack-dir ## Run the end-to-end tests in existing sandbox for applications.
-	kubectl exec -ti -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'wget https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 -O /usr/local/bin/yq > /dev/null 2>&1 && chmod +x /usr/local/bin/yq && apt-get install jq -y > /dev/null 2>&1'
 	for app in $(TESTING_APPS); do \
 		echo "Running tests for $${app}"; \
 		kubectl exec -ti -n cozy-e2e-tests deploy/cozystack-e2e-sandbox -- bash -c "/hack/e2e.application.sh $${app}"; \
