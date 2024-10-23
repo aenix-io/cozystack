@@ -1,0 +1,10 @@
+
+## @section Common parameters
+
+## @param external Enable external access from outside the cluster
+## @param replicas Persistent Volume size for NATS
+## @param storageClass StorageClass used to store the data
+##
+external: false
+replicas: 2
+storageClass: ""

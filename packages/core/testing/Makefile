@@ -42,7 +42,6 @@ test: wait-for-sandbox copy-hack-dir ## Run the end-to-end tests in existing san
 
 test-applications: wait-for-sandbox copy-hack-dir ## Run the end-to-end tests in existing sandbox for applications.
 	for app in $(TESTING_APPS); do \
-		echo "Running tests for $${app}"; \
 		kubectl exec -ti -n cozy-e2e-tests deploy/cozystack-e2e-sandbox -- bash -c "/hack/e2e.application.sh $${app}"; \
 	done
 	kubectl exec -ti -n cozy-e2e-tests deploy/cozystack-e2e-sandbox -- bash -c "kubectl get hr -A | grep -v 'True'"

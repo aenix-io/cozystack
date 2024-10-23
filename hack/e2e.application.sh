@@ -9,15 +9,29 @@ YELLOW='\033[0;33m'
 ROOT_NS="tenant-root"
 TEST_TENANT="tenant-e2e"
 
-function clean() {
-    kubectl delete helmrelease.helm.toolkit.fluxcd.io $TEST_TENANT -n $ROOT_NS
-    if true; then
-        echo -e "${GREEN}Cleanup successful!${RESET}"
-        return 0
-    else
-        echo -e "${RED}Cleanup failed!${RESET}"
-        return 1
+values_base_path="/hack/testdata/"
+checks_base_path="/hack/testdata/"
+
+function delete_hr() {
+    local release_name="$1"
+    local namespace="$2"
+
+    if [[ -z "$release_name" ]]; then
+        echo -e "${RED}Error: Release name is required.${RESET}"
+        exit 1
     fi
+
+    if [[ -z "$namespace" ]]; then
+        echo -e "${RED}Error: Namespace name is required.${RESET}"
+        exit 1
+    fi
+
+    if [[ "$release_name" == "tenant-e2e" ]]; then
+        echo -e "${YELLOW}Skipping deletion for release tenant-e2e.${RESET}"
+        return 0
+    fi
+
+    kubectl delete helmrelease $release_name -n $namespace
 }
 
 function install_helmrelease() {
@@ -43,6 +57,11 @@ function install_helmrelease() {
         exit 1
     fi
 
+    if [[ -n "$values_file" && -f "$values_file" ]]; then
+        local values_section
+        values_section=$(echo "  values:" && sed 's/^/    /' "$values_file")
+    fi
+
     local helmrelease_file=$(mktemp /tmp/HelmRelease.XXXXXX.yaml)
     {
         echo "apiVersion: helm.toolkit.fluxcd.io/v2"
@@ -64,11 +83,7 @@ function install_helmrelease() {
         echo "      version: '*'"
         echo "  interval: 1m0s"
         echo "  timeout: 5m0s"
-
-        if [[ -n "$values_file" && -f "$values_file" ]]; then
-            echo "  values:"
-            cat "$values_file" | sed 's/^/    /'
-        fi
+        [[ -n "$values_section" ]] && echo "$values_section"
     } > "$helmrelease_file"
 
     kubectl apply -f "$helmrelease_file"
@@ -79,26 +94,38 @@ function install_helmrelease() {
 function install_tenant (){
     local release_name="$1"
     local namespace="$2"
-    local values_file="${3:-tenant.yaml}"
+    local values_file="${values_base_path}tenant/values.yaml"
     local repo_name="cozystack-apps"
     local repo_ns="cozy-public"
-
     install_helmrelease "$release_name" "$namespace" "tenant" "$repo_name" "$repo_ns" "$values_file"
+}
+
+function make_extra_checks(){
+    local checks_file="$1"
+    echo "after exec make $checks_file"
+    if [[ -n "$checks_file" && -f "$checks_file" ]]; then
+        echo -e "${YELLOW}Start extra checks with file: ${checks_file}${RESET}"
+
+    fi
 }
 
 function check_helmrelease_status() {
     local release_name="$1"
     local namespace="$2"
+    local checks_file="$3"
     local timeout=300  # Timeout in seconds
     local interval=5   # Interval between checks in seconds
     local elapsed=0
+
 
     while [[ $elapsed -lt $timeout ]]; do
         local status_output
         status_output=$(kubectl get helmrelease "$release_name" -n "$namespace" -o json | jq -r '.status.conditions[-1].reason')
 
-        if [[ "$status_output" == "InstallSucceeded" ]]; then
+        if [[ "$status_output" == "InstallSucceeded" || "$status_output" == "UpgradeSucceeded" ]]; then
             echo -e "${GREEN}Helm release '$release_name' is ready.${RESET}"
+            make_extra_checks "$checks_file"
+            delete_hr $release_name $namespace
             return 0
         elif [[ "$status_output" == "InstallFailed" ]]; then
           echo -e "${RED}Helm release '$release_name': InstallFailed${RESET}"
@@ -122,14 +149,17 @@ if [ -z "$chart_name" ]; then
     exit 1
 fi
 
-echo "Running tests for chart: $chart_name"
-install_tenant $TEST_TENANT $ROOT_NS
-check_helmrelease_status $TEST_TENANT $ROOT_NS
 
+checks_file="${checks_base_path}${chart_name}/check.sh"
 repo_name="cozystack-apps"
 repo_ns="cozy-public"
-
 release_name="$chart_name-e2e"
-install_helmrelease "$release_name" "$TEST_TENANT" "$chart_name" "$repo_name" "$repo_ns"
+values_file="${values_base_path}${chart_name}/values.yaml"
 
-check_helmrelease_status "$release_name" "$TEST_TENANT"
+install_tenant $TEST_TENANT $ROOT_NS
+check_helmrelease_status $TEST_TENANT $ROOT_NS "${checks_base_path}tenant/check.sh"
+
+echo -e "${YELLOW}Running tests for chart: $chart_name${RESET}"
+
+install_helmrelease $release_name $TEST_TENANT $chart_name $repo_name $repo_ns $values_file
+check_helmrelease_status $release_name $TEST_TENANT $checks_file
