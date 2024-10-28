@@ -36,7 +36,7 @@ data:
         'endpoint'    : "/api",
         'provider'    : "basic"
       })
-      .constant('colors', {});  
+      .constant('colors', {});
 ---
 apiVersion: v1
 kind: Service
@@ -115,7 +115,7 @@ spec:
             - name: TELEGRAM_TOKEN
               value: "{{ .Values.alerta.alerts.telegram.token }}"
             - name: TELEGRAM_WEBHOOK_URL
-              value: "https://alerta.infra.aenix.org/api/webhooks/telegram?api-key={{ $apiKey }}"
+              value: "https://{{ printf "alerta.%s" (.Values.host | default $host) }}/api/webhooks/telegram?api-key={{ $apiKey }}"
             {{- end }}
 
           ports:
@@ -148,9 +148,9 @@ metadata:
   labels:
     app: alerta
   annotations:
-    {{- if ne $issuerType "cloudflare" }} 
+    {{- if ne $issuerType "cloudflare" }}
     acme.cert-manager.io/http01-ingress-class: {{ $ingress }}
-    {{- end }} 
+    {{- end }}
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: {{ $ingress }}
