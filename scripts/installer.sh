@@ -13,6 +13,7 @@ run_migrations() {
   current_version=$(kubectl get configmap -n cozy-system cozystack-version -o jsonpath='{.data.version}') || true
   until [ "$current_version" = "$VERSION" ]; do
     echo "run migration: $current_version --> $VERSION"
+    chmod +x scripts/migrations/$current_version
     scripts/migrations/$current_version
     current_version=$(kubectl get configmap -n cozy-system cozystack-version -o jsonpath='{.data.version}')
   done
