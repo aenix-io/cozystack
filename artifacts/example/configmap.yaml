@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cozystack-api
+  namespace: cozy-system
+data:
+  config.yaml: |
+    resources:
+    - application:
+        kind: Kubernetes
+        singular: kubernetes
+        plural: kuberneteses
+        shortNames: ["kubernetes", "kuberneteses"]
+      release:
+        prefix: kubernetes-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: kubernetes
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: Redis
+        singular: redis
+        plural: redises
+        shortNames: ["redis", "redises"]
+      release:
+        prefix: redis-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: rabbitmq
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: RabbitMQ
+        singular: rabbitmq
+        plural: rabbitmqs
+        shortNames: ["rabbitmq", "rabbitmqs"]
+      release:
+        prefix: rabbitmq-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: rabbitmq
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: Postgres
+        singular: postgres
+        plural: postgreses
+        shortNames: ["postgres", "postgreses"]
+      release:
+        prefix: postgres-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: postgres
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: FerretDB
+        singular: ferretdb
+        plural: ferretdb
+        shortNames: ["ferretdb", "ferretdbs"]
+      release:
+        prefix: ferretdb-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: ferretdb
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: Kafka
+        singular: kafka
+        plural: kafkas
+        shortNames: ["kafka", "kafkases"]
+      release:
+        prefix: ferretdb-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: kafka
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: VMDisk
+        plural: vmdisks
+        singular: vmdisk
+        shortNames: ["vmdisk", "vmdisks"]
+      release:
+        prefix: vm-disk-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: vm-disk
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: VMInstance
+        plural: vminstances
+        singular: vminstance
+        shortNames: ["vminstance", "vminstances"]
+      release:
+        prefix: vm-instance-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: vm-instance
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
