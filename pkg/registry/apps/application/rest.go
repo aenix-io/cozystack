@@ -15,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/apiserver/pkg/endpoints/request"
@@ -27,6 +26,7 @@ import (
 	"github.com/aenix.io/cozystack/pkg/config"
 )
 
+// Ensure REST implements necessary interfaces
 var (
 	_ rest.Getter          = &REST{}
 	_ rest.Lister          = &REST{}
@@ -37,13 +37,20 @@ var (
 	_ rest.Patcher         = &REST{}
 )
 
+// Define constants for label and annotation prefixes
+const (
+	LabelPrefix      = "apps.cozystack.io-"
+	AnnotationPrefix = "apps.cozystack.io-"
+)
+
+// Define the GroupVersionResource for HelmRelease
 var helmReleaseGVR = schema.GroupVersionResource{
 	Group:    "helm.toolkit.fluxcd.io",
 	Version:  "v2",
 	Resource: "helmreleases",
 }
 
-// REST implements the RESTStorage interface for Application.
+// REST implements the RESTStorage interface for Application resources
 type REST struct {
 	dynamicClient dynamic.Interface
 	gvr           schema.GroupVersionResource
@@ -52,40 +59,55 @@ type REST struct {
 	releaseConfig config.ReleaseConfig
 }
 
-// NewREST creates a new REST storage for Application with specific configuration.
+// NewREST creates a new REST storage for Application with specific configuration
 func NewREST(dynamicClient dynamic.Interface, config *config.Resource) *REST {
 	return &REST{
 		dynamicClient: dynamicClient,
-		gvr:           schema.GroupVersionResource{Group: appsv1alpha1.GroupName, Version: "v1alpha1", Resource: config.Application.Plural},
-		gvk:           schema.GroupVersion{Group: appsv1alpha1.GroupName, Version: "v1alpha1"}.WithKind(config.Application.Kind),
+		gvr: schema.GroupVersionResource{
+			Group:    appsv1alpha1.GroupName,
+			Version:  "v1alpha1",
+			Resource: config.Application.Plural,
+		},
+		gvk: schema.GroupVersion{
+			Group:   appsv1alpha1.GroupName,
+			Version: "v1alpha1",
+		}.WithKind(config.Application.Kind),
 		kindName:      config.Application.Kind,
 		releaseConfig: config.Release,
 	}
 }
 
+// NamespaceScoped indicates whether the resource is namespaced
 func (r *REST) NamespaceScoped() bool {
 	return true
 }
 
-// GetSingularName returns the singular name of the resource.
+// GetSingularName returns the singular name of the resource
 func (r *REST) GetSingularName() string {
 	return r.gvr.Resource
 }
 
-// Create creates a new Application by translating it into a HelmRelease.
+// Create handles the creation of a new Application by converting it to a HelmRelease
 func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	// Assert the object is of type Application
 	app, ok := obj.(*appsv1alpha1.Application)
 	if !ok {
 		return nil, fmt.Errorf("expected Application object, got %T", obj)
 	}
 
+	// Convert Application to HelmRelease
 	helmRelease, err := r.ConvertApplicationToHelmRelease(app)
 	if err != nil {
 		return nil, fmt.Errorf("conversion error: %v", err)
 	}
 
-	helmRelease.ObjectMeta.Labels = mergeMaps(helmRelease.ObjectMeta.Labels, r.releaseConfig.Labels)
+	// Merge system labels (from config) directly
+	helmRelease.Labels = mergeMaps(r.releaseConfig.Labels, helmRelease.Labels)
+	// Merge user labels with prefix
+	helmRelease.Labels = mergeMaps(helmRelease.Labels, addPrefixedMap(app.Labels, LabelPrefix))
+	// Note: Annotations from config are not handled as r.releaseConfig.Annotations is undefined
 
+	// Convert HelmRelease to unstructured format
 	unstructuredHR, err := runtime.DefaultUnstructuredConverter.ToUnstructured(helmRelease)
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert HelmRelease to unstructured: %v", err)
@@ -93,12 +115,14 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 
 	log.Printf("Creating HelmRelease %s in namespace %s", helmRelease.Name, app.Namespace)
 
+	// Create HelmRelease in Kubernetes
 	createdHR, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(app.Namespace).Create(ctx, &unstructured.Unstructured{Object: unstructuredHR}, *options)
 	if err != nil {
 		log.Printf("Failed to create HelmRelease %s: %v", helmRelease.Name, err)
 		return nil, fmt.Errorf("failed to create HelmRelease: %v", err)
 	}
 
+	// Convert the created HelmRelease back to Application
 	convertedApp, err := r.ConvertHelmReleaseToApplication(createdHR)
 	if err != nil {
 		log.Printf("Conversion error from HelmRelease to Application for resource %s: %v", createdHR.GetName(), err)
@@ -107,6 +131,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 
 	log.Printf("Successfully created and converted HelmRelease %s to Application", createdHR.GetName())
 
+	// Convert Application to unstructured format
 	unstructuredApp, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&convertedApp)
 	if err != nil {
 		log.Printf("Failed to convert Application to unstructured for resource %s: %v", convertedApp.GetName(), err)
@@ -117,7 +142,7 @@ func (r *REST) Create(ctx context.Context, obj runtime.Object, createValidation 
 	return &unstructured.Unstructured{Object: unstructuredApp}, nil
 }
 
-// Get retrieves an Application by translating it from a HelmRelease and returns it as an unstructured object.
+// Get retrieves an Application by converting the corresponding HelmRelease
 func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
 	namespace, err := r.getNamespace(ctx)
 	if err != nil {
@@ -126,18 +151,22 @@ func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 
 	log.Printf("Attempting to retrieve resource %s of type %s in namespace %s", name, r.gvr.Resource, namespace)
 
-	hr, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Get(ctx, r.releaseConfig.Prefix+name, *options)
+	// Get the corresponding HelmRelease using the new prefix
+	helmReleaseName := r.releaseConfig.Prefix + name
+	hr, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Get(ctx, helmReleaseName, *options)
 	if err != nil {
 		log.Printf("Error retrieving HelmRelease for resource %s: %v", name, err)
 		return nil, err
 	}
 
+	// Convert HelmRelease to Application
 	convertedApp, err := r.ConvertHelmReleaseToApplication(hr)
 	if err != nil {
 		log.Printf("Conversion error from HelmRelease to Application for resource %s: %v", name, err)
 		return nil, fmt.Errorf("conversion error: %v", err)
 	}
 
+	// Convert Application to unstructured format
 	unstructuredApp, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&convertedApp)
 	if err != nil {
 		log.Printf("Failed to convert Application to unstructured for resource %s: %v", name, err)
@@ -148,7 +177,7 @@ func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 	return &unstructured.Unstructured{Object: unstructuredApp}, nil
 }
 
-// List retrieves a list of Application resources by translating them from HelmReleases.
+// List retrieves a list of Applications by converting HelmReleases
 func (r *REST) List(ctx context.Context, options *metainternalversion.ListOptions) (runtime.Object, error) {
 	namespace, err := r.getNamespace(ctx)
 	if err != nil {
@@ -162,12 +191,14 @@ func (r *REST) List(ctx context.Context, options *metainternalversion.ListOption
 		FieldSelector: options.FieldSelector.String(),
 	}
 
+	// List HelmReleases based on selectors
 	hrList, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).List(ctx, metaOptions)
 	if err != nil {
 		log.Printf("Error listing HelmReleases: %v", err)
 		return nil, err
 	}
 
+	// Initialize an empty ApplicationList
 	appList := &appsv1alpha1.ApplicationList{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "apps.cozystack.io/v1alpha1",
@@ -179,6 +210,7 @@ func (r *REST) List(ctx context.Context, options *metainternalversion.ListOption
 		Items: []appsv1alpha1.Application{},
 	}
 
+	// Iterate over HelmReleases and convert to Applications
 	for _, hr := range hrList.Items {
 		if !r.shouldIncludeHelmRelease(&hr) {
 			continue
@@ -190,6 +222,7 @@ func (r *REST) List(ctx context.Context, options *metainternalversion.ListOption
 			continue
 		}
 
+		// Remove the prefix from the Application name
 		app.Name = strings.TrimPrefix(app.Name, r.releaseConfig.Prefix)
 		appList.Items = append(appList.Items, app)
 	}
@@ -198,47 +231,16 @@ func (r *REST) List(ctx context.Context, options *metainternalversion.ListOption
 	return appList, nil
 }
 
-// Patch applies a patch to an Application by translating it into a HelmRelease.
-func (r *REST) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, subresources ...string) (runtime.Object, error) {
-	namespace, err := r.getNamespace(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Printf("Patching HelmRelease %s in namespace %s with patch type %s", name, namespace, pt)
-
-	patchedHR, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Patch(ctx, r.releaseConfig.Prefix+name, pt, data, metav1.PatchOptions{}, subresources...)
-	if err != nil {
-		log.Printf("Failed to patch HelmRelease %s: %v", name, err)
-		return nil, fmt.Errorf("failed to patch HelmRelease: %v", err)
-	}
-
-	convertedApp, err := r.ConvertHelmReleaseToApplication(patchedHR)
-	if err != nil {
-		log.Printf("Conversion error from HelmRelease to Application for resource %s: %v", patchedHR.GetName(), err)
-		return nil, fmt.Errorf("conversion error: %v", err)
-	}
-
-	log.Printf("Successfully patched and converted HelmRelease %s to Application", patchedHR.GetName())
-
-	unstructuredApp, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&convertedApp)
-	if err != nil {
-		log.Printf("Failed to convert Application to unstructured for resource %s: %v", convertedApp.GetName(), err)
-		return nil, fmt.Errorf("failed to convert Application to unstructured: %v", err)
-	}
-
-	log.Printf("Successfully retrieved and converted resource %s of type %s to unstructured", convertedApp.GetName(), r.gvr.Resource)
-	return &unstructured.Unstructured{Object: unstructuredApp}, nil
-}
-
-// Update updates an existing Application by translating it into a HelmRelease.
+// Update updates an existing Application by converting it to a HelmRelease
 func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
+	// Retrieve the existing Application
 	oldObj, err := r.Get(ctx, name, &metav1.GetOptions{})
 	if err != nil {
 		if storage.IsNotFound(err) {
 			if !forceAllowCreate {
 				return nil, false, err
 			}
+			// If not found and force allow create, create a new one
 			obj, err := objInfo.UpdatedObject(ctx, nil)
 			if err != nil {
 				return nil, false, err
@@ -252,42 +254,60 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 		return nil, false, err
 	}
 
+	// Update the Application object
 	newObj, err := objInfo.UpdatedObject(ctx, oldObj)
 	if err != nil {
 		return nil, false, err
 	}
 
+	// Validate the update if a validation function is provided
 	if updateValidation != nil {
 		if err := updateValidation(ctx, newObj, oldObj); err != nil {
 			return nil, false, err
 		}
 	}
 
+	// Assert the new object is of type Application
 	app, ok := newObj.(*appsv1alpha1.Application)
 	if !ok {
 		return nil, false, fmt.Errorf("expected Application object, got %T", newObj)
 	}
 
+	// Convert Application to HelmRelease
 	helmRelease, err := r.ConvertApplicationToHelmRelease(app)
 	if err != nil {
 		return nil, false, fmt.Errorf("conversion error: %v", err)
 	}
 
-	helmRelease.ObjectMeta.Labels = mergeMaps(helmRelease.ObjectMeta.Labels, r.releaseConfig.Labels)
+	// Merge system labels (from config) directly
+	helmRelease.Labels = mergeMaps(r.releaseConfig.Labels, helmRelease.Labels)
+	// Merge user labels with prefix
+	helmRelease.Labels = mergeMaps(helmRelease.Labels, addPrefixedMap(app.Labels, LabelPrefix))
+	// Note: Annotations from config are not handled as r.releaseConfig.Annotations is undefined
 
+	// Convert HelmRelease to unstructured format
 	unstructuredHR, err := runtime.DefaultUnstructuredConverter.ToUnstructured(helmRelease)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to convert HelmRelease to unstructured: %v", err)
 	}
 
+	metadata, found, err := unstructured.NestedMap(unstructuredHR, "metadata")
+	if err != nil || !found {
+		log.Printf("Failed to retrieve metadata from HelmRelease: %v, found: %v", err, found)
+		return nil, false, fmt.Errorf("failed to retrieve metadata from HelmRelease: %v", err)
+	}
+	log.Printf("HelmRelease Metadata: %+v", metadata)
+
 	log.Printf("Updating HelmRelease %s in namespace %s", helmRelease.Name, helmRelease.Namespace)
 
+	// Update the HelmRelease in Kubernetes
 	resultHR, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(helmRelease.Namespace).Update(ctx, &unstructured.Unstructured{Object: unstructuredHR}, metav1.UpdateOptions{})
 	if err != nil {
 		log.Printf("Failed to update HelmRelease %s: %v", helmRelease.Name, err)
 		return nil, false, fmt.Errorf("failed to update HelmRelease: %v", err)
 	}
 
+	// Convert the updated HelmRelease back to Application
 	convertedApp, err := r.ConvertHelmReleaseToApplication(resultHR)
 	if err != nil {
 		log.Printf("Conversion error from HelmRelease to Application for resource %s: %v", resultHR.GetName(), err)
@@ -296,17 +316,19 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 
 	log.Printf("Successfully updated and converted HelmRelease %s to Application", resultHR.GetName())
 
+	// Convert Application to unstructured format
 	unstructuredApp, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&convertedApp)
 	if err != nil {
 		log.Printf("Failed to convert Application to unstructured for resource %s: %v", convertedApp.GetName(), err)
 		return nil, false, fmt.Errorf("failed to convert Application to unstructured: %v", err)
 	}
 
-	log.Printf("Successfully retrieved and converted resource %s of type %s to unstructured", convertedApp.GetName(), r.gvr.Resource)
+	log.Printf("Returning patched Application object: %+v", unstructuredApp)
+
 	return &unstructured.Unstructured{Object: unstructuredApp}, false, nil
 }
 
-// Delete removes an Application by deleting the corresponding HelmRelease.
+// Delete removes an Application by deleting the corresponding HelmRelease
 func (r *REST) Delete(ctx context.Context, name string, deleteValidation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
 	namespace, err := r.getNamespace(ctx)
 	if err != nil {
@@ -315,17 +337,21 @@ func (r *REST) Delete(ctx context.Context, name string, deleteValidation rest.Va
 
 	log.Printf("Deleting HelmRelease %s in namespace %s", name, namespace)
 
-	err = r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Delete(ctx, r.releaseConfig.Prefix+name, *options)
+	// Construct HelmRelease name with new prefix
+	helmReleaseName := r.releaseConfig.Prefix + name
+
+	// Delete the HelmRelease corresponding to the Application
+	err = r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Delete(ctx, helmReleaseName, *options)
 	if err != nil {
-		log.Printf("Failed to delete HelmRelease %s: %v", name, err)
+		log.Printf("Failed to delete HelmRelease %s: %v", helmReleaseName, err)
 		return nil, false, err
 	}
 
-	log.Printf("Successfully deleted HelmRelease %s", name)
+	log.Printf("Successfully deleted HelmRelease %s", helmReleaseName)
 	return nil, true, nil
 }
 
-// Watch sets up a watch on HelmReleases, filters them, and converts events to Applications.
+// Watch sets up a watch on HelmReleases, filters them, and converts events to Applications
 func (r *REST) Watch(ctx context.Context, options *metainternalversion.ListOptions) (watch.Interface, error) {
 	namespace, err := r.getNamespace(ctx)
 	if err != nil {
@@ -339,6 +365,7 @@ func (r *REST) Watch(ctx context.Context, options *metainternalversion.ListOptio
 		FieldSelector: options.FieldSelector.String(),
 	}
 
+	// List HelmReleases to obtain the current resource version
 	list, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).List(ctx, listOptions)
 	if err != nil {
 		log.Printf("Error listing HelmReleases for watch: %v", err)
@@ -348,6 +375,7 @@ func (r *REST) Watch(ctx context.Context, options *metainternalversion.ListOptio
 	resourceVersion := list.GetResourceVersion()
 	log.Printf("Obtained resourceVersion %s for watch", resourceVersion)
 
+	// Set up watch options with the obtained resource version
 	metaOptions := metav1.ListOptions{
 		LabelSelector:   buildLabelSelector(r.releaseConfig.Labels),
 		FieldSelector:   options.FieldSelector.String(),
@@ -355,12 +383,14 @@ func (r *REST) Watch(ctx context.Context, options *metainternalversion.ListOptio
 		ResourceVersion: resourceVersion,
 	}
 
+	// Start watching HelmReleases
 	helmWatcher, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Watch(ctx, metaOptions)
 	if err != nil {
 		log.Printf("Error setting up watch for HelmReleases: %v", err)
 		return nil, err
 	}
 
+	// Create a custom watcher to handle event filtering and conversion
 	customW := &customWatcher{
 		resultChan: make(chan watch.Event),
 		stopChan:   make(chan struct{}),
@@ -375,6 +405,7 @@ func (r *REST) Watch(ctx context.Context, options *metainternalversion.ListOptio
 					return
 				}
 
+				// Check if the HelmRelease event is relevant based on filtering criteria
 				matches, err := r.isRelevantHelmRelease(&event)
 				if err != nil {
 					log.Printf("Error filtering HelmRelease event: %v", err)
@@ -385,18 +416,21 @@ func (r *REST) Watch(ctx context.Context, options *metainternalversion.ListOptio
 					continue
 				}
 
+				// Convert HelmRelease to Application
 				app, err := r.ConvertHelmReleaseToApplication(event.Object.(*unstructured.Unstructured))
 				if err != nil {
 					log.Printf("Error converting HelmRelease to Application: %v", err)
 					continue
 				}
 
+				// Convert Application to unstructured format
 				unstructuredApp, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&app)
 				if err != nil {
 					log.Printf("Failed to convert Application to unstructured: %v", err)
 					continue
 				}
 
+				// Create a new watch event with the Application object
 				appEvent := watch.Event{
 					Type:   event.Type,
 					Object: &unstructured.Unstructured{Object: unstructuredApp},
@@ -422,26 +456,26 @@ func (r *REST) Watch(ctx context.Context, options *metainternalversion.ListOptio
 	return customW, nil
 }
 
-// customWatcher wraps the original watcher and filters/converts events.
+// customWatcher wraps the original watcher and filters/converts events
 type customWatcher struct {
 	resultChan chan watch.Event
 	stopChan   chan struct{}
 	stopOnce   sync.Once
 }
 
-// Stop terminates the watch.
+// Stop terminates the watch
 func (cw *customWatcher) Stop() {
 	cw.stopOnce.Do(func() {
 		close(cw.stopChan)
 	})
 }
 
-// ResultChan returns the event channel.
+// ResultChan returns the event channel
 func (cw *customWatcher) ResultChan() <-chan watch.Event {
 	return cw.resultChan
 }
 
-// isRelevantHelmRelease checks if the HelmRelease meets the specified criteria.
+// isRelevantHelmRelease checks if the HelmRelease meets the specified criteria
 func (r *REST) isRelevantHelmRelease(event *watch.Event) (bool, error) {
 	if event.Object == nil {
 		return false, nil
@@ -466,8 +500,26 @@ func (r *REST) isRelevantHelmRelease(event *watch.Event) (bool, error) {
 	return r.matchesSourceRefAndPrefix(hr), nil
 }
 
-// matchesSourceRefAndPrefix checks both SourceRefConfig and Prefix criteria.
+// shouldIncludeHelmRelease determines if a HelmRelease should be included based on filtering criteria
+func (r *REST) shouldIncludeHelmRelease(hr *unstructured.Unstructured) bool {
+	// Filter by Chart Name
+	chartName, found, err := unstructured.NestedString(hr.Object, "spec", "chart", "spec", "chart")
+	if err != nil || !found {
+		log.Printf("HelmRelease %s missing spec.chart.spec.chart field: %v", hr.GetName(), err)
+		return false
+	}
+	if chartName != r.releaseConfig.Chart.Name {
+		log.Printf("HelmRelease %s chart name %s does not match expected %s", hr.GetName(), chartName, r.releaseConfig.Chart.Name)
+		return false
+	}
+
+	// Filter by SourceRefConfig and Prefix
+	return r.matchesSourceRefAndPrefix(hr)
+}
+
+// matchesSourceRefAndPrefix checks both SourceRefConfig and Prefix criteria
 func (r *REST) matchesSourceRefAndPrefix(hr *unstructured.Unstructured) bool {
+	// Extract SourceRef fields
 	sourceRefKind, found, err := unstructured.NestedString(hr.Object, "spec", "chart", "spec", "sourceRef", "kind")
 	if err != nil || !found {
 		log.Printf("HelmRelease %s missing spec.chart.spec.sourceRef.kind field: %v", hr.GetName(), err)
@@ -483,6 +535,8 @@ func (r *REST) matchesSourceRefAndPrefix(hr *unstructured.Unstructured) bool {
 		log.Printf("HelmRelease %s missing spec.chart.spec.sourceRef.namespace field: %v", hr.GetName(), err)
 		return false
 	}
+
+	// Check if SourceRef matches the configuration
 	if sourceRefKind != r.releaseConfig.Chart.SourceRef.Kind ||
 		sourceRefName != r.releaseConfig.Chart.SourceRef.Name ||
 		sourceRefNamespace != r.releaseConfig.Chart.SourceRef.Namespace {
@@ -500,24 +554,7 @@ func (r *REST) matchesSourceRefAndPrefix(hr *unstructured.Unstructured) bool {
 	return true
 }
 
-// shouldIncludeHelmRelease determines if a HelmRelease should be included based on filtering criteria.
-func (r *REST) shouldIncludeHelmRelease(hr *unstructured.Unstructured) bool {
-	// Filter by Chart Name
-	chartName, found, err := unstructured.NestedString(hr.Object, "spec", "chart", "spec", "chart")
-	if err != nil || !found {
-		log.Printf("HelmRelease %s missing spec.chart.spec.chart field: %v", hr.GetName(), err)
-		return false
-	}
-	if chartName != r.releaseConfig.Chart.Name {
-		log.Printf("HelmRelease %s chart name %s does not match expected %s", hr.GetName(), chartName, r.releaseConfig.Chart.Name)
-		return false
-	}
-
-	// Filter by SourceRefConfig and Prefix
-	return r.matchesSourceRefAndPrefix(hr)
-}
-
-// getNamespace extracts the namespace from the context.
+// getNamespace extracts the namespace from the context
 func (r *REST) getNamespace(ctx context.Context) (string, error) {
 	namespace, ok := request.NamespaceFrom(ctx)
 	if !ok {
@@ -526,7 +563,7 @@ func (r *REST) getNamespace(ctx context.Context) (string, error) {
 	return namespace, nil
 }
 
-// buildLabelSelector constructs a label selector string from a map of labels.
+// buildLabelSelector constructs a label selector string from a map of labels
 func buildLabelSelector(labels map[string]string) string {
 	var selectors []string
 	for k, v := range labels {
@@ -535,7 +572,7 @@ func buildLabelSelector(labels map[string]string) string {
 	return strings.Join(selectors, ",")
 }
 
-// mergeMaps combines two maps of labels.
+// mergeMaps combines two maps of labels or annotations
 func mergeMaps(a, b map[string]string) map[string]string {
 	if a == nil && b == nil {
 		return nil
@@ -556,17 +593,46 @@ func mergeMaps(a, b map[string]string) map[string]string {
 	return merged
 }
 
-// ConvertHelmReleaseToApplication converts a HelmRelease to an Application.
+// addPrefixedMap adds the predefined prefix to the keys of a map
+func addPrefixedMap(original map[string]string, prefix string) map[string]string {
+	if original == nil {
+		return nil
+	}
+	processed := make(map[string]string, len(original))
+	for k, v := range original {
+		processed[prefix+k] = v
+	}
+	return processed
+}
+
+// filterPrefixedMap filters a map by the predefined prefix and removes the prefix from the keys
+func filterPrefixedMap(original map[string]string, prefix string) map[string]string {
+	if original == nil {
+		return nil
+	}
+	processed := make(map[string]string)
+	for k, v := range original {
+		if strings.HasPrefix(k, prefix) {
+			newKey := strings.TrimPrefix(k, prefix)
+			processed[newKey] = v
+		}
+	}
+	return processed
+}
+
+// ConvertHelmReleaseToApplication converts a HelmRelease to an Application
 func (r *REST) ConvertHelmReleaseToApplication(hr *unstructured.Unstructured) (appsv1alpha1.Application, error) {
 	log.Printf("Converting HelmRelease to Application for resource %s", hr.GetName())
 
 	var helmRelease helmv2.HelmRelease
+	// Convert unstructured to HelmRelease struct
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(hr.Object, &helmRelease)
 	if err != nil {
 		log.Printf("Error converting from unstructured to HelmRelease: %v", err)
 		return appsv1alpha1.Application{}, err
 	}
 
+	// Convert HelmRelease struct to Application struct
 	app, err := r.convertHelmReleaseToApplication(&helmRelease)
 	if err != nil {
 		log.Printf("Error converting from HelmRelease to Application: %v", err)
@@ -577,12 +643,12 @@ func (r *REST) ConvertHelmReleaseToApplication(hr *unstructured.Unstructured) (a
 	return app, nil
 }
 
-// ConvertApplicationToHelmRelease converts an Application to a HelmRelease.
+// ConvertApplicationToHelmRelease converts an Application to a HelmRelease
 func (r *REST) ConvertApplicationToHelmRelease(app *appsv1alpha1.Application) (*helmv2.HelmRelease, error) {
 	return r.convertApplicationToHelmRelease(app)
 }
 
-// convertHelmReleaseToApplication implements the actual conversion logic.
+// convertHelmReleaseToApplication implements the actual conversion logic
 func (r *REST) convertHelmReleaseToApplication(hr *helmv2.HelmRelease) (appsv1alpha1.Application, error) {
 	app := appsv1alpha1.Application{
 		TypeMeta: metav1.TypeMeta{
@@ -592,8 +658,12 @@ func (r *REST) convertHelmReleaseToApplication(hr *helmv2.HelmRelease) (appsv1al
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              strings.TrimPrefix(hr.Name, r.releaseConfig.Prefix),
 			Namespace:         hr.Namespace,
+			UID:               hr.GetUID(),
+			ResourceVersion:   hr.GetResourceVersion(),
 			CreationTimestamp: hr.CreationTimestamp,
 			DeletionTimestamp: hr.DeletionTimestamp,
+			Labels:            filterPrefixedMap(hr.Labels, LabelPrefix),
+			Annotations:       filterPrefixedMap(hr.Annotations, AnnotationPrefix),
 		},
 		Spec: hr.Spec.Values,
 		Status: appsv1alpha1.ApplicationStatus{
@@ -617,7 +687,7 @@ func (r *REST) convertHelmReleaseToApplication(hr *helmv2.HelmRelease) (appsv1al
 	return app, nil
 }
 
-// convertApplicationToHelmRelease implements the actual conversion logic.
+// convertApplicationToHelmRelease implements the actual conversion logic
 func (r *REST) convertApplicationToHelmRelease(app *appsv1alpha1.Application) (*helmv2.HelmRelease, error) {
 	helmRelease := &helmv2.HelmRelease{
 		TypeMeta: metav1.TypeMeta{
@@ -625,9 +695,12 @@ func (r *REST) convertApplicationToHelmRelease(app *appsv1alpha1.Application) (*
 			Kind:       "HelmRelease",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      r.releaseConfig.Prefix + app.Name,
-			Namespace: app.Namespace,
-			Labels:    r.releaseConfig.Labels,
+			Name:            r.releaseConfig.Prefix + app.Name,
+			Namespace:       app.Namespace,
+			Labels:          addPrefixedMap(app.Labels, LabelPrefix),
+			Annotations:     addPrefixedMap(app.Annotations, AnnotationPrefix),
+			ResourceVersion: app.ObjectMeta.ResourceVersion,
+			UID:             app.ObjectMeta.UID,
 		},
 		Spec: helmv2.HelmReleaseSpec{
 			Chart: &helmv2.HelmChartTemplate{
@@ -649,7 +722,7 @@ func (r *REST) convertApplicationToHelmRelease(app *appsv1alpha1.Application) (*
 	return helmRelease, nil
 }
 
-// ConvertToTable implements the TableConvertor interface.
+// ConvertToTable implements the TableConvertor interface for displaying resources in a table format
 func (r *REST) ConvertToTable(ctx context.Context, object runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
 	log.Printf("ConvertToTable: received object of type %T", object)
 
@@ -679,6 +752,7 @@ func (r *REST) ConvertToTable(ctx context.Context, object runtime.Object, tableO
 		}
 	}
 
+	// Handle table options
 	if opt, ok := tableOptions.(*metav1.TableOptions); ok && opt != nil && opt.NoHeaders {
 		table.ColumnDefinitions = nil
 	}
@@ -693,7 +767,7 @@ func (r *REST) ConvertToTable(ctx context.Context, object runtime.Object, tableO
 	return &table, nil
 }
 
-// buildTableFromApplications constructs a table from a list of Applications.
+// buildTableFromApplications constructs a table from a list of Applications
 func (r *REST) buildTableFromApplications(apps []appsv1alpha1.Application) metav1.Table {
 	table := metav1.Table{
 		ColumnDefinitions: []metav1.TableColumnDefinition{
@@ -724,7 +798,7 @@ func (r *REST) buildTableFromApplications(apps []appsv1alpha1.Application) metav
 	return table
 }
 
-// buildTableFromApplication constructs a table from a single Application.
+// buildTableFromApplication constructs a table from a single Application
 func (r *REST) buildTableFromApplication(app appsv1alpha1.Application) metav1.Table {
 	table := metav1.Table{
 		ColumnDefinitions: []metav1.TableColumnDefinition{
@@ -753,7 +827,7 @@ func (r *REST) buildTableFromApplication(app appsv1alpha1.Application) metav1.Ta
 	return table
 }
 
-// getVersion returns the application version or a placeholder if unknown.
+// getVersion returns the application version or a placeholder if unknown
 func getVersion(version string) string {
 	if version == "" {
 		return "<unknown>"
@@ -761,13 +835,13 @@ func getVersion(version string) string {
 	return version
 }
 
-// computeAge calculates the age of the object based on CreationTimestamp and current time.
+// computeAge calculates the age of the object based on CreationTimestamp and current time
 func computeAge(creationTime, currentTime time.Time) string {
 	ageDuration := currentTime.Sub(creationTime)
 	return duration.HumanDuration(ageDuration)
 }
 
-// getReadyStatus returns the ready status based on conditions.
+// getReadyStatus returns the ready status based on conditions
 func getReadyStatus(conditions []metav1.Condition) string {
 	for _, condition := range conditions {
 		if condition.Type == "Ready" {
@@ -784,32 +858,32 @@ func getReadyStatus(conditions []metav1.Condition) string {
 	return "Unknown"
 }
 
-// Destroy releases resources associated with REST.
+// Destroy releases resources associated with REST
 func (r *REST) Destroy() {
 	// No additional actions needed to release resources.
 }
 
-// New creates a new instance of Application.
+// New creates a new instance of Application
 func (r *REST) New() runtime.Object {
 	return &appsv1alpha1.Application{}
 }
 
-// NewList returns an empty list of Application objects.
+// NewList returns an empty list of Application objects
 func (r *REST) NewList() runtime.Object {
 	return &appsv1alpha1.ApplicationList{}
 }
 
-// Kind returns the resource kind used for API discovery.
+// Kind returns the resource kind used for API discovery
 func (r *REST) Kind() string {
 	return r.gvk.Kind
 }
 
-// GroupVersionKind returns the GroupVersionKind for REST.
+// GroupVersionKind returns the GroupVersionKind for REST
 func (r *REST) GroupVersionKind(schema.GroupVersion) schema.GroupVersionKind {
 	return r.gvk
 }
 
-// errNotAcceptable indicates that the resource does not support conversion to Table.
+// errNotAcceptable indicates that the resource does not support conversion to Table
 type errNotAcceptable struct {
 	resource schema.GroupResource
 	message  string
