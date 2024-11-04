@@ -17,7 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/aenix.io/cozystack/pkg/config"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -69,7 +69,8 @@ func RegisterDynamicTypes(scheme *runtime.Scheme, cfg *config.ResourceConfig) er
 		scheme.AddKnownTypeWithName(gvk, &Application{})
 		scheme.AddKnownTypeWithName(gvk.GroupVersion().WithKind(kind+"List"), &ApplicationList{})
 
-		fmt.Printf("Registered kind: %s\n", kind)
+		log.Printf("Registered kind: %s\n", kind)
+
 	}
 
 	return nil
