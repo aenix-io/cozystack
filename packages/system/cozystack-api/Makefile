@@ -1,18 +1,8 @@
-NAME=installer
+NAME=cozystack-api
 NAMESPACE=cozy-system
 
-TALOS_VERSION=$(shell awk '/^version:/ {print $$2}' images/talos/profiles/installer.yaml)
-
 include ../../../scripts/common-envs.mk
-
-show:
-	helm template -n $(NAMESPACE) $(NAME) .
-
-apply:
-	helm template -n $(NAMESPACE) $(NAME) . | kubectl apply -f -
-
-diff:
-	helm template -n $(NAMESPACE) $(NAME) . | kubectl diff -f -
+include ../../../scripts/package.mk
 
 image: image-cozystack-api
 
@@ -27,4 +17,4 @@ image-cozystack-api:
 		--load=$(LOAD)
 	IMAGE="$(REGISTRY)/cozystack-api:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/cozystack-api.json -o json -r)" \
 		yq -i '.cozystackAPI.image = strenv(IMAGE)' values.yaml
-	#rm -f images/cozystack-api.json
+	rm -f images/cozystack-api.json
