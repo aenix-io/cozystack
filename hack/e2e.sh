@@ -179,7 +179,7 @@ talosctl apply -f controlplane.yaml -n 192.168.123.13 -e 192.168.123.13 -i
 timeout 60 sh -c 'until nc -nzv 192.168.123.11 50000 && nc -nzv 192.168.123.12 50000 && nc -nzv 192.168.123.13 50000; do sleep 1; done'
 
 # Bootstrap
-talosctl bootstrap -n 192.168.123.11 -e 192.168.123.11
+timeout 10 sh -c 'until talosctl bootstrap -n 192.168.123.11 -e 192.168.123.11; do sleep 1; done'
 
 # Wait for etcd
 timeout 180 sh -c 'while talosctl etcd members -n 192.168.123.11,192.168.123.12,192.168.123.13 -e 192.168.123.10 2>&1 | grep "rpc error"; do sleep 1; done'
@@ -190,7 +190,7 @@ export KUBECONFIG=$PWD/kubeconfig
 
 # Wait for kubernetes nodes appear
 timeout 60 sh -c 'until [ $(kubectl get node -o name | wc -l) = 3 ]; do sleep 1; done'
-kubectl create ns cozy-system
+kubectl create ns cozy-system -o yaml | kubectl apply -f -
 kubectl create -f - <<\EOT
 apiVersion: v1
 kind: ConfigMap
