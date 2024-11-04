@@ -2,7 +2,7 @@ apiVersion: v2
 #name: Virtual Machine
 name: vm-instance
 description: Virtual machine instance
-icon: /logos/vm.svg
+icon: /logos/vmi.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #
