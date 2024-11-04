@@ -16,6 +16,12 @@ spec:
   additionalScrapeConfigs:
     name: additional-scrape-configs
     key: prometheus-additional.yaml
+  resources:
+    limits:
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      memory: 200Mi
   #statefulMode: true
   #statefulStorage:
   #  volumeClaimTemplate:

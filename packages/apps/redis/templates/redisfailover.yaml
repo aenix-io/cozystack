@@ -20,7 +20,6 @@ spec:
         cpu: 150m
         memory: 400Mi
       limits:
-        cpu: 2
         memory: 1000Mi
     {{- with .Values.size }}
     storage:
@@ -37,7 +36,7 @@ spec:
           storageClassName: {{ . }}
           {{- end }}
     {{- end }}
-    exporter: 
+    exporter:
       enabled: true
       image: oliver006/redis_exporter:v1.55.0-alpine
       args:
