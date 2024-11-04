@@ -1,0 +1,62 @@
+## @section Common parameters
+
+## @param host The hostname used to access the Kubernetes cluster externally (defaults to using the cluster name as a subdomain for the tenant host).
+## @param controlPlane.replicas Number of replicas for Kubernetes contorl-plane components
+## @param storageClass StorageClass used to store user data
+##
+host: ""
+controlPlane:
+  replicas: 2
+storageClass: replicated
+
+## @param nodeGroups [object] nodeGroups configuration
+##
+nodeGroups:
+  md0:
+    minReplicas: 0
+    maxReplicas: 10
+    instanceType: "u1.medium"
+    ephemeralStorage: 20Gi
+    roles:
+    - ingress-nginx
+
+    resources:
+      cpu: ""
+      memory: ""
+
+## @section Cluster Addons
+##
+addons:
+
+  ## Cert-manager: automatically creates and manages SSL/TLS certificate
+  ##
+  certManager:
+    ## @param addons.certManager.enabled Enables the cert-manager
+    ## @param addons.certManager.valuesOverride Custom values to override
+    enabled: true
+    valuesOverride: {}
+
+  ## Ingress-NGINX Controller
+  ##
+  ingressNginx:
+    ## @param addons.ingressNginx.enabled Enable Ingress-NGINX controller (expect nodes with 'ingress-nginx' role)
+    ## @param addons.ingressNginx.valuesOverride Custom values to override
+    ##
+    enabled: true
+    ## @param addons.ingressNginx.hosts List of domain names that should be passed through to the cluster by upper cluster
+    ## e.g:
+    ## hosts:
+    ## - example.org
+    ## - foo.example.net
+    ##
+    hosts: []
+    valuesOverride: {}
+
+  ## Flux CD
+  ##
+  fluxcd:
+    ## @param addons.fluxcd.enabled Enables Flux CD
+    ## @param addons.fluxcd.valuesOverride Custom values to override
+    ##
+    enabled: true
+    valuesOverride: {}
