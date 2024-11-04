@@ -66,9 +66,6 @@ func LoadConfig(path string) (*ResourceConfig, error) {
 		if res.Application.Plural == "" {
 			return nil, fmt.Errorf("resource at index %d has an empty plural", i)
 		}
-		if res.Release.Prefix == "" {
-			return nil, fmt.Errorf("resource at index %d has an empty release prefix", i)
-		}
 		if res.Release.Chart.Name == "" {
 			return nil, fmt.Errorf("resource at index %d has an empty chart name in release", i)
 		}

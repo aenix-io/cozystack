@@ -164,11 +164,23 @@ func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 		return nil, err
 	}
 
+	// Check if HelmRelease meets the required chartName and sourceRef criteria
+	if !r.shouldIncludeHelmRelease(hr) {
+		klog.Errorf("HelmRelease %s does not match the required chartName and sourceRef criteria", helmReleaseName)
+		return nil, fmt.Errorf("resource %s not found", name)
+	}
+
 	// Convert HelmRelease to Application
 	convertedApp, err := r.ConvertHelmReleaseToApplication(hr)
 	if err != nil {
 		klog.Errorf("Conversion error from HelmRelease to Application for resource %s: %v", name, err)
 		return nil, fmt.Errorf("conversion error: %v", err)
+	}
+
+	// Explicitly set apiVersion and kind for Application
+	convertedApp.TypeMeta = metav1.TypeMeta{
+		APIVersion: "apps.cozystack.io/v1alpha1",
+		Kind:       r.kindName,
 	}
 
 	// Convert Application to unstructured format
@@ -177,6 +189,10 @@ func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 		klog.Errorf("Failed to convert Application to unstructured for resource %s: %v", name, err)
 		return nil, fmt.Errorf("failed to convert Application to unstructured: %v", err)
 	}
+
+	// Explicitly set apiVersion and kind in unstructured object
+	unstructuredApp["apiVersion"] = "apps.cozystack.io/v1alpha1"
+	unstructuredApp["kind"] = r.kindName
 
 	klog.V(6).Infof("Successfully retrieved and converted resource %s of kind %s to unstructured", name, r.gvr.Resource)
 	return &unstructured.Unstructured{Object: unstructuredApp}, nil
@@ -393,6 +409,7 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 		return nil, false, fmt.Errorf("failed to convert HelmRelease to unstructured: %v", err)
 	}
 
+	// Retrieve metadata from unstructured object
 	metadata, found, err := unstructured.NestedMap(unstructuredHR, "metadata")
 	if err != nil || !found {
 		klog.Errorf("Failed to retrieve metadata from HelmRelease: %v, found: %v", err, found)
@@ -402,11 +419,24 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 
 	klog.V(6).Infof("Updating HelmRelease %s in namespace %s", helmRelease.Name, helmRelease.Namespace)
 
+	// Before updating, ensure the HelmRelease meets the inclusion criteria
+	// This prevents updating HelmReleases that should not be managed as Applications
+	if !r.shouldIncludeHelmRelease(&unstructured.Unstructured{Object: unstructuredHR}) {
+		klog.Errorf("HelmRelease %s does not match the required chartName and sourceRef criteria", helmRelease.Name)
+		return nil, false, fmt.Errorf("resource %s does not match inclusion criteria", name)
+	}
+
 	// Update the HelmRelease in Kubernetes
 	resultHR, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(helmRelease.Namespace).Update(ctx, &unstructured.Unstructured{Object: unstructuredHR}, metav1.UpdateOptions{})
 	if err != nil {
 		klog.Errorf("Failed to update HelmRelease %s: %v", helmRelease.Name, err)
 		return nil, false, fmt.Errorf("failed to update HelmRelease: %v", err)
+	}
+
+	// After updating, ensure the updated HelmRelease still meets the inclusion criteria
+	if !r.shouldIncludeHelmRelease(resultHR) {
+		klog.Errorf("Updated HelmRelease %s does not match the required chartName and sourceRef criteria", resultHR.GetName())
+		return nil, false, fmt.Errorf("updated resource %s does not match inclusion criteria", name)
 	}
 
 	// Convert the updated HelmRelease back to Application
@@ -418,12 +448,22 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 
 	klog.V(6).Infof("Successfully updated and converted HelmRelease %s to Application", resultHR.GetName())
 
+	// Explicitly set apiVersion and kind for Application
+	convertedApp.TypeMeta = metav1.TypeMeta{
+		APIVersion: "apps.cozystack.io/v1alpha1",
+		Kind:       r.kindName,
+	}
+
 	// Convert Application to unstructured format
 	unstructuredApp, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&convertedApp)
 	if err != nil {
 		klog.Errorf("Failed to convert Application to unstructured for resource %s: %v", convertedApp.GetName(), err)
 		return nil, false, fmt.Errorf("failed to convert Application to unstructured: %v", err)
 	}
+
+	// Explicitly set apiVersion and kind in unstructured object
+	unstructuredApp["apiVersion"] = "apps.cozystack.io/v1alpha1"
+	unstructuredApp["kind"] = r.kindName
 
 	klog.V(6).Infof("Returning patched Application object: %+v", unstructuredApp)
 

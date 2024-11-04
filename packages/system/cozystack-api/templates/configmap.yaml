@@ -7,10 +7,135 @@ data:
   config.yaml: |
     resources:
     - application:
+        kind: Bucket
+        singular: bucket
+        plural: buckets
+      release:
+        prefix: bucket-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: bucket
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: ClickHouse
+        singular: clickhouse
+        plural: clickhouses
+      release:
+        prefix: clickhouse-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: clickhouse
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: HTTPCache
+        singular: httpcache
+        plural: httpcaches
+      release:
+        prefix: http-cache-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: http-cache
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: NATS
+        singular: nats
+        plural: natses
+      release:
+        prefix: nats-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: nats
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: TCPBalancer
+        singular: tcpbalancer
+        plural: tcpbalancers
+      release:
+        prefix: tcp-balancer-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: http-cache
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: VirtualMachine
+        singular: virtualmachine
+        plural: virtualmachines
+      release:
+        prefix: virtual-machine-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: virtual-machine
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: VPN
+        singular: vpn
+        plural: vpns
+      release:
+        prefix: vpn-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: vpn
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: MySQL
+        singular: mysql
+        plural: mysqls
+      release:
+        prefix: mysql-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: mysql
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: Tenant
+        singular: tenant
+        plural: tenants
+      release:
+        prefix: tenant-
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: tenant
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-apps
+            namespace: cozy-public
+    - application:
         kind: Kubernetes
         singular: kubernetes
         plural: kuberneteses
-        shortNames: ["kubernetes", "kuberneteses"]
       release:
         prefix: kubernetes-
         labels:
@@ -25,7 +150,6 @@ data:
         kind: Redis
         singular: redis
         plural: redises
-        shortNames: ["redis", "redises"]
       release:
         prefix: redis-
         labels:
@@ -40,7 +164,6 @@ data:
         kind: RabbitMQ
         singular: rabbitmq
         plural: rabbitmqs
-        shortNames: ["rabbitmq", "rabbitmqs"]
       release:
         prefix: rabbitmq-
         labels:
@@ -55,7 +178,6 @@ data:
         kind: Postgres
         singular: postgres
         plural: postgreses
-        shortNames: ["postgres", "postgreses"]
       release:
         prefix: postgres-
         labels:
@@ -70,7 +192,6 @@ data:
         kind: FerretDB
         singular: ferretdb
         plural: ferretdb
-        shortNames: ["ferretdb", "ferretdbs"]
       release:
         prefix: ferretdb-
         labels:
@@ -85,7 +206,6 @@ data:
         kind: Kafka
         singular: kafka
         plural: kafkas
-        shortNames: ["kafka", "kafkases"]
       release:
         prefix: ferretdb-
         labels:
@@ -100,7 +220,6 @@ data:
         kind: VMDisk
         plural: vmdisks
         singular: vmdisk
-        shortNames: ["vmdisk", "vmdisks"]
       release:
         prefix: vm-disk-
         labels:
@@ -115,7 +234,6 @@ data:
         kind: VMInstance
         plural: vminstances
         singular: vminstance
-        shortNames: ["vminstance", "vminstances"]
       release:
         prefix: vm-instance-
         labels:
@@ -125,4 +243,60 @@ data:
           sourceRef:
             kind: HelmRepository
             name: cozystack-apps
+            namespace: cozy-public
+    - application:
+        kind: Monitoring
+        plural: monitorings
+        singular: monitoring
+      release:
+        prefix: ""
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: monitoring
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-extra
+            namespace: cozy-public
+    - application:
+        kind: Etcd
+        plural: etcds
+        singular: etcd
+      release:
+        prefix: ""
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: etcd
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-extra
+            namespace: cozy-public
+    - application:
+        kind: Ingress
+        plural: ingresses
+        singular: ingress
+      release:
+        prefix: ""
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: ingress
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-extra
+            namespace: cozy-public
+    - application:
+        kind: SeaweedFS
+        plural: seaweedfses
+        singular: seaweedfs
+      release:
+        prefix: ""
+        labels:
+          cozystack.io/ui: "true"
+        chart:
+          name: seaweedfs
+          sourceRef:
+            kind: HelmRepository
+            name: cozystack-extra
             namespace: cozy-public

@@ -29,17 +29,17 @@
       }
     }
   },
-  "buildx.build.ref": "buildkit/buildkit0/q6txzxgatfbboh1lhj182mbyh",
-  "containerimage.config.digest": "sha256:9d63425558c9125f866e3273c2df248dddc3a21d2105aa355c4c9ceb6dd6e55e",
+  "buildx.build.ref": "buildkit/buildkit0/svegl11mvyyrdqqb1jpeccy90",
+  "containerimage.config.digest": "sha256:29418b171efae7e8fac0a60dae15797375e9dc4bc849c60e0e2374fcbf5f5a9a",
   "containerimage.descriptor": {
     "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    "digest": "sha256:a9598dfd73eeb6928d26d9bf2fb54eb7f3ecf4427db2dc89b80399d6df242a9e",
+    "digest": "sha256:510d981d0472cb59bba13572a45482fcc257f3da9d1631fc99139be414e79792",
     "size": 504,
     "platform": {
       "architecture": "amd64",
       "os": "linux"
     }
   },
-  "containerimage.digest": "sha256:a9598dfd73eeb6928d26d9bf2fb54eb7f3ecf4427db2dc89b80399d6df242a9e",
+  "containerimage.digest": "sha256:510d981d0472cb59bba13572a45482fcc257f3da9d1631fc99139be414e79792",
   "image.name": "ghcr.io/aenix-io/cozystack/cozystack-api:latest"
 }
