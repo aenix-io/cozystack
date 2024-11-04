@@ -14,11 +14,17 @@ releases:
   namespace: cozy-fluxcd
   dependsOn: [fluxcd-operator]
 
+- name: cert-manager-crds
+  releaseName: cert-manager-crds
+  chart: cozy-cert-manager-crds
+  namespace: cozy-cert-manager
+  dependsOn: []
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
   namespace: cozy-cert-manager
-  dependsOn: []
+  dependsOn: [cert-manager-crds]
 
 - name: cert-manager-issuers
   releaseName: cert-manager-issuers
@@ -38,6 +44,13 @@ releases:
   namespace: cozy-monitoring
   privileged: true
   dependsOn: [victoria-metrics-operator]
+
+- name: monitoring-agents
+  releaseName: monitoring-agents
+  chart: cozy-monitoring-agents
+  namespace: cozy-monitoring
+  privileged: true
+  dependsOn: [monitoring]
 
 - name: etcd-operator
   releaseName: etcd-operator
@@ -99,7 +112,7 @@ releases:
   chart: cozy-external-dns
   namespace: cozy-external-dns
   optional: true
-  dependsOn: [] 
+  dependsOn: []
 
 - name: external-secrets-operator
   releaseName: external-secrets-operator

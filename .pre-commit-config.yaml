@@ -10,7 +10,7 @@ repos:
       exclude: '^.*templates/.*\.yaml$'
       args: [--unsafe]
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.41.0
+  rev: v0.42.0
   hooks:
     - id: markdownlint
       args: [--fix, --disable, MD013, MD041, --]

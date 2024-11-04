@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cozy-monitoring
+  labels:
+    name: cozy-monitoring
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cozy-victoria-metrics-operator
+  labels:
+    name: cozy-victoria-metrics-operator

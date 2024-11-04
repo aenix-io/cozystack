@@ -1,11 +1,13 @@
-{{- $global := (dict "Values" (deepCopy .Values) "Release" (deepCopy .Release) "Chart" (deepCopy .Chart) "Template" (deepCopy .Template)) -}}
 ---
+{{- if hasKey .Values "watchNamespace" }}
+  {{- fail "`watchNamespace` is deprecated Please use `watchNamespaces` slice instead" -}}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "vm-operator.fullname" . }}
-  namespace: {{ .Release.Namespace }}
-  {{- $ctx := merge (deepCopy $global) (dict "extraLabels" .Values.extraLabels) }}
+  namespace: {{ include "vm.namespace" . }}
+  {{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
   {{- with .Values.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
@@ -19,30 +21,32 @@ spec:
       {{- with .Values.annotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- $ctx := merge (deepCopy $global) (dict "extraLabels" .Values.podLabels) }}
+      {{- $_ := set $ctx "extraLabels" .Values.podLabels }}
       labels: {{ include "vm-operator.selectorLabels" $ctx | nindent 8}}
     spec:
-      {{- with .Values.podSecurityContext }}
-      securityContext: {{ toYaml . | nindent 8 }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.podSecurityContext "helm" .) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ template "vm-operator.serviceAccountName" . }}
+      serviceAccountName: {{ include "vm-operator.serviceAccountName" . }}
       {{- with (.Values.imagePullSecrets | default .Values.global.imagePullSecrets) }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: operator
-          image: {{ include "vm.image" (merge (deepCopy $global) (dict "app" .Values)) }}
+          image: {{ include "vm.image" (dict "helm" . "app" .Values ) }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.envFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
           env:
-          {{- range .Values.env }}
+            {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}
-          {{- end }}
+            {{- end }}
+            {{- if .Values.watchNamespaces }}
             - name: WATCH_NAMESPACE
-              value: {{ .Values.watchNamespace | quote }}
+              value: {{ (tpl (.Values.watchNamespaces | join ",") .) | quote }}
+            {{- end }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -94,7 +98,7 @@ spec:
               containerPort: {{ include "vm.port.from.flag" (dict "flag" (index .Values.extraArgs "health-probe-bind-address") "default" "8081") }}
               protocol: TCP
             - name: webhook
-              containerPort: 9443
+              containerPort: {{ include "vm.port.from.flag" (dict "flag" (index .Values.extraArgs "webhook.port") "default" "9443") }}
               protocol: TCP
           {{- with (fromYaml (include "vm.probe" (dict "app" .Values "type" "readiness"))) }}
           readinessProbe: {{ toYaml . | nindent 12 }}
@@ -115,14 +119,18 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
           resources: {{ toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.securityContext }}
-          securityContext: {{ toYaml . | nindent 12 }}
+          {{- if .Values.securityContext.enabled }}
+          securityContext: {{ include "vm.securityContext" (dict "securityContext" .Values.securityContext "helm" .) | nindent 12 }}
           {{- end }}
         {{- with.Values.extraContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- with .Values.lifecycle }}
+      lifecycle: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
@@ -145,7 +153,7 @@ spec:
         - name: cert
           secret:
             defaultMode: 420
-            secretName: {{ template "vm-operator.fullname" . }}-validation
+            secretName: {{ include "vm-operator.fullname" . }}-validation
         {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml .| nindent 8 }}

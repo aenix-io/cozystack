@@ -1,0 +1,19 @@
+#!/bin/sh
+# Migration 6 --> 7
+
+# Delete cert-manager crds labels and annotations
+
+for resource in certificaterequests.cert-manager.io certificates.cert-manager.io challenges.acme.cert-manager.io clusterissuers.cert-manager.io issuers.cert-manager.io orders.acme.cert-manager.io
+do
+    kubectl annotate crd $resource meta.helm.sh/release-name-
+    kubectl annotate crd $resource meta.helm.sh/release-namespace-
+
+    kubectl label crd $resource app-
+    kubectl label crd $resource app.kubernetes.io/instance-
+    kubectl label crd $resource app.kubernetes.io/managed-by-
+    kubectl label crd $resource app.kubernetes.io/name-
+    kubectl label crd $resource app.kubernetes.io/version-
+    kubectl label crd $resource helm.sh/chart-
+    kubectl label crd $resource helm.toolkit.fluxcd.io/name-
+    kubectl label crd $resource helm.toolkit.fluxcd.io/namespace-
+done

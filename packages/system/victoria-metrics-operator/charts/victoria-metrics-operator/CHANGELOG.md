@@ -1,8 +1,108 @@
-# CHANGELOG for `victoria-metrics-operator` helm-chart
-
 ## Next release
 
 - TODO
+
+## 0.36.0
+
+**Release date:** 2024-10-22
+
+![AppVersion: v0.48.4](https://img.shields.io/static/v1?label=AppVersion&message=v0.48.4&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- replaced `crd.enabled` property to `crds.plain`. Instead of disabling CRDs it selects if CRDs should be rendered from template or as plain CRDs
+
+## 0.35.5
+
+**Release date:** 2024-10-15
+
+![AppVersion: v0.48.4](https://img.shields.io/static/v1?label=AppVersion&message=v0.48.4&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to [v0.48.4](https://github.com/VictoriaMetrics/operator/releases/tag/v0.48.4) version
+
+## 0.35.4
+
+**Release date:** 2024-10-11
+
+![AppVersion: v0.48.3](https://img.shields.io/static/v1?label=AppVersion&message=v0.48.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Human-readable error about Helm version requirement
+
+## 0.35.3
+
+**Release date:** 2024-10-10
+
+![AppVersion: v0.48.3](https://img.shields.io/static/v1?label=AppVersion&message=v0.48.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- upgraded common chart dependency
+- made webhook pod port configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1565)
+- added configurable cleanup hook resources. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1571)
+- added ability to configure `terminationGracePeriodSeconds` and `lifecycle`. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1563) for details
+
+## 0.35.2
+
+**Release date:** 2024-09-29
+
+![AppVersion: v0.48.3](https://img.shields.io/static/v1?label=AppVersion&message=v0.48.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to [v0.48.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.48.3) version
+
+## 0.35.1
+
+**Release date:** 2024-09-26
+
+![AppVersion: v0.48.1](https://img.shields.io/static/v1?label=AppVersion&message=v0.48.1&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to [v0.48.1](https://github.com/VictoriaMetrics/operator/releases/tag/v0.48.1) version
+
+## 0.35.0
+
+**Release date:** 2024-09-26
+
+![AppVersion: v0.48.0](https://img.shields.io/static/v1?label=AppVersion&message=v0.48.0&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Made webhook port configurable. See [this issue](https://github.com/VictoriaMetrics/helm-charts/issues/1506)
+- Changed crd cleanup hook delete policy to prevent `resource already exists` error.
+- updates operator to [v0.48.0](https://github.com/VictoriaMetrics/operator/releases/tag/v0.48.0) version
+
+## 0.34.8
+
+**Release date:** 2024-09-10
+
+![AppVersion: v0.47.3](https://img.shields.io/static/v1?label=AppVersion&message=v0.47.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Added ability to override deployment namespace using `namespaceOverride` and `global.namespaceOverride` variables
+- Fixed template for cert-manager certificates
+- Fixed operator Role creation when only watching own namespace using `watchNamespaces`
+- Changed webhook service port from 443 to 9443
+
+## 0.34.7
+
+**Release date:** 2024-09-03
+
+![AppVersion: v0.47.3](https://img.shields.io/static/v1?label=AppVersion&message=v0.47.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- Do not create ClusterRole if `watchNamespaces` contains only namespace, where operator is deployed
+
+## 0.34.6
+
+**Release date:** 2024-08-29
+
+![AppVersion: v0.47.3](https://img.shields.io/static/v1?label=AppVersion&message=v0.47.3&color=success&logo=)
+![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+- updates operator to [v0.47.3](https://github.com/VictoriaMetrics/operator/releases/tag/v0.47.3) version
+- Made `cleanupCRD` deprecated in a favour of `crd.cleanup.enabled`
+- Made `cleanupImage` deprecated in a favour of `crd.cleanup.image`
+- Made `watchNamespace` string deprecated in a favour of `watchNamespaces` slice
+- Decreased rendering time by 2 seconds
 
 ## 0.34.5
 

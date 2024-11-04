@@ -5,17 +5,13 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ template "vm-operator.fullname" . }}
-  namespace: {{ .Release.Namespace }}
-  labels:
-{{ include "vm-operator.labels" . | indent 4 }}
-{{- with $mergedVMServiceScrapeLabels }}
-{{ toYaml . | indent 4 }}
-{{- end }}
-{{- with $mergedVMServiceScrapeAnnotations }}
-  annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
+  name: {{ include "vm-operator.fullname" . }}
+  namespace: {{ include "vm.namespace" . }}
+  {{- $ctx := dict "helm" . "extraLabels" $mergedVMServiceScrapeLabels }}
+  labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
+  {{- with $mergedVMServiceScrapeAnnotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   selector:
     matchLabels: {{ include "vm-operator.selectorLabels" . | nindent 6 }}
@@ -41,5 +37,5 @@ spec:
       {{- end }}
   namespaceSelector:
     matchNames:
-      - {{ .Release.Namespace }}
+      - {{ include "vm.namespace" . }}
 {{- end }}

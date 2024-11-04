@@ -1,5 +1,3 @@
-# Helm Chart For Victoria Metrics Operator.
-
 {{ template "chart.typeBadge" . }} {{ template "chart.versionBadge" . }}
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/victoriametrics)](https://artifacthub.io/packages/helm/victoriametrics/victoria-metrics-operator)
 
@@ -7,7 +5,7 @@
 
 ## Prerequisites
 
-* Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](../../REQUIREMENTS.md).
+* Install the follow packages: ``git``, ``kubectl``, ``helm``, ``helm-docs``. See this [tutorial](https://docs.victoriametrics.com/helm/requirements/).
 * PV support on underlying infrastructure.
 
 ## ArgoCD issues
@@ -72,69 +70,7 @@ This chart will do the following:
 
 * Rollout victoria metrics operator
 
-## How to install
-
-Access a Kubernetes cluster.
-
-Add a chart helm repository with follow commands:
-
-```console
-helm repo add vm https://victoriametrics.github.io/helm-charts/
-
-helm repo update
-```
-
-List versions of ``vm/victoria-metrics-operator`` chart available to installation:
-
-```console
-helm search repo vm/victoria-metrics-operator -l
-```
-
-Export default values of ``victoria-metrics-operator`` chart to file ``values.yaml``:
-
-```console
-helm show values vm/victoria-metrics-operator > values.yaml
-```
-
-Change the values according to the need of the environment in ``values.yaml`` file.
-
-Test the installation with command:
-
-```console
-helm install vmoperator vm/victoria-metrics-operator -f values.yaml -n NAMESPACE --debug --dry-run
-```
-
-Install chart with command:
-
-```console
-helm install vmoperator vm/victoria-metrics-operator -f values.yaml -n NAMESPACE
-```
-
-Get the pods lists by running this commands:
-
-```console
-kubectl get pods -A | grep 'operator'
-```
-
-Get the application by running this command:
-
-```console
-helm list -f vmoperator -n NAMESPACE
-```
-
-See the history of versions of ``vmoperator`` application with command.
-
-```console
-helm history vmoperator -n NAMESPACE
-```
-
-## How to uninstall
-
-Remove application with command.
-
-```console
-helm uninstall vmoperator -n NAMESPACE
-```
+{{ include "chart.installSection" . }}
 
 ## Validation webhook
 
@@ -149,19 +85,9 @@ admissionWebhooks:
     enabled: true
 ```
 
-## Documentation of Helm Chart
+{{ include "chart.uninstallSection" . }}
 
-Install ``helm-docs`` following the instructions on this [tutorial](../../REQUIREMENTS.md).
-
-Generate docs with ``helm-docs`` command.
-
-```bash
-cd charts/victoria-metrics-operator
-
-helm-docs
-```
-
-The markdown generation is entirely go template driven. The tool parses metadata from charts and generates a number of sub-templates that can be referenced in a template file (by default ``README.md.gotmpl``). If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
+{{ include "chart.helmDocs" . }}
 
 ## Parameters
 
@@ -169,4 +95,4 @@ The following tables lists the configurable parameters of the chart and their de
 
 Change the values according to the need of the environment in ``victoria-metrics-operator/values.yaml`` file.
 
-{{ template "chart.valuesTable" . }}
+{{ template "chart.valuesTableHtml" . }}

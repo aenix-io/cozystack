@@ -41,11 +41,17 @@ releases:
         SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
         JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
 
+- name: cert-manager-crds
+  releaseName: cert-manager-crds
+  chart: cozy-cert-manager-crds
+  namespace: cozy-cert-manager
+  dependsOn: [cilium, kubeovn]
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
   namespace: cozy-cert-manager
-  dependsOn: [cilium,kubeovn]
+  dependsOn: [cert-manager-crds]
 
 - name: cert-manager-issuers
   releaseName: cert-manager-issuers
@@ -65,6 +71,13 @@ releases:
   namespace: cozy-monitoring
   privileged: true
   dependsOn: [cilium,kubeovn,victoria-metrics-operator]
+
+- name: monitoring-agents
+  releaseName: monitoring-agents
+  chart: cozy-monitoring-agents
+  namespace: cozy-monitoring
+  privileged: true
+  dependsOn: [monitoring]
 
 - name: kubevirt-operator
   releaseName: kubevirt-operator
@@ -169,7 +182,7 @@ releases:
   releaseName: snapshot-controller
   chart: cozy-snapshot-controller
   namespace: cozy-snapshot-controller
-  dependsOn: [cilium,kubeovn,cert-manager-issuers]  
+  dependsOn: [cilium,kubeovn,cert-manager-issuers]
 
 - name: objectstorage-controller
   releaseName: objectstorage-controller
