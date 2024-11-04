@@ -478,10 +478,31 @@ func (r *REST) Delete(ctx context.Context, name string, deleteValidation rest.Va
 		return nil, false, err
 	}
 
-	klog.V(6).Infof("Deleting HelmRelease %s in namespace %s", name, namespace)
+	klog.V(6).Infof("Attempting to delete HelmRelease %s in namespace %s", name, namespace)
 
-	// Construct HelmRelease name with new prefix
+	// Construct HelmRelease name with the configured prefix
 	helmReleaseName := r.releaseConfig.Prefix + name
+
+	// Retrieve the HelmRelease before attempting to delete
+	hr, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Get(ctx, helmReleaseName, metav1.GetOptions{})
+	if err != nil {
+		if storage.IsNotFound(err) {
+			// If HelmRelease does not exist, return not found error
+			klog.Errorf("HelmRelease %s not found in namespace %s", helmReleaseName, namespace)
+			return nil, false, fmt.Errorf("resource %s not found", name)
+		}
+		// For other errors, log and return
+		klog.Errorf("Error retrieving HelmRelease %s: %v", helmReleaseName, err)
+		return nil, false, err
+	}
+
+	// Validate that the HelmRelease meets the inclusion criteria
+	if !r.shouldIncludeHelmRelease(hr) {
+		klog.Errorf("HelmRelease %s does not match the required chartName and sourceRef criteria", helmReleaseName)
+		return nil, false, fmt.Errorf("resource %s not found", name)
+	}
+
+	klog.V(6).Infof("Deleting HelmRelease %s in namespace %s", helmReleaseName, namespace)
 
 	// Delete the HelmRelease corresponding to the Application
 	err = r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Delete(ctx, helmReleaseName, *options)
