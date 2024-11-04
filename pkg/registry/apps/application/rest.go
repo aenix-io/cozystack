@@ -20,12 +20,14 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
-	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/klog/v2"
 
 	appsv1alpha1 "github.com/aenix.io/cozystack/pkg/apis/apps/v1alpha1"
 	"github.com/aenix.io/cozystack/pkg/config"
+
+	// Importing API errors package to construct appropriate error responses
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 // Ensure REST implements necessary interfaces
@@ -161,13 +163,22 @@ func (r *REST) Get(ctx context.Context, name string, options *metav1.GetOptions)
 	hr, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Get(ctx, helmReleaseName, *options)
 	if err != nil {
 		klog.Errorf("Error retrieving HelmRelease for resource %s: %v", name, err)
+
+		// Check if the error is a NotFound error
+		if apierrors.IsNotFound(err) {
+			// Return a NotFound error for the Application resource instead of HelmRelease
+			return nil, apierrors.NewNotFound(r.gvr.GroupResource(), name)
+		}
+
+		// For other errors, return them as-is
 		return nil, err
 	}
 
 	// Check if HelmRelease meets the required chartName and sourceRef criteria
 	if !r.shouldIncludeHelmRelease(hr) {
 		klog.Errorf("HelmRelease %s does not match the required chartName and sourceRef criteria", helmReleaseName)
-		return nil, fmt.Errorf("resource %s not found", name)
+		// Return a NotFound error for the Application resource
+		return nil, apierrors.NewNotFound(r.gvr.GroupResource(), name)
 	}
 
 	// Convert HelmRelease to Application
@@ -345,7 +356,7 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 	// Retrieve the existing Application
 	oldObj, err := r.Get(ctx, name, &metav1.GetOptions{})
 	if err != nil {
-		if storage.IsNotFound(err) {
+		if apierrors.IsNotFound(err) {
 			if !forceAllowCreate {
 				return nil, false, err
 			}
@@ -423,7 +434,8 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 	// This prevents updating HelmReleases that should not be managed as Applications
 	if !r.shouldIncludeHelmRelease(&unstructured.Unstructured{Object: unstructuredHR}) {
 		klog.Errorf("HelmRelease %s does not match the required chartName and sourceRef criteria", helmRelease.Name)
-		return nil, false, fmt.Errorf("resource %s does not match inclusion criteria", name)
+		// Return a NotFound error for the Application resource
+		return nil, false, apierrors.NewNotFound(r.gvr.GroupResource(), name)
 	}
 
 	// Update the HelmRelease in Kubernetes
@@ -436,7 +448,8 @@ func (r *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObje
 	// After updating, ensure the updated HelmRelease still meets the inclusion criteria
 	if !r.shouldIncludeHelmRelease(resultHR) {
 		klog.Errorf("Updated HelmRelease %s does not match the required chartName and sourceRef criteria", resultHR.GetName())
-		return nil, false, fmt.Errorf("updated resource %s does not match inclusion criteria", name)
+		// Return a NotFound error for the Application resource
+		return nil, false, apierrors.NewNotFound(r.gvr.GroupResource(), name)
 	}
 
 	// Convert the updated HelmRelease back to Application
@@ -486,10 +499,10 @@ func (r *REST) Delete(ctx context.Context, name string, deleteValidation rest.Va
 	// Retrieve the HelmRelease before attempting to delete
 	hr, err := r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Get(ctx, helmReleaseName, metav1.GetOptions{})
 	if err != nil {
-		if storage.IsNotFound(err) {
-			// If HelmRelease does not exist, return not found error
+		if apierrors.IsNotFound(err) {
+			// If HelmRelease does not exist, return NotFound error for Application
 			klog.Errorf("HelmRelease %s not found in namespace %s", helmReleaseName, namespace)
-			return nil, false, fmt.Errorf("resource %s not found", name)
+			return nil, false, apierrors.NewNotFound(r.gvr.GroupResource(), name)
 		}
 		// For other errors, log and return
 		klog.Errorf("Error retrieving HelmRelease %s: %v", helmReleaseName, err)
@@ -499,7 +512,8 @@ func (r *REST) Delete(ctx context.Context, name string, deleteValidation rest.Va
 	// Validate that the HelmRelease meets the inclusion criteria
 	if !r.shouldIncludeHelmRelease(hr) {
 		klog.Errorf("HelmRelease %s does not match the required chartName and sourceRef criteria", helmReleaseName)
-		return nil, false, fmt.Errorf("resource %s not found", name)
+		// Return NotFound error for Application resource
+		return nil, false, apierrors.NewNotFound(r.gvr.GroupResource(), name)
 	}
 
 	klog.V(6).Infof("Deleting HelmRelease %s in namespace %s", helmReleaseName, namespace)
@@ -508,7 +522,7 @@ func (r *REST) Delete(ctx context.Context, name string, deleteValidation rest.Va
 	err = r.dynamicClient.Resource(helmReleaseGVR).Namespace(namespace).Delete(ctx, helmReleaseName, *options)
 	if err != nil {
 		klog.Errorf("Failed to delete HelmRelease %s: %v", helmReleaseName, err)
-		return nil, false, err
+		return nil, false, fmt.Errorf("failed to delete HelmRelease: %v", err)
 	}
 
 	klog.V(6).Infof("Successfully deleted HelmRelease %s", helmReleaseName)
