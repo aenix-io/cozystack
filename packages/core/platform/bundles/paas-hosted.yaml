@@ -19,6 +19,12 @@ releases:
   chart: cozy-cert-manager-crds
   namespace: cozy-cert-manager
   dependsOn: []
+  
+- name: cozystack-api
+  releaseName: cozystack-api
+  chart: cozy-cozystack-api
+  namespace: cozy-system
+  dependsOn: []
 
 - name: cert-manager
   releaseName: cert-manager

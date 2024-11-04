@@ -47,6 +47,12 @@ releases:
   namespace: cozy-cert-manager
   dependsOn: [cilium, kubeovn]
 
+- name: cozystack-api
+  releaseName: cozystack-api
+  chart: cozy-cozystack-api
+  namespace: cozy-system
+  dependsOn: [cilium,kubeovn]
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
