@@ -14,6 +14,12 @@ releases:
   namespace: cozy-fluxcd
   dependsOn: [fluxcd-operator]
 
+- name: cozystack-api
+  releaseName: cozystack-api
+  chart: cozy-cozystack-api
+  namespace: cozy-system
+  dependsOn: []
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
