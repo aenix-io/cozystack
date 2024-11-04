@@ -31,11 +31,17 @@ releases:
       autoDirectNodeRoutes: true
       routingMode: native
 
+- name: cert-manager-crds
+  releaseName: cert-manager-crds
+  chart: cozy-cert-manager-crds
+  namespace: cozy-cert-manager
+  dependsOn: [cilium]
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
   namespace: cozy-cert-manager
-  dependsOn: [cilium]
+  dependsOn: [cert-manager-crds]
 
 - name: cert-manager-issuers
   releaseName: cert-manager-issuers
@@ -49,9 +55,9 @@ releases:
   namespace: cozy-victoria-metrics-operator
   dependsOn: [cilium,cert-manager]
 
-- name: monitoring
-  releaseName: monitoring
-  chart: cozy-monitoring
+- name: monitoring-agents
+  releaseName: monitoring-agents
+  chart: cozy-monitoring-agents
   namespace: cozy-monitoring
   privileged: true
   dependsOn: [cilium,victoria-metrics-operator]

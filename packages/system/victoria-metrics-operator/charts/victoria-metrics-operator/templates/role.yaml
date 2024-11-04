@@ -1,46 +1,38 @@
-{{- if .Values.rbac.create -}}
+{{- $rules := default dict }}
+{{- $fileContentsList := .Files.Get "crd.yaml" | splitList "---" }}
+{{- $groups := dict }}
+{{- range $fileContentsList }}
+  {{- $fileContents := . | fromYaml }}
+  {{- $group := $fileContents.spec.group }}
+  {{- $plural:= $fileContents.spec.names.plural }}
+  {{- $resources := get $groups $group | default (list) }}
+  {{- $resources = concat $resources (list $plural (printf "%s/finalizers" $plural) (printf "%s/status" $plural)) }}
+  {{- $groups = set $groups $group $resources }}
+{{- end }}
+
+{{- $verbs := dict "admin" (list "*") "view" (list "get" "list" "watch") }}
+{{- range $group, $resources := $groups }}
+  {{- range $name, $v := $verbs }}
+    {{- $r := index $rules $name | default list -}}
+    {{- $r = append $r (dict "apiGroups" (list $group) "resources" $resources "verbs" $v) -}}
+    {{- $_ := set $rules $name $r }}
+  {{- end }}
+{{- end -}}
+
+{{- $ctx := dict "helm" . "extraLabels" .Values.extraLabels }}
+
+{{- if .Values.rbac.create }}
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ template "vm-operator.fullname" . }}
-  labels:
-{{ include "vm-operator.labels" . | indent 4 }}
-{{- with .Values.extraLabels }}
-{{ toYaml . | indent 4 }}
-{{- end }}
-{{- with .Values.annotations }}
-  annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "vm-operator.fullname" . }}
+  labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  namespace: {{ include "vm.namespace" . }}
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - ""
-  resources:
-  - configmaps/status
-  verbs:
-  - get
-  - update
-  - patch
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
 - apiGroups:
   - coordination.k8s.io
   verbs:
@@ -49,24 +41,39 @@ rules:
   - update
   resources:
   - leases
-{{ if .Values.watchNamespace }}
-- apiGroups:
-  - ""
-  resources:
-  - endpoints
-  - endpointslices
+
+{{- $watchNamespaces := (fromYaml (tpl (toYaml (dict "ns" .Values.watchNamespaces)) .)).ns }}
+{{- $selfNamespace := (include "vm.namespace" .) }}
+{{- $watchSelfNamespace := (and (eq (len $watchNamespaces) 1) (eq (first $watchNamespaces) $selfNamespace)) }}
+{{- if not $watchSelfNamespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "vm-operator.fullname" . }}
+  labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+- nonResourceURLs:
+  - /metrics
+  - /metrics/resources
   verbs:
-  - list
-  - watch
   - get
+  - watch
+  - list
+{{- end }}
 - apiGroups:
   - ""
   resources:
-  - pods
   - configmaps
   - configmaps/finalizers
+  - endpoints
+  - events
   - persistentvolumeclaims
   - persistentvolumeclaims/finalizers
+  - pods
   - secrets
   - secrets/finalizers
   - services
@@ -75,6 +82,18 @@ rules:
   - serviceaccounts/finalizers
   verbs:
   - "*"
+- apiGroups:
+  - ""
+  resources:
+  - configmaps/status
+  - nodes
+  - nodes/proxy
+  - nodes/metrics
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - apps
   resources:
@@ -87,6 +106,31 @@ rules:
   verbs:
   - "*"
 - apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - "*"
+  verbs:
+  - "*"
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - clusterrolebindings/finalizers
+  - clusterroles
+  - clusterroles/finalizers
+  - roles
+  - rolebindings
+  verbs:
+  - "*"
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclasses
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
   - policy
   resources:
   - poddisruptionbudgets
@@ -94,110 +138,33 @@ rules:
   verbs:
   - "*"
 - apiGroups:
-  - monitoring.coreos.com
+  - route.openshift.io
+  - image.openshift.io
   resources:
-  - "*"
-  verbs:
-  - "*"
-- apiGroups:
-  - operator.victoriametrics.com
-  resources:
-  - vlogs
-    - vlogs/finalizers
-    - vmagents
-    - vmagents/finalizers
-    - vmalertmanagers
-    - vmalertmanagers/finalizers
-    - vmalertmanagerconfigs
-    - vmalertmanagerconfigs/finalizers
-    - vmalerts
-    - vmalerts/finalizers
-    - vmauths
-    - vmauths/finalizers
-    - vmusers
-    - vmusers/finalizers
-    - vmclusters
-    - vmclusters/finalizers
-    - vmpodscrapes
-    - vmpodscrapes/finalizers
-    - vmrules
-    - vmrules/finalizers
-    - vmservicescrapes
-    - vmservicescrapes/finalizers
-    - vmprobes
-    - vmprobes/finalizers
-    - vmsingles
-    - vmsingles/finalizers
-    - vmnodescrapes
-    - vmnodescrapes/finalizers
-    - vmstaticscrapes
-    - vmstaticscrapes/finalizers
-    - vmscrapeconfigs
-    - vmscrapeconfigs/finalizers
-  verbs:
-      - '*'
-- apiGroups:
-  - operator.victoriametrics.com
-  resources:
-  - vlogs/status
-  - vmagents/status
-  - vmalertmanagers/status
-  - vmalertmanagerconfigs/status
-  - vmalerts/status
-  - vmclusters/status
-  - vmpodscrapes/status
-  - vmscrapeconfigs/status
-  - vmrules/status
-  - vmservicescrapes/status
-  - vmprobes/status
-  - vmsingles/status
-  - vmscrapeconfig/status
-  - vmusers/status
-  - vmauths/status
-  - vmstaticscrapes/status
-  - vmnodescrapes/status
+  - routers/metrics
+  - registry/metrics
   verbs:
   - get
-  - patch
-  - update
-- apiGroups:
-  - extensions
-  - "extensions"
-  - networking.k8s.io
-  - "networking.k8s.io"
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-  - delete
-- apiGroups:
-  - "rbac.authorization.k8s.io"
-  resources:
-  - roles
-  - rolebindings
-  verbs:
-  - "*"
 - apiGroups:
   - autoscaling
-  resources:
-  - horizontalpodautoscalers
   verbs:
   - "*"
+  resources:
+  - horizontalpodautoscalers
 - apiGroups:
   - networking.k8s.io
-  - extensions
   resources:
   - ingresses
   - ingresses/finalizers
   verbs:
-  - create
+  - "*"
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
   - get
-  - patch
-  - update
-  - watch
-  - delete
+  - list
 - apiGroups:
   - discovery.k8s.io
   resources:
@@ -206,5 +173,44 @@ rules:
   - list
   - watch
   - get
-{{- end -}}
-{{- end -}}
+{{- with $rules.admin }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}
+{{- if .Values.crds.cleanup.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "vm-operator.fullname" . }}-cleanup-hook
+  namespace: {{ include "vm.namespace" . }}
+  labels: {{ include "vm-operator.labels" . | nindent 4 }}
+  annotations: {{ include "vm-operator.cleanup.annotations" (dict "hookWeight" "-5") | nindent 4 }}
+rules: {{ toYaml $rules.admin | nindent 2 }}
+{{- end }}
+
+{{- if .Values.rbac.aggregatedClusterRoles.enabled }}
+{{- /* This template generates readonly and admin cluster roles for */ -}}
+{{- /* each CRD present in the helm chart.  The clusterroles use the */ -}}
+{{- /* kubernetes clusterrole aggregation feature to include these */ -}}
+{{- /* cluster roles into the default view and admin roles */ -}}
+{{- /* See https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles */}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoriametrics:admin
+  labels:
+    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- .Values.rbac.aggregatedClusterRoles.labels.admin | toYaml | nindent 4 }}
+rules: {{ toYaml $rules.admin | nindent 2 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: victoriametrics:view
+  labels:
+    {{- include "vm-operator.labels" . | nindent 4 }}
+    {{- .Values.rbac.aggregatedClusterRoles.labels.view | toYaml | nindent 4 }}
+rules: {{ toYaml $rules.view | nindent 2 }}
+{{- end }}

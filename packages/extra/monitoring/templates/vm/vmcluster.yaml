@@ -12,6 +12,12 @@ spec:
     resources: {}
   vmselect:
     replicaCount: 2
+    resources:
+      limits:
+        memory: 1000Mi
+      requests:
+        cpu: 100m
+        memory: 500Mi
     extraArgs:
       search.maxUniqueTimeseries: "600000"
       vmalert.proxyURL: http://vmalert-{{ .name }}.{{ $.Release.Namespace }}.svc:8080

@@ -3,8 +3,8 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ include "vm-operator.fullname" . }}
-  namespace: {{ .Release.Namespace }}
-  {{- $ctx := merge (deepCopy .) (dict "extraLabels" .Values.podDisruptionBudget.labels) }}
+  namespace: {{ include "vm.namespace" . }}
+  {{- $ctx := dict "helm" . "extraLabels" .Values.podDisruptionBudget.labels }}
   labels: {{ include "vm-operator.labels" $ctx | nindent 4 }}
 spec:
   {{- with .Values.podDisruptionBudget.minAvailable }}

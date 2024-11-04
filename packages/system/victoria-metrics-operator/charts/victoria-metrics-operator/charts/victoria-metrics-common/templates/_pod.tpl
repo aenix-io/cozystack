@@ -1,39 +1,39 @@
 {{- define "vm.port.from.flag" -}}
-{{- $port := .default -}}
-{{- with .flag -}}
-{{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" -}}
-{{- end -}}
-{{- $port -}}
+  {{- $port := .default -}}
+  {{- with .flag -}}
+    {{- $port = regexReplaceAll ".*:(\\d+)" . "${1}" -}}
+  {{- end -}}
+  {{- $port -}}
 {{- end }}
 
 {{- /*
 Return true if the detected platform is Openshift
 Usage:
-{{- include "vm.compatibility.isOpenshift" . -}}
+{{- include "vm.isOpenshift" . -}}
 */ -}}
-{{- define "vm.compatibility.isOpenshift" -}}
-{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
-{{- true -}}
-{{- end -}}
+{{- define "vm.isOpenshift" -}}
+  {{- $Capabilities := (.helm).Capabilities | default .Capabilities -}}
+  {{- if $Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
+    {{- true -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /*
-Render a compatible securityContext depending on the platform. By default it is maintained as it is. In other platforms like Openshift we remove default user/group values that do not work out of the box with the restricted-v1 SCC
+Render a compatible securityContext depending on the platform.
 Usage:
-{{- include "vm.compatibility.renderSecurityContext" (dict "secContext" .Values.containerSecurityContext "context" $) -}}
+{{- include "vm.securityContext" (dict "securityContext" .Values.containerSecurityContext "helm" .) -}}
 */ -}}
-{{- define "vm.compatibility.renderSecurityContext" -}}
-{{- $adaptedContext := .secContext -}}
-{{- $adaptSecurityCtx := ((((.context.Values).global).compatibility).openshift).adaptSecurityContext | default "" -}}
-{{- if or (eq $adaptSecurityCtx "force") (and (eq $adaptSecurityCtx "auto") (include "vm.compatibility.isOpenshift" .context)) -}}
-  {{- /* Remove incompatible user/group values that do not work in Openshift out of the box */ -}}
-  {{- $adaptedContext = omit $adaptedContext "fsGroup" "runAsUser" "runAsGroup" -}}
-  {{- if not .secContext.seLinuxOptions -}} 
-    {{- /* If it is an empty object, we remove it from the resulting context because it causes validation issues */ -}}
-    {{- $adaptedContext = omit $adaptedContext "seLinuxOptions" -}}
+{{- define "vm.securityContext" -}}
+  {{- $securityContext := .securityContext -}}
+  {{- $Values := (.helm).Values | default .Values -}}
+  {{- $adaptMode := (((($Values).global).compatibility).openshift).adaptSecurityContext | default "" -}}
+  {{- if or (eq $adaptMode "force") (and (eq $adaptMode "auto") (include "vm.isOpenshift" .)) -}}
+    {{- $securityContext = omit $securityContext "fsGroup" "runAsUser" "runAsGroup" -}}
+    {{- if not $securityContext.seLinuxOptions -}}
+      {{- $securityContext = omit $securityContext "seLinuxOptions" -}}
+    {{- end -}}
   {{- end -}}
-{{- end -}}
-{{- omit $adaptedContext "enabled" | toYaml -}}
+  {{- omit $securityContext "enabled" | toYaml -}}
 {{- end -}}
 
 {{- /*
@@ -68,44 +68,49 @@ Render probe
 HTTP GET probe path
 */ -}}
 {{- define "vm.probe.http.path" -}}
-{{- index .app.extraArgs "http.pathPrefix" | default "" | trimSuffix "/" -}}/health
+  {{- index .app.extraArgs "http.pathPrefix" | default "" | trimSuffix "/" -}}/health
 {{- end -}}
 
 {{- /*
 HTTP GET probe scheme
 */ -}}
 {{- define "vm.probe.http.scheme" -}}
-{{- ternary "HTTPS" "HTTP" (.app.extraArgs.tls | default false) -}}
+  {{- ternary "HTTPS" "HTTP" (.app.extraArgs.tls | default false) -}}
 {{- end -}}
 
 {{- /*
 Net probe port
 */ -}}
 {{- define "vm.probe.port" -}}
-{{- dig "ports" "name" "http" (.app | dict) -}}
+  {{- dig "ports" "name" "http" (.app | dict) -}}
 {{- end -}}
 
 {{- define "vm.arg" -}}
-{{- if and (kindIs "bool" .value) .value -}}
--{{ .key }}
-{{- else -}}
--{{ .key }}={{ .value }}
-{{- end -}}
+  {{- if empty .value }}
+    {{- .key -}}
+  {{- else if and (kindIs "bool" .value) .value -}}
+    -{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}
+  {{- else -}}
+    -{{ ternary "" "-" (eq (len .key) 1) }}{{ .key }}={{ .value }}
+  {{- end -}}
 {{- end -}}
 
 {{- /*
 command line arguments
 */ -}}
 {{- define "vm.args" -}}
-{{- $args := default list -}}
-{{- range $key, $value := . -}}
-{{- if kindIs "slice" $value -}}
-{{- range $v := $value -}}
-{{- $args = append $args (include "vm.arg" (dict "key" $key "value" $v)) -}}
-{{- end -}}
-{{- else -}}
-{{- $args = append $args (include "vm.arg" (dict "key" $key "value" $value)) -}}
-{{- end -}}
-{{- end -}}
-{{- toYaml $args -}}
+  {{- $args := default list -}}
+  {{- range $key, $value := . -}}
+    {{- if not $key -}}
+      {{- fail "Empty key in command line args is not allowed" -}}
+    {{- end -}}
+    {{- if kindIs "slice" $value -}}
+      {{- range $v := $value -}}
+        {{- $args = append $args (include "vm.arg" (dict "key" $key "value" $v)) -}}
+      {{- end -}}
+    {{- else -}}
+      {{- $args = append $args (include "vm.arg" (dict "key" $key "value" $value)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toYaml (dict "args" $args) -}}
 {{- end -}}

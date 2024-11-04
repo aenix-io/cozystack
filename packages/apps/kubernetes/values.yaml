@@ -60,3 +60,12 @@ addons:
     ##
     enabled: false
     valuesOverride: {}
+
+  ## MonitoringAgents
+  ##
+  monitoringAgents:
+    ## @param addons.monitoringAgents.enabled Enables MonitoringAgents (fluentbit, vmagents for sending logs and metrics to storage) if tenant monitoring enabled, send to tenant storage, else to root storage
+    ## @param addons.monitoringAgents.valuesOverride Custom values to override
+    ##
+    enabled: false
+    valuesOverride: {}

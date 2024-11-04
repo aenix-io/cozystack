@@ -1,0 +1,41 @@
+{{- if .Values.addons.monitoringAgents.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: {{ .Release.Name }}-cozy-victoria-metrics-operator
+  labels:
+    cozystack.io/repository: system
+    coztstack.io/target-cluster-name: {{ .Release.Name }}
+spec:
+  interval: 5m
+  releaseName: cozy-victoria-metrics-operator
+  chart:
+    spec:
+      chart: cozy-victoria-metrics-operator
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-system
+        namespace: cozy-system
+  kubeConfig:
+    secretRef:
+      name: {{ .Release.Name }}-kubeconfig
+  targetNamespace: cozy-victoria-metrics-operator
+  storageNamespace: cozy-victoria-metrics-operator
+  install:
+    createNamespace: true
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  dependsOn:
+  {{- if lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" .Release.Namespace .Release.Name }}
+  - name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  - name: {{ .Release.Name }}-cilium
+    namespace: {{ .Release.Namespace }}
+  - name: {{ .Release.Name }}-cert-manager-crds
+    namespace: {{ .Release.Namespace }}
+{{- end }}
