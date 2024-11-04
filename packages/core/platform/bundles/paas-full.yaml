@@ -41,6 +41,12 @@ releases:
         SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
         JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
 
+- name: cozystack-api
+  releaseName: cozystack-api
+  chart: cozy-cozystack-api
+  namespace: cozy-system
+  dependsOn: [cilium,kubeovn]
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozystack-api
+  namespace: cozy-system
+  labels:
+    app: cozystack-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozystack-api
+  template:
+    metadata:
+      labels:
+        app: cozystack-api
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: cozystack-api
+      containers:
+      - name: cozystack-api
+        image: "{{ .Values.cozystackAPI.image }}"
+        args: ["--config=/config/config.yaml"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config/config.yaml
+          subPath: config.yaml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: cozystack-api
+          items:
+          - key: config.yaml
+            path: config.yaml
