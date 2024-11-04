@@ -1,5 +1,5 @@
 /*
-Copyright 2024 The Kubernetes Authors.
+Copyright 2024 The Cozystack Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,31 +30,31 @@ func TestAppsEmulationVersionToKubeEmulationVersion(t *testing.T) {
 
 	testCases := []struct {
 		desc                     string
-		appsEmulationVer       *version.Version
+		appsEmulationVer         *version.Version
 		expectedKubeEmulationVer *version.Version
 	}{
 		{
 			desc:                     "same version as than kube binary",
-			appsEmulationVer:       version.MajorMinor(1, 2),
+			appsEmulationVer:         version.MajorMinor(1, 2),
 			expectedKubeEmulationVer: defaultKubeEffectiveVersion.BinaryVersion(),
 		},
 		{
 			desc:                     "1 version lower than kube binary",
-			appsEmulationVer:       version.MajorMinor(1, 1),
+			appsEmulationVer:         version.MajorMinor(1, 1),
 			expectedKubeEmulationVer: defaultKubeEffectiveVersion.BinaryVersion().OffsetMinor(-1),
 		},
 		{
 			desc:                     "2 versions lower than kube binary",
-			appsEmulationVer:       version.MajorMinor(1, 0),
+			appsEmulationVer:         version.MajorMinor(1, 0),
 			expectedKubeEmulationVer: defaultKubeEffectiveVersion.BinaryVersion().OffsetMinor(-2),
 		},
 		{
 			desc:                     "capped at kube binary",
-			appsEmulationVer:       version.MajorMinor(1, 3),
+			appsEmulationVer:         version.MajorMinor(1, 3),
 			expectedKubeEmulationVer: defaultKubeEffectiveVersion.BinaryVersion(),
 		},
 		{
-			desc:               "no mapping",
+			desc:             "no mapping",
 			appsEmulationVer: version.MajorMinor(2, 10),
 		},
 	}

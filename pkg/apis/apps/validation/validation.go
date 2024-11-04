@@ -1,5 +1,5 @@
 /*
-Copyright 2016 The Kubernetes Authors.
+Copyright 2024 The Cozystack Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ limitations under the License.
 package validation
 
 import (
-	"k8s.io/apimachinery/pkg/util/validation/field"
 	"github.com/aenix.io/cozystack/pkg/apis/apps"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // ValidateApplication validates a Application.
