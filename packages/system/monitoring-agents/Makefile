@@ -1,5 +1,5 @@
-export NAME=monitoring
-export NAMESPACE=cozy-$(NAME)
+export NAME=monitoring-agents
+export NAMESPACE=cozy-monitoring
 
 include ../../../scripts/package.mk
 

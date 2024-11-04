@@ -55,19 +55,12 @@ releases:
   namespace: cozy-victoria-metrics-operator
   dependsOn: [cilium,cert-manager]
 
-- name: monitoring
-  releaseName: monitoring
-  chart: cozy-monitoring
-  namespace: cozy-monitoring
-  privileged: true
-  dependsOn: [cilium,victoria-metrics-operator]
-
 - name: monitoring-agents
   releaseName: monitoring-agents
   chart: cozy-monitoring-agents
   namespace: cozy-monitoring
   privileged: true
-  dependsOn: [monitoring]
+  dependsOn: [cilium,victoria-metrics-operator]
 
 - name: metallb
   releaseName: metallb

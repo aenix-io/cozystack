@@ -44,19 +44,12 @@ releases:
   namespace: cozy-victoria-metrics-operator
   dependsOn: [cert-manager]
 
-- name: monitoring
-  releaseName: monitoring
-  chart: cozy-monitoring
-  namespace: cozy-monitoring
-  privileged: true
-  dependsOn: [victoria-metrics-operator]
-
 - name: monitoring-agents
   releaseName: monitoring-agents
   chart: cozy-monitoring-agents
   namespace: cozy-monitoring
   privileged: true
-  dependsOn: [monitoring]
+  dependsOn: [victoria-metrics-operator]
 
 - name: etcd-operator
   releaseName: etcd-operator

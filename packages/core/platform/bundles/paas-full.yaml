@@ -71,19 +71,12 @@ releases:
   namespace: cozy-victoria-metrics-operator
   dependsOn: [cilium,kubeovn,cert-manager]
 
-- name: monitoring
-  releaseName: monitoring
-  chart: cozy-monitoring
-  namespace: cozy-monitoring
-  privileged: true
-  dependsOn: [cilium,kubeovn,victoria-metrics-operator]
-
 - name: monitoring-agents
   releaseName: monitoring-agents
   chart: cozy-monitoring-agents
   namespace: cozy-monitoring
   privileged: true
-  dependsOn: [monitoring]
+  dependsOn: [cilium,kubeovn,victoria-metrics-operator]
 
 - name: kubevirt-operator
   releaseName: kubevirt-operator
