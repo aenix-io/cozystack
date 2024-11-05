@@ -30,12 +30,14 @@ releases:
   releaseName: cert-manager-issuers
   chart: cozy-cert-manager-issuers
   namespace: cozy-cert-manager
+  optional: true
   dependsOn: [cert-manager]
 
 - name: victoria-metrics-operator
   releaseName: victoria-metrics-operator
   chart: cozy-victoria-metrics-operator
   namespace: cozy-victoria-metrics-operator
+  optional: true
   dependsOn: [cert-manager]
 
 - name: monitoring-agents
@@ -43,54 +45,63 @@ releases:
   chart: cozy-monitoring-agents
   namespace: cozy-monitoring
   privileged: true
+  optional: true
   dependsOn: [victoria-metrics-operator]
 
 - name: etcd-operator
   releaseName: etcd-operator
   chart: cozy-etcd-operator
   namespace: cozy-etcd-operator
+  optional: true
   dependsOn: [cert-manager]
 
 - name: grafana-operator
   releaseName: grafana-operator
   chart: cozy-grafana-operator
   namespace: cozy-grafana-operator
+  optional: true
   dependsOn: []
 
 - name: mariadb-operator
   releaseName: mariadb-operator
   chart: cozy-mariadb-operator
   namespace: cozy-mariadb-operator
+  optional: true
   dependsOn: [victoria-metrics-operator]
 
 - name: postgres-operator
   releaseName: postgres-operator
   chart: cozy-postgres-operator
   namespace: cozy-postgres-operator
+  optional: true
   dependsOn: [cert-manager]
 
 - name: kafka-operator
   releaseName: kafka-operator
   chart: cozy-kafka-operator
   namespace: cozy-kafka-operator
+  optional: true
   dependsOn: []
 
 - name: clickhouse-operator
   releaseName: clickhouse-operator
   chart: cozy-clickhouse-operator
   namespace: cozy-clickhouse-operator
+  optional: true
   dependsOn: []
 
 - name: rabbitmq-operator
   releaseName: rabbitmq-operator
   chart: cozy-rabbitmq-operator
   namespace: cozy-rabbitmq-operator
+  optional: true
   dependsOn: []
 
 - name: redis-operator
   releaseName: redis-operator
   chart: cozy-redis-operator
   namespace: cozy-redis-operator
+  optional: true
   dependsOn: []
 
 - name: telepresence
