@@ -45,7 +45,7 @@ spec:
     vmagent:
       externalLabels:
         cluster: {{ .Release.Name }}
-        tenant: {{ $targetTenant }}
+        tenant: {{ .Release.Namespace }}
       remoteWrite:
         url: http://vminsert-shortterm.{{ $targetTenant }}.svc:8480/insert/0/prometheus
 
@@ -97,7 +97,7 @@ spec:
           [FILTER]
               Name modify
               Match *
-              Add tenant {{ $targetTenant }}
+              Add tenant {{ .Release.Namespace }}
           [FILTER]
               Name modify
               Match *
