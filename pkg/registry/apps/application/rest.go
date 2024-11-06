@@ -923,6 +923,7 @@ func (r *REST) convertHelmReleaseToApplication(hr *helmv2.HelmRelease) (appsv1al
 			APIVersion: "apps.cozystack.io/v1alpha1",
 			Kind:       r.kindName,
 		},
+		AppVersion: hr.Spec.Chart.Spec.Version,
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              strings.TrimPrefix(hr.Name, r.releaseConfig.Prefix),
 			Namespace:         hr.Namespace,

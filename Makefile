@@ -6,6 +6,7 @@ build:
 	make -C packages/apps/mysql image
 	make -C packages/apps/clickhouse image
 	make -C packages/apps/kubernetes image
+	make -C packages/system/cozystack-api image
 	make -C packages/system/cilium image
 	make -C packages/system/kubeovn image
 	make -C packages/system/dashboard image
@@ -35,4 +36,4 @@ assets:
 test:
 	make -C packages/core/testing apply
 	make -C packages/core/testing test
-	make -C packages/core/testing delete
+	make -C packages/core/testing test-applications
