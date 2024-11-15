@@ -48,7 +48,8 @@ mysql 0.5.0 4b84798
 mysql 0.5.1 fab5940b
 mysql 0.5.2 HEAD
 nats 0.1.0 5ca8823
-nats 0.2.0 HEAD
+nats 0.2.0 c07c4bbd
+nats 0.3.0 HEAD
 postgres 0.1.0 f642698
 postgres 0.2.0 7cd7de73
 postgres 0.2.1 4a97e297

@@ -8,3 +8,10 @@
 external: false
 replicas: 2
 storageClass: ""
+## @param users [object] Users configuration
+## Example:
+## users:
+##   user1:
+##     password: strongpassword
+##   user2: {}
+users: {}
