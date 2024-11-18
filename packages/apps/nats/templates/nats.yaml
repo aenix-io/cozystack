@@ -40,8 +40,7 @@ spec:
     nats:
       fullnameOverride: {{ .Release.Name }}
       config:
-        {{- if .Values.users }}
-        {{- if gt (len .Values.users) 0 }}
+        {{- if gt (len .Values.passwords) 0 }}
         merge:
           accounts:
             A:
@@ -50,7 +49,6 @@ spec:
                 - user: "{{ $username }}"
                   password: "{{ $password }}"
                 {{- end }}
-        {{- end }}
         {{- end }}
         cluster:
           enabled: true
