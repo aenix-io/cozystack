@@ -72,7 +72,7 @@ spec:
             - name: KC_PROXY
               value: "edge"
             - name: KEYCLOAK_ADMIN
-              value: {{ .Values.user }}
+              value: admin
             - name: KEYCLOAK_ADMIN_PASSWORD
               value: {{ $password }}
             - name: KC_DB
