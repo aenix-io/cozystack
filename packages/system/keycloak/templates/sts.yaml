@@ -107,7 +107,7 @@ spec:
             - name: KC_HOSTNAME
               value: https://keycloak.{{ $host }}
             - name: JAVA_OPTS_APPEND
-              value: "-Djgroups.dns.query=keycloak-headless.keycloak.svc.cozy.local"
+              value: "-Djgroups.dns.query=keycloak-headless.cozy-keycloak.svc.cozy.local"
           ports:
             - name: http
               containerPort: 8080
