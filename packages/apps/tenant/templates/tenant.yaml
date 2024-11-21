@@ -88,3 +88,143 @@ roleRef:
   kind: Role
   name: {{ include "tenant.name" . }}
   apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tenant.name" . }}-view
+  namespace: {{ include "tenant.name" . }}
+rules:
+  - apiGroups: ["apps.cozystack.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["helm.toolkit.fluxcd.io"]
+    resources: ["helmreleases"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tenant.name" . }}-view
+  namespace: {{ include "tenant.name" . }}
+subjects:
+  - kind: Group
+    name: {{ include "tenant.name" . }}-view
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: {{ include "tenant.name" . }}-view
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tenant.name" . }}-use
+  namespace: {{ include "tenant.name" . }}
+rules:
+  - apiGroups: ["apps.cozystack.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["helm.toolkit.fluxcd.io"]
+    resources: ["helmreleases"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["kubevirt.io"]
+    resources: ["virtualmachines"]
+    verbs: ["get", "list"]
+  - apiGroups: ["subresources.kubevirt.io"]
+    resources: ["virtualmachineinstances/console", "virtualmachineinstances/vnc"]
+    verbs: ["get", "list"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tenant.name" . }}-use
+  namespace: {{ include "tenant.name" . }}
+subjects:
+  - kind: Group
+    name: {{ include "tenant.name" . }}-use
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: {{ include "tenant.name" . }}-use
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tenant.name" . }}-admin
+  namespace: {{ include "tenant.name" . }}
+rules:
+  - apiGroups: ["helm.toolkit.fluxcd.io"]
+    resources: ["helmreleases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log", "pods"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: ["kubevirt.io"]
+    resources: ["virtualmachines"]
+    verbs: ["get", "list"]
+  - apiGroups: ["subresources.kubevirt.io"]
+    resources: ["virtualmachineinstances/console", "virtualmachineinstances/vnc"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps.cozystack.io"]
+    resources: ["buckets", "clickhouses", "ferretdb", "foos", "httpcaches", "kafkas", "kuberneteses", "mysqls", "natses", "postgreses", "rabbitmqs", "redises", "seaweedfses", "tcpbalancers", "virtualmachines", "vmdisks", "vminstances"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tenant.name" . }}-admin
+  namespace: {{ include "tenant.name" . }}
+subjects:
+  - kind: Group
+    name: {{ include "tenant.name" . }}-admin
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: {{ include "tenant.name" . }}-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tenant.name" . }}-super-admin
+  namespace: {{ include "tenant.name" . }}
+rules:
+  - apiGroups: ["helm.toolkit.fluxcd.io"]
+    resources: ["helmreleases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log", "pods"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: ["kubevirt.io"]
+    resources: ["virtualmachines"]
+    verbs: ["get", "list"]
+  - apiGroups: ["subresources.kubevirt.io"]
+    resources: ["virtualmachineinstances/console", "virtualmachineinstances/vnc"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps.cozystack.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tenant.name" . }}-super-admin
+  namespace: {{ include "tenant.name" . }}
+subjects:
+  - kind: Group
+    name: {{ include "tenant.name" . }}-super-admin
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: {{ include "tenant.name" . }}-super-admin
+  apiGroup: rbac.authorization.k8s.io
