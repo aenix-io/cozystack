@@ -6,6 +6,13 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - services
+  resourceNames:
+  - {{ .Release.Name }}
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
   - secrets
   resourceNames:
   - {{ .Release.Name }}-credentials

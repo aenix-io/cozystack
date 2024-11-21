@@ -8,12 +8,8 @@ rules:
   resources:
   - services
   resourceNames:
-  - chendpoint-{{ .Release.Name }}
-  verbs: ["get", "list", "watch"]
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  resourceNames:
-  - {{ .Release.Name }}-credentials
+  - rfs-{{ .Release.Name }}
+  - rfrm-{{ .Release.Name }}
+  - rfrs-{{ .Release.Name }}
+  - "{{ .Release.Name }}-external-lb"
   verbs: ["get", "list", "watch"]

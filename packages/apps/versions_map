@@ -5,7 +5,8 @@ clickhouse 0.2.1 5ca8823
 clickhouse 0.3.0 b00621e
 clickhouse 0.4.0 320fc32
 clickhouse 0.5.0 2a4768a5
-clickhouse 0.6.0 HEAD
+clickhouse 0.6.0 18bbdb67
+clickhouse 0.6.1 HEAD
 ferretdb 0.1.0 4ffa8615
 ferretdb 0.1.1 5ca8823
 ferretdb 0.2.0 adaf603
@@ -21,7 +22,8 @@ kafka 0.2.0 a2cc83d
 kafka 0.2.1 3ac17018
 kafka 0.2.2 d0758692
 kafka 0.2.3 5ca8823
-kafka 0.3.0 HEAD
+kafka 0.3.0 c07c4bbd
+kafka 0.3.1 HEAD
 kubernetes 0.1.0 f642698
 kubernetes 0.2.0 7cd7de73
 kubernetes 0.3.0 7caccec1
@@ -49,7 +51,8 @@ mysql 0.5.1 fab5940b
 mysql 0.5.2 HEAD
 nats 0.1.0 5ca8823
 nats 0.2.0 c07c4bbd
-nats 0.3.0 HEAD
+nats 0.3.0 78366f19
+nats 0.3.1 HEAD
 postgres 0.1.0 f642698
 postgres 0.2.0 7cd7de73
 postgres 0.2.1 4a97e297
@@ -70,7 +73,8 @@ rabbitmq 0.4.2 00b2834e
 rabbitmq 0.4.3 HEAD
 redis 0.1.1 f642698
 redis 0.2.0 5ca8823
-redis 0.3.0 HEAD
+redis 0.3.0 c07c4bbd
+redis 0.3.1 HEAD
 tcp-balancer 0.1.0 f642698
 tcp-balancer 0.2.0 HEAD
 tenant 0.1.3 3d1b86c
