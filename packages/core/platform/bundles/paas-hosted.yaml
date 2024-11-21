@@ -19,7 +19,7 @@ releases:
   chart: cozy-cert-manager-crds
   namespace: cozy-cert-manager
   dependsOn: []
-  
+
 - name: cozystack-api
   releaseName: cozystack-api
   chart: cozy-cozystack-api
@@ -145,3 +145,9 @@ releases:
             {{- end }}
   {{- end }}
   {{- end }}
+
+- name: keycloak
+  releaseName: keycloak
+  chart: cozy-keycloak
+  namespace: cozy-keycloak
+  dependsOn: [postgres-operator]
