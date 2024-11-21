@@ -179,4 +179,5 @@ releases:
   releaseName: keycloak
   chart: cozy-keycloak
   namespace: cozy-keycloak
+  optional: true
   dependsOn: [postgres-operator]
