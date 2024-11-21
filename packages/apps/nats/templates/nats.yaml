@@ -1,3 +1,25 @@
+{{- $passwords := dict }}
+{{- range $user, $u := .Values.users }}
+  {{- if $u.password }}
+    {{- $_ := set $passwords $user $u.password }}
+  {{- else if not (index $passwords $user) }}
+    {{- $_ := set $passwords $user (randAlphaNum 16) }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.users }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-credentials
+stringData:
+  {{- range $user, $u := .Values.users }}
+  {{ quote $user }}: {{ quote (index $passwords $user) }}
+  {{- end }}
+{{- end }}
+
+---
+
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -18,6 +40,16 @@ spec:
     nats:
       fullnameOverride: {{ .Release.Name }}
       config:
+        {{- if gt (len .Values.passwords) 0 }}
+        merge:
+          accounts:
+            A:
+              users:
+                {{- range $username, $password := $passwords }}
+                - user: "{{ $username }}"
+                  password: "{{ $password }}"
+                {{- end }}
+        {{- end }}
         cluster:
           enabled: true
           replicas: {{ .Values.replicas }}
