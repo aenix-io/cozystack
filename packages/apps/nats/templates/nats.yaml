@@ -40,7 +40,7 @@ spec:
     nats:
       fullnameOverride: {{ .Release.Name }}
       config:
-        {{- if gt (len .Values.passwords) 0 }}
+        {{- if gt (len $passwords) 0 }}
         merge:
           accounts:
             A:

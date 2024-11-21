@@ -8,12 +8,12 @@ rules:
   resources:
   - services
   resourceNames:
-  - chendpoint-{{ .Release.Name }}
+  - {{ .Release.Name }}-kafka-bootstrap
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""
   resources:
   - secrets
   resourceNames:
-  - {{ .Release.Name }}-credentials
+  - {{ .Release.Name }}-clients-ca
   verbs: ["get", "list", "watch"]
