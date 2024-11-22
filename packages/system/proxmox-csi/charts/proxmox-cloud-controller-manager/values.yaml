@@ -61,6 +61,36 @@ serviceAccount:
 # -- CCM pods' priorityClassName.
 priorityClassName: system-cluster-critical
 
+# -- Add additional init containers to the CCM pods.
+# ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+initContainers: []
+  # - name: loadbalancer
+  #   restartPolicy: Always
+  #   image: ghcr.io/sergelogvinov/haproxy:2.8.3-alpine3.18
+  #   imagePullPolicy: IfNotPresent
+  #   env:
+  #     - name: SVC
+  #       value: "proxmox.domain.com"
+  #     - name: PORT
+  #       value: "8006"
+  #   securityContext:
+  #     runAsUser: 99
+  #     runAsGroup: 99
+  #   resources:
+  #     limits:
+  #       cpu: 50m
+  #       memory: 64Mi
+  #     requests:
+  #       cpu: 50m
+  #       memory: 32Mi
+
+# -- hostAliases Deployment pod host aliases
+# ref: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
+hostAliases: []
+  # - ip: 127.0.0.1
+  #   hostnames:
+  #     - proxmox.domain.com
+
 # -- Annotations for data pods.
 # ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 podAnnotations: {}
@@ -98,7 +128,12 @@ resources:
     cpu: 10m
     memory: 32Mi
 
-# -- Deployment update stategy type.
+# -- Deploy CCM  in Daemonset mode.
+# CCM will use hostNetwork.
+# It allows to use CCM without CNI plugins.
+useDaemonSet: false
+
+# -- Deployment update strategy type.
 # ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment
 updateStrategy:
   type: RollingUpdate
@@ -123,3 +158,20 @@ tolerations:
 # -- Affinity for data pods assignment.
 # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 affinity: {}
+#  nodeAffinity:
+#    requiredDuringSchedulingIgnoredDuringExecution:
+#      nodeSelectorTerms:
+#      - matchExpressions:
+#        - key: node-role.kubernetes.io/control-plane
+#          operator: Exists
+
+# -- Additional volumes for Pods
+extraVolumes: []
+# - name: ca
+#   secret:
+#     secretName: my-ca
+# -- Additional volume mounts for Pods
+extraVolumeMounts: []
+# - mountPath: /etc/ssl/certs/ca-certificates.crt
+#   name: ca
+#   subPath: ca.crt

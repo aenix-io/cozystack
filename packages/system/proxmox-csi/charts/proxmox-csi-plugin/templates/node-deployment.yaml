@@ -59,7 +59,7 @@ spec:
             - name: socket
               mountPath: /csi
             - name: kubelet
-              mountPath: /var/lib/kubelet
+              mountPath: {{ .Values.node.kubeletDir }}
               mountPropagation: Bidirectional
             - name: dev
               mountPath: /dev
@@ -71,7 +71,7 @@ spec:
             capabilities:
               drop:
               - ALL
-            # readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: true
             seccompProfile:
               type: RuntimeDefault
           image: "{{ .Values.node.driverRegistrar.image.repository }}:{{ .Values.node.driverRegistrar.image.tag }}"
@@ -79,7 +79,7 @@ spec:
           args:
             - "-v={{ .Values.logVerbosityLevel }}"
             - "--csi-address=unix:///csi/csi.sock"
-            - "--kubelet-registration-path=/var/lib/kubelet/plugins/{{ .Values.provisionerName }}/csi.sock"
+            - "--kubelet-registration-path={{ .Values.node.kubeletDir }}/plugins/{{ .Values.provisionerName }}/csi.sock"
           volumeMounts:
             - name: socket
               mountPath: /csi
@@ -107,15 +107,15 @@ spec:
       volumes:
         - name: socket
           hostPath:
-            path: /var/lib/kubelet/plugins/{{ .Values.provisionerName }}/
+            path: {{ .Values.node.kubeletDir }}/plugins/{{ .Values.provisionerName }}/
             type: DirectoryOrCreate
         - name: registration
           hostPath:
-            path: /var/lib/kubelet/plugins_registry/
+            path: {{ .Values.node.kubeletDir }}/plugins_registry/
             type: Directory
         - name: kubelet
           hostPath:
-            path: /var/lib/kubelet
+            path: {{ .Values.node.kubeletDir }}
             type: Directory
         - name: dev
           hostPath:

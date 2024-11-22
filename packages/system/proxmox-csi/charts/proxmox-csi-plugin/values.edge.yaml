@@ -1,4 +1,6 @@
 
+createNamespace: true
+
 controller:
   plugin:
     image:
@@ -10,9 +12,6 @@ node:
     image:
       pullPolicy: Always
       tag: edge
-
-  nodeSelector:
-    node.cloudprovider.kubernetes.io/platform: nocloud
 
 nodeSelector:
   node-role.kubernetes.io/control-plane: ""

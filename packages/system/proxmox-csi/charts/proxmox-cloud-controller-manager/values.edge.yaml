@@ -1,10 +1,14 @@
-
 image:
   pullPolicy: Always
   tag: edge
 
-nodeSelector:
-  node-role.kubernetes.io/control-plane: ""
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
 
 logVerbosityLevel: 4
 
