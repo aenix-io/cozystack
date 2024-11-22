@@ -1,0 +1,26 @@
+diff --git a/web/template/bucket.html.tmpl b/web/template/bucket.html.tmpl
+index e2f8d28..87add13 100644
+--- a/web/template/bucket.html.tmpl
++++ b/web/template/bucket.html.tmpl
+@@ -13,7 +13,7 @@
+ 
+ <nav class="nav-extended">
+     <div class="nav-wrapper container">
+-        <a href="/buckets/{{$.BucketName}}" class="brand-logo center"><i class="material-icons">folder_open</i>{{ .BucketName }}</a>
++        <a href="/" class="brand-logo">Cozystack S3 Manager</a>
+         {{ if not .Objects }}
+         <ul class="right">
+             <li>
+diff --git a/web/template/buckets.html.tmpl b/web/template/buckets.html.tmpl
+index c7ea184..fb1dce7 100644
+--- a/web/template/buckets.html.tmpl
++++ b/web/template/buckets.html.tmpl
+@@ -1,7 +1,7 @@
+ {{ define "content" }}
+ <nav>
+     <div class="nav-wrapper container">
+-        <a href="/" class="brand-logo">S3 Manager</a>
++        <a href="/" class="brand-logo">Cozystack S3 Manager</a>
+     </div>
+ </nav>
+ 

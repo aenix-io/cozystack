@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-dashboard-resources
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  resourceNames:
+  - rfs-{{ .Release.Name }}
+  - rfrm-{{ .Release.Name }}
+  - rfrs-{{ .Release.Name }}
+  - "{{ .Release.Name }}-external-lb"
+  verbs: ["get", "list", "watch"]

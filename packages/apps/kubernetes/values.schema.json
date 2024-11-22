@@ -75,6 +75,21 @@
                             "default": {}
                         }
                     }
+                },
+                "monitoringAgents": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enables MonitoringAgents (fluentbit, vmagents for sending logs and metrics to storage) if tenant monitoring enabled, send to tenant storage, else to root storage",
+                            "default": false
+                        },
+                        "valuesOverride": {
+                            "type": "object",
+                            "description": "Custom values to override",
+                            "default": {}
+                        }
+                    }
                 }
             }
         }

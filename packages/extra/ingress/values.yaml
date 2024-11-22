@@ -27,3 +27,6 @@ clouflareProxy: false
 
 ## @param dashboard Should ingress serve Cozystack service dashboard
 dashboard: false
+
+## @param cdiUploadProxy Should ingress serve CDI upload proxy
+cdiUploadProxy: false

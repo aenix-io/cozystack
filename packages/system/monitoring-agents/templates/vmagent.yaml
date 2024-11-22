@@ -1,0 +1,31 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAgent
+metadata:
+  name: vmagent
+spec:
+  externalLabels:
+    cluster: {{ .Values.vmagent.externalLabels.cluster }}
+    tenant: {{ .Values.vmagent.externalLabels.tenant }}
+  extraArgs:
+    promscrape.streamParse: "true"
+    promscrape.maxScrapeSize: 32MB
+  remoteWrite:
+  - url: {{ .Values.vmagent.remoteWrite.url | quote }}
+  scrapeInterval: 30s
+  selectAllByDefault: true
+  additionalScrapeConfigs:
+    name: additional-scrape-configs
+    key: prometheus-additional.yaml
+  resources:
+    limits:
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      memory: 200Mi
+  #statefulMode: true
+  #statefulStorage:
+  #  volumeClaimTemplate:
+  #    spec:
+  #      resources:
+  #          requests:
+  #            storage: 20Gi

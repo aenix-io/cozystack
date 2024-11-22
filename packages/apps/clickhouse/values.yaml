@@ -1,14 +1,18 @@
 ## @section Common parameters
 
 ## @param size Persistent Volume size
+## @param logStorageSize Persistent Volume for logs size
 ## @param shards Number of Clickhouse replicas
 ## @param replicas Number of Clickhouse shards
 ## @param storageClass StorageClass used to store the data
+## @param logTTL for query_log and query_thread_log
 ##
 size: 10Gi
+logStorageSize: 2Gi
 shards: 1
 replicas: 2
 storageClass: ""
+logTTL: 15
 
 ## @section Configuration parameters
 

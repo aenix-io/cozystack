@@ -1,0 +1,38 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
+{{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
+{{- $issuerType := (index $cozyConfig.data "clusterissuer") | default "http01" }}
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.bucketName }}-ui
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: "basic"
+    nginx.ingress.kubernetes.io/auth-secret: "{{ .Values.bucketName }}-ui-auth"
+    nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "99999"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "99999"
+    {{- if ne $issuerType "cloudflare" }}
+    acme.cert-manager.io/http01-ingress-class: {{ $ingress }}
+    {{- end }}
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: {{ $ingress }}
+  tls:
+    - hosts:
+        - "{{ .Values.bucketName }}.{{ $host }}"
+      secretName: {{ .Values.bucketName }}-ui-tls
+  rules:
+  - host: {{ .Values.bucketName }}.{{ $host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.bucketName }}-ui
+            port:
+              number: 8080

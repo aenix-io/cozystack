@@ -15,12 +15,14 @@ nodeGroups:
   md0:
     minReplicas: 0
     maxReplicas: 10
-    resources:
-      cpu: 2
-      memory: 1024Mi
+    instanceType: "u1.medium"
     ephemeralStorage: 20Gi
     roles:
     - ingress-nginx
+
+    resources:
+      cpu: ""
+      memory: ""
 
 ## @section Cluster Addons
 ##
@@ -55,6 +57,15 @@ addons:
   fluxcd:
     ## @param addons.fluxcd.enabled Enables Flux CD
     ## @param addons.fluxcd.valuesOverride Custom values to override
+    ##
+    enabled: false
+    valuesOverride: {}
+
+  ## MonitoringAgents
+  ##
+  monitoringAgents:
+    ## @param addons.monitoringAgents.enabled Enables MonitoringAgents (fluentbit, vmagents for sending logs and metrics to storage) if tenant monitoring enabled, send to tenant storage, else to root storage
+    ## @param addons.monitoringAgents.valuesOverride Custom values to override
     ##
     enabled: false
     valuesOverride: {}

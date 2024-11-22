@@ -1,6 +1,7 @@
 NAMESPACE=cozy-e2e-tests
 NAME := sandbox
 CLEAN := 1
+TESTING_APPS := $(shell find ../../apps -maxdepth 1 -mindepth 1 -type d | awk -F/ '{print $$NF}')
 
 include ../../../scripts/common-envs.mk
 
@@ -32,10 +33,18 @@ image-e2e-sandbox:
 		yq -i '.e2e.image = strenv(IMAGE)' values.yaml
 	rm -f images/e2e-sandbox.json
 
-test: wait-for-sandbox ## Run the end-to-end tests in existing sandbox.
-	cat ../../../hack/e2e.sh | kubectl exec -i -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'cat > /e2e.sh && chmod +x /e2e.sh'
+copy-hack-dir:
+	tar -C ../../../ -cf- hack | kubectl exec -i -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- tar -xf-
+
+test: wait-for-sandbox copy-hack-dir ## Run the end-to-end tests in existing sandbox.
 	helm template -n cozy-system installer ../installer | kubectl exec -i -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'cat > /cozystack-installer.yaml'
-	kubectl exec -ti -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'export COZYSTACK_INSTALLER_YAML=$$(cat /cozystack-installer.yaml) && /e2e.sh'
+	kubectl exec -ti -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'export COZYSTACK_INSTALLER_YAML=$$(cat /cozystack-installer.yaml) && /hack/e2e.sh'
+
+test-applications: wait-for-sandbox copy-hack-dir ## Run the end-to-end tests in existing sandbox for applications.
+	for app in $(TESTING_APPS); do \
+		kubectl exec -ti -n cozy-e2e-tests deploy/cozystack-e2e-sandbox -- bash -c "/hack/e2e.application.sh $${app}"; \
+	done
+	kubectl exec -ti -n cozy-e2e-tests deploy/cozystack-e2e-sandbox -- bash -c "kubectl get hr -A | grep -v 'True'"
 
 delete: ## Remove sandbox from existing Kubernetes cluster.
 	kubectl delete deploy -n $(NAMESPACE) cozystack-e2e-$(NAME)

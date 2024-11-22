@@ -8,7 +8,7 @@ rules:
   resources:
   - services
   resourceNames:
-  - chi-clickhouse-test-clickhouse-0-0
+  - chendpoint-{{ .Release.Name }}
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""

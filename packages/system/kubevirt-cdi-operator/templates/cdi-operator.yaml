@@ -5718,7 +5718,7 @@ spec:
         - name: APISERVER_IMAGE
           value: quay.io/kubevirt/cdi-apiserver:v1.60.2
         - name: UPLOAD_SERVER_IMAGE
-          value: quay.io/kubevirt/cdi-uploadserver:v1.60.2
+          value: ghcr.io/aenix-io/cozystack/cdi/cdi-uploadserver:v1.60.2-fix@sha256:2c0cfae427861521a204d020e2981fdb23c8b32b66261c03b2a2cdcd7089ac64
         - name: UPLOAD_PROXY_IMAGE
           value: quay.io/kubevirt/cdi-uploadproxy:v1.60.2
         - name: VERBOSITY

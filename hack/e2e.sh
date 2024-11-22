@@ -114,7 +114,7 @@ machine:
     - name: zfs
     - name: spl
   install:
-    image: ghcr.io/aenix-io/cozystack/talos:v1.8.0
+    image: ghcr.io/aenix-io/cozystack/talos:v1.8.2
   files:
   - content: |
       [plugins]
@@ -179,7 +179,7 @@ talosctl apply -f controlplane.yaml -n 192.168.123.13 -e 192.168.123.13 -i
 timeout 60 sh -c 'until nc -nzv 192.168.123.11 50000 && nc -nzv 192.168.123.12 50000 && nc -nzv 192.168.123.13 50000; do sleep 1; done'
 
 # Bootstrap
-talosctl bootstrap -n 192.168.123.11 -e 192.168.123.11
+timeout 10 sh -c 'until talosctl bootstrap -n 192.168.123.11 -e 192.168.123.11; do sleep 1; done'
 
 # Wait for etcd
 timeout 180 sh -c 'while talosctl etcd members -n 192.168.123.11,192.168.123.12,192.168.123.13 -e 192.168.123.10 2>&1 | grep "rpc error"; do sleep 1; done'
@@ -190,7 +190,7 @@ export KUBECONFIG=$PWD/kubeconfig
 
 # Wait for kubernetes nodes appear
 timeout 60 sh -c 'until [ $(kubectl get node -o name | wc -l) = 3 ]; do sleep 1; done'
-kubectl create ns cozy-system
+kubectl create ns cozy-system -o yaml | kubectl apply -f -
 kubectl create -f - <<\EOT
 apiVersion: v1
 kind: ConfigMap
@@ -217,6 +217,10 @@ timeout 60 sh -c 'until kubectl get hr -A | grep cozy; do sleep 1; done'
 sleep 5
 
 kubectl get hr -A | awk 'NR>1 {print "kubectl wait --timeout=15m --for=condition=ready -n " $1 " hr/" $2 " &"} END{print "wait"}' | sh -x
+
+# Wait for Cluster-API providers
+kubectl wait deploy --timeout=30s --for=condition=available -n cozy-cluster-api capi-controller-manager capi-kamaji-controller-manager capi-kubeadm-bootstrap-controller-manager capi-operator-cluster-api-operator capk-controller-manager
+
 # Wait for linstor controller
 kubectl wait deploy --timeout=5m --for=condition=available -n cozy-linstor linstor-controller
 

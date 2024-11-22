@@ -1,4 +1,4 @@
-{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}  
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 {{- $issuerType := (index $cozyConfig.data "clusterissuer") | default "http01" }} 
 
 {{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
@@ -94,7 +94,7 @@ spec:
     metadata:
       annotations:
         {{- if ne $issuerType "cloudflare" }}
-        acme.cert-manager.io/http01-ingress-class: "{{ $ingress }}"  
+        acme.cert-manager.io/http01-ingress-class: "{{ $ingress }}"
         {{- end }}
         cert-manager.io/cluster-issuer: letsencrypt-prod
     spec:

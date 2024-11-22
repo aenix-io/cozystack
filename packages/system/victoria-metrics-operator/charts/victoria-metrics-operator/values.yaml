@@ -1,12 +1,19 @@
 global:
-  image:
-    registry: ""
+  # -- Image pull secrets, that can be shared across multiple helm charts
   imagePullSecrets: []
+  image:
+    # -- Image registry, that can be shared across multiple helm charts
+    registry: ""
+  # -- Openshift security context compatibility configuration
+  compatibility:
+    openshift:
+      adaptSecurityContext: "auto"
   cluster:
     dnsDomain: cluster.local
 # Default values for victoria-metrics.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+# -- operator image configuration
 image:
   # -- Image registry
   registry: ""
@@ -21,18 +28,30 @@ image:
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
-# -- enables CRD creation and management.
-# -- with this option, if you remove this chart, all crd resources will be deleted with it.
-createCRD: true
+crds:
+  # -- check if plain or templated CRDs should be created.
+  # with this option set to `false`, all CRDs will be rendered from templates.
+  # with this option set to `true`, all CRDs are immutable and require manual upgrade.
+  plain: false
+  cleanup:
+    # -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
+    enabled: false
+    # -- Image configuration for CRD cleanup Job
+    image:
+      repository: bitnami/kubectl
+      # use image tag that matches k8s API version by default
+      tag: ""
+      pullPolicy: IfNotPresent
+    # -- Cleanup hook resources
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "256Mi"
+      requests:
+        cpu: "100m"
+        memory: "56Mi"
 
-# -- Tells helm to clean up all the vm resources under this release's namespace when uninstalling
-cleanupCRD: false
-cleanupImage:
-  repository: bitnami/kubectl
-  # use image tag that matches k8s API version by default
-  # tag: 1.29.6
-  pullPolicy: IfNotPresent
-
+# -- Number of operator replicas
 replicaCount: 1
 
 # -- Secret to pull images
@@ -44,17 +63,16 @@ nameOverride: ""
 # -- Overrides the full name of server component
 fullnameOverride: ""
 
-# -- VM operator log level
-# -- possible values: info and error.
+# -- VM operator log level. Possible values: info and error.
 logLevel: "info"
 
 rbac:
   # -- Specifies whether the RBAC resources should be created
   create: true
-  # -- create aggregated clusterRoles for CRD readonly and admin permissions
+  # -- Create aggregated clusterRoles for CRD readonly and admin permissions
   aggregatedClusterRoles:
     enabled: true
-    # -- labels attached to according clusterRole
+    # -- Labels attached to according clusterRole
     labels:
       view:
         rbac.authorization.k8s.io/aggregate-to-view: "true"
@@ -63,13 +81,18 @@ rbac:
 
 # -- Labels to be added to the all resources
 extraLabels: {}
-# extra Labels for Pods only
+# -- extra Labels for Pods only
 podLabels: {}
 # -- Annotations to be added to the all resources
 annotations: {}
 
-podSecurityContext: {}
-securityContext: {}
+# -- Pod's security context. Details are [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+podSecurityContext:
+  enabled: true
+
+# -- Security context to be added to server pods
+securityContext:
+  enabled: true
 
 operator:
   # -- By default, operator converts prometheus-operator objects.
@@ -83,10 +106,10 @@ operator:
   # It should reduce  vmagent and vmauth config sync-time and make it predictable.
   useCustomConfigReloader: false
 
-# By default, the operator will watch all the namespaces
+# -- By default, the operator will watch all the namespaces
 # If you want to override this behavior, specify the namespace.
-# Operator supports only single namespace for watching.
-watchNamespace: ""
+# Operator supports multiple namespaces for watching.
+watchNamespaces: []
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -95,25 +118,45 @@ serviceAccount:
   name: ""
 
 service:
+  # -- Service annotations
   annotations: {}
+  # -- Service labels
   labels: {}
+  # -- Service ClusterIP
   clusterIP: ""
+  # -- Service external IPs. Check [here](https://kubernetes.io/docs/user-guide/services/#external-ips) for details
   externalIPs: ""
+  # -- Service load balacner IP
   loadBalancerIP: ""
+  # -- Load balancer source range
   loadBalancerSourceRanges: []
+  # -- Service type
   type: ClusterIP
+  # -- Health check node port for a service. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
   healthCheckNodePort: ""
+  # -- Service external traffic policy. Check [here](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip) for details
   externalTrafficPolicy: ""
+  # -- Service IP family policy. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilyPolicy: ""
+  # -- List of service IP families. Check [here](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services) for details.
   ipFamilies: []
+  # -- Service port
+  servicePort: 8080
+  # -- Service webhook port
+  webhookPort: 9443
 
-## See `kubectl explain poddisruptionbudget.spec` for more
-## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+# -- See `kubectl explain poddisruptionbudget.spec` for more or check [these docs](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
 podDisruptionBudget:
   enabled: false
   # minAvailable: 1
   # maxUnavailable: 1
   labels: {}
+
+# -- Graceful pod termination timeout. See [this article](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution) for details.
+terminationGracePeriodSeconds: 30
+
+# -- Operator lifecycle. See [this article](https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/) for details.
+lifecycle: {}
 
 # -- Resource object
 resources:
@@ -125,27 +168,28 @@ resources:
   #   cpu: 80m
   #   memory: 120Mi
 
-# -- Pod's node selector. Ref: [https://kubernetes.io/docs/user-guide/node-selection/](https://kubernetes.io/docs/user-guide/node-selection/
+# -- Pod's node selector. Details are [here](https://kubernetes.io/docs/user-guide/node-selection/)
 nodeSelector: {}
 
-# -- Array of tolerations object. Ref: [https://kubernetes.io/docs/concepts/configuration/assign-pod-node/](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
+# -- Array of tolerations object. Spec is [here](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
 tolerations: []
 
 # -- Pod affinity
 affinity: {}
 
-# -- Pod Topology Spread Constraints. Ref: [https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+# -- Pod Topology Spread Constraints. Spec is [here](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
 topologySpreadConstraints: []
 
-# -- operator container additional commandline arguments
+# -- Operator container additional commandline arguments
 extraArgs: {}
 
-# -- extra settings for the operator deployment. full list Ref: [https://github.com/VictoriaMetrics/operator/blob/master/vars.MD](https://github.com/VictoriaMetrics/operator/blob/master/vars.MD)
+# -- Extra settings for the operator deployment. Full list [here](https://docs.victoriametrics.com/operator/vars)
 env:
   []
   # - name: VM_VMSINGLEDEFAULT_VERSION
   #   value: v1.43.0
 
+# -- Specify alternative source for env variables
 envFrom:
   []
   #- configMapRef:
@@ -173,6 +217,7 @@ extraVolumeMounts:
   # - name: example
   #   mountPath: /example
 
+# -- Extra containers to run in a pod with operator
 extraContainers:
   []
   # - name: config-reloader
@@ -195,9 +240,7 @@ admissionWebhooks:
     vlogs: true
   # -- What to do in case, when operator not available to validate request.
   policy: Fail
-  # -- Enables custom ca bundle, if you are not using cert-manager.
-  # -- in case of custom ca, you have to create secret - {{chart-name}}-validation
-  # -- with keys: tls.key, tls.crt, ca.crt
+  # -- Enables custom ca bundle, if you are not using cert-manager. In case of custom ca, you have to create secret - {chart-name}-validation with keys: tls.key, tls.crt, ca.crt
   certManager:
     # -- Enables cert creation and injection by cert-manager.
     enabled: false
@@ -210,7 +253,7 @@ admissionWebhooks:
     cert:
     key:
 
-# -- configures monitoring with serviceScrape. VMServiceScrape must be pre-installed
+# -- Configures monitoring with serviceScrape. VMServiceScrape must be pre-installed
 serviceMonitor:
   enabled: false
   extraLabels: {}
@@ -223,17 +266,15 @@ serviceMonitor:
   basicAuth: {}
 
 probe:
-  # Readiness probe
+  # -- Readiness probe
   readiness:
     httpGet:
-      path: '{{ include "vm.probe.http.path" . }}'
-      scheme: '{{ include "vm.probe.http.scheme" . }}'
       port: probe
     initialDelaySeconds: 5
     periodSeconds: 15
     timeoutSeconds: 5
     failureThreshold: 3
-  # Liveness probe
+  # -- Liveness probe
   liveness:
     tcpSocket:
       port: probe
@@ -241,7 +282,7 @@ probe:
     periodSeconds: 15
     timeoutSeconds: 5
     failureThreshold: 3
-  # Startup probe
+  # -- Startup probe
   startup: {}
 
 # -- Add extra specs dynamically to this chart

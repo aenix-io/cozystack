@@ -3,7 +3,7 @@ set -o pipefail
 set -e
 
 BUNDLE=$(set -x; kubectl get configmap -n cozy-system cozystack -o 'go-template={{index .data "bundle-name"}}')
-VERSION=5
+VERSION=8
 
 run_migrations() {
   if ! kubectl get configmap -n cozy-system cozystack-version; then
@@ -13,6 +13,7 @@ run_migrations() {
   current_version=$(kubectl get configmap -n cozy-system cozystack-version -o jsonpath='{.data.version}') || true
   until [ "$current_version" = "$VERSION" ]; do
     echo "run migration: $current_version --> $VERSION"
+    chmod +x scripts/migrations/$current_version
     scripts/migrations/$current_version
     current_version=$(kubectl get configmap -n cozy-system cozystack-version -o jsonpath='{.data.version}')
   done
@@ -79,9 +80,13 @@ fi
 # Reconcile Helm repositories
 kubectl annotate helmrepositories.source.toolkit.fluxcd.io -A -l cozystack.io/repository reconcile.fluxcd.io/requestedAt=$(date +"%Y-%m-%dT%H:%M:%SZ") --overwrite
 
-# Unsuspend all system charts
-kubectl get hr -A -l cozystack.io/system-app=true --no-headers | while read namespace name rest; do
-  kubectl patch hr -n "$namespace" "$name" -p '{"spec": {"suspend": null}}' --type=merge --field-manager=flux-client-side-apply
+# Unsuspend all Cozystack managed charts
+kubectl get hr -A -o go-template='{{ range .items }}{{ if .spec.suspend }}{{ .spec.chart.spec.sourceRef.namespace }}/{{ .spec.chart.spec.sourceRef.name }} {{ .metadata.namespace }} {{ .metadata.name }}{{ "\n" }}{{ end }}{{ end }}' | while read repo namespace name; do
+  case "$repo" in
+    cozy-system/cozystack-system|cozy-public/cozystack-extra|cozy-public/cozystack-apps)
+      kubectl patch hr -n "$namespace" "$name" -p '{"spec": {"suspend": null}}' --type=merge --field-manager=flux-client-side-apply
+      ;;
+  esac
 done
 
 # Reconcile platform chart

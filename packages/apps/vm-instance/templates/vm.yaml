@@ -1,0 +1,98 @@
+{{- if and .Values.instanceType (not (lookup "instancetype.kubevirt.io/v1beta1" "VirtualMachineClusterInstancetype" "" .Values.instanceType)) }}
+{{-   fail (printf "Specified instancetype not exists in cluster: %s" .Values.instanceType) }}
+{{- end }}
+{{- if and .Values.instanceProfile (not (lookup "instancetype.kubevirt.io/v1beta1" "VirtualMachineClusterPreference" "" .Values.instanceProfile)) }}
+{{-   fail (printf "Specified profile not exists in cluster: %s" .Values.instanceProfile) }}
+{{- end }}
+
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: {{ include "virtual-machine.fullname" . }}
+  labels:
+    {{- include "virtual-machine.labels" . | nindent 4 }}
+spec:
+  running: {{ .Values.running | default "true" }}
+  {{- with .Values.instanceType }}
+  instancetype:
+    kind: VirtualMachineClusterInstancetype
+    name: {{ . }}
+    revisionName: null
+  {{- end }}
+  {{- with .Values.instanceProfile }}
+  preference:
+    kind: VirtualMachineClusterPreference
+    name: {{ . }}
+    revisionName: null
+  {{- end }}
+
+  template:
+    metadata:
+      annotations:
+        kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+      labels:
+        {{- include "virtual-machine.labels" . | nindent 8 }}
+    spec:
+      domain:
+        {{- if and .Values.resources .Values.resources.cpu }}
+        cpu:
+          cores: {{ .Values.resources.cpu }}
+        {{- end }}
+        {{- if and .Values.resources .Values.resources.memory }}
+        resources:
+          requests:
+            memory: {{ .Values.resources.memory | quote }}
+        {{- end }}
+        devices:
+          disks:
+          {{- range $i, $disk := .Values.disks }}
+          - name: disk-{{ .name }}
+            {{- $disk := lookup "cdi.kubevirt.io/v1beta1" "DataVolume" $.Release.Namespace .name }}
+            {{- if $disk }}
+            {{- if and (hasKey $disk.metadata.annotations "vm-disk.cozystack.io/optical") (eq (index $disk.metadata.annotations "vm-disk.cozystack.io/optical") "true") }}
+            cdrom: {}
+            {{- else }}
+            disk: {}
+            {{- end }}
+            {{- if eq $i 0 }}
+            bootOrder: 1
+            {{- end }}
+            {{- else }}
+            {{-   fail (printf "Specified disk not exists in cluster: %s" .name) }}
+            {{- end }}
+          {{- end }}
+          {{- if or .Values.sshKeys .Values.cloudInit }}
+          - name: cloudinitdisk
+            disk:
+              bus: virtio
+          {{- end }}
+          interfaces:
+          - name: default
+            bridge: {}
+        machine:
+          type: ""
+      {{- with .Values.sshKeys }}
+      accessCredentials:
+      - sshPublicKey:
+          source:
+            secret:
+              secretName: {{ include "virtual-machine.fullname" $ }}-ssh-keys
+          propagationMethod:
+            noCloud: {}
+      {{- end }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      {{- range .Values.disks }}
+      - name: disk-{{ .name }}
+        dataVolume:
+          name: {{ .name }}
+      {{- end }}
+      {{- if or .Values.sshKeys .Values.cloudInit }}
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          secretRef:
+            name: {{ include "virtual-machine.fullname" . }}-cloud-init
+      {{- end }}
+      networks:
+      - name: default
+        pod: {}

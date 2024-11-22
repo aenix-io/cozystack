@@ -31,29 +31,38 @@ releases:
       autoDirectNodeRoutes: true
       routingMode: native
 
+- name: cert-manager-crds
+  releaseName: cert-manager-crds
+  chart: cozy-cert-manager-crds
+  namespace: cozy-cert-manager
+  dependsOn: [cilium]
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
   namespace: cozy-cert-manager
-  dependsOn: [cilium]
+  dependsOn: [cert-manager-crds]
 
 - name: cert-manager-issuers
   releaseName: cert-manager-issuers
   chart: cozy-cert-manager-issuers
   namespace: cozy-cert-manager
+  optional: true
   dependsOn: [cilium,cert-manager]
 
 - name: victoria-metrics-operator
   releaseName: victoria-metrics-operator
   chart: cozy-victoria-metrics-operator
   namespace: cozy-victoria-metrics-operator
+  optional: true
   dependsOn: [cilium,cert-manager]
 
-- name: monitoring
-  releaseName: monitoring
-  chart: cozy-monitoring
+- name: monitoring-agents
+  releaseName: monitoring-agents
+  chart: cozy-monitoring-agents
   namespace: cozy-monitoring
   privileged: true
+  optional: true
   dependsOn: [cilium,victoria-metrics-operator]
 
 - name: metallb
@@ -67,48 +76,56 @@ releases:
   releaseName: etcd-operator
   chart: cozy-etcd-operator
   namespace: cozy-etcd-operator
+  optional: true
   dependsOn: [cilium,cert-manager]
 
 - name: grafana-operator
   releaseName: grafana-operator
   chart: cozy-grafana-operator
   namespace: cozy-grafana-operator
+  optional: true
   dependsOn: [cilium]
 
 - name: mariadb-operator
   releaseName: mariadb-operator
   chart: cozy-mariadb-operator
   namespace: cozy-mariadb-operator
+  optional: true
   dependsOn: [cilium,cert-manager,victoria-metrics-operator]
 
 - name: postgres-operator
   releaseName: postgres-operator
   chart: cozy-postgres-operator
   namespace: cozy-postgres-operator
+  optional: true
   dependsOn: [cilium,cert-manager]
 
 - name: kafka-operator
   releaseName: kafka-operator
   chart: cozy-kafka-operator
   namespace: cozy-kafka-operator
+  optional: true
   dependsOn: [cilium]
 
 - name: clickhouse-operator
   releaseName: clickhouse-operator
   chart: cozy-clickhouse-operator
   namespace: cozy-clickhouse-operator
+  optional: true
   dependsOn: [cilium]
 
 - name: rabbitmq-operator
   releaseName: rabbitmq-operator
   chart: cozy-rabbitmq-operator
   namespace: cozy-rabbitmq-operator
+  optional: true
   dependsOn: [cilium]
 
 - name: redis-operator
   releaseName: redis-operator
   chart: cozy-redis-operator
   namespace: cozy-redis-operator
+  optional: true
   dependsOn: [cilium]
 
 - name: piraeus-operator
@@ -127,6 +144,7 @@ releases:
   releaseName: objectstorage-controller
   chart: cozy-objectstorage-controller
   namespace: cozy-objectstorage-controller
+  optional: true
   dependsOn: [cilium]
 
 - name: linstor
@@ -156,3 +174,10 @@ releases:
   namespace: cozy-external-secrets-operator
   optional: true
   dependsOn: [cilium]
+
+- name: keycloak
+  releaseName: keycloak
+  chart: cozy-keycloak
+  namespace: cozy-keycloak
+  optional: true
+  dependsOn: [postgres-operator]

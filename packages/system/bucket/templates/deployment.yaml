@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.bucketName }}-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.bucketName }}-ui
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.bucketName }}-ui
+    spec:
+      containers:
+      - name: s3manager
+        image: "{{ $.Files.Get "images/s3manager.tag" | trim }}"
+        env:
+        - name: ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.bucketName }}-credentials
+              key: endpoint
+        - name: SKIP_SSL_VERIFICATION
+          value: "true"
+        - name: ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.bucketName }}-credentials
+              key: accessKey
+        - name: SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.bucketName }}-credentials
+              key: secretKey

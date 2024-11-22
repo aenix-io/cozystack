@@ -41,11 +41,23 @@ releases:
         SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
         JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
 
+- name: cert-manager-crds
+  releaseName: cert-manager-crds
+  chart: cozy-cert-manager-crds
+  namespace: cozy-cert-manager
+  dependsOn: [cilium, kubeovn]
+
+- name: cozystack-api
+  releaseName: cozystack-api
+  chart: cozy-cozystack-api
+  namespace: cozy-system
+  dependsOn: [cilium,kubeovn]
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
   namespace: cozy-cert-manager
-  dependsOn: [cilium,kubeovn]
+  dependsOn: [cert-manager-crds]
 
 - name: cert-manager-issuers
   releaseName: cert-manager-issuers
@@ -59,9 +71,9 @@ releases:
   namespace: cozy-victoria-metrics-operator
   dependsOn: [cilium,kubeovn,cert-manager]
 
-- name: monitoring
-  releaseName: monitoring
-  chart: cozy-monitoring
+- name: monitoring-agents
+  releaseName: monitoring-agents
+  chart: cozy-monitoring-agents
   namespace: cozy-monitoring
   privileged: true
   dependsOn: [cilium,kubeovn,victoria-metrics-operator]
@@ -78,6 +90,12 @@ releases:
   namespace: cozy-kubevirt
   privileged: true
   dependsOn: [cilium,kubeovn,kubevirt-operator]
+
+- name: kubevirt-instancetypes
+  releaseName: kubevirt-instancetypes
+  chart: cozy-kubevirt-instancetypes
+  namespace: cozy-kubevirt
+  dependsOn: [cilium,kubeovn,kubevirt-operator,kubevirt]
 
 - name: kubevirt-cdi-operator
   releaseName: kubevirt-cdi-operator
@@ -163,7 +181,7 @@ releases:
   releaseName: snapshot-controller
   chart: cozy-snapshot-controller
   namespace: cozy-snapshot-controller
-  dependsOn: [cilium,kubeovn,cert-manager-issuers]  
+  dependsOn: [cilium,kubeovn,cert-manager-issuers]
 
 - name: objectstorage-controller
   releaseName: objectstorage-controller
@@ -231,3 +249,9 @@ releases:
   namespace: cozy-external-secrets-operator
   optional: true
   dependsOn: [cilium,kubeovn]
+
+- name: keycloak
+  releaseName: keycloak
+  chart: cozy-keycloak
+  namespace: cozy-keycloak
+  dependsOn: [postgres-operator]

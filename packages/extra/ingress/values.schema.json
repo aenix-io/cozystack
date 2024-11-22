@@ -30,6 +30,11 @@
             "type": "boolean",
             "description": "Should ingress serve Cozystack service dashboard",
             "default": false
+        },
+        "cdiUploadProxy": {
+            "type": "boolean",
+            "description": "Should ingress serve CDI upload proxy",
+            "default": false
         }
     }
 }
