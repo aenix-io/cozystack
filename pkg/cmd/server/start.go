@@ -18,6 +18,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -37,6 +38,7 @@ import (
 	utilversionpkg "k8s.io/apiserver/pkg/util/version"
 	"k8s.io/component-base/featuregate"
 	baseversion "k8s.io/component-base/version"
+	"k8s.io/kube-openapi/pkg/validation/spec"
 	netutils "k8s.io/utils/net"
 )
 
@@ -156,6 +158,22 @@ func (o AppsServerOptions) Validate(args []string) error {
 	return utilerrors.NewAggregate(allErrors)
 }
 
+// DeepCopySchema делает глубокую копию структуры spec.Schema
+func DeepCopySchema(schema *spec.Schema) (*spec.Schema, error) {
+	data, err := json.Marshal(schema)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal schema: %w", err)
+	}
+
+	var newSchema spec.Schema
+	err = json.Unmarshal(data, &newSchema)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal schema: %w", err)
+	}
+
+	return &newSchema, nil
+}
+
 // Config returns the configuration for the API server based on AppsServerOptions
 func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 	// TODO: set the "real" external address
@@ -165,6 +183,12 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 		return nil, fmt.Errorf("error creating self-signed certificates: %v", err)
 	}
 
+	// First, register the dynamic types
+	err := v1alpha1.RegisterDynamicTypes(apiserver.Scheme, o.ResourceConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to register dynamic types: %v", err)
+	}
+
 	serverConfig := genericapiserver.NewRecommendedConfig(apiserver.Codecs)
 
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(
@@ -172,6 +196,68 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 	)
 	serverConfig.OpenAPIConfig.Info.Title = "Apps"
 	serverConfig.OpenAPIConfig.Info.Version = "0.1"
+
+	serverConfig.OpenAPIConfig.PostProcessSpec = func(swagger *spec.Swagger) (*spec.Swagger, error) {
+		defs := swagger.Definitions
+
+		// Check basic Application definition
+		appDef, exists := defs["com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.Application"]
+		if !exists {
+			return swagger, fmt.Errorf("Application definition not found")
+		}
+
+		// Check basic ApplicationList definition
+		listDef, exists := defs["com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.ApplicationList"]
+		if !exists {
+			return swagger, fmt.Errorf("ApplicationList definition not found")
+		}
+
+		for _, gvk := range v1alpha1.RegisteredGVKs {
+			resourceName := fmt.Sprintf("com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.%s", gvk.Kind)
+			newDef, err := DeepCopySchema(&appDef)
+			if err != nil {
+				return nil, fmt.Errorf("failed to deepcopy schema for %s: %w", gvk.Kind, err)
+			}
+
+			// Fix Extensions for resource
+			if newDef.Extensions == nil {
+				newDef.Extensions = map[string]interface{}{}
+			}
+			newDef.Extensions["x-kubernetes-group-version-kind"] = []map[string]interface{}{
+				{
+					"group":   gvk.Group,
+					"version": gvk.Version,
+					"kind":    gvk.Kind,
+				},
+			}
+			defs[resourceName] = *newDef
+			fmt.Printf("PostProcessSpec: Added OpenAPI definition for %s\n", resourceName)
+
+			// List resource
+			listResourceName := fmt.Sprintf("com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.%sList", gvk.Kind)
+			newListDef, err := DeepCopySchema(&listDef)
+			if err != nil {
+				return nil, fmt.Errorf("failed to deepcopy schema for %sList: %w", gvk.Kind, err)
+			}
+
+			// Fix Extensions for List resource
+			if newListDef.Extensions == nil {
+				newListDef.Extensions = map[string]interface{}{}
+			}
+			newListDef.Extensions["x-kubernetes-group-version-kind"] = []map[string]interface{}{
+				{
+					"group":   gvk.Group,
+					"version": gvk.Version,
+					"kind":    fmt.Sprintf("%sList", gvk.Kind),
+				},
+			}
+			defs[listResourceName] = *newListDef
+			fmt.Printf("PostProcessSpec: Added OpenAPI definition for %s\n", listResourceName)
+		}
+
+		swagger.Definitions = defs
+		return swagger, nil
+	}
 
 	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(
 		sampleopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(apiserver.Scheme),

@@ -28,6 +28,10 @@ import (
 // GroupName holds the API group name.
 const GroupName = "apps.cozystack.io"
 
+var (
+	RegisteredGVKs []schema.GroupVersionKind
+)
+
 // SchemeGroupVersion is group version used to register these objects
 var SchemeGroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1alpha1"}
 
@@ -70,7 +74,7 @@ func RegisterDynamicTypes(scheme *runtime.Scheme, cfg *config.ResourceConfig) er
 		scheme.AddKnownTypeWithName(gvk.GroupVersion().WithKind(kind+"List"), &ApplicationList{})
 
 		log.Printf("Registered kind: %s\n", kind)
-
+		RegisteredGVKs = append(RegisteredGVKs, gvk)
 	}
 
 	return nil
