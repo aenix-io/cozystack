@@ -38,6 +38,7 @@ import (
 	utilversionpkg "k8s.io/apiserver/pkg/util/version"
 	"k8s.io/component-base/featuregate"
 	baseversion "k8s.io/component-base/version"
+	"k8s.io/klog/v2"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 	netutils "k8s.io/utils/net"
 )
@@ -231,7 +232,7 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 				},
 			}
 			defs[resourceName] = *newDef
-			fmt.Printf("PostProcessSpec: Added OpenAPI definition for %s\n", resourceName)
+			klog.V(6).Infof("PostProcessSpec: Added OpenAPI definition for %s\n", resourceName)
 
 			// List resource
 			listResourceName := fmt.Sprintf("com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.%sList", gvk.Kind)
@@ -252,7 +253,7 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 				},
 			}
 			defs[listResourceName] = *newListDef
-			fmt.Printf("PostProcessSpec: Added OpenAPI definition for %s\n", listResourceName)
+			klog.V(6).Infof("PostProcessSpec: Added OpenAPI definition for %s\n", listResourceName)
 		}
 
 		swagger.Definitions = defs

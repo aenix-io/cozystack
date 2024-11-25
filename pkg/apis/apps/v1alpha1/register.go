@@ -17,12 +17,11 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"log"
-
 	"github.com/aenix.io/cozystack/pkg/config"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/klog/v2"
 )
 
 // GroupName holds the API group name.
@@ -73,7 +72,7 @@ func RegisterDynamicTypes(scheme *runtime.Scheme, cfg *config.ResourceConfig) er
 		scheme.AddKnownTypeWithName(gvk, &Application{})
 		scheme.AddKnownTypeWithName(gvk.GroupVersion().WithKind(kind+"List"), &ApplicationList{})
 
-		log.Printf("Registered kind: %s\n", kind)
+		klog.V(1).Infof("Registered kind: %s\n", kind)
 		RegisteredGVKs = append(RegisteredGVKs, gvk)
 	}
 
