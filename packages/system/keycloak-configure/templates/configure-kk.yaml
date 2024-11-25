@@ -3,25 +3,25 @@
 {{- $apiServerAdress := index $cozyConfig.data "api-server-adress" }}
 {{- $k8sClient := randAlphaNum 32 -}}
 
-apiVersion: v1.edp.epam.com/v1
-kind: Keycloak
+apiVersion: v1.edp.epam.com/v1alpha1
+kind: ClusterKeycloak
 metadata:
   name: keycloak-cozy
+  namespace: {{ .Release.Namespace }}
 spec:
   secret: keycloak-credentials
   url: https://keycloak.{{ $host }}
 
 ---
 
-apiVersion: v1.edp.epam.com/v1
-kind: KeycloakRealm
+apiVersion: v1.edp.epam.com/v1alpha1
+kind: ClusterKeycloakRealm
 metadata:
   name: keycloakrealm-cozy
+  namespace: {{ .Release.Namespace }}
 spec:
  realmName: cozy
- keycloakRef:
-   name: keycloak-cozy
-   kind: Keycloak
+ clusterKeycloakRef: keycloak-cozy
 
 ---
 
@@ -33,7 +33,7 @@ spec:
   name: groups
   realmRef:
     name: keycloakrealm-cozy
-    kind: KeycloakRealm
+    kind: ClusterKeycloakRealm
   description: "Group Membership"
   protocol: openid-connect
   protocolMappers:
@@ -68,7 +68,7 @@ spec:
     enabled: true
   realmRef:
     name: keycloakrealm-cozy
-    kind: KeycloakRealm
+    kind: ClusterKeycloakRealm
   secret: $k8s-client:client-secret-key
   advancedProtocolMappers: true
   authorizationServicesEnabled: true

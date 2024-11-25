@@ -261,3 +261,9 @@ releases:
   chart: cozy-keycloak-operator
   namespace: cozy-keycloak
   dependsOn: [keycloak]
+
+- name: keycloak-configure
+  releaseName: keycloak-configure
+  chart: cozy-keycloak-configure
+  namespace: cozy-keycloak
+  dependsOn: [keycloak-operator]

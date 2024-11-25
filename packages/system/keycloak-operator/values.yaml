@@ -1,0 +1,2 @@
+keycloak-operator:
+  clusterReconciliationEnabled: true
