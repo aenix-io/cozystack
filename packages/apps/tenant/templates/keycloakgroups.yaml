@@ -1,0 +1,45 @@
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: {{ include "tenant.name" . }}-view
+spec:
+  name: {{ include "tenant.name" . }}-view
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: KeycloakRealm
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: {{ include "tenant.name" . }}-use
+spec:
+  name: {{ include "tenant.name" . }}-use
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: KeycloakRealm
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: {{ include "tenant.name" . }}-admin
+spec:
+  name: {{ include "tenant.name" . }}-admin
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: KeycloakRealm
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: {{ include "tenant.name" . }}-super-admin
+spec:
+  name: {{ include "tenant.name" . }}-super-admin
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: KeycloakRealm
