@@ -7,7 +7,8 @@ kind: Secret
 metadata:
   name: {{ .Release.Name }}-credentials
 stringData:
-  admin: {{ $password }}
+  username: admin
+  password: {{ $password }}
 
 ---
 
@@ -124,12 +125,4 @@ spec:
               port: http
             initialDelaySeconds: 60
             timeoutSeconds: 1
-      volumes:
-        - name: init-script
-          configMap:
-            name: keycloak-init-script
-      volumeMounts:
-        - name: init-script
-          mountPath: /scripts
-          readOnly: true
       terminationGracePeriodSeconds: 60
