@@ -1,0 +1,27 @@
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmIdentityProvider
+metadata:
+  name: keycloakrealmidentityprovider-sample
+spec:
+  realmRef:
+    kind: KeycloakRealm
+    name: realm
+  alias: instagram
+  authenticateByDefault: false
+  enabled: true
+  firstBrokerLoginFlowAlias: "first broker login"
+  providerId: "instagram"
+  config:
+    clientId: "foo"
+    clientSecret: "$secretName:secretKey"
+    hideOnLoginPage: "true"
+    syncMode: "IMPORT"
+    useJwksUrl: "true"
+  mappers:
+    - name: "test-33221"
+      identityProviderMapper: "hardcoded-attribute-idp-mapper"
+      identityProviderAlias: "instagram"
+      config:
+        attribute: "foo"
+        "attribute.value": "bar"
+        syncMode: "IMPORT"

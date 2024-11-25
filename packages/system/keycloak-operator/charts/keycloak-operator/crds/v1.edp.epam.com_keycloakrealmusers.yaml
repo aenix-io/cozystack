@@ -1,0 +1,157 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+  name: keycloakrealmusers.v1.edp.epam.com
+spec:
+  group: v1.edp.epam.com
+  names:
+    kind: KeycloakRealmUser
+    listKind: KeycloakRealmUserList
+    plural: keycloakrealmusers
+    singular: keycloakrealmuser
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Reconcilation status
+      jsonPath: .status.value
+      name: Status
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: KeycloakRealmUser is the Schema for the keycloak user API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: KeycloakRealmUserSpec defines the desired state of KeycloakRealmUser.
+            properties:
+              attributes:
+                additionalProperties:
+                  type: string
+                description: Attributes is a map of user attributes.
+                nullable: true
+                type: object
+              email:
+                description: Email is a user email.
+                type: string
+              emailVerified:
+                description: EmailVerified is a user email verified flag.
+                type: boolean
+              enabled:
+                description: Enabled is a user enabled flag.
+                type: boolean
+              firstName:
+                description: FirstName is a user first name.
+                type: string
+              groups:
+                description: Groups is a list of groups assigned to user.
+                items:
+                  type: string
+                nullable: true
+                type: array
+              keepResource:
+                default: true
+                description: |-
+                  KeepResource, when set to false, results in the deletion of the KeycloakRealmUser Custom Resource (CR)
+                  from the cluster after the corresponding user is created in Keycloak. The user will continue to exist in Keycloak.
+                  When set to true, the CR will not be deleted after processing.
+                type: boolean
+              lastName:
+                description: LastName is a user last name.
+                type: string
+              password:
+                description: Password is a user password. Allows to keep user password
+                  within Custom Resource. For security concerns, it is recommended
+                  to use PasswordSecret instead.
+                type: string
+              passwordSecret:
+                description: PasswordSecret defines Kubernetes secret Name and Key,
+                  which holds User secret.
+                nullable: true
+                properties:
+                  key:
+                    description: Key is the key in the secret.
+                    type: string
+                  name:
+                    description: Name is the name of the secret.
+                    type: string
+                required:
+                - key
+                - name
+                type: object
+              realm:
+                description: |-
+                  Deprecated: use RealmRef instead.
+                  Realm is name of KeycloakRealm custom resource.
+                type: string
+              realmRef:
+                description: RealmRef is reference to Realm custom resource.
+                properties:
+                  kind:
+                    description: Kind specifies the kind of the Keycloak resource.
+                    enum:
+                    - KeycloakRealm
+                    - ClusterKeycloakRealm
+                    type: string
+                  name:
+                    description: Name specifies the name of the Keycloak resource.
+                    type: string
+                type: object
+              reconciliationStrategy:
+                description: |-
+                  ReconciliationStrategy is a strategy for reconciliation. Possible values: full, create-only.
+                  Default value: full. If set to create-only, user will be created only if it does not exist. If user exists, it will not be updated.
+                  If set to full, user will be created if it does not exist, or updated if it exists.
+                type: string
+              requiredUserActions:
+                description: 'RequiredUserActions is required action when user log
+                  in, example: CONFIGURE_TOTP, UPDATE_PASSWORD, UPDATE_PROFILE, VERIFY_EMAIL.'
+                items:
+                  type: string
+                nullable: true
+                type: array
+              roles:
+                description: Roles is a list of roles assigned to user.
+                items:
+                  type: string
+                nullable: true
+                type: array
+              username:
+                description: Username is a username in keycloak.
+                type: string
+            required:
+            - username
+            type: object
+          status:
+            description: KeycloakRealmUserStatus defines the observed state of KeycloakRealmUser.
+            properties:
+              failureCount:
+                format: int64
+                type: integer
+              value:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

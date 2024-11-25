@@ -181,3 +181,10 @@ releases:
   namespace: cozy-keycloak
   optional: true
   dependsOn: [postgres-operator]
+
+- name: keycloak-operator
+  releaseName: keycloak-operator
+  chart: cozy-keycloak-operator
+  namespace: cozy-keycloak
+  optional: true
+  dependsOn: [keycloak]
