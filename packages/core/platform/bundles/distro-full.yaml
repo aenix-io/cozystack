@@ -188,3 +188,10 @@ releases:
   namespace: cozy-keycloak
   optional: true
   dependsOn: [keycloak]
+
+- name: keycloak-configure
+  releaseName: keycloak-configure
+  chart: cozy-keycloak-configure
+  namespace: cozy-keycloak
+  optional: true
+  dependsOn: [keycloak-operator]
