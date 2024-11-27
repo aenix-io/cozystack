@@ -2,6 +2,9 @@
 {{- $host := index $cozyConfig.data "root-host" }}
 {{- $apiServerAdress := index $cozyConfig.data "api-server-adress" }}
 {{- $k8sClient := randAlphaNum 32 -}}
+{{- $kubeappsClient := randAlphaNum 32 -}}
+{{- $rootSaConfigMap := lookup "v1" "ConfigMap" "kube-system" "kube-root-ca.crt" }}
+{{- $k8sCa := index $rootSaConfigMap.data "ca.crt" | b64enc  }}
 
 apiVersion: v1.edp.epam.com/v1alpha1
 kind: ClusterKeycloak
@@ -20,8 +23,8 @@ metadata:
   name: keycloakrealm-cozy
   namespace: {{ .Release.Namespace }}
 spec:
- realmName: cozy
- clusterKeycloakRef: keycloak-cozy
+  realmName: cozy
+  clusterKeycloakRef: keycloak-cozy
 
 ---
 
@@ -36,6 +39,7 @@ spec:
     kind: ClusterKeycloakRealm
   description: "Group Membership"
   protocol: openid-connect
+  default: true
   protocolMappers:
     - name: groups
       protocol: openid-connect
@@ -46,6 +50,8 @@ spec:
         "full.path": "false"
         "id.token.claim": "true"
         "userinfo.token.claim": "true"
+  attributes:
+    "include.in.token.scope": "true"
 
 ---
 
@@ -84,3 +90,152 @@ spec:
   redirectUris:
     - http://localhost:18000
     - http://localhost:8000
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClientScope
+metadata:
+  name: kubernetes-client
+spec:
+  name: kubernetes-client
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+  description: "kubernetes-client"
+  protocol: openid-connect
+  default: true
+  attributes:
+    "include.in.token.scope": "true"
+  protocolMappers:
+    - name: audience
+      protocol: openid-connect
+      protocolMapper: "oidc-audience-mapper"
+      config:
+        "included.client.audience": "kubernetes"
+        "id.token.claim": "true"
+        "access.token.claim": "true"
+        "lightweight.claim": "false"
+        "introspection.token.claim": "true"
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubeapps-client
+type: Opaque
+stringData:
+  client-secret-key: {{ $kubeappsClient }}
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClient
+metadata:
+  name: kubeapps-client
+spec:
+  serviceAccount:
+    enabled: true
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+  secret: $kubeapps-client:client-secret-key
+  advancedProtocolMappers: true
+  authorizationServicesEnabled: true
+  name: kubeapps
+  clientId: kubeapps
+  directAccess: true
+  public: false
+  webUrl: "https://dashboard.{{ $host }}"
+  defaultClientScopes:
+    - groups
+    - kubernetes-client
+  redirectUris:
+    - "http://dashboard.{{ $host }}/oauth2/callback/*"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubeapps-auth-config
+  namespace: cozy-dashboard
+data:
+  values.yaml: |
+    kubeapps:
+      authProxy:
+        enabled: true
+        provider: "oidc"
+        clientID: "kubeapps"
+        clientSecret: {{ $kubeappsClient }}
+        cookieSecret: {{ randAlphaNum 16 | b64enc | quote }}
+        extraFlags:
+          - --ssl-insecure-skip-verify
+          - --cookie-secure=false
+          - --scope=openid email groups
+          - --oidc-issuer-url=https://keycloak.{{ $host }}/realms/cozy
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: kubeapps-admin
+  namespace: {{ include "tenant.name" . }}
+spec:
+  name: kubeapps-admin
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tenant-root-dashboard-resources
+  namespace: tenant-root
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  resourceNames:
+  - kubeconfig
+  verbs: ["get", "list", "watch"]
+
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubeconfig
+  namespace: tenant-root
+stringData:
+  kubeconfig: |
+    apiVersion: v1
+    clusters:
+    - cluster:
+        server: https://{{ $apiServerAdress }}:6443
+        certificate-authority-data: {{ $k8sCa }}
+      name: cluster
+    contexts:
+    - context:
+        cluster: cluster
+        user: keycloak
+      name: default
+    current-context: default
+    users:
+    - name: keycloak
+      user:
+        exec:
+          apiVersion: client.authentication.k8s.io/v1beta1
+          args:
+          - oidc-login
+          - get-token
+          - --oidc-issuer-url=https://keycloak.{{ $host }}/realms/cozy
+          - --oidc-client-id=kubernetes
+          - --oidc-client-secret={{ $k8sClient | quote }}
+          command: kubectl

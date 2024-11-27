@@ -1,4 +1,8 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $host := index $cozyConfig.data "root-host" }}
+{{- if not $host }}
+{{- fail "ERROR need root-host in cozystack ConfigMap" }}
+{{- end }}
 
 releases:
 - name: fluxcd-operator
@@ -200,11 +204,14 @@ releases:
   releaseName: dashboard
   chart: cozy-dashboard
   namespace: cozy-dashboard
-  dependsOn: [cilium,kubeovn]
+  dependsOn: [cilium,kubeovn,keycloak-configure]
+  valuesFrom:
+    - kind: ConfigMap
+      name: kubeapps-auth-config
+      valuesKey: values.yaml
   {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
   {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
   values:
-    kubeapps:
       redis:
         master:
           podAnnotations:
