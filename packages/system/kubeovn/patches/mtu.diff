@@ -1,0 +1,14 @@
+diff --git a/packages/system/kubeovn/charts/kube-ovn/templates/ovncni-ds.yaml b/packages/system/kubeovn/charts/kube-ovn/templates/ovncni-ds.yaml
+index c6834ef..423f66b 100644
+--- a/packages/system/kubeovn/charts/kube-ovn/templates/ovncni-ds.yaml
++++ b/packages/system/kubeovn/charts/kube-ovn/templates/ovncni-ds.yaml
+@@ -76,6 +76,9 @@ spec:
+           - --kubelet-dir={{ .Values.kubelet_conf.KUBELET_DIR }}
+           - --enable-tproxy={{ .Values.func.ENABLE_TPROXY }}
+           - --ovs-vsctl-concurrency={{ .Values.performance.OVS_VSCTL_CONCURRENCY }}
++          {{- with .Values.mtu }}
++          - --mtu={{ . }}
++          {{- end }}
+         securityContext:
+           runAsUser: 0
+           privileged: true
