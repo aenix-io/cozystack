@@ -237,5 +237,7 @@ stringData:
           - get-token
           - --oidc-issuer-url=https://keycloak.{{ $host }}/realms/cozy
           - --oidc-client-id=kubernetes
-          - --oidc-client-secret={{ $k8sClient | quote }}
+          - --oidc-client-secret={{ $k8sClient }}
+          - --skip-open-browser
+          - --grant-type=password
           command: kubectl
