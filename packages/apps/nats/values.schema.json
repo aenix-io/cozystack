@@ -2,34 +2,45 @@
     "title": "Chart Values",
     "type": "object",
     "properties": {
-      "external": {
-        "type": "boolean",
-        "description": "Enable external access from outside the cluster",
-        "default": false
-      },
-      "replicas": {
-        "type": "number",
-        "description": "Persistent Volume size for NATS",
-        "default": 2
-      },
-      "storageClass": {
-        "type": "string",
-        "description": "StorageClass used to store the data",
-        "default": ""
-      },
-      "users": {
-        "type": "object",
-        "description": "Users configuration",
-        "additionalProperties": {
-          "type": "object",
-          "properties": {
-            "password": {
-              "type": "string",
-              "description": "Password for the user"
-            }
-          }
+        "external": {
+            "type": "boolean",
+            "description": "Enable external access from outside the cluster",
+            "default": false
         },
-        "default": {}
-      }
+        "replicas": {
+            "type": "number",
+            "description": "Persistent Volume size for NATS",
+            "default": 2
+        },
+        "storageClass": {
+            "type": "string",
+            "description": "StorageClass used to store the data",
+            "default": ""
+        },
+        "jetstream": {
+            "type": "object",
+            "properties": {
+                "size": {
+                    "type": "string",
+                    "description": "Jetstream persistent storage size",
+                    "default": "10Gi"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable or disable Jetstream",
+                    "default": true
+                }
+            }
+        },
+        "config": {
+            "type": "object",
+            "properties": {
+                "merge": {
+                    "type": "object",
+                    "description": "Additional configuration to merge into NATS config",
+                    "default": {}
+                }
+            }
+        }
     }
-  }
+}
