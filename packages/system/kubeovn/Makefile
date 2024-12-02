@@ -11,6 +11,7 @@ update:
 	curl -sSL https://github.com/kubeovn/kube-ovn/archive/refs/heads/master.tar.gz | \
 	tar xzvf - --strip 1 kube-ovn-master/charts
 	patch --no-backup-if-mismatch -p4 < patches/cozyconfig.diff
+	patch --no-backup-if-mismatch -p4 < patches/mtu.diff
 
 image:
 	docker buildx build images/kubeovn \
