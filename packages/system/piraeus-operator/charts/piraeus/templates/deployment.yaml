@@ -93,8 +93,12 @@ spec:
       serviceAccountName: {{ include "piraeus-operator.serviceAccountName" . }}
       terminationGracePeriodSeconds: 10
       priorityClassName: {{ .Values.priorityClassName | default "system-cluster-critical" }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
       volumes:
       - name: cert
         secret:
