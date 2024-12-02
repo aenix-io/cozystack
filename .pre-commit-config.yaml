@@ -1,6 +1,6 @@
 repos:
--   repo: local
-    hooks:
+- repo: local
+  hooks:
     - id: gen-versions-map
       name: Generate versions map and check for changes
       entry: sh -c 'make -C packages/apps check-version-map && make -C packages/extra check-version-map'
@@ -8,3 +8,16 @@ repos:
       types: [file]
       pass_filenames: false
       description: Run the script and fail if it generates changes
+    - id: run-make-generate
+      name: Run 'make generate' in all app directories
+      entry: |
+        /bin/bash -c '
+          for dir in ./packages/apps/*/; do
+            if [ -d "$dir" ]; then
+              echo "Running make generate in $dir"
+              (cd "$dir" && make generate)
+            fi
+          done
+        '
+      language: script
+      files: ^.*$
