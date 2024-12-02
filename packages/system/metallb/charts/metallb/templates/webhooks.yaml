@@ -11,26 +11,6 @@ webhooks:
     service:
       name: metallb-webhook-service
       namespace: {{ .Release.Namespace }}
-      path: /validate-metallb-io-v1beta1-addresspool
-  failurePolicy: {{ .Values.crds.validationFailurePolicy }}
-  name: addresspoolvalidationwebhook.metallb.io
-  rules:
-  - apiGroups:
-    - metallb.io
-    apiVersions:
-    - v1beta1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - addresspools
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: metallb-webhook-service
-      namespace: {{ .Release.Namespace }}
       path: /validate-metallb-io-v1beta2-bgppeer
   failurePolicy: {{ .Values.crds.validationFailurePolicy }}
   name: bgppeervalidationwebhook.metallb.io
@@ -150,6 +130,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: metallb-webhook-service
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "metallb.labels" . | nindent 4 }}
 spec:
@@ -163,6 +144,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: webhook-server-cert
+  name: metallb-webhook-cert
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "metallb.labels" . | nindent 4 }}

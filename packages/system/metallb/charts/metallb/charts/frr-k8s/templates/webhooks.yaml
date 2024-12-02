@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "frrk8s.fullname" . }}-webhook-server
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "frrk8s.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frr-k8s-webhook-server
+    {{- range $key, $value := .Values.frrk8s.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: frr-k8s-webhook-server
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: frr-k8s-webhook-server
+      labels:
+        app.kubernetes.io/component: frr-k8s-webhook-server
+    spec:
+      {{- if .Values.frrk8s.runtimeClassName }}
+      runtimeClassName: {{ .Values.frrk8s.runtimeClassName }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - command:
+        - /frr-k8s
+        args:
+        {{- with .Values.frrk8s.logLevel }}
+        - --log-level={{ . }}
+        {{- end }}
+        - "--webhook-mode=onlywebhook"
+        {{- if .Values.frrk8s.disableCertRotation }}
+        - "--disable-cert-rotation=true"
+        {{- end }}
+        {{- if .Values.frrk8s.restartOnRotatorSecretRefresh }}
+        - "--restart-on-rotator-secret-refresh=true"
+        {{- end }}
+        - "--namespace=$(NAMESPACE)"
+        - --health-probe-bind-address=:8081
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: {{ .Values.frrk8s.image.repository }}:{{ .Values.frrk8s.image.tag | default .Chart.AppVersion }}
+        {{- if .Values.frrk8s.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.frrk8s.image.pullPolicy }}
+        {{- end }}
+        name: frr-k8s-webhook-server
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
+        {{- if .Values.frrk8s.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: {{ .Values.frrk8s.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.frrk8s.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.frrk8s.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.frrk8s.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: {{ .Values.frrk8s.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.frrk8s.readinessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.frrk8s.readinessProbe.failureThreshold }}
+        {{- end }}
+        {{- with .Values.frrk8s.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        - name: cert
+          mountPath: /tmp/k8s-webhook-server/serving-certs
+          readOnly: true
+      {{- with .Values.frrk8s.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.frrk8s.tolerateMaster .Values.frrk8s.tolerations }}
+      tolerations:
+      {{- if .Values.frrk8s.tolerateMaster }}
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+        operator: Exists
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+        operator: Exists
+      {{- end }}
+      {{- with .Values.frrk8s.tolerations }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.frrk8s.priorityClassName }}
+      priorityClassName: {{ . | quote }}
+      {{- end }}
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: frr-k8s-webhook-server-cert
+      serviceAccountName: {{ template "frrk8s.serviceAccountName" . }}
+      terminationGracePeriodSeconds: 10
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: frr-k8s-webhook-server-cert
+  namespace: {{ .Release.Namespace | quote }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frr-k8s-webhook-service
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  ports:
+  - port: 443
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/component: frr-k8s-webhook-server
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: frr-k8s-validating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: frr-k8s-webhook-service
+      namespace: {{ .Release.Namespace }}
+      path: /validate-frrk8s-metallb-io-v1beta1-frrconfiguration
+  failurePolicy: {{ .Values.crds.validationFailurePolicy }}
+  name: frrconfigurationsvalidationwebhook.metallb.io
+  rules:
+  - apiGroups:
+    - frrk8s.metallb.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - frrconfigurations
+  sideEffects: None
