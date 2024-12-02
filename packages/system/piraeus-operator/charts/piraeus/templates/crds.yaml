@@ -830,6 +830,19 @@ spec:
                       The daemon uses the TLS certificate and key to establish secure connections on behalf of DRBD.
                     type: boolean
                 type: object
+              ipFamilies:
+                description: |-
+                  IPFamilies configures the IP Family (IPv4 or IPv6) to use to connect to the LINSTOR Satellite.
+
+                  If set, the control traffic between LINSTOR Controller and Satellite will use only the given IP Family.
+                  If not set, the Operator will configure all families found in the Satellites Pods' Status.
+                items:
+                  description: IPFamily represents the IP Family (IPv4 or IPv6).
+                  enum:
+                  - IPv4
+                  - IPv6
+                  type: string
+                type: array
               nodeAffinity:
                 description: |-
                   NodeAffinity selects which LinstorSatellite resources this spec should be applied to.
@@ -1426,6 +1439,19 @@ spec:
                       The daemon uses the TLS certificate and key to establish secure connections on behalf of DRBD.
                     type: boolean
                 type: object
+              ipFamilies:
+                description: |-
+                  IPFamilies configures the IP Family (IPv4 or IPv6) to use to connect to the LINSTOR Satellite.
+
+                  If set, the control traffic between LINSTOR Controller and Satellite will use only the given IP Family.
+                  If not set, the Operator will configure all families found in the Satellites Pods' Status.
+                items:
+                  description: IPFamily represents the IP Family (IPv4 or IPv6).
+                  enum:
+                  - IPv4
+                  - IPv6
+                  type: string
+                type: array
               patches:
                 description: |-
                   Patches is a list of kustomize patches to apply.
