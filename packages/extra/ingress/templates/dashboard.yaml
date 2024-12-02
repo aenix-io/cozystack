@@ -10,9 +10,13 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    {{- if eq $issuerType "cloudflare" }} 
+    {{- if eq $issuerType "cloudflare" }}
     {{- else }}
     acme.cert-manager.io/http01-ingress-class: {{ .Release.Namespace }}
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 100m
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+    nginx.ingress.kubernetes.io/client-max-body-size: 100m
     {{- end }}
   name: dashboard-{{ .Release.Namespace }}
   namespace: cozy-dashboard

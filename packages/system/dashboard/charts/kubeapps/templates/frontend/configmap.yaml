@@ -139,7 +139,7 @@ data:
 
       location /logos {
         # Add the Authorization header if exists
-        add_header Authorization $http_authorization;
+        proxy_set_header Cookie "";
         proxy_pass http://cozystack.cozy-system.svc:80;
       }
     }

@@ -2,6 +2,12 @@
 {{- $bundleName := index $cozyConfig.data "bundle-name" }}
 {{- $bundle := tpl (.Files.Get (printf "bundles/%s.yaml" $bundleName)) . | fromYaml }}
 {{- $host := "example.org" }}
+{{- $host := "example.org" }}
+{{- if $cozyConfig.data }}
+  {{- if hasKey $cozyConfig.data "root-host" }}
+    {{- $host = index $cozyConfig.data "root-host" }}
+  {{- end }}
+{{- end }}
 {{- $tenantRoot := list }}
 {{- if .Capabilities.APIVersions.Has "helm.toolkit.fluxcd.io/v2" }}
 {{- $tenantRoot = lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" "tenant-root" "tenant-root" }}
