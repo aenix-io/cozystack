@@ -1,2 +1,2 @@
 cozystackAPI:
-  image: ghcr.io/aenix-io/cozystack/cozystack-api:latest@sha256:96d277a34aff6d9847251da521ca86615af2aae370ec095d046112bc4044ddea
+  image: ghcr.io/aenix-io/cozystack/cozystack-api:v0.19.0@sha256:ae79f91f8cd9d5f379cda70c6beddb9fdb508082523b652fc42eb89e9500e964
