@@ -1,3 +1,6 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $oidcEnabled := index $cozyConfig.data "oidc-enabled" }}
+{{- if $oidcEnabled }}
 apiVersion: v1.edp.epam.com/v1
 kind: KeycloakRealmGroup
 metadata:
@@ -47,3 +50,4 @@ spec:
   realmRef:
     name: keycloakrealm-cozy
     kind: ClusterKeycloakRealm
+{{- end }}
