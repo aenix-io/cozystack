@@ -1,6 +1,9 @@
 metallb:
   crds:
     enabled: true
+  speaker:
+    frr:
+      enabled: false
 
   #speaker:
   #  tolerateMaster: false
