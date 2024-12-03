@@ -1,4 +1,0 @@
-FRR-k8s is now running in the cluster.
-
-Now you can configure it via its CRs. Please refer to the frr-k8s official docs
-on how to use the CRs.
