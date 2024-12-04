@@ -174,3 +174,16 @@ data:
           - --cookie-secure=false
           - --scope=openid email groups
           - --oidc-issuer-url=https://keycloak.{{ $host }}/realms/cozy
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: kubeapps-admin
+  namespace: cozy-dashboard
+spec:
+  name: kubeapps-admin
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
