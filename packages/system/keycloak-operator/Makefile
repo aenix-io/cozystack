@@ -1,3 +1,7 @@
+export NAME=keycloak-operator
+export NAMESPACE=cozy-keycloak
+
+include ../../../scripts/common-envs.mk
 include ../../../scripts/package.mk
 
 update:
