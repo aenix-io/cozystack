@@ -7,25 +7,19 @@
 {{- $existingKubeappsSecret := lookup "v1" "Secret" .Release.Namespace "kubeapps-client" }}
 {{- $existingAuthConfig := lookup "v1" "Secret" "cozy-dashboard" "kubeapps-auth-config" }}
 
-{{ $k8sClient := "" }}
+{{ $k8sClient := randAlphaNum 32 }}
 {{- if $existingK8sSecret }}
   {{- $k8sClient = index $existingK8sSecret.data "client-secret-key" | b64dec }}
-{{- else }}
-  {{- $k8sClient = randAlphaNum 32 }}
 {{- end }}
 
-{{ $kubeappsClient := "" }}
+{{ $kubeappsClient := randAlphaNum 32 }}
 {{- if $existingKubeappsSecret }}
   {{- $kubeappsClient = index $existingKubeappsSecret.data "client-secret-key" | b64dec }}
-{{- else }}
-  {{- $kubeappsClient = randAlphaNum 32 }}
 {{- end }}
 
-{{ $cookieSecret := "" }}
+{{ $cookieSecret := randAlphaNum 16 }}
 {{- if $existingAuthConfig }}
   {{- $cookieSecret = index $existingAuthConfig.data "cookieSecret" | b64dec }}
-{{- else }}
-  {{- $cookieSecret = randAlphaNum 16 }}
 {{- end }}
 
 ---
