@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/s3manager:v0.5.0@sha256:6a33bc3bb8e64ce7acb805d911cceb893e7cdcc9dcb47249d26287c2ea78757d
+ghcr.io/aenix-io/cozystack/s3manager:v0.5.0@sha256:b8891879e6f150a0e15afd00cd6aae1f024a245bbcca3d4569e6e3d71f512c3f
