@@ -1,7 +1,12 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $oidcEnabled := index $cozyConfig.data "oidc-enabled" }}
 {{- $host := index $cozyConfig.data "root-host" }}
 {{- if not $host }}
 {{- fail "ERROR need root-host in cozystack ConfigMap" }}
+{{- end }}
+{{- $apiServerEndpoint := index $cozyConfig.data "api-server-endpoint" }}
+{{- if not $apiServerEndpoint }}
+{{- fail "ERROR need api-server-endpoint in cozystack ConfigMap" }}
 {{- end }}
 
 releases:
@@ -205,10 +210,6 @@ releases:
   chart: cozy-dashboard
   namespace: cozy-dashboard
   dependsOn: [cilium,kubeovn,keycloak-configure]
-  valuesFrom:
-    - kind: ConfigMap
-      name: kubeapps-auth-config
-      valuesKey: values.yaml
   {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
   {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
   values:
@@ -221,6 +222,15 @@ releases:
             {{- end }}
             {{- end }}
   {{- end }}
+  {{- end }}
+  {{- if $oidcEnabled }}
+  dependsOn: [keycloak-configure]
+  valuesFrom:
+    - kind: ConfigMap
+      name: kubeapps-auth-config
+      valuesKey: values.yaml
+  {{- else }}
+  dependsOn: []
   {{- end }}
 
 - name: kamaji
@@ -257,6 +267,7 @@ releases:
   optional: true
   dependsOn: [cilium,kubeovn]
 
+{{- if $oidcEnabled }}
 - name: keycloak
   releaseName: keycloak
   chart: cozy-keycloak
@@ -274,3 +285,4 @@ releases:
   chart: cozy-keycloak-configure
   namespace: cozy-keycloak
   dependsOn: [keycloak-operator]
+{{- end }}

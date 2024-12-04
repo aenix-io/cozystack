@@ -1,6 +1,5 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 {{- $host := index $cozyConfig.data "root-host" }}
-{{- $apiServerAdress := index $cozyConfig.data "api-server-adress" }}
 {{- $k8sClient := randAlphaNum 32 -}}
 {{- $kubeappsClient := randAlphaNum 32 -}}
 {{- $rootSaConfigMap := lookup "v1" "ConfigMap" "kube-system" "kube-root-ca.crt" }}
@@ -82,7 +81,7 @@ spec:
   clientId: kubernetes
   directAccess: true
   public: false
-  webUrl: https://{{ $apiServerAdress }}/oauth2/callback
+  webUrl: https://localhost:8000/oauth2/callback
   webOrigins:
     - /*
   defaultClientScopes:
@@ -175,69 +174,3 @@ data:
           - --cookie-secure=false
           - --scope=openid email groups
           - --oidc-issuer-url=https://keycloak.{{ $host }}/realms/cozy
-
----
-
-apiVersion: v1.edp.epam.com/v1
-kind: KeycloakRealmGroup
-metadata:
-  name: kubeapps-admin
-  namespace: {{ include "tenant.name" . }}
-spec:
-  name: kubeapps-admin
-  realmRef:
-    name: keycloakrealm-cozy
-    kind: ClusterKeycloakRealm
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: tenant-root-dashboard-resources
-  namespace: tenant-root
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  resourceNames:
-  - kubeconfig
-  verbs: ["get", "list", "watch"]
-
-
----
-
-apiVersion: v1
-kind: Secret
-metadata:
-  name: kubeconfig
-  namespace: tenant-root
-stringData:
-  kubeconfig: |
-    apiVersion: v1
-    clusters:
-    - cluster:
-        server: https://{{ $apiServerAdress }}:6443
-        certificate-authority-data: {{ $k8sCa }}
-      name: cluster
-    contexts:
-    - context:
-        cluster: cluster
-        user: keycloak
-      name: default
-    current-context: default
-    users:
-    - name: keycloak
-      user:
-        exec:
-          apiVersion: client.authentication.k8s.io/v1beta1
-          args:
-          - oidc-login
-          - get-token
-          - --oidc-issuer-url=https://keycloak.{{ $host }}/realms/cozy
-          - --oidc-client-id=kubernetes
-          - --oidc-client-secret={{ $k8sClient }}
-          - --skip-open-browser
-          - --grant-type=password
-          command: kubectl
