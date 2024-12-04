@@ -1,9 +1,67 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 {{- $host := index $cozyConfig.data "root-host" }}
-{{- $k8sClient := randAlphaNum 32 -}}
-{{- $kubeappsClient := randAlphaNum 32 -}}
 {{- $rootSaConfigMap := lookup "v1" "ConfigMap" "kube-system" "kube-root-ca.crt" }}
-{{- $k8sCa := index $rootSaConfigMap.data "ca.crt" | b64enc  }}
+{{- $k8sCa := index $rootSaConfigMap.data "ca.crt" | b64enc }}
+
+{{- $existingK8sSecret := lookup "v1" "Secret" .Release.Namespace "k8s-client" }}
+{{- $existingKubeappsSecret := lookup "v1" "Secret" .Release.Namespace "kubeapps-client" }}
+{{- $existingAuthConfig := lookup "v1" "Secret" "cozy-dashboard" "kubeapps-auth-config" }}
+
+{{ $k8sClient := "" }}
+{{- if $existingK8sSecret }}
+  {{- $k8sClient := index $existingK8sSecret.data "client-secret-key" | b64dec }}
+{{- else }}
+  {{- $k8sClient := randAlphaNum 32 }}
+{{- end }}
+
+{{ $kubeappsClient := "" }}
+{{- if $existingKubeappsSecret }}
+  {{- $kubeappsClient := index $existingKubeappsSecret.data "client-secret-key" | b64dec }}
+{{- else }}
+  {{- $kubeappsClient := randAlphaNum 32 }}
+{{- end }}
+
+{{ $cookieSecret := "" }}
+{{- if $existingAuthConfig }}
+  {{- $cookieSecret := index $existingAuthConfig.data "cookieSecret" | b64dec }}
+{{- else }}
+  {{- $cookieSecret := randAlphaNum 16 }}
+{{- end }}
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: k8s-client
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+data:
+  client-secret-key: {{ $k8sClient | b64enc }}
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubeapps-client
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+data:
+  client-secret-key: {{ $kubeappsClient | b64enc }}
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubeapps-auth-config
+  namespace: cozy-dashboard
+type: Opaque
+data:
+  cookieSecret: {{ $cookieSecret | b64enc }}
+
+---
 
 apiVersion: v1.edp.epam.com/v1alpha1
 kind: ClusterKeycloak
@@ -53,14 +111,6 @@ spec:
     "include.in.token.scope": "true"
 
 ---
-
-apiVersion: v1
-kind: Secret
-metadata:
-  name: k8s-client
-type: Opaque
-stringData:
-  client-secret-key: {{ $k8sClient }}
 
 ---
 
@@ -119,16 +169,6 @@ spec:
 
 ---
 
-apiVersion: v1
-kind: Secret
-metadata:
-  name: kubeapps-client
-type: Opaque
-stringData:
-  client-secret-key: {{ $kubeappsClient }}
-
----
-
 apiVersion: v1.edp.epam.com/v1
 kind: KeycloakClient
 metadata:
@@ -168,7 +208,7 @@ data:
         provider: "oidc"
         clientID: "kubeapps"
         clientSecret: {{ $kubeappsClient }}
-        cookieSecret: {{ randAlphaNum 16 | b64enc | quote }}
+        cookieSecret: {{ $cookieSecret }}
         extraFlags:
           - --ssl-insecure-skip-verify
           - --cookie-secure=false
