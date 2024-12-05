@@ -503,6 +503,31 @@ spec:
                     type: string
                 qosPolicy:
                   type: string
+                bgpSpeaker:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                    asn:
+                      type: integer
+                    remoteAsn:
+                      type: integer
+                    neighbors:
+                      type: array
+                      items:
+                        type: string
+                    holdTime:
+                      type: string
+                    routerId:
+                      type: string
+                    password:
+                      type: string
+                    enableGracefulRestart:
+                      type: boolean
+                    extraArgs:
+                      type: array
+                      items:
+                        type: string
                 tolerations:
                   type: array
                   items:
@@ -1300,7 +1325,11 @@ spec:
                   type: boolean
                 v4Eip:
                   type: string
+                v6Eip:
+                  type: string
                 v4Ip:
+                  type: string
+                v6Ip:
                   type: string
                 vpc:
                   type: string
@@ -1493,7 +1522,11 @@ spec:
                   type: boolean
                 v4Eip:
                   type: string
+                v6Eip:
+                  type: string
                 v4Ip:
+                  type: string
+                v6Ip:
                   type: string
                 vpc:
                   type: string
@@ -1570,12 +1603,17 @@ spec:
         - jsonPath: .spec.namespaces
           name: Namespaces
           type: string
+        - jsonPath: .status.defaultLogicalSwitch
+          name: DefaultSubnet
+          type: string
       name: v1
       schema:
         openAPIV3Schema:
           properties:
             spec:
               properties:
+                defaultSubnet:
+                  type: string
                 enableExternal:
                   type: boolean
                 enableBfd:
@@ -1976,6 +2014,10 @@ spec:
                   type: string
                 u2oInterconnectionVPC:
                   type: string
+                mcastQuerierIP:
+                  type: string
+                mcastQuerierMAC:
+                  type: string
                 v4usingIPrange:
                   type: string
                 v4availableIPrange:
@@ -2156,6 +2198,28 @@ spec:
                   type: boolean
                 routeTable:
                   type: string
+                namespaceSelectors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      matchLabels:
+                        type: object
+                        additionalProperties:
+                          type: string
+                      matchExpressions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            operator:
+                              type: string
+                            values:
+                              type: array
+                              items:
+                                type: string
   scope: Cluster
   names:
     plural: subnets
