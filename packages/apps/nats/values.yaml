@@ -15,3 +15,25 @@ storageClass: ""
 ##     password: strongpassword
 ##   user2: {}
 users: {}
+
+jetstream:
+  ## @param jetstream.size Jetstream persistent storage size
+  ## Specifies the size of the persistent storage for Jetstream (message store).
+  ## Default: 10Gi
+  size: 10Gi
+
+  ## @param jetstream.enabled Enable or disable Jetstream
+  ## Set to true to enable Jetstream for persistent messaging in NATS.
+  ## Default: true
+  enabled: true
+
+config:
+  ## @param config.merge Additional configuration to merge into NATS config
+  ## Allows you to customize NATS server settings by merging additional configurations.
+  ## For example, you can add extra parameters, configure authentication, or set custom settings.
+  ## Default: {}
+  merge: {}
+  ## @param config.resolver Additional configuration to merge into NATS config
+  ## Allows you to customize NATS server settings by merging resolver configurations.
+  ## Default: {}
+  resolver: {}
