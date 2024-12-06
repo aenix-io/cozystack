@@ -32,8 +32,32 @@ config:
   ## Allows you to customize NATS server settings by merging additional configurations.
   ## For example, you can add extra parameters, configure authentication, or set custom settings.
   ## Default: {}
+  ## example:
+  ##
+  ##   merge:
+  ##     $include: ./my-config.conf
+  ##     zzz$include: ./my-config-last.conf
+  ##     server_name: nats
+  ##     authorization:
+  ##       token: << $TOKEN >>
+  ##     jetstream:
+  ##       max_memory_store: << 1GB >>
+  ##
+  ## will yield the config:
+  ## {
+  ##   include ./my-config.conf;
+  ##   "authorization": {
+  ##     "token": $TOKEN
+  ##   },
+  ##   "jetstream": {
+  ##     "max_memory_store": 1GB
+  ##   },
+  ##   "server_name": "nats",
+  ##   include ./my-config-last.conf;
+  ## }
   merge: {}
   ## @param config.resolver Additional configuration to merge into NATS config
   ## Allows you to customize NATS server settings by merging resolver configurations.
   ## Default: {}
+  ## Example see: https://github.com/nats-io/k8s/blob/main/helm/charts/nats/values.yaml#L247
   resolver: {}
