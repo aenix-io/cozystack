@@ -1,0 +1,22 @@
+diff --git a/pkg/controller/kubevirteps/kubevirteps_controller.go b/pkg/controller/kubevirteps/kubevirteps_controller.go
+index a3c1aa33..1e76e6cc 100644
+--- a/pkg/controller/kubevirteps/kubevirteps_controller.go
++++ b/pkg/controller/kubevirteps/kubevirteps_controller.go
+@@ -413,10 +413,14 @@ func (c *Controller) reconcileByAddressType(service *v1.Service, tenantSlices []
+ 	var desiredPorts []discovery.EndpointPort
+ 
+ 	for _, port := range service.Spec.Ports {
++		pName := port.Name
++		pProtocol := port.Protocol
++		pVal := port.TargetPort.IntVal
++
+ 		desiredPorts = append(desiredPorts, discovery.EndpointPort{
+-			Port:     &port.TargetPort.IntVal,
+-			Protocol: &port.Protocol,
+-			Name:     &port.Name,
++			Port:     &pVal,
++			Protocol: &pProtocol,
++			Name:     &pName,
+ 		})
+ 	}
+ 
