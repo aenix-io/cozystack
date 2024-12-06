@@ -1,14 +1,14 @@
 diff --git a/packages/system/kubeovn/charts/kube-ovn/templates/ovncni-ds.yaml b/packages/system/kubeovn/charts/kube-ovn/templates/ovncni-ds.yaml
-index c6834ef..423f66b 100644
+index 63f4258..dafe1fd 100644
 --- a/packages/system/kubeovn/charts/kube-ovn/templates/ovncni-ds.yaml
 +++ b/packages/system/kubeovn/charts/kube-ovn/templates/ovncni-ds.yaml
-@@ -76,6 +76,9 @@ spec:
-           - --kubelet-dir={{ .Values.kubelet_conf.KUBELET_DIR }}
-           - --enable-tproxy={{ .Values.func.ENABLE_TPROXY }}
-           - --ovs-vsctl-concurrency={{ .Values.performance.OVS_VSCTL_CONCURRENCY }}
+@@ -112,6 +112,9 @@ spec:
+           - --secure-serving={{- .Values.func.SECURE_SERVING }}
+           - --enable-ovn-ipsec={{- .Values.func.ENABLE_OVN_IPSEC }}
+           - --set-vxlan-tx-off={{- .Values.func.SET_VXLAN_TX_OFF }}
 +          {{- with .Values.mtu }}
 +          - --mtu={{ . }}
 +          {{- end }}
          securityContext:
            runAsUser: 0
-           privileged: true
+           privileged: false

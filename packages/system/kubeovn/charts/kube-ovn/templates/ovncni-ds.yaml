@@ -29,16 +29,52 @@ spec:
       hostNetwork: true
       hostPID: true
       initContainers:
+      - name: hostpath-init
+        image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+          - sh
+          - -xec
+          - {{ if not .Values.DISABLE_MODULES_MANAGEMENT -}}
+            iptables -V
+            {{- else -}}
+            echo "nothing to do"
+            {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: true
+          capabilities:
+            drop:
+              - ALL
+          privileged: true
+          runAsUser: 0
+          runAsGroup: 0
+        volumeMounts:
+          - name: usr-local-sbin
+            mountPath: /usr/local/sbin
+          - mountPath: /run/xtables.lock
+            name: xtables-lock
+            readOnly: false
+          - mountPath: /var/run/netns
+            name: host-ns
+            readOnly: false
+          - name: kube-ovn-log
+            mountPath: /var/log/kube-ovn
       - name: install-cni
         image: {{ .Values.global.registry.address }}/{{ .Values.global.images.kubeovn.repository }}:{{ .Values.global.images.kubeovn.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/kube-ovn/install-cni.sh"]
+        command:
+          - /kube-ovn/install-cni.sh
+          - --cni-conf-dir={{ .Values.cni_conf.CNI_CONF_DIR }}
+          - --cni-conf-file={{ .Values.cni_conf.CNI_CONF_FILE }}
+          - --cni-conf-name={{- .Values.cni_conf.CNI_CONFIG_PRIORITY -}}-kube-ovn.conflist
         securityContext:
           runAsUser: 0
           privileged: true
         volumeMounts:
           - mountPath: /opt/cni/bin
             name: cni-bin
+          - mountPath: /etc/cni/net.d
+            name: cni-conf
           {{- if .Values.cni_conf.MOUNT_LOCAL_BIN_DIR }}
           - mountPath: /usr/local/bin
             name: local-bin
@@ -65,9 +101,6 @@ spec:
           - --dpdk-tunnel-iface={{- .Values.networking.DPDK_TUNNEL_IFACE }}
           - --network-type={{- .Values.networking.TUNNEL_TYPE }}
           - --default-interface-name={{- .Values.networking.vlan.VLAN_INTERFACE_NAME }}
-          - --cni-conf-dir={{ .Values.cni_conf.CNI_CONF_DIR }}
-          - --cni-conf-file={{ .Values.cni_conf.CNI_CONF_FILE }}
-          - --cni-conf-name={{- .Values.cni_conf.CNI_CONFIG_PRIORITY -}}-kube-ovn.conflist
           - --logtostderr=false
           - --alsologtostderr=true
           - --log_file=/var/log/kube-ovn/kube-ovn-cni.log
@@ -76,12 +109,26 @@ spec:
           - --kubelet-dir={{ .Values.kubelet_conf.KUBELET_DIR }}
           - --enable-tproxy={{ .Values.func.ENABLE_TPROXY }}
           - --ovs-vsctl-concurrency={{ .Values.performance.OVS_VSCTL_CONCURRENCY }}
+          - --secure-serving={{- .Values.func.SECURE_SERVING }}
+          - --enable-ovn-ipsec={{- .Values.func.ENABLE_OVN_IPSEC }}
+          - --set-vxlan-tx-off={{- .Values.func.SET_VXLAN_TX_OFF }}
           {{- with .Values.mtu }}
           - --mtu={{ . }}
           {{- end }}
         securityContext:
           runAsUser: 0
-          privileged: true
+          privileged: false
+          capabilities:
+            add:
+              - NET_ADMIN
+              - NET_BIND_SERVICE
+              - NET_RAW
+              - SYS_ADMIN
+              - SYS_PTRACE
+              {{- if not .Values.DISABLE_MODULES_MANAGEMENT }}
+              - SYS_MODULE
+              {{- end }}
+              - SYS_NICE
         env:
           - name: ENABLE_SSL
             value: "{{ .Values.networking.ENABLE_SSL }}"
@@ -93,6 +140,14 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
           - name: POD_IPS
             valueFrom:
               fieldRef:
@@ -102,19 +157,22 @@ spec:
           - name: DBUS_SYSTEM_BUS_ADDRESS
             value: "unix:path=/host/var/run/dbus/system_bus_socket"
         volumeMounts:
+          - name: usr-local-sbin
+            mountPath: /usr/local/sbin
           - name: host-modules
             mountPath: /lib/modules
             readOnly: true
+          - mountPath: /run/xtables.lock
+            name: xtables-lock
+            readOnly: false
           - name: shared-dir
             mountPath: {{ .Values.kubelet_conf.KUBELET_DIR }}/pods
           - mountPath: /etc/openvswitch
             name: systemid
             readOnly: true
-          - mountPath: /etc/cni/net.d
-            name: cni-conf
           - mountPath: /run/openvswitch
             name: host-run-ovs
-            mountPropagation: Bidirectional
+            mountPropagation: HostToContainer
           - mountPath: /run/ovn
             name: host-run-ovn
           - mountPath: /host/var/run/dbus
@@ -132,21 +190,31 @@ spec:
           - mountPath: /etc/localtime
             name: localtime
             readOnly: true
+        {{- if .Values.func.ENABLE_OVN_IPSEC }}
+          - mountPath: /etc/ovs_ipsec_keys
+            name: ovs-ipsec-keys
+        {{- end }}
         readinessProbe:
           failureThreshold: 3
           periodSeconds: 7
           successThreshold: 1
-          tcpSocket:
-            port: 10665
-          timeoutSeconds: 3
+          exec:
+            command:
+              - /kube-ovn/kube-ovn-healthcheck
+              - --port=10665
+              - --tls={{- .Values.func.SECURE_SERVING }}
+          timeoutSeconds: 5
         livenessProbe:
           failureThreshold: 3
           initialDelaySeconds: 30
           periodSeconds: 7
           successThreshold: 1
-          tcpSocket:
-            port: 10665
-          timeoutSeconds: 3
+          exec:
+            command:
+              - /kube-ovn/kube-ovn-healthcheck
+              - --port=10665
+              - --tls={{- .Values.func.SECURE_SERVING }}
+          timeoutSeconds: 5
         resources:
           requests:
             cpu: {{ index .Values "kube-ovn-cni" "requests" "cpu" }}
@@ -157,9 +225,15 @@ spec:
       nodeSelector:
         kubernetes.io/os: "linux"
       volumes:
+        - name: usr-local-sbin
+          emptyDir: {}
         - name: host-modules
           hostPath:
             path: /lib/modules
+        - name: xtables-lock
+          hostPath:
+            path: /run/xtables.lock
+            type: FileOrCreate
         - name: shared-dir
           hostPath:
             path: {{ .Values.kubelet_conf.KUBELET_DIR }}/pods
@@ -200,4 +274,9 @@ spec:
         - name: local-bin
           hostPath:
             path: {{ .Values.cni_conf.MOUNT_LOCAL_BIN_DIR }}
+        {{- end }}
+        {{- if .Values.func.ENABLE_OVN_IPSEC }}
+        - name: ovs-ipsec-keys
+          hostPath:
+            path: /etc/origin/ovs_ipsec_keys
         {{- end }}

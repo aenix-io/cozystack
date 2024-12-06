@@ -8,8 +8,9 @@ include ../../../scripts/package.mk
 
 update:
 	rm -rf charts && mkdir -p charts/kube-ovn
-	curl -sSL https://github.com/kubeovn/kube-ovn/archive/refs/heads/master.tar.gz | \
-	tar xzvf - --strip 1 kube-ovn-master/charts
+	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/kubeovn/kube-ovn | awk -F'[/^]' 'END{print $$3}') && \
+	curl -sSL https://github.com/kubeovn/kube-ovn/archive/refs/tags/$${tag}.tar.gz | \
+	tar xzvf - --strip 1 kube-ovn-$${tag#*v}/charts
 	patch --no-backup-if-mismatch -p4 < patches/cozyconfig.diff
 	patch --no-backup-if-mismatch -p4 < patches/mtu.diff
 
