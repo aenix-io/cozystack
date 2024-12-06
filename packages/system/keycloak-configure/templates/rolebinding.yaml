@@ -6,11 +6,27 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: admin
+  name: kubeapps-admin
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: kubeapps-admin
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kubeapps-admin
+  namespace: cozy-public
+subjects:
+- kind: Group
+  name: kubeapps-admin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: kubeapps-admin
+  apiGroup: rbac.authorization.k8s.io
 
 ---
 
