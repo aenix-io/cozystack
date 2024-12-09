@@ -416,9 +416,19 @@ metadata:
   name: {{ include "tenant.name" . }}-super-admin
   namespace: {{ include "tenant.name" . }}
 subjects:
-  - kind: Group
-    name: {{ include "tenant.name" . }}-super-admin
-    apiGroup: rbac.authorization.k8s.io
+{{- if hasPrefix "tenant-" .Release.Namespace }}
+{{- $parts := splitList "-" .Release.Namespace }}
+{{- range $i, $v := $parts }}
+{{- if ne $i 0 }}
+- kind: Group
+  name: {{ join "-" (slice $parts 0 (add $i 1)) }}-super-admin
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
+{{- end }}
+{{- end }}
+- kind: Group
+  name: {{ include "tenant.name" . }}-super-admin
+  apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
   name: {{ include "tenant.name" . }}-super-admin
