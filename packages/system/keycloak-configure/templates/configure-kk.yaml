@@ -232,7 +232,7 @@ apiVersion: v1.edp.epam.com/v1
 kind: KeycloakRealmGroup
 metadata:
   name: cozystack-cluster-admin
-  namespace: cozy-dashboard
+  namespace: cozy-system
 spec:
   name: cozystack-cluster-admin
   realmRef:
