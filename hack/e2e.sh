@@ -322,7 +322,7 @@ kubectl wait --timeout=5m --for=condition=available -n tenant-root deploy root-i
 kubectl wait --timeout=5m --for=jsonpath=.status.readyReplicas=3 -n tenant-root sts etcd
 
 # Wait for Victoria metrics
-kubectl wait --timeout=5m --for=jsonpath=.status.updateStatus=operational -n tenant-root vmalert/vmalert-longterm vmalert/vmalert-shortterm vmalertmanager/alertmanager
+kubectl wait --timeout=5m --for=jsonpath=.status.updateStatus=operational -n tenant-root vmalert/vmalert-shortterm vmalertmanager/alertmanager
 kubectl wait --timeout=5m --for=jsonpath=.status.status=operational -n tenant-root vlogs/generic
 kubectl wait --timeout=5m --for=jsonpath=.status.clusterStatus=operational -n tenant-root vmcluster/shortterm vmcluster/longterm
 
