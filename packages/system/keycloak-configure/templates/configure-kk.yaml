@@ -225,3 +225,16 @@ spec:
   realmRef:
     name: keycloakrealm-cozy
     kind: ClusterKeycloakRealm
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: cozystack-cluster-admin
+  namespace: cozy-system
+spec:
+  name: cozystack-cluster-admin
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
