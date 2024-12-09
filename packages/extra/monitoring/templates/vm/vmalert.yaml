@@ -18,4 +18,5 @@ spec:
     url: http://vminsert-{{ .name }}.{{ $.Release.Namespace }}.svc:8480/insert/0/prometheus/api/v1/write
   resources: {}
   selectAllByDefault: true
+{{- break }}
 {{- end }}
