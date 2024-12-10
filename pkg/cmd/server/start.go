@@ -256,6 +256,9 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 			klog.V(6).Infof("PostProcessSpec: Added OpenAPI definition for %s\n", listResourceName)
 		}
 
+		delete(defs, "com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.Application")
+		delete(defs, "com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.ApplicationList")
+
 		swagger.Definitions = defs
 		return swagger, nil
 	}

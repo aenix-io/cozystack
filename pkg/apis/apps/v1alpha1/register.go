@@ -72,6 +72,10 @@ func RegisterDynamicTypes(scheme *runtime.Scheme, cfg *config.ResourceConfig) er
 		scheme.AddKnownTypeWithName(gvk, &Application{})
 		scheme.AddKnownTypeWithName(gvk.GroupVersion().WithKind(kind+"List"), &ApplicationList{})
 
+		gvkInternal := schema.GroupVersion{Group: GroupName, Version: runtime.APIVersionInternal}.WithKind(kind)
+		scheme.AddKnownTypeWithName(gvkInternal, &Application{})
+		scheme.AddKnownTypeWithName(gvkInternal.GroupVersion().WithKind(kind+"List"), &ApplicationList{})
+
 		klog.V(1).Infof("Registered kind: %s\n", kind)
 		RegisteredGVKs = append(RegisteredGVKs, gvk)
 	}
