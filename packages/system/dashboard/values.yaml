@@ -33,11 +33,11 @@ kubeapps:
     image:
       registry: ghcr.io/aenix-io/cozystack
       repository: dashboard
-      tag: v0.20.0
+      tag: v0.20.1
       digest: "sha256:4818712e9fc9c57cc321512760c3226af564a04e69d4b3ec9229ab91fd39abeb"
   kubeappsapis:
     image:
       registry: ghcr.io/aenix-io/cozystack
       repository: kubeapps-apis
-      tag: v0.20.0
-      digest: "sha256:097b04a5870a966f764aacc317276078149ad7d038fce6a388b9a8f47c3d34a6"
+      tag: v0.20.1
+      digest: "sha256:c38a5ca21a89c8031355e44d8c5464a89be2df437e41e382b62e22c66624c813"
