@@ -223,7 +223,7 @@ releases:
             {{- end }}
   {{- end }}
   {{- end }}
-  {{- if $oidcEnabled }}
+  {{- if eq $oidcEnabled "true" }}
   dependsOn: [keycloak-configure]
   valuesFrom:
     - kind: ConfigMap
