@@ -155,7 +155,7 @@ data:
         labels:
           cozystack.io/ui: "true"
         chart:
-          name: rabbitmq
+          name: redis
           sourceRef:
             kind: HelmRepository
             name: cozystack-apps
