@@ -4,8 +4,10 @@
 ## @param size Persistent Volume size
 ## @param replicas Number of Redis replicas
 ## @param storageClass StorageClass used to store the data
+## @param authEnabled Enable password generation
 ##
 external: false
 size: 1Gi
 replicas: 2
 storageClass: ""
+authEnabled: true
