@@ -1,4 +1,11 @@
 kubeapps:
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/client-max-body-size: 100m
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 100m
+      nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
   fullnameOverride: dashboard
   postgresql:
     enabled: false
