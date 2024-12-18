@@ -139,9 +139,9 @@ releases:
   releaseName: dashboard
   chart: cozy-dashboard
   namespace: cozy-dashboard
-  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
-  {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
   values:
+    {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
+    {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
     kubeapps:
       redis:
         master:
@@ -151,14 +151,17 @@ releases:
             repository.cozystack.io/{{ $repo.metadata.name }}: {{ quote . }}
             {{- end }}
             {{- end }}
-  {{- end }}
-  {{- end }}
+    {{- end }}
+    {{- end }}
+
+    {{- $dashboardKCconfig := lookup "v1" "ConfigMap" "cozy-dashboard" "kubeapps-auth-config" }}
+    {{- $dashboardKCValues := dig "data" "values.yaml" "" $dashboardKCconfig }}
+    {{- if $dashboardKCValues }}
+    {{- $dashboardKCValues | nindent 4 }}
+    {{- end }}
+
   {{- if eq $oidcEnabled "true" }}
   dependsOn: [keycloak-configure]
-  valuesFrom:
-    - kind: ConfigMap
-      name: kubeapps-auth-config
-      valuesKey: values.yaml
   {{- else }}
   dependsOn: []
   {{- end }}

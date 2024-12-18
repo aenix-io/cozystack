@@ -210,25 +210,28 @@ releases:
   chart: cozy-dashboard
   namespace: cozy-dashboard
   dependsOn: [cilium,kubeovn,keycloak-configure]
-  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
-  {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
   values:
-      redis:
-        master:
-          podAnnotations:
-            {{- range $index, $repo := . }}
-            {{- with (($repo.status).artifact).revision }}
-            repository.cozystack.io/{{ $repo.metadata.name }}: {{ quote . }}
-            {{- end }}
-            {{- end }}
-  {{- end }}
-  {{- end }}
+    {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
+    {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
+    redis:
+      master:
+        podAnnotations:
+          {{- range $index, $repo := . }}
+          {{- with (($repo.status).artifact).revision }}
+          repository.cozystack.io/{{ $repo.metadata.name }}: {{ quote . }}
+          {{- end }}
+          {{- end }}
+    {{- end }}
+    {{- end }}
+
+    {{- $dashboardKCconfig := lookup "v1" "ConfigMap" "cozy-dashboard" "kubeapps-auth-config" }}
+    {{- $dashboardKCValues := dig "data" "values.yaml" "" $dashboardKCconfig }}
+    {{- if $dashboardKCValues }}
+    {{- $dashboardKCValues | nindent 4 }}
+    {{- end }}
+
   {{- if eq $oidcEnabled "true" }}
   dependsOn: [keycloak-configure]
-  valuesFrom:
-    - kind: ConfigMap
-      name: kubeapps-auth-config
-      valuesKey: values.yaml
   {{- else }}
   dependsOn: []
   {{- end }}

@@ -1,5 +1,5 @@
 diff --git a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
-index c489cb6ca..8884a6484 100644
+index 37593c166..bc58a05ef 100644
 --- a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
 +++ b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
 @@ -29,8 +29,10 @@ import (
@@ -25,7 +25,7 @@ index c489cb6ca..8884a6484 100644
  		return nil, connecterror.FromK8sError("list", "HelmRelease", namespace+"/*", err)
  	} else {
  		return relList.Items, nil
-@@ -512,6 +517,9 @@ func (s *Server) newFluxHelmRelease(chart *models.Chart, targetName types.Namesp
+@@ -508,6 +513,9 @@ func (s *Server) newFluxHelmRelease(chart *models.Chart, targetName types.Namesp
  		ObjectMeta: metav1.ObjectMeta{
  			Name:      targetName.Name,
  			Namespace: targetName.Namespace,
@@ -34,9 +34,9 @@ index c489cb6ca..8884a6484 100644
 +			},
  		},
  		Spec: helmv2.HelmReleaseSpec{
- 			Chart: helmv2.HelmChartTemplate{
+ 			Chart: &helmv2.HelmChartTemplate{
 diff --git a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go
-index 790b21514..539276a17 100644
+index 5154ed7f7..fe80fdf4f 100644
 --- a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go
 +++ b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/repo.go
 @@ -32,6 +32,7 @@ import (
