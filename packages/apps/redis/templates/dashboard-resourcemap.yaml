@@ -13,3 +13,10 @@ rules:
   - rfrs-{{ .Release.Name }}
   - "{{ .Release.Name }}-external-lb"
   verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  resourceNames:
+  - "{{ .Release.Name }}-auth"
+  verbs: ["get", "list", "watch"]
