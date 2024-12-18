@@ -4,7 +4,7 @@
 # syntax = docker/dockerfile:1
 
 FROM alpine as source
-ARG VERSION=v2.11.0
+ARG VERSION=v2.12.0
 RUN apk add --no-cache patch
 WORKDIR /source
 RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/${VERSION}.tar.gz | tar xzf - --strip-components=1
@@ -17,7 +17,7 @@ RUN patch -p1 < /patches/labels.diff
 RUN patch -p1 < /patches/reconcile-strategy.diff
 RUN patch -p1 < /patches/dashboard-resource.diff
 
-FROM bitnami/golang:1.22.5 AS builder
+FROM bitnami/golang:1.23.4 AS builder
 WORKDIR /go/src/github.com/vmware-tanzu/kubeapps
 COPY --from=source /source/go.mod /source/go.sum ./
 ARG VERSION="devel"

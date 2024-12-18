@@ -1,5 +1,5 @@
 diff --git a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/server.go b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/server.go
-index 53fac6474..4602a1148 100644
+index ef3d506b3..a69f8552f 100644
 --- a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/server.go
 +++ b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/server.go
 @@ -5,6 +5,7 @@ package main
@@ -11,8 +11,8 @@ index 53fac6474..4602a1148 100644
  	"net/http"
  
 @@ -16,7 +17,6 @@ import (
- 	helmv2beta2 "github.com/fluxcd/helm-controller/api/v2beta2"
- 	sourcev1beta2 "github.com/fluxcd/source-controller/api/v1beta2"
+ 	helmv2 "github.com/fluxcd/helm-controller/api/v2"
+ 	sourcev1 "github.com/fluxcd/source-controller/api/v1"
  	authorizationv1 "k8s.io/api/authorization/v1"
 -	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
  	"k8s.io/apimachinery/pkg/runtime"
