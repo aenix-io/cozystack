@@ -1,8 +1,8 @@
 diff --git a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
-index 8884a6484..4bf77071c 100644
+index bc58a05ef..895a4024f 100644
 --- a/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
 +++ b/cmd/kubeapps-apis/plugins/fluxv2/packages/v1alpha1/release.go
-@@ -530,6 +530,7 @@ func (s *Server) newFluxHelmRelease(chart *models.Chart, targetName types.Namesp
+@@ -526,6 +526,7 @@ func (s *Server) newFluxHelmRelease(chart *models.Chart, targetName types.Namesp
  						Kind:      sourcev1.HelmRepositoryKind,
  						Namespace: chart.Repo.Namespace,
  					},
