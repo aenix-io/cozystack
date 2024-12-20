@@ -44,3 +44,9 @@ alerta:
     telegram:
       token: ""
       chatID: ""
+
+## Configuration for Grafana
+## @param grafana.db.size Persistent Volume size for grafana database
+grafana:
+  db:
+    size: 10Gi
