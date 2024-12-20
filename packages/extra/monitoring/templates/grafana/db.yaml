@@ -5,7 +5,7 @@ metadata:
 spec:
   instances: 2
   storage:
-    size: 10Gi
+    size: {{ .Values.grafana.db.size }}
 
   inheritedMetadata:
     labels:

@@ -16,7 +16,8 @@ monitoring 1.3.0 6c5cf5b
 monitoring 1.4.0 adaf603b
 monitoring 1.5.0 4b90bf5a
 monitoring 1.5.1 57e90b70
-monitoring 1.5.2 HEAD
+monitoring 1.5.2 898374b5
+monitoring 1.5.3 HEAD
 seaweedfs 0.1.0 5ca8823
 seaweedfs 0.2.0 9e33dc0
 seaweedfs 0.2.1 HEAD

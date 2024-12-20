@@ -45,14 +45,29 @@
                 "token": {
                   "type": "string",
                   "description": "telegram token for your bot",
-                  "default": "7262461387:AAGtwq16iwuVtWtzoN6TUEMpF00fpC9Xz34"
+                  "default": ""
                 },
                 "chatID": {
                   "type": "string",
                   "description": "specify multiple ID's separated by comma. Get yours in https://t.me/chatid_echo_bot",
-                  "default": "-4520856007"
+                  "default": ""
                 }
               }
+            }
+          }
+        }
+      }
+    },
+    "grafana": {
+      "type": "object",
+      "properties": {
+        "db": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "string",
+              "description": "Persistent Volume size for grafana database",
+              "default": "10Gi"
             }
           }
         }
