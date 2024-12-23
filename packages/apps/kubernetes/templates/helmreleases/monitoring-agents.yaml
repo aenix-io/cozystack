@@ -48,7 +48,6 @@ spec:
         tenant: {{ .Release.Namespace }}
       remoteWrite:
         url: http://vminsert-shortterm.{{ $targetTenant }}.svc:8480/insert/0/prometheus
-
     fluent-bit:
       readinessProbe:
         httpGet:
