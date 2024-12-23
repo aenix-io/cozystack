@@ -6,7 +6,7 @@ metadata:
 spec:
   datasource:
     access: proxy
-    type: victorialogs-datasource
+    type: victoriametrics-logs-datasource
     name: vlogs-{{ .name }}
     url: http://vlogs-{{ .name }}.{{ $.Release.Namespace }}.svc:9428
   instanceSelector:

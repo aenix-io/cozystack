@@ -1,5 +1,5 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
-{{- $issuerType := (index $cozyConfig.data "clusterissuer") | default "http01" }} 
+{{- $issuerType := (index $cozyConfig.data "clusterissuer") | default "http01" }}
 
 {{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
 {{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
@@ -30,7 +30,7 @@ spec:
       admin_user: user
       admin_password: ${GF_PASSWORD}
     plugins:
-      allow_loading_unsigned_plugins: "victorialogs-datasource"
+      allow_loading_unsigned_plugins: "victoriametrics-logs-datasource"
   deployment:
     spec:
       replicas: 2
@@ -51,7 +51,7 @@ spec:
                   set -ex
                   mkdir -p /var/lib/grafana/plugins/
                   ver=$(curl -s https://api.github.com/repos/VictoriaMetrics/victorialogs-datasource/releases/latest | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-                  curl -L https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/$ver/victorialogs-datasource-$ver.tar.gz -o /var/lib/grafana/plugins/vl-plugin.tar.gz
+                  curl -L https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/$ver/victoriametrics-logs-datasource-$ver.tar.gz -o /var/lib/grafana/plugins/vl-plugin.tar.gz
                   tar -xf /var/lib/grafana/plugins/vl-plugin.tar.gz -C /var/lib/grafana/plugins/
                   rm /var/lib/grafana/plugins/vl-plugin.tar.gz
               volumeMounts:
