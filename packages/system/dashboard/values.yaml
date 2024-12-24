@@ -118,7 +118,7 @@ kubeapps:
                   labels:
                     cozystack.io/ui: "true"
                   chart:
-                    name: http-cache
+                    name: tcp-balancer
                     sourceRef:
                       kind: HelmRepository
                       name: cozystack-apps
@@ -254,7 +254,7 @@ kubeapps:
                   singular: kafka
                   plural: kafkas
                 release:
-                  prefix: ferretdb-
+                  prefix: kafka-
                   labels:
                     cozystack.io/ui: "true"
                   chart:
