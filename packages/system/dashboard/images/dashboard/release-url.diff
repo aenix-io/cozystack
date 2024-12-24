@@ -1,0 +1,34 @@
+diff --git a/dashboard/src/shared/url.ts b/dashboard/src/shared/url.ts
+index 7918652b0..64c3435af 100644
+--- a/dashboard/src/shared/url.ts
++++ b/dashboard/src/shared/url.ts
+@@ -36,7 +36,7 @@ export const app = {
+       return `${app.apps.list(
+         pkgCluster,
+         pkgNamespace,
+-      )}/${pkgPluginName}/${pkgPluginVersion}/${pkgId}`;
++      )}/${pkgPluginName}/${pkgPluginVersion}/${encodeURIComponent(pkgId)}`;
+     },
+     upgrade: (ref: InstalledPackageReference) => `${app.apps.get(ref)}/upgrade`,
+     upgradeTo: (ref: InstalledPackageReference, version?: string) =>
+diff --git a/dashboard/src/components/DeploymentForm/DeploymentForm.tsx b/dashboard/src/components/DeploymentForm/DeploymentForm.tsx
+index 7ccb77b5d..589f72b65 100644
+--- a/dashboard/src/components/DeploymentForm/DeploymentForm.tsx
++++ b/dashboard/src/components/DeploymentForm/DeploymentForm.tsx
+@@ -144,13 +144,15 @@ export default function DeploymentForm() {
+       );
+       setDeploying(false);
+       if (deployed) {
++        const chartParts = packageId?.split("/") || [];
++        const kind = chartParts[chartParts.length - 1];
+         push(
+           // Redirect to the installed package, note that the cluster/ns are the ones passed
+           // in the URL, not the ones from the package.
+           url.app.apps.get({
+             context: { cluster: targetCluster, namespace: targetNamespace },
+             plugin: pluginObj,
+-            identifier: releaseName,
++            identifier: `${kind}%2F${releaseName}`,
+           } as AvailablePackageReference),
+         );
+       }
