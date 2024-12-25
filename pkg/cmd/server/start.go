@@ -201,26 +201,30 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 	serverConfig.OpenAPIConfig.PostProcessSpec = func(swagger *spec.Swagger) (*spec.Swagger, error) {
 		defs := swagger.Definitions
 
-		// Check basic Application definition
+		// Verify the presence of the base Application/ApplicationList definitions
 		appDef, exists := defs["com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.Application"]
 		if !exists {
 			return swagger, fmt.Errorf("Application definition not found")
 		}
 
-		// Check basic ApplicationList definition
 		listDef, exists := defs["com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.ApplicationList"]
 		if !exists {
 			return swagger, fmt.Errorf("ApplicationList definition not found")
 		}
 
+		// Iterate over all registered GVKs (e.g., Bucket, Database, etc.)
 		for _, gvk := range v1alpha1.RegisteredGVKs {
+			// This will be something like:
+			// "com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.Bucket"
 			resourceName := fmt.Sprintf("com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.%s", gvk.Kind)
+
+			// 1. Create a copy of the base Application definition for the new resource
 			newDef, err := DeepCopySchema(&appDef)
 			if err != nil {
 				return nil, fmt.Errorf("failed to deepcopy schema for %s: %w", gvk.Kind, err)
 			}
 
-			// Fix Extensions for resource
+			// 2. Update x-kubernetes-group-version-kind to match the new resource
 			if newDef.Extensions == nil {
 				newDef.Extensions = map[string]interface{}{}
 			}
@@ -231,17 +235,20 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 					"kind":    gvk.Kind,
 				},
 			}
+
+			// 3. Save the new resource definition under the correct name
 			defs[resourceName] = *newDef
 			klog.V(6).Infof("PostProcessSpec: Added OpenAPI definition for %s\n", resourceName)
 
-			// List resource
+			// 4. Now handle the corresponding List type (e.g., BucketList).
+			//    We'll start by copying the ApplicationList definition.
 			listResourceName := fmt.Sprintf("com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.%sList", gvk.Kind)
 			newListDef, err := DeepCopySchema(&listDef)
 			if err != nil {
 				return nil, fmt.Errorf("failed to deepcopy schema for %sList: %w", gvk.Kind, err)
 			}
 
-			// Fix Extensions for List resource
+			// 5. Update x-kubernetes-group-version-kind for the List definition
 			if newListDef.Extensions == nil {
 				newListDef.Extensions = map[string]interface{}{}
 			}
@@ -252,10 +259,22 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 					"kind":    fmt.Sprintf("%sList", gvk.Kind),
 				},
 			}
+
+			// 6. IMPORTANT: Fix the "items" reference so it points to the new resource
+			//    rather than to "Application".
+			if itemsProp, found := newListDef.Properties["items"]; found {
+				if itemsProp.Items != nil && itemsProp.Items.Schema != nil {
+					itemsProp.Items.Schema.Ref = spec.MustCreateRef("#/definitions/" + resourceName)
+					newListDef.Properties["items"] = itemsProp
+				}
+			}
+
+			// 7. Finally, save the new List definition
 			defs[listResourceName] = *newListDef
 			klog.V(6).Infof("PostProcessSpec: Added OpenAPI definition for %s\n", listResourceName)
 		}
 
+		// Remove the original Application/ApplicationList from the definitions
 		delete(defs, "com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.Application")
 		delete(defs, "com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.ApplicationList")
 
