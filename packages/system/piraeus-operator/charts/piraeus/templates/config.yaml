@@ -30,7 +30,7 @@ data:
         tag: v1.6.0
         image: drbd-reactor
       ha-controller:
-        tag: v1.2.2
+        tag: v1.2.3
         image: piraeus-ha-controller
       drbd-shutdown-guard:
         tag: v1.0.0
