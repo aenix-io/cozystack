@@ -31,9 +31,7 @@ rules:
 - apiGroups: ["rbac.authorization.k8s.io"]
   resources: ["roles"]
   verbs: ["get"]
-- apiGroups: ["helm.toolkit.fluxcd.io"]
-  resources: ["helmreleases"]
-  verbs: ["*"]
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -87,14 +85,6 @@ rules:
       - list
       - watch
   - apiGroups:
-      - helm.toolkit.fluxcd.io
-    resources:
-      - helmreleases
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
       - ""
     resources:
       - "*"
@@ -122,6 +112,9 @@ subjects:
   name: tenant-root-view
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
+- kind: Group
+  name: {{ include "tenant.name" . }}-view
+  apiGroup: rbac.authorization.k8s.io
 {{- if hasPrefix "tenant-" .Release.Namespace }}
 {{- $parts := splitList "-" .Release.Namespace }}
 {{- range $i, $v := $parts }}
@@ -154,13 +147,6 @@ rules:
   - apiGroups: ["apps.cozystack.io"]
     resources:
     - "*"
-    verbs:
-    - get
-    - list
-    - watch
-  - apiGroups: ["helm.toolkit.fluxcd.io"]
-    resources:
-    - helmreleases
     verbs:
     - get
     - list
@@ -198,6 +184,9 @@ subjects:
   name: tenant-root-use
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
+- kind: Group
+  name: {{ include "tenant.name" . }}-use
+  apiGroup: rbac.authorization.k8s.io
 {{- if hasPrefix "tenant-" .Release.Namespace }}
 {{- $parts := splitList "-" .Release.Namespace }}
 {{- range $i, $v := $parts }}
@@ -234,13 +223,6 @@ rules:
     - list
     - watch
     - delete
-  - apiGroups: ["helm.toolkit.fluxcd.io"]
-    resources:
-    - helmreleases
-    verbs:
-    - get
-    - list
-    - watch
   - apiGroups: ["kubevirt.io"]
     resources:
     - virtualmachines
@@ -293,6 +275,9 @@ subjects:
   name: tenant-root-admin
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
+- kind: Group
+  name: {{ include "tenant.name" . }}-admin
+  apiGroup: rbac.authorization.k8s.io
 {{- if hasPrefix "tenant-" .Release.Namespace }}
 {{- $parts := splitList "-" .Release.Namespace }}
 {{- range $i, $v := $parts }}
@@ -329,11 +314,6 @@ rules:
     - list
     - watch
     - delete
-  - apiGroups: ["helm.toolkit.fluxcd.io"]
-    resources:
-    - helmreleases
-    verbs:
-    - '*'
   - apiGroups: ["kubevirt.io"]
     resources:
     - virtualmachines
@@ -363,6 +343,9 @@ subjects:
   name: tenant-root-super-admin
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
+- kind: Group
+  name: {{ include "tenant.name" . }}-super-admin
+  apiGroup: rbac.authorization.k8s.io
 {{- if hasPrefix "tenant-" .Release.Namespace }}
 {{- $parts := splitList "-" .Release.Namespace }}
 {{- range $i, $v := $parts }}
@@ -404,6 +387,12 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 - kind: Group
   name: {{ include "tenant.name" . }}-admin
+  apiGroup: rbac.authorization.k8s.io
+- kind: Group
+  name: {{ include "tenant.name" . }}-use
+  apiGroup: rbac.authorization.k8s.io
+- kind: Group
+  name: {{ include "tenant.name" . }}-view
   apiGroup: rbac.authorization.k8s.io
 - kind: ServiceAccount
   name: {{ include "tenant.name" . }}

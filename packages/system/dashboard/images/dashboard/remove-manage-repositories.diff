@@ -1,0 +1,66 @@
+diff --git a/dashboard/src/components/Catalog/Catalog.tsx b/dashboard/src/components/Catalog/Catalog.tsx
+index 5f2d2a1c5..093cb598d 100644
+--- a/dashboard/src/components/Catalog/Catalog.tsx
++++ b/dashboard/src/components/Catalog/Catalog.tsx
+@@ -15,7 +15,6 @@ import qs from "qs";
+ import React, { useEffect } from "react";
+ import { useDispatch, useSelector } from "react-redux";
+ import * as ReactRouter from "react-router-dom";
+-import { Link } from "react-router-dom";
+ import { IClusterServiceVersion, IStoreState } from "shared/types";
+ import { app } from "shared/url";
+ import { escapeRegExp, getPluginPackageName } from "shared/utils";
+@@ -85,7 +84,6 @@ export default function Catalog() {
+     operators,
+     repos: { reposSummaries: repos },
+     config: {
+-      appVersion,
+       kubeappsCluster,
+       helmGlobalNamespace,
+       carvelGlobalNamespace,
+@@ -420,24 +418,6 @@ export default function Catalog() {
+         <div className="empty-catalog">
+           <CdsIcon shape="bundle" />
+           <p>The current catalog is empty.</p>
+-          <p>
+-            Manage your Package Repositories in Kubeapps by visiting the Package repositories
+-            configuration page.
+-          </p>
+-          <Link to={app.config.pkgrepositories(cluster || "", namespace || "")}>
+-            <CdsButton>Manage Package Repositories</CdsButton>
+-          </Link>
+-          <p>
+-            For help managing other packaging formats, such as Flux or Carvel, please refer to the{" "}
+-            <a
+-              target="_blank"
+-              rel="noopener noreferrer"
+-              href={`https://github.com/vmware-tanzu/kubeapps/tree/${appVersion}/site/content/docs/latest`}
+-            >
+-              Kubeapps documentation
+-            </a>
+-            .
+-          </p>
+         </div>
+       ) : (
+         <Row>
+diff --git a/dashboard/src/components/Header/Menu.tsx b/dashboard/src/components/Header/Menu.tsx
+index c8ec1da8c..e59f90190 100644
+--- a/dashboard/src/components/Header/Menu.tsx
++++ b/dashboard/src/components/Header/Menu.tsx
+@@ -78,16 +78,6 @@ function Menu({ clusters, appVersion, logout }: IContextSelectorProps) {
+           <div className="dropdown-menu dropdown-configuration-menu" role="menu" hidden={!open}>
+             <div>
+               <label className="dropdown-menu-padding dropdown-menu-label">Administration</label>
+-              <Link
+-                to={app.config.pkgrepositories(clusters.currentCluster, namespaceSelected)}
+-                className="dropdown-menu-link"
+-                onClick={toggleOpen}
+-              >
+-                <div className="dropdown-menu-item" role="menuitem">
+-                  <CdsIcon solid={true} size="md" shape="library" />{" "}
+-                  <span>Package Repositories</span>
+-                </div>
+-              </Link>
+               <div className="dropdown-divider" role="separator" />
+               {featureFlags?.operators && (
+                 <Link
