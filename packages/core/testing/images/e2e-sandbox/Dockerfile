@@ -1,8 +1,8 @@
 FROM ubuntu:22.04
 
-ARG KUBECTL_VERSION=1.31.0
-ARG TALOSCTL_VERSION=1.7.6
-ARG HELM_VERSION=3.15.4
+ARG KUBECTL_VERSION=1.32.0
+ARG TALOSCTL_VERSION=1.8.4
+ARG HELM_VERSION=3.16.4
 
 RUN apt-get update
 RUN apt-get -y install genisoimage qemu-kvm qemu-utils iproute2 iptables wget xz-utils netcat curl jq
