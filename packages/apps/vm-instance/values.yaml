@@ -18,8 +18,8 @@ instanceProfile: ubuntu
 ## @param disks [array] List of disks to attach
 ## Example:
 ## disks:
-## - name: vm-disk-example-system
-## - name: vm-disk-example-data
+## - name: example-system
+## - name: example-data
 disks: []
 
 ## @param resources.cpu The number of CPU cores allocated to the virtual machine

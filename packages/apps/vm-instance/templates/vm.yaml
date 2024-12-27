@@ -85,7 +85,7 @@ spec:
       {{- range .Values.disks }}
       - name: disk-{{ .name }}
         dataVolume:
-          name: {{ .name }}
+          name: vm-disk-{{ .name }}
       {{- end }}
       {{- if or .Values.sshKeys .Values.cloudInit }}
       - name: cloudinitdisk
