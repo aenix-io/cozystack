@@ -10,7 +10,11 @@ RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/v${VERSI
 COPY apple-touch-icon.png favicon-16x16.png favicon-32x32.png favicon.ico mstile-144x144.png mstile-150x150.png mstile-310x150.png mstile-310x310.png mstile-70x70.png safari-pinned-tab.svg public/
 
 COPY release-url.diff /patches/release-url.diff
+COPY remove-manage-repositories.diff /patches/remove-manage-repositories.diff
+COPY documentation.diff /patches/documentation.diff
 RUN patch -p2 < /patches/release-url.diff
+RUN patch -p2 < /patches/remove-manage-repositories.diff
+RUN patch -p2 < /patches/documentation.diff
 
 RUN sed -i 's/opacity: 0.05;/display: none;/g' src/components/InfoCard/InfoCard.scss
 RUN sed -i 's/"Kubeapps",/"Cozystack",/' lang/en.json

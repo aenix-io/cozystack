@@ -25,7 +25,7 @@ update-dockerfiles:
 	version=$$(echo "$$tag" | sed 's/^v//') && \
 	sed -i "s/ARG VERSION=.*/ARG VERSION=$${version}/" images/dashboard/Dockerfile
 
-image-dashboard:
+image-dashboard: update-version
 	docker buildx build images/dashboard \
 		--provenance false \
 		--tag $(REGISTRY)/dashboard:$(call settag,$(TAG)) \
@@ -44,7 +44,7 @@ image-dashboard:
 		yq -i '.kubeapps.dashboard.image.digest = strenv(DIGEST)' values.yaml
 	rm -f images/dashboard.json
 
-image-kubeapps-apis:
+image-kubeapps-apis: update-version
 	docker buildx build images/kubeapps-apis \
 		--provenance false \
 		--tag $(REGISTRY)/kubeapps-apis:$(call settag,$(TAG)) \
@@ -62,3 +62,6 @@ image-kubeapps-apis:
 	DIGEST=$$(yq e '."containerimage.digest"' images/kubeapps-apis.json -o json -r) \
 		yq -i '.kubeapps.kubeappsapis.image.digest = strenv(DIGEST)' values.yaml
 	rm -f images/kubeapps-apis.json
+
+update-version:
+	sed -i "s|\(\"appVersion\":\).*|\1 \"$(TAG)\",|g" ./charts/kubeapps/templates/dashboard/configmap.yaml

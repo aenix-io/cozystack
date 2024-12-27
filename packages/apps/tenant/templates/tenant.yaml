@@ -388,6 +388,12 @@ subjects:
 - kind: Group
   name: {{ include "tenant.name" . }}-admin
   apiGroup: rbac.authorization.k8s.io
+- kind: Group
+  name: {{ include "tenant.name" . }}-use
+  apiGroup: rbac.authorization.k8s.io
+- kind: Group
+  name: {{ include "tenant.name" . }}-view
+  apiGroup: rbac.authorization.k8s.io
 - kind: ServiceAccount
   name: {{ include "tenant.name" . }}
   namespace: {{ include "tenant.name" . }}
