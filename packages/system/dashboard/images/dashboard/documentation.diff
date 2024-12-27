@@ -1,5 +1,5 @@
 diff --git a/dashboard/src/components/AppList/AppListGrid.tsx b/dashboard/src/components/AppList/AppListGrid.tsx
-index d3261e459..597512e62 100644
+index d3261e459..dee6a50c1 100644
 --- a/dashboard/src/components/AppList/AppListGrid.tsx
 +++ b/dashboard/src/components/AppList/AppListGrid.tsx
 @@ -42,7 +42,7 @@ function AppListGrid(props: IAppListProps) {
@@ -7,7 +7,7 @@ index d3261e459..597512e62 100644
            or check the{" "}
            <a
 -            href={`https://github.com/vmware-tanzu/kubeapps/blob/${appVersion}/site/content/docs/latest/tutorials/getting-started.md`}
-+            href={`https://cozystack.io/docs/`}
++            href={"https://cozystack.io/docs/"}
              target="_blank"
              rel="noopener noreferrer"
            >
