@@ -14,7 +14,7 @@ COPY remove-manage-repositories.diff /patches/remove-manage-repositories.diff
 COPY documentation.diff /patches/documentation.diff
 RUN patch -p2 < /patches/release-url.diff
 RUN patch -p2 < /patches/remove-manage-repositories.diff
-RUN patch -p2 < /patches/documentation.diff
+#RUN patch -p2 < /patches/documentation.diff
 
 RUN sed -i 's/opacity: 0.05;/display: none;/g' src/components/InfoCard/InfoCard.scss
 RUN sed -i 's/"Kubeapps",/"Cozystack",/' lang/en.json
