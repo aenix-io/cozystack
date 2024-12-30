@@ -1,2 +1,2 @@
 cozystack:
-  image: ghcr.io/aenix-io/cozystack/cozystack:v0.21.0@sha256:90487dafccb12705b5e9760595b43c0352f3a94551c55c5fa7778bf9173d1737
+  image: ghcr.io/aenix-io/cozystack/cozystack:v0.21.1@sha256:05a1b10700b387594887785e49e496da13d83abb9dc6415195b70ed9898e9d39
