@@ -10,7 +10,7 @@ spec:
   vminsert:
     replicaCount: 2
     resources:
-      {{- if and (not (hasKey .vminsert "resources")) (empty .vminsert.resources) }}
+      {{- if empty .vminsert.resources }}
       limits:
         memory: 1000Mi
       requests:
@@ -22,7 +22,7 @@ spec:
   vmselect:
     replicaCount: 2
     resources:
-      {{- if and (not (hasKey .vmselect "resources")) (empty .vmselect.resources) }}
+      {{- if empty .vmselect.resources }}
       limits:
         memory: 1000Mi
       requests:
@@ -48,7 +48,7 @@ spec:
   vmstorage:
     replicaCount: 2
     resources:
-      {{- if and (not (hasKey .vmstorage "resources")) (empty .vmstorage.resources) }}
+      {{- if empty .vmstorage.resources }}
       limits:
         memory: 2048Mi
       requests:
