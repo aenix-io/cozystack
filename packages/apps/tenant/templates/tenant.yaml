@@ -241,23 +241,7 @@ rules:
     - list
   - apiGroups: ["apps.cozystack.io"]
     resources:
-    - buckets
-    - clickhouses
-    - ferretdb
-    - foos
-    - httpcaches
-    - kafkas
-    - kuberneteses
-    - mysqls
-    - natses
-    - postgreses
-    - rabbitmqs
-    - redises
-    - seaweedfses
-    - tcpbalancers
-    - virtualmachines
-    - vmdisks
-    - vminstances
+    - "*"
     verbs:
     - get
     - list

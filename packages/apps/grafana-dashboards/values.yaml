@@ -1,0 +1,38 @@
+## @section Dashboard parameters
+
+## @param urlDashboards List of dashboards with URLs.
+## Each entry must include:
+## - name: The name of the dashboard
+## - link: The URL of the dashboard JSON
+urlDashboards: []  # @param urlDashboards List of dashboards to load from URLs
+
+## Example:
+## urlDashboards:
+##   - name: "grafanadashboard-from-url"
+##     link: "https://raw.githubusercontent.com/grafana-operator/grafana-operator/master/examples/dashboard_from_url/dashboard.json"
+
+## @param jsonDashboards List of dashboards with inline JSON.
+## Each entry must include:
+## - name: The name of the dashboard
+## - json: The JSON content of the dashboard
+jsonDashboards: []  # @param jsonDashboards List of dashboards to load from inline JSON
+
+## Example:
+## jsonDashboards:
+##   - name: "grafanadashboard-sample"
+##     json: |
+##       {
+##         "panels": [
+##           { "type": "graph", "title": "Sample Panel" }
+##         ]
+##       }
+
+
+## @param instanceSelector Selector to match Grafana instances.
+## Leave empty to skip instance selection.
+instanceSelector: {}  # @param instanceSelector Selector for matching Grafana instances
+
+## Example:
+## instanceSelector:
+##   matchLabels:
+##     dashboards: "grafana"

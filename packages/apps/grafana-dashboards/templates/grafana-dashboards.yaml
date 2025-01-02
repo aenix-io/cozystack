@@ -1,0 +1,41 @@
+
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+
+
+{{- range .Values.urlDashboards }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ .name }}
+spec:
+  {{- if .Values.instanceSelector | not }}
+  instanceSelector:
+    matchLabels:
+      dashboards: {{ $myNS }}
+  {{- else }}
+  instanceSelector:
+{{ $instanceSelector | indent 4 }}
+  {{- end }}
+  url: {{ .link }}
+{{- end }}
+
+{{- range .Values.jsonDashboards }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ .name }}
+spec:
+  {{- if .Values.instanceSelector | not }}
+  instanceSelector:
+    matchLabels:
+      dashboards: {{ $myNS }}
+  {{- else }}
+  instanceSelector:
+{{ $instanceSelector | indent 4 }}
+  {{- end }}
+  resyncPeriod: "30s"
+  json: |
+{{ .json | indent 4 }}
+{{- end }}
