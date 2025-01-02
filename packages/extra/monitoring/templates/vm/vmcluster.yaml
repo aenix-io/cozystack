@@ -6,22 +6,35 @@ metadata:
   name: {{ .name }}
 spec:
   replicationFactor: 2
-  retentionPeriod: "3"
+  retentionPeriod: {{ .retentionPeriod }}
   vminsert:
     replicaCount: 2
-    resources: {}
-  vmselect:
-    replicaCount: 2
     resources:
+      {{- if and (not (hasKey .vminsert "resources")) (empty .vminsert.resources) }}
       limits:
         memory: 1000Mi
       requests:
         cpu: 100m
         memory: 500Mi
+      {{- else }}
+      {{- toYaml .vminsert.resources | nindent 6 }}
+      {{- end }}
+  vmselect:
+    replicaCount: 2
+    resources:
+      {{- if and (not (hasKey .vmselect "resources")) (empty .vmselect.resources) }}
+      limits:
+        memory: 1000Mi
+      requests:
+        cpu: 100m
+        memory: 500Mi
+      {{- else }}
+      {{- toYaml .vmselect.resources | nindent 6 }}
+      {{- end }}
     extraArgs:
       search.maxUniqueTimeseries: "600000"
       vmalert.proxyURL: http://vmalert-{{ .name }}.{{ $.Release.Namespace }}.svc:8080
-      dedup.minScrapeInterval: "15s"
+      dedup.minScrapeInterval: {{ .deduplicationInterval }}
     cacheMountPath: /select-cache
     storage:
       volumeClaimTemplate:
@@ -35,11 +48,15 @@ spec:
   vmstorage:
     replicaCount: 2
     resources:
+      {{- if and (not (hasKey .vmstorage "resources")) (empty .vmstorage.resources) }}
       limits:
-        memory: 1000Mi
+        memory: 2048Mi
       requests:
         cpu: 100m
         memory: 500Mi
+      {{- else }}
+      {{- toYaml .vmstorage.resources | nindent 6 }}
+      {{- end }}
     storage:
       volumeClaimTemplate:
         spec:

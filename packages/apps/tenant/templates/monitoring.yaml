@@ -26,12 +26,24 @@ spec:
     metricsStorages:
     - name: shortterm
       retentionPeriod: "3d"
-      deduplicationInterval: "5m"
+      deduplicationInterval: "15s"
       storage: 10Gi
+      vminsert:
+        resources: {}
+      vmselect:
+        resources: {}
+      vmstorage:
+        resources: {}
     - name: longterm
       retentionPeriod: "14d"
       deduplicationInterval: "15s"
       storage: 10Gi
+      vminsert:
+        resources: {}
+      vmselect:
+        resources: {}
+      vmstorage:
+        resources: {}
     oncall:
       enabled: false
 {{- end }}
