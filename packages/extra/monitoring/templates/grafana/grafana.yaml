@@ -10,7 +10,7 @@ kind: Grafana
 metadata:
   name: grafana
   labels:
-    dashboards: grafana
+    dashboards: "{{ $myNS }}"
 spec:
   config:
     log:

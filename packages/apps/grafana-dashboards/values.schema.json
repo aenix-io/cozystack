@@ -1,0 +1,23 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "urlDashboards": {
+            "type": "array",
+            "description": "List of dashboards with URLs.",
+            "default": [],
+            "items": {}
+        },
+        "jsonDashboards": {
+            "type": "array",
+            "description": "List of dashboards with inline JSON.",
+            "default": [],
+            "items": {}
+        },
+        "instanceSelector": {
+            "type": "object",
+            "description": "Selector to match Grafana instances.",
+            "default": {}
+        }
+    }
+}

@@ -13,6 +13,7 @@ ferretdb 0.2.0 adaf603
 ferretdb 0.3.0 aa2f553
 ferretdb 0.4.0 def2eb0f
 ferretdb 0.4.1 HEAD
+grafana-dashboards 0.1.0 HEAD
 http-cache 0.1.0 a956713
 http-cache 0.2.0 5ca8823
 http-cache 0.3.0 fab5940
@@ -95,7 +96,8 @@ tenant 1.6.1 edbbb9be
 tenant 1.6.2 ccedc5fe
 tenant 1.6.3 2057bb96
 tenant 1.6.4 3c9e50a4
-tenant 1.6.5 HEAD
+tenant 1.6.5 f1e11451
+tenant 1.6.6 HEAD
 virtual-machine 0.1.4 f2015d6
 virtual-machine 0.1.5 7cd7de7
 virtual-machine 0.2.0 5ca8823

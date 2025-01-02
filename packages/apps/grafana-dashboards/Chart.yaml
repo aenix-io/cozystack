@@ -1,0 +1,8 @@
+apiVersion: v2
+name: grafana-dashboards
+description: Grafana dashboards
+icon: /logos/grafana-dashboards.svg
+
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
