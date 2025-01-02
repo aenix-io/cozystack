@@ -6,7 +6,7 @@ metadata:
   name: {{ .name }}
 spec:
   replicationFactor: 2
-  retentionPeriod: {{ .retentionPeriod }}
+  retentionPeriod: {{ .retentionPeriod | quote }}
   vminsert:
     replicaCount: 2
     resources:
@@ -34,7 +34,7 @@ spec:
     extraArgs:
       search.maxUniqueTimeseries: "600000"
       vmalert.proxyURL: http://vmalert-{{ .name }}.{{ $.Release.Namespace }}.svc:8080
-      dedup.minScrapeInterval: {{ .deduplicationInterval }}
+      dedup.minScrapeInterval: {{ .deduplicationInterval | quote}}
     cacheMountPath: /select-cache
     storage:
       volumeClaimTemplate:
