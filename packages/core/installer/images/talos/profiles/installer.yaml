@@ -2,8 +2,8 @@
 # do not edit it
 arch: amd64
 platform: metal
-secureboot: false
 version: v1.9.1
+secureboot: true
 input:
   kernel:
     path: /usr/install/amd64/vmlinuz
@@ -25,3 +25,6 @@ output:
   kind: installer
   imageOptions: {}
   outFormat: raw
+customization:
+  extraKernelArgs:
+  - -selinux
