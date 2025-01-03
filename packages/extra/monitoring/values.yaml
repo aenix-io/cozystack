@@ -5,17 +5,59 @@ host: ""
 
 ## @param metricsStorages [array] Configuration of metrics storage instances
 ##
+## Example:
+## metricsStorages:
+## - name: shortterm
+##   retentionPeriod: "3d"
+##   deduplicationInterval: "15s"
+##   storage: 10Gi
+##   storageClassName: ""
+##   vminsert:
+##     resources:
+##       limits:
+##         memory: 1024Mi
+##       requests:
+##         cpu: 200m
+##         memory: 512Mi
+##   vmselect:
+##     resources:
+##       limits:
+##         memory: 2048Mi
+##       requests:
+##         cpu: 300m
+##         memory: 1Gi
+##   vmstorage:
+##     resources:
+##       limits:
+##         memory: 4096Mi
+##       requests:
+##         cpu: 500m
+##         memory: 2Gi
+##
 metricsStorages:
 - name: shortterm
   retentionPeriod: "3d"
-  deduplicationInterval: "5m"
-  storage: 10Gi
-  storageClassName: ""
-- name: longterm
-  retentionPeriod: "14d"
   deduplicationInterval: "15s"
   storage: 10Gi
   storageClassName: ""
+  vminsert:
+    resources: {}
+  vmselect:
+    resources: {}
+  vmstorage:
+    resources: {}
+- name: longterm
+  retentionPeriod: "14d"
+  deduplicationInterval: "5m"
+  storage: 10Gi
+  storageClassName: ""
+  vminsert:
+    resources: {}
+  vmselect:
+    resources: {}
+  vmstorage:
+    resources: {}
+
 
 ## @param logsStorages [array] Configuration of logs storage instances
 ##
