@@ -36,7 +36,7 @@ spec:
         resources: {}
     - name: longterm
       retentionPeriod: "14d"
-      deduplicationInterval: "15s"
+      deduplicationInterval: "5m"
       storage: 10Gi
       vminsert:
         resources: {}
