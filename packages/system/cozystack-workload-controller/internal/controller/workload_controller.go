@@ -41,6 +41,15 @@ type WorkloadReconciler struct {
 // +kubebuilder:rbac:groups=cozystack.io,resources=workloads,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=cozystack.io,resources=workloads/status,verbs=get;update;patch
 
+func (r *WorkloadReconciler) isPodReady(pod *corev1.Pod) bool {
+	for _, condition := range pod.Status.Conditions {
+		if condition.Type == corev1.PodReady {
+			return condition.Status == corev1.ConditionTrue
+		}
+	}
+	return false
+}
+
 func (r *WorkloadReconciler) reconcilePod(ctx context.Context, pod *corev1.Pod) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
@@ -99,6 +108,7 @@ func (r *WorkloadReconciler) reconcilePod(ctx context.Context, pod *corev1.Pod) 
 			workload.Status.Kind = kind
 			workload.Status.Type = workloadType
 			workload.Status.Resources = resources
+			workload.Status.Operational = r.isPodReady(pod)
 
 			return nil
 		})
