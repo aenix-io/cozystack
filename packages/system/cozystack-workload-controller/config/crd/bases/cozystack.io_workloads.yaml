@@ -27,6 +27,10 @@ spec:
     - jsonPath: .status.resources.memory
       name: Memory
       type: string
+    - format: upper
+      jsonPath: .status.operational
+      name: Operational
+      type: boolean
     name: v1alpha1
     schema:
       openAPIV3Schema:
@@ -59,6 +63,10 @@ spec:
                 description: Kind represents the type of workload (redis, postgres,
                   etc.)
                 type: string
+              operational:
+                description: Operational indicates if all pods of the workload are
+                  ready
+                type: boolean
               resources:
                 additionalProperties:
                   anyOf:

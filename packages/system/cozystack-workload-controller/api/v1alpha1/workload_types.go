@@ -40,6 +40,10 @@ type WorkloadStatus struct {
 	// Resources specifies the compute resources allocated to this workload
 	// +required
 	Resources map[string]resource.Quantity `json:"resources"`
+
+	// Operational indicates if all pods of the workload are ready
+	// +optional
+	Operational bool `json:"operational"`
 }
 
 // +kubebuilder:object:root=true
@@ -47,6 +51,7 @@ type WorkloadStatus struct {
 // +kubebuilder:printcolumn:name="Type",type="string",JSONPath=".status.type"
 // +kubebuilder:printcolumn:name="CPU",type="string",JSONPath=".status.resources.cpu"
 // +kubebuilder:printcolumn:name="Memory",type="string",JSONPath=".status.resources.memory"
+// +kubebuilder:printcolumn:name="Operational",type="boolean",JSONPath=`.status.operational`
 
 // Workload is the Schema for the workloads API
 type Workload struct {
