@@ -21,11 +21,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// WorkloadSpec defines the desired state of Workload
-type WorkloadSpec struct {
-	// Placeholder for future spec fields
-}
-
 // WorkloadStatus defines the observed state of Workload
 type WorkloadStatus struct {
 	// Kind represents the type of workload (redis, postgres, etc.)
@@ -58,7 +53,6 @@ type Workload struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   WorkloadSpec   `json:"spec,omitempty"`
 	Status WorkloadStatus `json:"status,omitempty"`
 }
 

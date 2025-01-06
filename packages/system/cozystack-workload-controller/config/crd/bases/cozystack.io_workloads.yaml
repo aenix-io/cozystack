@@ -27,8 +27,7 @@ spec:
     - jsonPath: .status.resources.memory
       name: Memory
       type: string
-    - format: upper
-      jsonPath: .status.operational
+    - jsonPath: .status.operational
       name: Operational
       type: boolean
     name: v1alpha1
@@ -52,9 +51,6 @@ spec:
               More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
-            type: object
-          spec:
-            description: WorkloadSpec defines the desired state of Workload
             type: object
           status:
             description: WorkloadStatus defines the observed state of Workload
