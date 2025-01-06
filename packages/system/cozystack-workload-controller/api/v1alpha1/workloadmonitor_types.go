@@ -10,6 +10,10 @@ type WorkloadMonitorSpec struct {
 	// +required
 	Selector map[string]string `json:"selector"`
 
+	// Type specifies the type of the workload
+	// +optional
+	Type string `json:"type,omitempty"`
+
 	// Version specifies the version of the workload
 	// +optional
 	Version string `json:"version,omitempty"`

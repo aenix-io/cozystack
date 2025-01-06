@@ -88,16 +88,6 @@ func (r *WorkloadMonitorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		targetReplicas = *monitor.Spec.Replicas
 	}
 
-	// Consider operational status based on:
-	// 1. Current replicas match target replicas
-	// 2. Available replicas meet minReplicas requirement
-	if observedReplicas != targetReplicas {
-		monitor.Status.Operational = false
-		logger.Info("Observed replicas don't match target",
-			"observed", observedReplicas,
-			"target", targetReplicas)
-	}
-
 	if monitor.Spec.MinReplicas != nil && availableReplicas < *monitor.Spec.MinReplicas {
 		monitor.Status.Operational = false
 		logger.Info("Available replicas below minimum",

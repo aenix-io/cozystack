@@ -73,6 +73,9 @@ spec:
                   type: string
                 description: Selector is a label selector to find workloads to monitor
                 type: object
+              type:
+                description: Type specifies the type of the workload
+                type: string
               version:
                 description: Version specifies the version of the workload
                 type: string
