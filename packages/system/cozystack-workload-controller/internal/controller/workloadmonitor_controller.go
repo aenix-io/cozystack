@@ -7,6 +7,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -79,17 +80,12 @@ func (r *WorkloadMonitorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	monitor.Status.AvailableReplicas = availableReplicas
 	monitor.Status.ObservedReplicas = observedReplicas
 
-	// Check if operational based on the criteria
-	monitor.Status.Operational = true
+	// Initially set operational = true
+	monitor.Status.Operational = pointer.Bool(true)
 
-	// Get target replicas (use spec.replicas if set, otherwise use observedReplicas)
-	targetReplicas := observedReplicas
-	if monitor.Spec.Replicas != nil {
-		targetReplicas = *monitor.Spec.Replicas
-	}
-
+	// If there are less available replicas than minReplicas, set false
 	if monitor.Spec.MinReplicas != nil && availableReplicas < *monitor.Spec.MinReplicas {
-		monitor.Status.Operational = false
+		monitor.Status.Operational = pointer.Bool(false)
 		logger.Info("Available replicas below minimum",
 			"available", availableReplicas,
 			"minimum", *monitor.Spec.MinReplicas)
@@ -98,7 +94,6 @@ func (r *WorkloadMonitorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	logger.Info("Updating status",
 		"availableReplicas", monitor.Status.AvailableReplicas,
 		"observedReplicas", monitor.Status.ObservedReplicas,
-		"targetReplicas", targetReplicas,
 		"operational", monitor.Status.Operational,
 		"minReplicas", monitor.Spec.MinReplicas)
 

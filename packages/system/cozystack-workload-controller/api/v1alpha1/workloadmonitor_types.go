@@ -34,7 +34,7 @@ type WorkloadMonitorSpec struct {
 type WorkloadMonitorStatus struct {
 	// Operational indicates if the workload meets all operational requirements
 	// +optional
-	Operational bool `json:"operational"`
+	Operational *bool `json:"operational,omitempty"`
 
 	// AvailableReplicas is the number of ready replicas
 	// +optional
