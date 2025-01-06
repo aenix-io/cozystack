@@ -1,0 +1,13 @@
+diff --git a/cluster-autoscaler/cloudprovider/clusterapi/clusterapi_unstructured.go b/cluster-autoscaler/cloudprovider/clusterapi/clusterapi_unstructured.go
+index 4eec0e4bf..f28fd9241 100644
+--- a/cluster-autoscaler/cloudprovider/clusterapi/clusterapi_unstructured.go
++++ b/cluster-autoscaler/cloudprovider/clusterapi/clusterapi_unstructured.go
+@@ -106,8 +106,6 @@ func (r unstructuredScalableResource) Replicas() (int, error) {
+ 
+ func (r unstructuredScalableResource) SetSize(nreplicas int) error {
+ 	switch {
+-	case nreplicas > r.maxSize:
+-		return fmt.Errorf("size increase too large - desired:%d max:%d", nreplicas, r.maxSize)
+ 	case nreplicas < r.minSize:
+ 		return fmt.Errorf("size decrease too large - desired:%d min:%d", nreplicas, r.minSize)
+ 	}
