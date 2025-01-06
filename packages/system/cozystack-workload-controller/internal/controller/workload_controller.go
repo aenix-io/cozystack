@@ -105,6 +105,7 @@ func (r *WorkloadReconciler) reconcilePod(ctx context.Context, pod *corev1.Pod) 
 				return err
 			}
 
+			workload.Labels = pod.Labels
 			workload.Status.Kind = kind
 			workload.Status.Type = workloadType
 			workload.Status.Resources = resources

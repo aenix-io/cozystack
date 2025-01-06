@@ -15,6 +15,7 @@ rules:
 - apiGroups:
   - cozystack.io
   resources:
+  - workloadmonitors
   - workloads
   verbs:
   - create
@@ -27,6 +28,13 @@ rules:
 - apiGroups:
   - cozystack.io
   resources:
+  - workloadmonitors/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - cozystack.io
+  resources:
+  - workloadmonitors/status
   - workloads/status
   verbs:
   - get
