@@ -12,8 +12,8 @@ type Config struct {
 	Endpoint string
 	// Interval between telemetry data collection
 	Interval time.Duration
-	// CozyStackVersion represents the current version of CozyStack
-	CozyStackVersion string
+	// CozystackVersion represents the current version of Cozystack
+	CozystackVersion string
 }
 
 // DefaultConfig returns default telemetry configuration
@@ -22,6 +22,6 @@ func DefaultConfig() *Config {
 		Disabled:         false,
 		Endpoint:         "https://telemetry.cozystack.io",
 		Interval:         15 * time.Minute,
-		CozyStackVersion: "unknown",
+		CozystackVersion: "unknown",
 	}
 }

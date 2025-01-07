@@ -10,6 +10,8 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -18,18 +20,24 @@ import (
 
 // Collector handles telemetry data collection and sending
 type Collector struct {
-	client client.Client
-	config *Config
-	ticker *time.Ticker
-	stopCh chan struct{}
+	client          client.Client
+	discoveryClient discovery.DiscoveryInterface
+	config          *Config
+	ticker          *time.Ticker
+	stopCh          chan struct{}
 }
 
 // NewCollector creates a new telemetry collector
-func NewCollector(client client.Client, config *Config) *Collector {
-	return &Collector{
-		client: client,
-		config: config,
+func NewCollector(client client.Client, config *Config, kubeConfig *rest.Config) (*Collector, error) {
+	discoveryClient, err := discovery.NewDiscoveryClientForConfig(kubeConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create discovery client: %w", err)
 	}
+	return &Collector{
+		client:          client,
+		discoveryClient: discoveryClient,
+		config:          config,
+	}, nil
 }
 
 // Start implements manager.Runnable
@@ -80,6 +88,14 @@ func (c *Collector) collect(ctx context.Context) {
 
 	clusterID := string(kubeSystemNS.UID)
 
+	var cozystackCM corev1.ConfigMap
+	if err := c.client.Get(ctx, types.NamespacedName{Namespace: "cozy-system", Name: "cozystack"}, &cozystackCM); err != nil {
+		logger.Error(err, "Failed to get cozystack configmap in cozy-system namespace")
+		return
+	}
+
+	bundle := cozystackCM.Data["bundle-name"]
+
 	// Get Kubernetes version from nodes
 	var nodeList corev1.NodeList
 	if err := c.client.List(ctx, &nodeList); err != nil {
@@ -90,13 +106,14 @@ func (c *Collector) collect(ctx context.Context) {
 	// Create metrics buffer
 	var metrics strings.Builder
 
-	// Add CozyStack info metric
+	// Add Cozystack info metric
 	if len(nodeList.Items) > 0 {
-		k8sVersion := nodeList.Items[0].Status.NodeInfo.KubeletVersion
+		k8sVersion, _ := c.discoveryClient.ServerVersion()
 		metrics.WriteString(fmt.Sprintf(
-			"cozystack_info{version=\"%s\",kubernetes_version=\"%s\"} 1\n",
-			c.config.CozyStackVersion,
+			"cozystack_cluster_info{version=\"%s\",kubernetes_version=\"%s\",bundle=\"%s\"} 1\n",
+			c.config.CozystackVersion,
 			k8sVersion,
+			bundle,
 		))
 	}
 
@@ -109,7 +126,7 @@ func (c *Collector) collect(ctx context.Context) {
 
 	for osKey, count := range nodeOSCount {
 		metrics.WriteString(fmt.Sprintf(
-			"nodes_count{os=\"%s\",kernel=\"%s\"} %d\n",
+			"cozystack_nodes{os=\"%s\",kernel=\"%s\"} %d\n",
 			osKey,
 			nodeList.Items[0].Status.NodeInfo.KernelVersion,
 			count,
@@ -125,8 +142,8 @@ func (c *Collector) collect(ctx context.Context) {
 
 	for _, monitor := range monitorList.Items {
 		metrics.WriteString(fmt.Sprintf(
-			"workload_count{uid=\"%s\",kind=\"%s\",type=\"%s\",version=\"%s\"} %d\n",
-			clusterID,
+			"cozystack_workload_replicas{uid=\"%s\",kind=\"%s\",type=\"%s\",version=\"%s\"} %d\n",
+			monitor.UID,
 			monitor.Spec.Kind,
 			monitor.Spec.Type,
 			monitor.Spec.Version,

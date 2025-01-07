@@ -101,7 +101,7 @@ func main() {
 		Disabled:         disableTelemetry,
 		Endpoint:         telemetryEndpoint,
 		Interval:         interval,
-		CozyStackVersion: cozystackVersion,
+		CozystackVersion: cozystackVersion,
 	}
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
@@ -190,7 +190,12 @@ func main() {
 	}
 
 	// Initialize telemetry collector
-	collector := telemetry.NewCollector(mgr.GetClient(), &telemetryConfig)
+	collector, err := telemetry.NewCollector(mgr.GetClient(), &telemetryConfig, mgr.GetConfig())
+	if err != nil {
+		setupLog.Error(err, "unable to create telemetry collector")
+		os.Exit(1)
+	}
+
 	if err := mgr.Add(collector); err != nil {
 		setupLog.Error(err, "unable to set up telemetry collector")
 		os.Exit(1)
