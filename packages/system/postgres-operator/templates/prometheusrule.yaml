@@ -1,0 +1,84 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cnpg-default-alerts
+spec:
+  groups:
+  - name: cnpg-default.rules
+    rules:
+    - alert: LongRunningTransaction
+      annotations:
+        description: >-
+          Pod {{ $labels.pod }} has a transaction running longer than 5 minutes (300 seconds).
+          This could indicate a potential lock issue or unoptimized query execution.
+        summary: Long-running transaction detected.
+      expr: rate(cnpg_backends_max_tx_duration_seconds[5m]) > 300
+      for: 1m
+      labels:
+        severity: warning
+
+    - alert: BackendsWaiting
+      annotations:
+        description: >-
+          Pod {{ $labels.pod }} has backends waiting for queries to complete for longer than 5 minutes.
+          This may indicate resource contention or slow query performance.
+        summary: Waiting backends detected.
+      expr: rate(cnpg_backends_waiting_total[5m]) > 300
+      for: 1m
+      labels:
+        severity: warning
+
+    - alert: PGDatabaseXidAge
+      annotations:
+        description: >-
+          Pod {{ $labels.pod }} has exceeded the transaction ID age limit of 150,000,000.
+          This may lead to transaction wraparound and data corruption if not resolved.
+        summary: Transaction ID age limit exceeded.
+      expr: max(cnpg_pg_database_xid_age) > 300000000
+      for: 1m
+      labels:
+        severity: critical
+
+    - alert: PGReplication
+      annotations:
+        description: >-
+          Standby on pod {{ $labels.pod }} is lagging behind the primary by more than 5 minutes (300 seconds).
+          This can lead to outdated data on replicas.
+        summary: Replication lag detected.
+      expr: rate(cnpg_pg_replication_lag[5m]) > 300
+      for: 1m
+      labels:
+        severity: critical
+
+    - alert: LastFailedArchiveTime
+      annotations:
+        description: >-
+          Archiving on pod {{ $labels.pod }} failed more recently than the last successful archive.
+          Investigate logs for archiving errors.
+        summary: Archiving failure detected.
+      expr: (cnpg_pg_stat_archiver_last_failed_time - cnpg_pg_stat_archiver_last_archived_time) > time() - 60
+      for: 1m
+      labels:
+        severity: warning
+
+    - alert: DatabaseDeadlockConflicts
+      annotations:
+        description: >-
+          Pod {{ $labels.pod }} has experienced more than 10 deadlock conflicts.
+          Review database logs and queries to identify potential locking issues.
+        summary: Deadlock conflicts detected.
+      expr: increase(cnpg_pg_stat_database_deadlocks[10m]) > 10
+      for: 1m
+      labels:
+        severity: warning
+
+    - alert: ReplicaFailingReplication
+      annotations:
+        description: >-
+          Replica pod {{ $labels.pod }} is failing to replicate due to issues with WAL receiver.
+          Verify network connectivity, disk space, and replica configuration.
+        summary: Replica replication failure detected.
+      expr: cnpg_pg_replication_in_recovery > 0 and cnpg_pg_replication_is_wal_receiver_up == 0
+      for: 1m
+      labels:
+        severity: critical
