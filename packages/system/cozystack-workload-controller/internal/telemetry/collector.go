@@ -9,6 +9,7 @@ import (
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
@@ -75,6 +76,37 @@ func (c *Collector) Stop() {
 	close(c.stopCh)
 }
 
+// getSizeGroup returns the exponential size group for PVC
+func getSizeGroup(size resource.Quantity) string {
+	gb := size.Value() / (1024 * 1024 * 1024)
+	switch {
+	case gb <= 1:
+		return "1Gi"
+	case gb <= 5:
+		return "5Gi"
+	case gb <= 10:
+		return "10Gi"
+	case gb <= 25:
+		return "25Gi"
+	case gb <= 50:
+		return "50Gi"
+	case gb <= 100:
+		return "100Gi"
+	case gb <= 250:
+		return "250Gi"
+	case gb <= 500:
+		return "500Gi"
+	case gb <= 1024:
+		return "1Ti"
+	case gb <= 2048:
+		return "2Ti"
+	case gb <= 5120:
+		return "5Ti"
+	default:
+		return "10Ti"
+	}
+}
+
 // collect gathers and sends telemetry data
 func (c *Collector) collect(ctx context.Context) {
 	logger := log.FromContext(ctx)
@@ -94,7 +126,10 @@ func (c *Collector) collect(ctx context.Context) {
 		return
 	}
 
+	oidcEnabled := cozystackCM.Data["oidc-enabled"]
 	bundle := cozystackCM.Data["bundle-name"]
+	bundleEnable := cozystackCM.Data["bundle-enable"]
+	bundleDisable := cozystackCM.Data["bundle-disable"]
 
 	// Get Kubernetes version from nodes
 	var nodeList corev1.NodeList
@@ -110,10 +145,13 @@ func (c *Collector) collect(ctx context.Context) {
 	if len(nodeList.Items) > 0 {
 		k8sVersion, _ := c.discoveryClient.ServerVersion()
 		metrics.WriteString(fmt.Sprintf(
-			"cozystack_cluster_info{version=\"%s\",kubernetes_version=\"%s\",bundle=\"%s\"} 1\n",
+			"cozy_cluster_info{cozystack_version=\"%s\",kubernetes_version=\"%s\",oidc_enabled=\"%s\",bundle_name=\"%s\",bunde_enable=\"%s\",bunde_disable=\"%s\"} 1\n",
 			c.config.CozystackVersion,
 			k8sVersion,
+			oidcEnabled,
 			bundle,
+			bundleEnable,
+			bundleDisable,
 		))
 	}
 
@@ -126,11 +164,84 @@ func (c *Collector) collect(ctx context.Context) {
 
 	for osKey, count := range nodeOSCount {
 		metrics.WriteString(fmt.Sprintf(
-			"cozystack_nodes{os=\"%s\",kernel=\"%s\"} %d\n",
+			"cozy_nodes_count{os=\"%s\",kernel=\"%s\"} %d\n",
 			osKey,
 			nodeList.Items[0].Status.NodeInfo.KernelVersion,
 			count,
 		))
+	}
+
+	// Collect LoadBalancer services metrics
+	var serviceList corev1.ServiceList
+	if err := c.client.List(ctx, &serviceList); err != nil {
+		logger.Error(err, "Failed to list Services")
+	} else {
+		lbCount := 0
+		for _, svc := range serviceList.Items {
+			if svc.Spec.Type == corev1.ServiceTypeLoadBalancer {
+				lbCount++
+			}
+		}
+		metrics.WriteString(fmt.Sprintf("cozy_loadbalancers_count %d\n", lbCount))
+	}
+
+	// Count tenant namespaces
+	var nsList corev1.NamespaceList
+	if err := c.client.List(ctx, &nsList); err != nil {
+		logger.Error(err, "Failed to list Namespaces")
+	} else {
+		tenantCount := 0
+		for _, ns := range nsList.Items {
+			if strings.HasPrefix(ns.Name, "tenant-") {
+				tenantCount++
+			}
+		}
+		metrics.WriteString(fmt.Sprintf("cozy_tenants_count %d\n", tenantCount))
+	}
+
+	// Collect PV metrics grouped by driver and size
+	var pvList corev1.PersistentVolumeList
+	if err := c.client.List(ctx, &pvList); err != nil {
+		logger.Error(err, "Failed to list PVs")
+	} else {
+		// Map to store counts by size and driver
+		pvMetrics := make(map[string]map[string]int)
+
+		for _, pv := range pvList.Items {
+			if capacity, ok := pv.Spec.Capacity[corev1.ResourceStorage]; ok {
+				sizeGroup := getSizeGroup(capacity)
+
+				// Get the CSI driver name
+				driver := "unknown"
+				if pv.Spec.CSI != nil {
+					driver = pv.Spec.CSI.Driver
+				} else if pv.Spec.HostPath != nil {
+					driver = "hostpath"
+				} else if pv.Spec.NFS != nil {
+					driver = "nfs"
+				}
+
+				// Initialize nested map if needed
+				if _, exists := pvMetrics[sizeGroup]; !exists {
+					pvMetrics[sizeGroup] = make(map[string]int)
+				}
+
+				// Increment count for this size/driver combination
+				pvMetrics[sizeGroup][driver]++
+			}
+		}
+
+		// Write metrics
+		for size, drivers := range pvMetrics {
+			for driver, count := range drivers {
+				metrics.WriteString(fmt.Sprintf(
+					"cozy_pvs_count{driver=\"%s\",size=\"%s\"} %d\n",
+					driver,
+					size,
+					count,
+				))
+			}
+		}
 	}
 
 	// Collect workload metrics
@@ -142,7 +253,7 @@ func (c *Collector) collect(ctx context.Context) {
 
 	for _, monitor := range monitorList.Items {
 		metrics.WriteString(fmt.Sprintf(
-			"cozystack_workload_replicas{uid=\"%s\",kind=\"%s\",type=\"%s\",version=\"%s\"} %d\n",
+			"cozy_workloads_count{uid=\"%s\",kind=\"%s\",type=\"%s\",version=\"%s\"} %d\n",
 			monitor.UID,
 			monitor.Spec.Kind,
 			monitor.Spec.Type,
