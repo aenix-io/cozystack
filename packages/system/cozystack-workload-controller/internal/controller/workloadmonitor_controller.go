@@ -34,7 +34,7 @@ type WorkloadMonitorReconciler struct {
 // +kubebuilder:rbac:groups=cozystack.io,resources=workloads/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch
 
-// isPodReady checks if the Pod is in Ready condition.
+// isPodReady checks if the Pod is in the Ready condition.
 func (r *WorkloadMonitorReconciler) isPodReady(pod *corev1.Pod) bool {
 	for _, c := range pod.Status.Conditions {
 		if c.Type == corev1.PodReady && c.Status == corev1.ConditionTrue {
@@ -52,25 +52,30 @@ func (r *WorkloadMonitorReconciler) reconcilePodForMonitor(
 ) error {
 	logger := log.FromContext(ctx)
 
-	// Collect resources from Pod's container limits
-	totalResources := map[string]resource.Quantity{}
-	for _, container := range pod.Spec.Containers {
+	// Combine both init containers and normal containers to sum resources properly
+	combinedContainers := append(pod.Spec.InitContainers, pod.Spec.Containers...)
+
+	// totalResources will store the sum of all container resource limits
+	totalResources := make(map[string]resource.Quantity)
+
+	// Iterate over all containers to aggregate their Limits
+	for _, container := range combinedContainers {
 		for name, qty := range container.Resources.Limits {
 			if existing, exists := totalResources[name.String()]; exists {
 				existing.Add(qty)
 				totalResources[name.String()] = existing
 			} else {
-				totalResources[name.String()] = qty
+				totalResources[name.String()] = qty.DeepCopy()
 			}
 		}
 	}
 
-	// If annotation "workload.cozystack.io/resources" is present, merge it
+	// If annotation "workload.cozystack.io/resources" is present, parse and merge
 	if resourcesStr, ok := pod.Annotations["workload.cozystack.io/resources"]; ok {
 		annRes := map[string]string{}
 		if err := json.Unmarshal([]byte(resourcesStr), &annRes); err != nil {
 			logger.Error(err, "Failed to parse resources annotation", "pod", pod.Name)
-			// we do not return an error here to keep reconciling other Pods
+			// We do not return an error here to keep reconciling other Pods
 		} else {
 			for k, v := range annRes {
 				parsed, err := resource.ParseQuantity(v)
@@ -91,22 +96,22 @@ func (r *WorkloadMonitorReconciler) reconcilePodForMonitor(
 		},
 	}
 
-	// Create or Update the Workload
+	// CreateOrUpdate the Workload owned by this WorkloadMonitor
 	_, err := ctrl.CreateOrUpdate(ctx, r.Client, workload, func() error {
-		// Set WorkloadMonitor as the owner, so Workload is deleted automatically if monitor is removed.
+		// Set this WorkloadMonitor as owner for garbage collection
 		if err := controllerutil.SetControllerReference(monitor, workload, r.Scheme); err != nil {
-			// If there's an owner reference conflict, handle it appropriately
 			return err
 		}
 
-		// Copy labels from the Pod if needed (or just set your own)
+		// Copy labels from the Pod if needed
 		workload.Labels = pod.Labels
 
 		// Fill Workload status fields:
-		// Kind and Type come from the WorkloadMonitor spec per the new requirements
-		workload.Status.Kind = monitor.Spec.Kind // example: "redis"
-		workload.Status.Type = monitor.Spec.Type // example: "sentinel"
+		// - Kind and Type come from the WorkloadMonitor spec
+		workload.Status.Kind = monitor.Spec.Kind
+		workload.Status.Type = monitor.Spec.Type
 
+		// Convert the resource map to the Workload's .Status.Resources
 		workload.Status.Resources = totalResources
 		workload.Status.Operational = r.isPodReady(&pod)
 
@@ -120,27 +125,25 @@ func (r *WorkloadMonitorReconciler) reconcilePodForMonitor(
 	return nil
 }
 
-// Reconcile handles two scenarios:
-// 1) Reconciling WorkloadMonitor objects themselves (create/update/delete).
-// 2) Reconciling Pod events, which we map to relevant WorkloadMonitor(s).
+// Reconcile is the main reconcile loop.
+// 1. It reconciles WorkloadMonitor objects themselves (create/update/delete).
+// 2. It also reconciles Pod events mapped to WorkloadMonitor via label selector.
 func (r *WorkloadMonitorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	// Try to fetch the WorkloadMonitor. If it exists, we proceed with normal logic.
-	// If it's not found, it might be a Pod event -> we handle that via watch mapping below.
+	// Fetch the WorkloadMonitor object if it exists
 	monitor := &cozyv1alpha1.WorkloadMonitor{}
 	err := r.Get(ctx, req.NamespacedName, monitor)
 	if err != nil {
-		// If the resource is not found, it might be a Pod reconciling attempt (mapFunc).
+		// If the resource is not found, it may be a Pod event (mapFunc).
 		if apierrors.IsNotFound(err) {
-			// nothing to do if the WorkloadMonitor doesn't exist
 			return ctrl.Result{}, nil
 		}
 		logger.Error(err, "Unable to fetch WorkloadMonitor")
 		return ctrl.Result{}, err
 	}
 
-	// 1. List Pods that match this monitor's Selector
+	// List Pods that match the WorkloadMonitor's selector
 	podList := &corev1.PodList{}
 	if err := r.List(
 		ctx,
@@ -154,12 +157,11 @@ func (r *WorkloadMonitorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 	var observedReplicas, availableReplicas int32
 
-	// 2. For each matching Pod, create or update a Workload
+	// For each matching Pod, reconcile the corresponding Workload
 	for _, pod := range podList.Items {
 		observedReplicas++
 		if err := r.reconcilePodForMonitor(ctx, monitor, pod); err != nil {
 			logger.Error(err, "Failed to reconcile Workload for Pod", "pod", pod.Name)
-			// continue or return depending on your logic
 			continue
 		}
 		if r.isPodReady(&pod) {
@@ -167,36 +169,32 @@ func (r *WorkloadMonitorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		}
 	}
 
-	// 3. Update WorkloadMonitor status
+	// Update WorkloadMonitor status based on observed pods
 	monitor.Status.ObservedReplicas = observedReplicas
 	monitor.Status.AvailableReplicas = availableReplicas
-	monitor.Status.Operational = pointer.Bool(true)
 
+	// Default to operational = true, but check MinReplicas if set
+	monitor.Status.Operational = pointer.Bool(true)
 	if monitor.Spec.MinReplicas != nil && availableReplicas < *monitor.Spec.MinReplicas {
 		monitor.Status.Operational = pointer.Bool(false)
 	}
 
-	// Use MergeFrom to properly patch only status changes
-	// patch := client.MergeFrom(monitor.DeepCopy())
-	// if err := r.Status().Patch(ctx, monitor, patch); err != nil {
-	// 	logger.Error(err, "Unable to update WorkloadMonitor status", "monitor", monitor.Name)
-	// 	return ctrl.Result{}, err
-	// }
+	// Update the WorkloadMonitor status in the cluster
 	if err := r.Status().Update(ctx, monitor); err != nil {
 		logger.Error(err, "Unable to update WorkloadMonitor status", "monitor", monitor.Name)
 		return ctrl.Result{}, err
 	}
 
-	// If no periodic resync is desired, return without requeue.
+	// Return without requeue if we want purely event-driven reconciliations
 	return ctrl.Result{}, nil
 }
 
-// SetupWithManager sets up the controller with the Manager.
+// SetupWithManager registers our controller with the Manager and sets up watches.
 func (r *WorkloadMonitorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		// Watch for changes to WorkloadMonitor objects
+		// Watch WorkloadMonitor objects
 		For(&cozyv1alpha1.WorkloadMonitor{}).
-		// Also watch for Pod events, and map them to the relevant WorkloadMonitor(s)
+		// Also watch Pod objects and map them back to WorkloadMonitor if labels match
 		Watches(
 			&corev1.Pod{},
 			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []reconcile.Request {
@@ -205,15 +203,14 @@ func (r *WorkloadMonitorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return nil
 				}
 
-				// Find all WorkloadMonitors in the same namespace
 				var monitorList cozyv1alpha1.WorkloadMonitorList
+				// List all WorkloadMonitors in the same namespace
 				if err := r.List(ctx, &monitorList, client.InNamespace(pod.Namespace)); err != nil {
-					// if we can't list, we can't do any mapping
 					return nil
 				}
 
+				// Match each monitor's selector with the Pod's labels
 				var requests []reconcile.Request
-				// For each monitor, check if the Pod labels satisfy the monitor's selector
 				for _, m := range monitorList.Items {
 					matches := true
 					for k, v := range m.Spec.Selector {
@@ -234,7 +231,7 @@ func (r *WorkloadMonitorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				return requests
 			}),
 		).
-		// Watch for changes to Workload objects we create. If needed, you can enqueue the parent monitor again:
+		// Watch for changes to Workload objects we create (owned by WorkloadMonitor)
 		Owns(&cozyv1alpha1.Workload{}).
 		Complete(r)
 }
