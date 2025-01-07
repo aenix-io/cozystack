@@ -10,6 +10,10 @@ type WorkloadMonitorSpec struct {
 	// +required
 	Selector map[string]string `json:"selector"`
 
+	// Kind specifies the kind of the workload
+	// +optional
+	Kind string `json:"kind,omitempty"`
+
 	// Type specifies the type of the workload
 	// +optional
 	Type string `json:"type,omitempty"`
@@ -47,7 +51,10 @@ type WorkloadMonitorStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Kind",type="string",JSONPath=".spec.kind"
+// +kubebuilder:printcolumn:name="Type",type="string",JSONPath=".spec.type"
 // +kubebuilder:printcolumn:name="Version",type="string",JSONPath=".spec.version"
+// +kubebuilder:printcolumn:name="Replicas",type="integer",JSONPath=".spec.replicas"
 // +kubebuilder:printcolumn:name="MinReplicas",type="integer",JSONPath=".spec.minReplicas"
 // +kubebuilder:printcolumn:name="Available",type="integer",JSONPath=".status.availableReplicas"
 // +kubebuilder:printcolumn:name="Observed",type="integer",JSONPath=".status.observedReplicas"
