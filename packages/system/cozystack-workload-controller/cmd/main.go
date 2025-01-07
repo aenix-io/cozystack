@@ -20,6 +20,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"os"
+	"time"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -37,6 +38,7 @@ import (
 
 	cozystackiov1alpha1 "github.com/aenix-io/cozystack/api/v1alpha1"
 	"github.com/aenix-io/cozystack/internal/controller"
+	"github.com/aenix-io/cozystack/internal/telemetry"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -58,6 +60,10 @@ func main() {
 	var probeAddr string
 	var secureMetrics bool
 	var enableHTTP2 bool
+	var disableTelemetry bool
+	var telemetryEndpoint string
+	var telemetryInterval string
+	var cozystackVersion string
 	var tlsOpts []func(*tls.Config)
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
@@ -69,11 +75,34 @@ func main() {
 		"If set, the metrics endpoint is served securely via HTTPS. Use --metrics-secure=false to use HTTP instead.")
 	flag.BoolVar(&enableHTTP2, "enable-http2", false,
 		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
+	flag.BoolVar(&disableTelemetry, "disable-telemetry", false,
+		"Disable telemetry collection")
+	flag.StringVar(&telemetryEndpoint, "telemetry-endpoint", "https://telemetry.cozystack.io",
+		"Endpoint for sending telemetry data")
+	flag.StringVar(&telemetryInterval, "telemetry-interval", "15m",
+		"Interval between telemetry data collection (e.g. 15m, 1h)")
+	flag.StringVar(&cozystackVersion, "cozystack-version", "unknown",
+		"Version of CozyStack")
 	opts := zap.Options{
 		Development: true,
 	}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
+
+	// Parse telemetry interval
+	interval, err := time.ParseDuration(telemetryInterval)
+	if err != nil {
+		setupLog.Error(err, "invalid telemetry interval")
+		os.Exit(1)
+	}
+
+	// Configure telemetry
+	telemetryConfig := telemetry.Config{
+		Disabled:         disableTelemetry,
+		Endpoint:         telemetryEndpoint,
+		Interval:         interval,
+		CozyStackVersion: cozystackVersion,
+	}
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
@@ -157,6 +186,13 @@ func main() {
 	}
 	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up ready check")
+		os.Exit(1)
+	}
+
+	// Initialize telemetry collector
+	collector := telemetry.NewCollector(mgr.GetClient(), &telemetryConfig)
+	if err := mgr.Add(collector); err != nil {
+		setupLog.Error(err, "unable to set up telemetry collector")
 		os.Exit(1)
 	}
 
