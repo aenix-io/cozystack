@@ -170,6 +170,20 @@ spec:
                 port:
                   name: http
 ---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: alerta
+spec:
+  replicas: 1
+  minReplicas: 1
+  kind: monitoring
+  type: alerta
+  selector:
+    app: alerta
+    release: alerta
+  version: {{ $.Chart.Version }}
+---
 apiVersion: v1
 kind: Secret
 metadata:
