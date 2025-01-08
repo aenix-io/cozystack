@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"sort"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -19,7 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	cozyv1alpha1 "github.com/aenix-io/cozystack/api/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
 // WorkloadMonitorReconciler reconciles a WorkloadMonitor object
@@ -42,6 +42,50 @@ func (r *WorkloadMonitorReconciler) isPodReady(pod *corev1.Pod) bool {
 		}
 	}
 	return false
+}
+
+// updateOwnerReferences adds the given monitor as a new owner reference to the object if not already present.
+// It then sorts the owner references to enforce a consistent order.
+func updateOwnerReferences(obj metav1.Object, monitor client.Object) {
+	// Retrieve current owner references
+	owners := obj.GetOwnerReferences()
+
+	// Check if current monitor is already in owner references
+	var alreadyOwned bool
+	for _, ownerRef := range owners {
+		if ownerRef.UID == monitor.GetUID() {
+			alreadyOwned = true
+			break
+		}
+	}
+
+	runtimeObj, ok := monitor.(runtime.Object)
+	if !ok {
+		return
+	}
+	gvk := runtimeObj.GetObjectKind().GroupVersionKind()
+
+	// If not already present, add new owner reference without controller flag
+	if !alreadyOwned {
+		newOwnerRef := metav1.OwnerReference{
+			APIVersion: gvk.GroupVersion().String(),
+			Kind:       gvk.Kind,
+			Name:       monitor.GetName(),
+			UID:        monitor.GetUID(),
+			// Set Controller to false to avoid conflict as multiple controllers are not allowed
+			Controller:         pointer.BoolPtr(false),
+			BlockOwnerDeletion: pointer.BoolPtr(true),
+		}
+		owners = append(owners, newOwnerRef)
+	}
+
+	// Sort owner references to enforce a consistent order by UID
+	sort.SliceStable(owners, func(i, j int) bool {
+		return owners[i].UID < owners[j].UID
+	})
+
+	// Update the owner references of the object
+	obj.SetOwnerReferences(owners)
 }
 
 // reconcilePodForMonitor creates or updates a Workload object for the given Pod and WorkloadMonitor.
@@ -75,7 +119,6 @@ func (r *WorkloadMonitorReconciler) reconcilePodForMonitor(
 		annRes := map[string]string{}
 		if err := json.Unmarshal([]byte(resourcesStr), &annRes); err != nil {
 			logger.Error(err, "Failed to parse resources annotation", "pod", pod.Name)
-			// We do not return an error here to keep reconciling other Pods
 		} else {
 			for k, v := range annRes {
 				parsed, err := resource.ParseQuantity(v)
@@ -88,30 +131,23 @@ func (r *WorkloadMonitorReconciler) reconcilePodForMonitor(
 		}
 	}
 
-	// Prepare the Workload object
 	workload := &cozyv1alpha1.Workload{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      pod.Name, // or any logic to ensure uniqueness
+			Name:      pod.Name,
 			Namespace: pod.Namespace,
 		},
 	}
 
-	// CreateOrUpdate the Workload owned by this WorkloadMonitor
 	_, err := ctrl.CreateOrUpdate(ctx, r.Client, workload, func() error {
-		// Set this WorkloadMonitor as owner for garbage collection
-		if err := controllerutil.SetControllerReference(monitor, workload, r.Scheme); err != nil {
-			return err
-		}
+		// Update owner references with the new monitor
+		updateOwnerReferences(workload.GetObjectMeta(), monitor)
 
 		// Copy labels from the Pod if needed
 		workload.Labels = pod.Labels
 
 		// Fill Workload status fields:
-		// - Kind and Type come from the WorkloadMonitor spec
 		workload.Status.Kind = monitor.Spec.Kind
 		workload.Status.Type = monitor.Spec.Type
-
-		// Convert the resource map to the Workload's .Status.Resources
 		workload.Status.Resources = totalResources
 		workload.Status.Operational = r.isPodReady(&pod)
 
