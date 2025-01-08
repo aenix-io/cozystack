@@ -109,12 +109,12 @@ func getSizeGroup(size resource.Quantity) string {
 
 // collect gathers and sends telemetry data
 func (c *Collector) collect(ctx context.Context) {
-	logger := log.FromContext(ctx)
+	logger := log.FromContext(ctx).V(1)
 
 	// Get cluster ID from kube-system namespace
 	var kubeSystemNS corev1.Namespace
 	if err := c.client.Get(ctx, types.NamespacedName{Name: "kube-system"}, &kubeSystemNS); err != nil {
-		logger.Error(err, "Failed to get kube-system namespace")
+		logger.Info(fmt.Sprintf("Failed to get kube-system namespace: %v", err))
 		return
 	}
 
@@ -122,7 +122,7 @@ func (c *Collector) collect(ctx context.Context) {
 
 	var cozystackCM corev1.ConfigMap
 	if err := c.client.Get(ctx, types.NamespacedName{Namespace: "cozy-system", Name: "cozystack"}, &cozystackCM); err != nil {
-		logger.Error(err, "Failed to get cozystack configmap in cozy-system namespace")
+		logger.Info(fmt.Sprintf("Failed to get cozystack configmap in cozy-system namespace: %v", err))
 		return
 	}
 
@@ -134,7 +134,7 @@ func (c *Collector) collect(ctx context.Context) {
 	// Get Kubernetes version from nodes
 	var nodeList corev1.NodeList
 	if err := c.client.List(ctx, &nodeList); err != nil {
-		logger.Error(err, "Failed to list nodes")
+		logger.Info(fmt.Sprintf("Failed to list nodes: %v", err))
 		return
 	}
 
@@ -174,7 +174,7 @@ func (c *Collector) collect(ctx context.Context) {
 	// Collect LoadBalancer services metrics
 	var serviceList corev1.ServiceList
 	if err := c.client.List(ctx, &serviceList); err != nil {
-		logger.Error(err, "Failed to list Services")
+		logger.Info(fmt.Sprintf("Failed to list Services: %v", err))
 	} else {
 		lbCount := 0
 		for _, svc := range serviceList.Items {
@@ -188,7 +188,7 @@ func (c *Collector) collect(ctx context.Context) {
 	// Count tenant namespaces
 	var nsList corev1.NamespaceList
 	if err := c.client.List(ctx, &nsList); err != nil {
-		logger.Error(err, "Failed to list Namespaces")
+		logger.Info(fmt.Sprintf("Failed to list Namespaces: %v", err))
 	} else {
 		tenantCount := 0
 		for _, ns := range nsList.Items {
@@ -202,7 +202,7 @@ func (c *Collector) collect(ctx context.Context) {
 	// Collect PV metrics grouped by driver and size
 	var pvList corev1.PersistentVolumeList
 	if err := c.client.List(ctx, &pvList); err != nil {
-		logger.Error(err, "Failed to list PVs")
+		logger.Info(fmt.Sprintf("Failed to list PVs: %v", err))
 	} else {
 		// Map to store counts by size and driver
 		pvMetrics := make(map[string]map[string]int)
@@ -247,7 +247,7 @@ func (c *Collector) collect(ctx context.Context) {
 	// Collect workload metrics
 	var monitorList cozyv1alpha1.WorkloadMonitorList
 	if err := c.client.List(ctx, &monitorList); err != nil {
-		logger.Error(err, "Failed to list WorkloadMonitors")
+		logger.Info(fmt.Sprintf("Failed to list WorkloadMonitors: %v", err))
 		return
 	}
 
@@ -264,7 +264,7 @@ func (c *Collector) collect(ctx context.Context) {
 
 	// Send metrics
 	if err := c.sendMetrics(clusterID, metrics.String()); err != nil {
-		logger.Error(err, "Failed to send metrics")
+		logger.Info(fmt.Sprintf("Failed to send metrics: %v", err))
 	}
 }
 

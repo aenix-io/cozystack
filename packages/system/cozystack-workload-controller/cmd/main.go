@@ -82,9 +82,9 @@ func main() {
 	flag.StringVar(&telemetryInterval, "telemetry-interval", "15m",
 		"Interval between telemetry data collection (e.g. 15m, 1h)")
 	flag.StringVar(&cozystackVersion, "cozystack-version", "unknown",
-		"Version of CozyStack")
+		"Version of Cozystack")
 	opts := zap.Options{
-		Development: true,
+		Development: false,
 	}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
@@ -192,13 +192,14 @@ func main() {
 	// Initialize telemetry collector
 	collector, err := telemetry.NewCollector(mgr.GetClient(), &telemetryConfig, mgr.GetConfig())
 	if err != nil {
-		setupLog.Error(err, "unable to create telemetry collector")
-		os.Exit(1)
+		setupLog.V(1).Error(err, "unable to create telemetry collector, telemetry will be disabled")
 	}
 
-	if err := mgr.Add(collector); err != nil {
-		setupLog.Error(err, "unable to set up telemetry collector")
-		os.Exit(1)
+	if collector != nil {
+		if err := mgr.Add(collector); err != nil {
+			setupLog.Error(err, "unable to set up telemetry collector")
+			setupLog.V(1).Error(err, "unable to set up telemetry collector, continuing without telemetry")
+		}
 	}
 
 	setupLog.Info("starting manager")
