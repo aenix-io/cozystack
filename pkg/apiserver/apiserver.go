@@ -29,11 +29,11 @@ import (
 	"k8s.io/client-go/dynamic"
 	restclient "k8s.io/client-go/rest"
 
-	"github.com/aenix.io/cozystack/pkg/apis/apps"
-	"github.com/aenix.io/cozystack/pkg/apis/apps/install"
-	"github.com/aenix.io/cozystack/pkg/config"
-	appsregistry "github.com/aenix.io/cozystack/pkg/registry"
-	applicationstorage "github.com/aenix.io/cozystack/pkg/registry/apps/application"
+	"github.com/aenix-io/cozystack/pkg/apis/apps"
+	"github.com/aenix-io/cozystack/pkg/apis/apps/install"
+	"github.com/aenix-io/cozystack/pkg/config"
+	appsregistry "github.com/aenix-io/cozystack/pkg/registry"
+	applicationstorage "github.com/aenix-io/cozystack/pkg/registry/apps/application"
 )
 
 var (

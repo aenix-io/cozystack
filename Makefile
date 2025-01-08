@@ -37,3 +37,6 @@ test:
 	make -C packages/core/testing apply
 	make -C packages/core/testing test
 	make -C packages/core/testing test-applications
+
+generate:
+	hack/update-codegen.sh

@@ -22,9 +22,9 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	testing "k8s.io/client-go/testing"
-	v1alpha1 "github.com/aenix.io/cozystack/pkg/apis/apps/v1alpha1"
-	internal "github.com/aenix.io/cozystack/pkg/generated/applyconfiguration/internal"
-	appsv1alpha1 "github.com/aenix.io/cozystack/pkg/generated/applyconfiguration/apps/v1alpha1"
+	v1alpha1 "github.com/aenix-io/cozystack/pkg/apis/apps/v1alpha1"
+	internal "github.com/aenix-io/cozystack/pkg/generated/applyconfiguration/internal"
+	appsv1alpha1 "github.com/aenix-io/cozystack/pkg/generated/applyconfiguration/apps/v1alpha1"
 )
 
 // ForKind returns an apply configuration type for the given GroupVersionKind, or nil if no

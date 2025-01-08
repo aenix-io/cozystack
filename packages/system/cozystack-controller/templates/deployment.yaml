@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozystack-controller
+  namespace: cozy-system
+  labels:
+    app: cozystack-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozystack-controller
+  template:
+    metadata:
+      labels:
+        app: cozystack-controller
+    spec:
+      serviceAccountName: cozystack-controller
+      containers:
+      - name: cozystack-controller
+        image: "{{ .Values.cozystackController.image }}"
+        args:
+        - --zap-log-level=debug
