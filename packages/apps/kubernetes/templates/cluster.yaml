@@ -30,8 +30,6 @@ spec:
             node-role.kubernetes.io/{{ . }}: ""
             {{- end }}
             cluster.x-k8s.io/deployment-name: {{ $.Release.Name }}-{{ .groupName }}
-            workload.cozystack.io/kind: kubernetes
-            workload.cozystack.io/type: worker
         spec:
           domain:
             {{- if and .group.resources .group.resources.cpu }}
@@ -126,8 +124,6 @@ spec:
     podAdditionalMetadata:
       labels:
         policy.cozystack.io/allow-to-etcd: "true"
-        workload.cozystack.io/kind: kubernetes
-        workload.cozystack.io/type: control-plane
   replicas: 2
   version: 1.30.1
 ---
@@ -139,6 +135,7 @@ metadata:
 spec:
   replicas: 2
   minReplicas: 1
+  kind: kubernetes
   type: control-plane
   selector:
     kamaji.clastix.io/component: deployment
@@ -283,6 +280,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 spec:
   minReplicas: {{ $group.minReplicas }}
+  kind: kubernetes
   type: worker
   selector:
     cluster.x-k8s.io/cluster-name: {{ $.Release.Name }}
