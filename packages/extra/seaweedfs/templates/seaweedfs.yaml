@@ -60,3 +60,59 @@ spec:
       cosi:
         driverName: "{{ .Release.Namespace }}.seaweedfs.objectstorage.k8s.io"
         bucketClassName: "{{ .Release.Namespace }}"
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ $.Release.Name }}-master
+spec:
+  replicas: 3
+  minReplicas: 2
+  kind: seaweedfs
+  type: master
+  selector:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/name: seaweedfs
+  version: {{ $.Chart.Version }}
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ $.Release.Name }}-filer
+spec:
+  replicas: 2
+  minReplicas: 1
+  kind: seaweedfs
+  type: filer
+  selector:
+    app.kubernetes.io/component: filer
+    app.kubernetes.io/name: seaweedfs
+  version: {{ $.Chart.Version }}
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ $.Release.Name }}-volume
+spec:
+  replicas: {{ .Values.replicas }}
+  minReplicas: {{ div .Values.replicas 2 | add1 }}
+  kind: seaweedfs
+  type: volume
+  selector:
+    app.kubernetes.io/component: volume
+    app.kubernetes.io/name: seaweedfs
+  version: {{ $.Chart.Version }}
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ $.Release.Name }}-db
+spec:
+  replicas: 2
+  minReplicas: 1
+  kind: seaweedfs
+  type: postgres
+  selector:
+    cnpg.io/cluster: seaweedfs-db
+    cnpg.io/podRole: instance
+  version: {{ $.Chart.Version }}

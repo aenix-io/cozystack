@@ -231,3 +231,17 @@ spec:
   podMetadata:
     labels:
       policy.cozystack.io/allow-to-apiserver: "true"
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: alertmanager
+spec:
+  replicas: 3
+  minReplicas: 2
+  kind: monitoring
+  type: alertmanager
+  selector:
+    app.kubernetes.io/instance: alertmanager
+    app.kubernetes.io/name: vmalertmanager
+  version: {{ $.Chart.Version }}

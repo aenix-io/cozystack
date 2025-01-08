@@ -36,6 +36,11 @@ rules:
   - grafana-db
   - alerta-db
   - alermanager
+  {{- range .Values.metricsStorages }}
+  - {{ .name }}-vmstorage
+  - {{ .name }}-vmselect
+  - {{ .name }}-vminsert
+  {{- end }}
   {{- range .Values.logsStorages }}
   - {{ $.Release.Name }}-vlogs-{{ .name }}
   {{- end }}
@@ -44,3 +49,5 @@ rules:
   {{- break }}
   {{- end }}
   verbs: ["get", "list", "watch"]
+
+
