@@ -20,6 +20,17 @@ releases:
   namespace: cozy-cert-manager
   dependsOn: []
 
+- name: cozystack-controller
+  releaseName: cozystack-controller
+  chart: cozy-cozystack-controller
+  namespace: cozy-system
+  dependsOn: [cilium]
+  {{- if eq (index $cozyConfig.data "telemetry-enabled") "false" }}
+  values:
+    cozystackController:
+      disableTelemetry: true
+  {{- end }}
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
