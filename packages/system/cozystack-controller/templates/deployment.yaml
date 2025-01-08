@@ -20,4 +20,11 @@ spec:
       - name: cozystack-controller
         image: "{{ .Values.cozystackController.image }}"
         args:
+        {{- if .Values.cozystackController.debug }}
         - --zap-log-level=debug
+        {{- else }}
+        - --zap-log-level=info
+        {{- end }}
+        {{- if .Values.cozystackController.disableTelemetry }}
+        - --disable-telemetry
+        {{- end }}
