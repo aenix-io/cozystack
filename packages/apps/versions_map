@@ -42,7 +42,7 @@ kubernetes 0.12.0 74649f8
 kubernetes 0.12.1 28fca4e
 kubernetes 0.13.0 ced8e5b9
 kubernetes 0.14.0 bfbde07c
-kubernetes 0.14.1 d14b66ce
+kubernetes 0.14.1 fde4bcfa
 kubernetes 0.15.0 HEAD
 mysql 0.1.0 f642698
 mysql 0.2.0 8b975ff0
@@ -66,7 +66,7 @@ postgres 0.5.0 c07c4bbd
 postgres 0.6.0 2a4768a
 postgres 0.6.2 54fd61c
 postgres 0.7.0 dc9d8bb
-postgres 0.7.1 620871a5
+postgres 0.7.1 175a65f
 postgres 0.8.0 HEAD
 rabbitmq 0.1.0 f642698
 rabbitmq 0.2.0 5ca8823
@@ -79,7 +79,7 @@ redis 0.1.1 f642698
 redis 0.2.0 5ca8823
 redis 0.3.0 c07c4bbd
 redis 0.3.1 b7375f73
-redis 0.4.0 b43c9586
+redis 0.4.0 abc8f082
 redis 0.5.0 HEAD
 tcp-balancer 0.1.0 f642698
 tcp-balancer 0.2.0 HEAD
@@ -105,11 +105,11 @@ virtual-machine 0.1.5 7cd7de7
 virtual-machine 0.2.0 5ca8823
 virtual-machine 0.3.0 b908400
 virtual-machine 0.4.0 4746d51
-virtual-machine 0.5.0 48128743
+virtual-machine 0.5.0 cad9cde
 virtual-machine 0.6.0 HEAD
 vm-disk 0.1.0 HEAD
 vm-instance 0.1.0 ced8e5b9
-vm-instance 0.2.0 175a65f8
+vm-instance 0.2.0 4f767ee3
 vm-instance 0.3.0 HEAD
 vpn 0.1.0 f642698
 vpn 0.2.0 7151424
