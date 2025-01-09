@@ -99,6 +99,23 @@ spec:
                 - domain
                 - networkPolicy
                 type: object
+              commonMetadata:
+                description: |-
+                  CommonMetadata specifies the common labels and annotations that are
+                  applied to all resources. Any existing label or annotation will be
+                  overridden if its key matches a common one.
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: Annotations to be added to the object's metadata.
+                    type: object
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: Labels to be added to the object's metadata.
+                    type: object
+                type: object
               components:
                 description: |-
                   Components is the list of controllers to install.
@@ -265,6 +282,15 @@ spec:
                     - GitRepository
                     - Bucket
                     type: string
+                  name:
+                    description: |-
+                      Name is the name of the Flux source and kustomization resources.
+                      When not specified, the name is set to the namespace name of the FluxInstance.
+                    maxLength: 63
+                    type: string
+                    x-kubernetes-validations:
+                    - message: Sync name is immutable
+                      rule: self == oldSelf
                   path:
                     description: |-
                       Path is the path to the source directory containing
@@ -421,6 +447,11 @@ spec:
                 description: |-
                   LastAppliedRevision is the version and digest of the
                   distribution config that was last reconcile.
+                type: string
+              lastArtifactRevision:
+                description: |-
+                  LastArtifactRevision is the digest of the last pulled
+                  distribution artifact.
                 type: string
               lastAttemptedRevision:
                 description: |-
