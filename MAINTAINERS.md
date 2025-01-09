@@ -3,7 +3,7 @@
 | Maintainer | GitHub Username | Company |          Responsibility           |
 | ---------- | --------------- | ------- | --------------------------------- |
 | Andrei Kvapil | [@kvaps](https://github.com/kvaps) | Ænix | Core Maintainer |
-| George Gaál | [@gecube](https://github.com/gecube) | Ænix | DevOps Practices in Platform |
+| George Gaál | [@gecube](https://github.com/gecube) | Ænix | DevOps Practices in Platform, Developers Advocate |
 | Kingdon Barrett | [@kingdonb](https://github.com/kingdonb) | Urmanac | FluxCD and flux-operator |
 | Timofei Larkin | [@lllamnyp](https://github.com/lllamnyp) | - | Etcd-operator Lead |
 | Artem Bortnikov | [@aobort](https://github.com/aobort) | Timescale | Etcd-operator Lead |
