@@ -4,33 +4,26 @@ metadata:
   name: {{ .Release.Name }}-dashboard-resources
 rules:
 - apiGroups:
-  - networking.k8s.io
-  resources:
-  - ingresses
-  resourceNames:
-  - {{ .Release.Name }}
-  verbs: ["get", "list", "watch"]
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  resourceNames:
-  - {{ .Release.Name }}-admin-kubeconfig
-  verbs: ["get", "list", "watch"]
-- apiGroups:
   - ""
   resources:
   - services
   resourceNames:
-  - {{ .Release.Name }}
+  - {{ $.Release.Name }}-s3
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  resourceNames:
+  - ingress-{{ $.Release.Name }}-s3
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - cozystack.io
   resources:
   - workloadmonitors
   resourceNames:
-  - {{ .Release.Name }}
-  {{- range $groupName, $group := .Values.nodeGroups }}
-  - {{ $.Release.Name }}-{{ $groupName }}
-  {{- end }}
+  - {{ $.Release.Name }}-master
+  - {{ $.Release.Name }}-filer
+  - {{ $.Release.Name }}-volume
+  - {{ $.Release.Name }}-db
   verbs: ["get", "list", "watch"]

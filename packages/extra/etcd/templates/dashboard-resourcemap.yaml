@@ -8,23 +8,12 @@ rules:
   resources:
   - services
   resourceNames:
-  - rfs-{{ .Release.Name }}
-  - rfrm-{{ .Release.Name }}
-  - rfrs-{{ .Release.Name }}
-  - "{{ .Release.Name }}-external-lb"
-  verbs: ["get", "list", "watch"]
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  resourceNames:
-  - "{{ .Release.Name }}-auth"
+  - etcd
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - cozystack.io
   resources:
   - workloadmonitors
   resourceNames:
-  - {{ .Release.Name }}-redis
-  - {{ .Release.Name }}-sentinel
+  - {{ .Release.Name }}
   verbs: ["get", "list", "watch"]
