@@ -22,7 +22,7 @@ import (
 	labels "k8s.io/apimachinery/pkg/labels"
 	listers "k8s.io/client-go/listers"
 	cache "k8s.io/client-go/tools/cache"
-	appsv1alpha1 "github.com/aenix.io/cozystack/pkg/apis/apps/v1alpha1"
+	appsv1alpha1 "github.com/aenix-io/cozystack/pkg/apis/apps/v1alpha1"
 )
 
 // ApplicationLister helps list Applications.

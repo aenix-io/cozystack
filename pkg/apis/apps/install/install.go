@@ -17,7 +17,7 @@ limitations under the License.
 package install
 
 import (
-	appsv1alpha1 "github.com/aenix.io/cozystack/pkg/apis/apps/v1alpha1"
+	appsv1alpha1 "github.com/aenix-io/cozystack/pkg/apis/apps/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )

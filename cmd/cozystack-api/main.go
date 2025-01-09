@@ -19,7 +19,7 @@ package main
 import (
 	"os"
 
-	"github.com/aenix.io/cozystack/pkg/cmd/server"
+	"github.com/aenix-io/cozystack/pkg/cmd/server"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/component-base/cli"
 )
