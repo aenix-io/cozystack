@@ -8,13 +8,15 @@ spec:
     rules:
     - alert: LongRunningTransaction
       annotations:
-        description: Namespace {{ $labels.namespace }} App {{ $labels.application_name }} Pod {{ $labels.pod }} is taking more than 5 minutes (300 seconds) for a query.
+        description: Namespace {{ $labels.namespace }} Job {{ $labels.job }} Pod {{ $labels.pod }} is taking more than 5 minutes (300 seconds) for a query.
         summary: A query is taking longer than 5 minutes.
       expr: |-
         cnpg_backends_max_tx_duration_seconds > 300
       for: 1m
       labels:
         severity: warning
+        namespace: {{ $labels.namespace }}
+        job: {{ $labels.job }}
     - alert: BackendsWaiting
       annotations:
         description: Namespace {{ $labels.namespace }} Job {{ $labels.job }} Pod {{ $labels.pod }} has been waiting for longer than 5 minutes
@@ -24,6 +26,8 @@ spec:
       for: 1m
       labels:
         severity: warning
+        namespace: {{ $labels.namespace }}
+        job: {{ $labels.job }}
     - alert: PGDatabaseXidAge
       annotations:
         description: Over 300,000,000 transactions from frozen xid on Namespace {{ $labels.namespace }} Job {{ $labels.job }} Pod {{ $labels.pod }}
@@ -33,6 +37,8 @@ spec:
       for: 1m
       labels:
         severity: warning
+        namespace: {{ $labels.namespace }}
+        job: {{ $labels.job }}
     - alert: PGReplication
       annotations:
         description: Namespace {{ $labels.namespace }} Job {{ $labels.job }} Pod {{ $labels.pod }} Standby is lagging behind by over 300 seconds (5 minutes)
@@ -42,6 +48,8 @@ spec:
       for: 1m
       labels:
         severity: warning
+        namespace: {{ $labels.namespace }}
+        job: {{ $labels.job }}
     - alert: LastFailedArchiveTime
       annotations:
         description: Archiving failed for Namespace {{ $labels.namespace }} Job {{ $labels.job }} Pod {{ $labels.pod }}
@@ -51,6 +59,8 @@ spec:
       for: 1m
       labels:
         severity: warning
+        namespace: {{ $labels.namespace }}
+        job: {{ $labels.job }}
     - alert: DatabaseDeadlockConflicts
       annotations:
         description: There are over 10 deadlock conflicts in Namespace {{ $labels.namespace }} Job {{ $labels.job }} Pod {{ $labels.pod }}
@@ -60,6 +70,8 @@ spec:
       for: 1m
       labels:
         severity: warning
+        namespace: {{ $labels.namespace }}
+        job: {{ $labels.job }}
     - alert: ReplicaFailingReplication
       annotations:
         description: Namespace {{ $labels.namespace }} Job {{ $labels.job }} Pod {{ $labels.pod }} Replica is failing to replicate
@@ -69,3 +81,21 @@ spec:
       for: 1m
       labels:
         severity: warning
+        namespace: {{ $labels.namespace }}
+        job: {{ $labels.job }}
+    - alert: CNPGClusterOffline
+      annotations:
+        summary: CNPG Cluster has no running instances!
+        description: |-
+          CloudNativePG Cluster Namespace: {{ $labels.namespace }} Job: {{ $labels.job }} Pod: {{ $labels.pod }} has no ready instances.
+          Having an offline cluster means your applications will not be able to access the database, leading to
+          potential service disruption and/or data loss.
+        runbook_url: https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/docs/runbooks/CNPGClusterOffline.md
+      expr: |
+        sum by (namespace, pod) (cnpg_collector_up)) OR on() vector(0) == 0
+      for: 5m
+      labels:
+        severity: critical
+        namespace: {{ $labels.namespace }}
+        job: {{ $labels.job }}
+        pod: {{ $labels.pod }}
