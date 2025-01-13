@@ -202,12 +202,12 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 		defs := swagger.Definitions
 
 		// Verify the presence of the base Application/ApplicationList definitions
-		appDef, exists := defs["com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.Application"]
+		appDef, exists := defs["com.github.aenix-io.cozystack.pkg.apis.apps.v1alpha1.Application"]
 		if !exists {
 			return swagger, fmt.Errorf("Application definition not found")
 		}
 
-		listDef, exists := defs["com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.ApplicationList"]
+		listDef, exists := defs["com.github.aenix-io.cozystack.pkg.apis.apps.v1alpha1.ApplicationList"]
 		if !exists {
 			return swagger, fmt.Errorf("ApplicationList definition not found")
 		}
@@ -215,8 +215,8 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 		// Iterate over all registered GVKs (e.g., Bucket, Database, etc.)
 		for _, gvk := range v1alpha1.RegisteredGVKs {
 			// This will be something like:
-			// "com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.Bucket"
-			resourceName := fmt.Sprintf("com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.%s", gvk.Kind)
+			// "com.github.aenix-io.cozystack.pkg.apis.apps.v1alpha1.Bucket"
+			resourceName := fmt.Sprintf("com.github.aenix-io.cozystack.pkg.apis.apps.v1alpha1.%s", gvk.Kind)
 
 			// 1. Create a copy of the base Application definition for the new resource
 			newDef, err := DeepCopySchema(&appDef)
@@ -242,7 +242,7 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 
 			// 4. Now handle the corresponding List type (e.g., BucketList).
 			//    We'll start by copying the ApplicationList definition.
-			listResourceName := fmt.Sprintf("com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.%sList", gvk.Kind)
+			listResourceName := fmt.Sprintf("com.github.aenix-io.cozystack.pkg.apis.apps.v1alpha1.%sList", gvk.Kind)
 			newListDef, err := DeepCopySchema(&listDef)
 			if err != nil {
 				return nil, fmt.Errorf("failed to deepcopy schema for %sList: %w", gvk.Kind, err)
@@ -275,8 +275,8 @@ func (o *AppsServerOptions) Config() (*apiserver.Config, error) {
 		}
 
 		// Remove the original Application/ApplicationList from the definitions
-		delete(defs, "com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.Application")
-		delete(defs, "com.github.aenix.io.cozystack.pkg.apis.apps.v1alpha1.ApplicationList")
+		delete(defs, "com.github.aenix-io.cozystack.pkg.apis.apps.v1alpha1.Application")
+		delete(defs, "com.github.aenix-io.cozystack.pkg.apis.apps.v1alpha1.ApplicationList")
 
 		swagger.Definitions = defs
 		return swagger, nil
