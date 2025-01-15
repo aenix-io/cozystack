@@ -3,14 +3,14 @@
 arch: amd64
 platform: metal
 secureboot: false
-version: v1.8.4
+version: v1.9.1
 input:
   kernel:
     path: /usr/install/amd64/vmlinuz
   initramfs:
     path: /usr/install/amd64/initramfs.xz
   baseInstaller:
-    imageRef: ghcr.io/siderolabs/installer:v1.8.4
+    imageRef: ghcr.io/kvaps/talos/installer:v1.9.1-1-gac655f2d3-dirty
   systemExtensions:
     - imageRef: ghcr.io/siderolabs/amd-ucode:20241210
     - imageRef: ghcr.io/siderolabs/amdgpu-firmware:20241110
@@ -19,8 +19,8 @@ input:
     - imageRef: ghcr.io/siderolabs/intel-ice-firmware:20241210
     - imageRef: ghcr.io/siderolabs/intel-ucode:20241112
     - imageRef: ghcr.io/siderolabs/qlogic-firmware:20241210
-    - imageRef: ghcr.io/siderolabs/drbd:9.2.11-v1.8.4
-    - imageRef: ghcr.io/siderolabs/zfs:2.2.6-v1.8.4
+    - imageRef: ghcr.io/siderolabs/drbd:9.2.12-v1.9.1
+    - imageRef: ghcr.io/kvaps/talos/zfs:2.2.7-v1.9.1-2-gc043c0a
 output:
   kind: kernel
   imageOptions: {}
