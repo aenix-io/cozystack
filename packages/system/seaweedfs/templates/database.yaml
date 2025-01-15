@@ -8,6 +8,9 @@ spec:
   storage:
     size: 10Gi
 
+  monitoring:
+    enablePodMonitor: true
+
   inheritedMetadata:
     labels:
       policy.cozystack.io/allow-to-apiserver: "true"
