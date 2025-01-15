@@ -1,4 +1,4 @@
-KUBEOVN_TAG = v1.13.0
+KUBEOVN_TAG = v1.13.2
 
 export NAME=kubeovn
 export NAMESPACE=cozy-$(NAME)
