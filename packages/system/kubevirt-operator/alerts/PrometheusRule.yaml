@@ -2,7 +2,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: vm-not-running-alert
-  namespace: monitoring
 spec:
   groups:
   - name: kubevirt-alerts
