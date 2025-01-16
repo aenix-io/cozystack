@@ -47,7 +47,7 @@ spec:
           disks:
           {{- range $i, $disk := .Values.disks }}
           - name: disk-{{ .name }}
-            {{- $disk := lookup "cdi.kubevirt.io/v1beta1" "DataVolume" $.Release.Namespace .name }}
+            {{- $disk := lookup "cdi.kubevirt.io/v1beta1" "DataVolume" $.Release.Namespace (printf "vm-disk-%s" .name) }}
             {{- if $disk }}
             {{- if and (hasKey $disk.metadata.annotations "vm-disk.cozystack.io/optical") (eq (index $disk.metadata.annotations "vm-disk.cozystack.io/optical") "true") }}
             cdrom: {}
