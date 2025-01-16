@@ -19,8 +19,8 @@ diff:
 
 update:
 	hack/gen-profiles.sh
-	IMAGE=$$(awk '/^version:/ {print $$2}' images/talos/profiles/installer.yaml) \
-		yq -i '.talos.imager.image = "ghcr.io/siderolabs/imager:" + strenv(IMAGE)' ../builder/values.yaml
+	IMAGE=$$(yq '.input.baseInstaller.imageRef | sub("/installer:", "/imager:")' images/talos/profiles/installer.yaml) \
+		yq -i '.talos.imager.image = strenv(IMAGE)' ../builder/values.yaml
 
 image: pre-checks image-cozystack image-talos image-matchbox
 

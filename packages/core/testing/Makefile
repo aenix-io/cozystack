@@ -36,7 +36,10 @@ image-e2e-sandbox:
 copy-hack-dir:
 	tar -C ../../../ -cf- hack | kubectl exec -i -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- tar -xf-
 
-test: wait-for-sandbox copy-hack-dir ## Run the end-to-end tests in existing sandbox.
+copy-image:
+	cat ../../../_out/assets/nocloud-amd64.raw.xz | kubectl exec -i -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -xec 'xz --decompress > /nocloud-amd64.raw'
+
+test: wait-for-sandbox copy-hack-dir copy-image ## Run the end-to-end tests in existing sandbox.
 	helm template -n cozy-system installer ../installer | kubectl exec -i -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'cat > /cozystack-installer.yaml'
 	kubectl exec -ti -n $(NAMESPACE) deploy/cozystack-e2e-$(NAME) -- sh -c 'export COZYSTACK_INSTALLER_YAML=$$(cat /cozystack-installer.yaml) && /hack/e2e.sh'
 
