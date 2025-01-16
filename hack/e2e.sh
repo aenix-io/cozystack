@@ -229,6 +229,7 @@ sleep 5
 kubectl get hr -A | awk 'NR>1 {print "kubectl wait --timeout=15m --for=condition=ready -n " $1 " hr/" $2 " &"} END{print "wait"}' | sh -x
 
 # Wait for Cluster-API providers
+timeout 30 sh -c 'until kubectl get deploy -n cozy-cluster-api capi-controller-manager capi-kamaji-controller-manager capi-kubeadm-bootstrap-controller-manager capi-operator-cluster-api-operator capk-controller-manager; do sleep 1; done'
 kubectl wait deploy --timeout=30s --for=condition=available -n cozy-cluster-api capi-controller-manager capi-kamaji-controller-manager capi-kubeadm-bootstrap-controller-manager capi-operator-cluster-api-operator capk-controller-manager
 
 # Wait for linstor controller
@@ -296,6 +297,9 @@ spec:
   autoAssign: true
   avoidBuggyIPs: false
 EOT
+
+# Wait for cozystack-api
+kubectl wait --for=condition=Available apiservices v1alpha1.apps.cozystack.io --timeout=2m
 
 kubectl patch -n tenant-root tenants.apps.cozystack.io root --type=merge -p '{"spec":{
   "host": "example.org",

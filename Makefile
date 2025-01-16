@@ -7,6 +7,7 @@ build:
 	make -C packages/apps/clickhouse image
 	make -C packages/apps/kubernetes image
 	make -C packages/system/cozystack-api image
+	make -C packages/system/cozystack-controller image
 	make -C packages/system/cilium image
 	make -C packages/system/kubeovn image
 	make -C packages/system/dashboard image
