@@ -31,3 +31,4 @@ control-plane/control-plane-status
 control-plane/deprecated-resources
 control-plane/dns-coredns
 control-plane/kube-etcd3
+kubevirt/kubevirt-control-plane
