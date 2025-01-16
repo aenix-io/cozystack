@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.30.1@sha256:77336fdd85a5587baecae8cf37eba8829062231b1b4729d2fd60e6435b8e0a43
+ghcr.io/aenix-io/cozystack/ubuntu-container-disk:v1.30.1@sha256:8392f00a7182294ce6fd417d254f7c2aa09fb9203d829dec70344a8050369430

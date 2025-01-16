@@ -93,7 +93,7 @@ releases:
   releaseName: postgres-operator
   chart: cozy-postgres-operator
   namespace: cozy-postgres-operator
-  dependsOn: [cert-manager]
+  dependsOn: [cert-manager,victoria-metrics-operator]
 
 - name: kafka-operator
   releaseName: kafka-operator
