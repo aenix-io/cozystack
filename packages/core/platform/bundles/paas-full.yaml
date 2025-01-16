@@ -89,7 +89,7 @@ releases:
   releaseName: victoria-metrics-operator
   chart: cozy-victoria-metrics-operator
   namespace: cozy-victoria-metrics-operator
-  dependsOn: [cilium,kubeovn,cert-manager]
+  dependsOn: [cert-manager]
 
 - name: monitoring-agents
   releaseName: monitoring-agents
@@ -102,7 +102,7 @@ releases:
   releaseName: kubevirt-operator
   chart: cozy-kubevirt-operator
   namespace: cozy-kubevirt
-  dependsOn: [cilium,kubeovn]
+  dependsOn: [victoria-metrics-operator]
 
 - name: kubevirt
   releaseName: kubevirt
