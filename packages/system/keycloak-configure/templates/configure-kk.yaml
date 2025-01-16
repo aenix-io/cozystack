@@ -1,5 +1,6 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 {{- $host := index $cozyConfig.data "root-host" }}
+{{- $extraRedirectUris := splitList "|" ((index $cozyConfig.data "extra-keycloak-redirect-uri-for-dashboard") | default "") }}
 {{- $rootSaConfigMap := lookup "v1" "ConfigMap" "kube-system" "kube-root-ca.crt" }}
 {{- $k8sCa := index $rootSaConfigMap.data "ca.crt" | b64enc }}
 
@@ -190,6 +191,9 @@ spec:
     - kubernetes-client
   redirectUris:
     - "http://dashboard.{{ $host }}/oauth2/callback/*"
+    {{- range $uri := $extraRedirectUris }}
+    - "{{ $uri }}"
+    {{- end }}
 
 ---
 
