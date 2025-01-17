@@ -51,6 +51,11 @@
                   "type": "string",
                   "description": "specify multiple ID's separated by comma. Get yours in https://t.me/chatid_echo_bot",
                   "default": ""
+                },
+                "disabledSeverity": {
+                  "type": "string",
+                  "description": "list of severity without alerts, separated comma like: \"informational,warning\"",
+                  "default": ""
                 }
               }
             }
