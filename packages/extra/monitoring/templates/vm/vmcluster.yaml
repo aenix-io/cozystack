@@ -10,26 +10,26 @@ spec:
   vminsert:
     replicaCount: 2
     resources:
-      {{- if empty .vminsert.resources }}
+      {{- if and (hasKey . "vminsert") (hasKey .vminsert "resources") }}
+      {{- toYaml .vminsert.resources | nindent 6 }}
+      {{- else }}
       limits:
         memory: 1000Mi
       requests:
         cpu: 100m
         memory: 500Mi
-      {{- else }}
-      {{- toYaml .vminsert.resources | nindent 6 }}
       {{- end }}
   vmselect:
     replicaCount: 2
     resources:
-      {{- if empty .vmselect.resources }}
+      {{- if and (hasKey . "vmselect") (hasKey .vmselect "resources") }}
+      {{- toYaml .vmselect.resources | nindent 6 }}
+      {{- else }}
       limits:
         memory: 1000Mi
       requests:
         cpu: 100m
         memory: 500Mi
-      {{- else }}
-      {{- toYaml .vmselect.resources | nindent 6 }}
       {{- end }}
     extraArgs:
       search.maxUniqueTimeseries: "600000"
@@ -48,14 +48,14 @@ spec:
   vmstorage:
     replicaCount: 2
     resources:
-      {{- if empty .vmstorage.resources }}
+      {{- if and (hasKey . "vmstorage") (hasKey .vmstorage "resources") }}
+      {{- toYaml .vmstorage.resources | nindent 6 }}
+      {{- else }}
       limits:
         memory: 2048Mi
       requests:
         cpu: 100m
         memory: 500Mi
-      {{- else }}
-      {{- toYaml .vmstorage.resources | nindent 6 }}
       {{- end }}
     storage:
       volumeClaimTemplate:
