@@ -195,4 +195,7 @@ releases:
   chart: cozy-keycloak-configure
   namespace: cozy-keycloak
   dependsOn: [keycloak-operator]
+  values:
+    cozyValues: |
+      {{ (lookup "v1" "ConfigMap" "cozy-system" "cozystack").data | toJson | sha256sum }}
 {{- end }}
