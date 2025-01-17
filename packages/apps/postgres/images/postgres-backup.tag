@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/postgres-backup:0.8.0@sha256:6a8ec7e7052f2d02ec5457d7cbac6ee52b3ed93a883988a192d1394fc7c88117
+ghcr.io/aenix-io/cozystack/postgres-backup:0.8.0@sha256:b140bcdbc2f3aec6d59f82ba8504a950a922e4b554f887ae1dd352dcb9429349
