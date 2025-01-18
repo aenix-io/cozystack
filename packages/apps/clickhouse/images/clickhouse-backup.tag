@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/clickhouse-backup:0.6.1@sha256:15d251c98b03b76ccbbd0f83d12303f766955f43494821847636cee448948105
+ghcr.io/aenix-io/cozystack/clickhouse-backup:0.6.1@sha256:7a99cabdfd541f863aa5d1b2f7b49afd39838fb94c8448986634a1dc9050751c
