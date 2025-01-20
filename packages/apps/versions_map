@@ -106,11 +106,13 @@ virtual-machine 0.2.0 5ca8823
 virtual-machine 0.3.0 b908400
 virtual-machine 0.4.0 4746d51
 virtual-machine 0.5.0 cad9cde
-virtual-machine 0.6.0 HEAD
+virtual-machine 0.6.0 0e728870
+virtual-machine 0.7.0 HEAD
 vm-disk 0.1.0 HEAD
 vm-instance 0.1.0 ced8e5b9
 vm-instance 0.2.0 4f767ee3
-vm-instance 0.3.0 HEAD
+vm-instance 0.3.0 0e728870
+vm-instance 0.4.0 HEAD
 vpn 0.1.0 f642698
 vpn 0.2.0 7151424
 vpn 0.3.0 a2bcf100

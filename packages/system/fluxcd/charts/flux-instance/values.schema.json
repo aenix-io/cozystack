@@ -41,6 +41,19 @@
                     },
                     "type": "object"
                 },
+                "commonMetadata": {
+                    "properties": {
+                        "annotations": {
+                            "properties": {},
+                            "type": "object"
+                        },
+                        "labels": {
+                            "properties": {},
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
                 "components": {
                     "items": {
                         "enum": [
@@ -121,6 +134,9 @@
                                 "OCIRepository",
                                 "Bucket"
                             ],
+                            "type": "string"
+                        },
+                        "name": {
                             "type": "string"
                         },
                         "path": {

@@ -22,6 +22,17 @@ spec:
     {{- end }}
   components: {{ .Values.instance.components | toYaml | nindent 4 }}
   cluster: {{ .Values.instance.cluster | toYaml | nindent 4 }}
+  {{- if or .Values.instance.commonMetadata.annotations  .Values.instance.commonMetadata.labels }}
+  commonMetadata:
+    {{- with .Values.instance.commonMetadata.annotations }}
+    annotations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.instance.commonMetadata.labels }}
+    labels:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
   kustomize: {{ .Values.instance.kustomize | toYaml | nindent 4 }}
   {{- if .Values.instance.sync.url }}
   sync:
@@ -29,6 +40,9 @@ spec:
     url: {{ .Values.instance.sync.url }}
     ref: {{ .Values.instance.sync.ref }}
     path: {{ .Values.instance.sync.path }}
+    {{- if .Values.instance.sync.name }}
+    name: {{ .Values.instance.sync.name }}
+    {{- end }}
     {{- if .Values.instance.sync.pullSecret }}
     pullSecret: {{ .Values.instance.sync.pullSecret }}
     {{- end }}

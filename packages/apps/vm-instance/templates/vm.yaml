@@ -17,15 +17,12 @@ spec:
   instancetype:
     kind: VirtualMachineClusterInstancetype
     name: {{ . }}
-    revisionName: null
-  {{- end }}
+    {{- end }}
   {{- with .Values.instanceProfile }}
   preference:
     kind: VirtualMachineClusterPreference
     name: {{ . }}
-    revisionName: null
-  {{- end }}
-
+    {{- end }}
   template:
     metadata:
       annotations:
