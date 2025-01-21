@@ -35,6 +35,7 @@ spec:
     metadata:
       labels:
         app: "{{ $.Release.Name }}-update-hook"
+        policy.cozystack.io/allow-to-apiserver: "true"
     spec:
       serviceAccountName: {{ $.Release.Name }}-update-hook
       restartPolicy: Never
