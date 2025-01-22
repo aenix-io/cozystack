@@ -66,7 +66,6 @@ spec:
             metadata:
               type: object
             spec:
-              description: TenantControlPlaneSpec defines the desired state of TenantControlPlane.
               properties:
                 addons:
                   description: Addons contain which addons are enabled
@@ -6413,10 +6412,23 @@ spec:
                   type: object
                 dataStore:
                   description: |-
-                    DataStore allows to specify a DataStore that should be used to store the Kubernetes data for the given Tenant Control Plane.
-                    This parameter is optional and acts as an override over the default one which is used by the Kamaji Operator.
-                    Migration from a different DataStore to another one is not yet supported and the reconciliation will be blocked.
+                    DataStore specifies the DataStore that should be used to store the Kubernetes data for the given Tenant Control Plane.
+                    When Kamaji runs with the default DataStore flag, all empty values will inherit the default value.
+                    By leaving it empty and running Kamaji with no default DataStore flag, it is possible to achieve automatic assignment to a specific DataStore object.
+
+                    Migration from one DataStore to another backed by the same Driver is possible. See: https://kamaji.clastix.io/guides/datastore-migration/
+                    Migration from one DataStore to another backed by a different Driver is not supported.
                   type: string
+                dataStoreSchema:
+                  description: |-
+                    DataStoreSchema allows to specify the name of the database (for relational DataStores) or the key prefix (for etcd). This
+                    value is optional and immutable. Note that Kamaji currently doesn't ensure that DataStoreSchema values are unique. It's up
+                    to the user to avoid clashes between different TenantControlPlanes. If not set upon creation, Kamaji will default the
+                    DataStoreSchema by concatenating the namespace and name of the TenantControlPlane.
+                  type: string
+                  x-kubernetes-validations:
+                    - message: changing the dataStoreSchema is not supported
+                      rule: self == oldSelf
                 kubernetes:
                   description: Kubernetes specification for tenant control plane
                   properties:
@@ -6539,15 +6551,47 @@ spec:
                       items:
                         type: string
                       type: array
+                    clusterDomain:
+                      default: cluster.local
+                      description: The default domain name used for DNS resolution within the cluster.
+                      pattern: .*\..*
+                      type: string
+                      x-kubernetes-validations:
+                        - message: changing the cluster domain is not supported
+                          rule: self == oldSelf
                     dnsServiceIPs:
-                      default:
-                        - 10.96.0.10
+                      description: |-
+                        The DNS Service for internal resolution, it must match the Service CIDR.
+                        In case of an empty value, it is automatically computed according to the Service CIDR, e.g.:
+                        Service CIDR 10.96.0.0/16, the resulting DNS Service IP will be 10.96.0.10 for IPv4,
+                        for IPv6 from the CIDR 2001:db8:abcd::/64 the resulting DNS Service IP will be 2001:db8:abcd::10.
+                      items:
+                        type: string
+                      type: array
+                    loadBalancerClass:
+                      description: |-
+                        Specify the LoadBalancer class in case of multiple load balancer implementations.
+                        Field supported only for Tenant Control Plane instances exposed using a LoadBalancer Service.
+                      minLength: 1
+                      type: string
+                      x-kubernetes-validations:
+                        - message: LoadBalancerClass is immutable
+                          rule: self == oldSelf
+                    loadBalancerSourceRanges:
+                      description: |-
+                        LoadBalancerSourceRanges restricts the IP ranges that can access
+                        the LoadBalancer type Service. This field defines a list of IP
+                        address ranges (in CIDR format) that are allowed to access the service.
+                        If left empty, the service will allow traffic from all IP ranges (0.0.0.0/0).
+                        This feature is useful for restricting access to API servers or services
+                        to specific networks for security purposes.
+                        Example: {"192.168.1.0/24", "10.0.0.0/8"}
                       items:
                         type: string
                       type: array
                     podCidr:
                       default: 10.244.0.0/16
-                      description: CIDR for Kubernetes Pods
+                      description: 'CIDR for Kubernetes Pods: if empty, defaulted to 10.244.0.0/16.'
                       type: string
                     port:
                       default: 6443
@@ -6556,13 +6600,24 @@ spec:
                       type: integer
                     serviceCidr:
                       default: 10.96.0.0/16
-                      description: Kubernetes Service
+                      description: 'CIDR for Kubernetes Services: if empty, defaulted to 10.96.0.0/16.'
                       type: string
                   type: object
               required:
                 - controlPlane
                 - kubernetes
               type: object
+              x-kubernetes-validations:
+                - message: unsetting the dataStore is not supported
+                  rule: '!has(oldSelf.dataStore) || has(self.dataStore)'
+                - message: unsetting the dataStoreSchema is not supported
+                  rule: '!has(oldSelf.dataStoreSchema) || has(self.dataStoreSchema)'
+                - message: LoadBalancer source ranges are supported only with LoadBalancer service type
+                  rule: '!has(self.networkProfile.loadBalancerSourceRanges) || (size(self.networkProfile.loadBalancerSourceRanges) == 0 || self.controlPlane.service.serviceType == ''LoadBalancer'')'
+                - message: LoadBalancerClass is supported only with LoadBalancer service type
+                  rule: '!has(self.networkProfile.loadBalancerClass) || self.controlPlane.service.serviceType == ''LoadBalancer'''
+                - message: LoadBalancerClass cannot be set or unset at runtime
+                  rule: self.controlPlane.service.serviceType != 'LoadBalancer' || (oldSelf.controlPlane.service.serviceType != 'LoadBalancer' && self.controlPlane.service.serviceType == 'LoadBalancer') || has(self.networkProfile.loadBalancerClass) == has(oldSelf.networkProfile.loadBalancerClass)
             status:
               description: TenantControlPlaneStatus defines the observed state of TenantControlPlane.
               properties:
