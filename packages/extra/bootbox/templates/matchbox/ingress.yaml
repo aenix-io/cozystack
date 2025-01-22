@@ -15,6 +15,9 @@ metadata:
     acme.cert-manager.io/http01-ingress-class: {{ $ingress }}
     {{- end }}
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- if .Values.whitelistHTTP }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: "{{ join "," (.Values.whitelist | default "0.0.0.0/32") }}"
+    {{- end }}
 spec:
   ingressClassName: {{ $ingress }}
   tls:

@@ -4,6 +4,8 @@
 
 ### Common parameters
 
-| Name       | Description                                  | Value |
-| ---------- | -------------------------------------------- | ----- |
-| `machines` | Configuration of physcial machines instances | `[]`  |
+| Name            | Description                                           | Value  |
+| --------------- | ----------------------------------------------------- | ------ |
+| `whitelistHTTP` | Secure HTTP by enabling  client networks whitelisting | `true` |
+| `whitelist`     | List of client networks                               | `[]`   |
+| `machines`      | Configuration of physcial machines instances          | `[]`   |

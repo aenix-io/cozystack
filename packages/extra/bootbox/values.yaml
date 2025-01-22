@@ -1,5 +1,16 @@
 ## @section Common parameters
 
+## @param whitelistHTTP Secure HTTP by enabling  client networks whitelisting
+## @param whitelist List of client networks
+## Example:
+## whitelistHTTP: true
+## whitelist:
+## - "1.2.3.4"
+## - "10.8.0.0/16"
+##
+whitelistHTTP: true
+whitelist: []
+
 ## @param machines [array] Configuration of physcial machines instances
 ##
 ## Example:
