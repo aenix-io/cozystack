@@ -1,0 +1,87 @@
+{{- if .Values.deploy }}
+{{- $roleType := .Values.rbac.type }}
+{{- $nodeSelector := .Values.nodeSelector }}
+{{- if .Values.global }}
+{{- $roleType = coalesce .Values.global.rbac.type .Values.rbac.type }}
+{{- $nodeSelector = coalesce .Values.nodeSelector .Values.global.nodeSelector }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.name }}
+    control-plane: controller-manager
+  name: {{ .Values.name }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+      control-plane: controller-manager
+      stack: tinkerbell
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+      labels:
+        app: {{ .Values.name }}
+        control-plane: controller-manager
+        stack: tinkerbell
+    spec:
+      {{- if .Values.hostNetwork }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - name: manager
+        image: {{ .Values.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+        - /manager
+        args:
+        - --leader-elect
+        {{- if eq $roleType "Role" }}
+        - -kube-namespace={{ .Release.Namespace }}
+        {{- end }}
+        {{- range .Values.additionalArgs }}
+        - {{ . }}
+        {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      terminationGracePeriodSeconds: 10
+      {{- with $nodeSelector }}
+      nodeSelector:
+      {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.singleNodeClusterConfig.controlPlaneTolerationsEnabled }}
+      tolerations:
+      {{- include "singleNodeClusterConfig" . | indent 6 }}
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          {{- include "preferWorkerNodes" (dict "nodeAffinityWeight" .Values.singleNodeClusterConfig.nodeAffinityWeight) | indent 10 }}
+      {{- end }}
+{{- end }}

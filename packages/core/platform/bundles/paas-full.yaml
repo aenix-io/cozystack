@@ -281,6 +281,13 @@ releases:
   optional: true
   dependsOn: [cilium,kubeovn]
 
+- name: tinkerbell
+  releaseName: tinkerbell
+  chart: cozy-tinkerbell
+  namespace: cozy-tinkerbell
+  optional: true
+  dependsOn: [cilium,kubeovn]
+
 {{- if $oidcEnabled }}
 - name: keycloak
   releaseName: keycloak

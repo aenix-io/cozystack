@@ -1,0 +1,342 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.4
+  name: tasks.bmc.tinkerbell.org
+spec:
+  group: bmc.tinkerbell.org
+  names:
+    categories:
+    - tinkerbell
+    kind: Task
+    listKind: TaskList
+    plural: tasks
+    shortNames:
+    - t
+    singular: task
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Task is the Schema for the Task API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: TaskSpec defines the desired state of Task.
+            properties:
+              connection:
+                description: Connection represents the Machine connectivity information.
+                properties:
+                  authSecretRef:
+                    description: |-
+                      AuthSecretRef is the SecretReference that contains authentication information of the Machine.
+                      The Secret must contain username and password keys. This is optional as it is not required when using
+                      the RPC provider.
+                    properties:
+                      name:
+                        description: name is unique within a namespace to reference
+                          a secret resource.
+                        type: string
+                      namespace:
+                        description: namespace defines the space within which the
+                          secret name must be unique.
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  host:
+                    description: Host is the host IP address or hostname of the Machine.
+                    minLength: 1
+                    type: string
+                  insecureTLS:
+                    description: InsecureTLS specifies trusted TLS connections.
+                    type: boolean
+                  port:
+                    default: 623
+                    description: Port is the port number for connecting with the Machine.
+                    type: integer
+                  providerOptions:
+                    description: ProviderOptions contains provider specific options.
+                    properties:
+                      intelAMT:
+                        description: IntelAMT contains the options to customize the
+                          IntelAMT provider.
+                        properties:
+                          hostScheme:
+                            default: http
+                            description: HostScheme determines whether to use http
+                              or https for intelAMT calls.
+                            enum:
+                            - http
+                            - https
+                            type: string
+                          port:
+                            description: Port that intelAMT will use for calls.
+                            type: integer
+                        type: object
+                      ipmitool:
+                        description: IPMITOOL contains the options to customize the
+                          Ipmitool provider.
+                        properties:
+                          cipherSuite:
+                            description: CipherSuite that ipmitool will use for calls.
+                            type: string
+                          port:
+                            description: Port that ipmitool will use for calls.
+                            type: integer
+                        type: object
+                      preferredOrder:
+                        description: |-
+                          PreferredOrder allows customizing the order that BMC providers are called.
+                          Providers added to this list will be moved to the front of the default order.
+                          Provider names are case insensitive.
+                          The default order is: ipmitool, asrockrack, gofish, intelamt, dell, supermicro, openbmc.
+                        items:
+                          description: ProviderName is the bmclib specific provider
+                            name. Names are case insensitive.
+                          pattern: (?i)^(ipmitool|asrockrack|gofish|IntelAMT|dell|supermicro|openbmc)$
+                          type: string
+                        type: array
+                      redfish:
+                        description: Redfish contains the options to customize the
+                          Redfish provider.
+                        properties:
+                          port:
+                            description: Port that redfish will use for calls.
+                            type: integer
+                          systemName:
+                            description: |-
+                              SystemName is the name of the system to use for redfish calls.
+                              With redfish implementations that manage multiple systems via a single endpoint, this allows for specifying the system to manage.
+                            type: string
+                          useBasicAuth:
+                            description: UseBasicAuth for redfish calls. The default
+                              is false which means token based auth is used.
+                            type: boolean
+                        type: object
+                      rpc:
+                        description: RPC contains the options to customize the RPC
+                          provider.
+                        properties:
+                          consumerURL:
+                            description: |-
+                              ConsumerURL is the URL where an rpc consumer/listener is running
+                              and to which we will send and receive all notifications.
+                            type: string
+                          experimental:
+                            description: Experimental options.
+                            properties:
+                              customRequestPayload:
+                                description: CustomRequestPayload must be in json.
+                                type: string
+                              dotPath:
+                                description: 'DotPath is the path to the json object
+                                  where the bmclib RequestPayload{} struct will be
+                                  embedded. For example: object.data.body'
+                                type: string
+                            type: object
+                          hmac:
+                            description: HMAC is the options used to create a HMAC
+                              signature.
+                            properties:
+                              prefixSigDisabled:
+                                description: 'PrefixSigDisabled determines whether
+                                  the algorithm will be prefixed to the signature.
+                                  Example: sha256=abc123'
+                                type: boolean
+                              secrets:
+                                additionalProperties:
+                                  items:
+                                    description: |-
+                                      SecretReference represents a Secret Reference. It has enough information to retrieve secret
+                                      in any namespace
+                                    properties:
+                                      name:
+                                        description: name is unique within a namespace
+                                          to reference a secret resource.
+                                        type: string
+                                      namespace:
+                                        description: namespace defines the space within
+                                          which the secret name must be unique.
+                                        type: string
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                  type: array
+                                description: Secrets are a map of algorithms to secrets
+                                  used for signing.
+                                type: object
+                            type: object
+                          logNotificationsDisabled:
+                            description: LogNotificationsDisabled determines whether
+                              responses from rpc consumer/listeners will be logged
+                              or not.
+                            type: boolean
+                          request:
+                            description: Request is the options used to create the
+                              rpc HTTP request.
+                            properties:
+                              httpContentType:
+                                description: HTTPContentType is the content type to
+                                  use for the rpc request notification.
+                                type: string
+                              httpMethod:
+                                description: HTTPMethod is the HTTP method to use
+                                  for the rpc request notification.
+                                type: string
+                              staticHeaders:
+                                additionalProperties:
+                                  items:
+                                    type: string
+                                  type: array
+                                description: StaticHeaders are predefined headers
+                                  that will be added to every request.
+                                type: object
+                              timestampFormat:
+                                description: TimestampFormat is the time format for
+                                  the timestamp header.
+                                type: string
+                              timestampHeader:
+                                description: 'TimestampHeader is the header name that
+                                  should contain the timestamp. Example: X-BMCLIB-Timestamp'
+                                type: string
+                            type: object
+                          signature:
+                            description: Signature is the options used for adding
+                              an HMAC signature to an HTTP request.
+                            properties:
+                              appendAlgoToHeaderDisabled:
+                                description: |-
+                                  AppendAlgoToHeaderDisabled decides whether to append the algorithm to the signature header or not.
+                                  Example: X-BMCLIB-Signature becomes X-BMCLIB-Signature-256
+                                  When set to true, a header will be added for each algorithm. Example: X-BMCLIB-Signature-256 and X-BMCLIB-Signature-512
+                                type: boolean
+                              headerName:
+                                description: 'HeaderName is the header name that should
+                                  contain the signature(s). Example: X-BMCLIB-Signature'
+                                type: string
+                              includedPayloadHeaders:
+                                description: |-
+                                  IncludedPayloadHeaders are headers whose values will be included in the signature payload. Example: X-BMCLIB-My-Custom-Header
+                                  All headers will be deduplicated.
+                                items:
+                                  type: string
+                                type: array
+                            type: object
+                        required:
+                        - consumerURL
+                        type: object
+                    type: object
+                required:
+                - host
+                - insecureTLS
+                type: object
+              task:
+                description: Task defines the specific action to be performed.
+                maxProperties: 1
+                properties:
+                  oneTimeBootDeviceAction:
+                    description: OneTimeBootDeviceAction represents a baseboard management
+                      one time set boot device operation.
+                    properties:
+                      device:
+                        description: |-
+                          Devices represents the boot devices, in order for setting one time boot.
+                          Currently only the first device in the slice is used to set one time boot.
+                        items:
+                          description: BootDevice represents boot device of the Machine.
+                          type: string
+                        type: array
+                      efiBoot:
+                        description: EFIBoot instructs the machine to use EFI boot.
+                        type: boolean
+                    required:
+                    - device
+                    type: object
+                  powerAction:
+                    description: PowerAction represents a baseboard management power
+                      operation.
+                    enum:
+                    - "on"
+                    - "off"
+                    - soft
+                    - status
+                    - cycle
+                    - reset
+                    type: string
+                  virtualMediaAction:
+                    description: VirtualMediaAction represents a baseboard management
+                      virtual media insert/eject.
+                    properties:
+                      kind:
+                        type: string
+                      mediaURL:
+                        description: |-
+                          mediaURL represents the URL of the image to be inserted into the virtual media, or empty to
+                          eject media.
+                        type: string
+                    required:
+                    - kind
+                    type: object
+                type: object
+            required:
+            - task
+            type: object
+          status:
+            description: TaskStatus defines the observed state of Task.
+            properties:
+              completionTime:
+                description: |-
+                  CompletionTime represents time when the task was completed.
+                  The completion time is only set when the task finishes successfully.
+                format: date-time
+                type: string
+              conditions:
+                description: Conditions represents the latest available observations
+                  of an object's current state.
+                items:
+                  properties:
+                    message:
+                      description: Message represents human readable message indicating
+                        details about last transition.
+                      type: string
+                    status:
+                      description: |-
+                        Status is the status of the Task condition.
+                        Can be True or False.
+                      type: string
+                    type:
+                      description: Type of the Task condition.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              startTime:
+                description: StartTime represents time when the Task started processing.
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

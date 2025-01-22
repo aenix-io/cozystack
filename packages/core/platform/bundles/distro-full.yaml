@@ -199,3 +199,10 @@ releases:
   namespace: cozy-keycloak
   optional: true
   dependsOn: [keycloak]
+
+- name: tinkerbell
+  releaseName: tinkerbell
+  chart: cozy-tinkerbell
+  namespace: cozy-tinkerbell
+  optional: true
+  dependsOn: [cilium,kubeovn]
