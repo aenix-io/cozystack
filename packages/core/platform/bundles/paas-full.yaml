@@ -281,10 +281,11 @@ releases:
   optional: true
   dependsOn: [cilium,kubeovn]
 
-- name: tinkerbell
-  releaseName: tinkerbell
-  chart: cozy-tinkerbell
-  namespace: cozy-tinkerbell
+- name: bootbox
+  releaseName: bootbox
+  chart: cozy-bootbox
+  namespace: cozy-bootbox
+  privileged: true
   optional: true
   dependsOn: [cilium,kubeovn]
 

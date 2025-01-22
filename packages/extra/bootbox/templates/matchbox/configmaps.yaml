@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bootbox-profiles
+data:
+  default.json: |
+    {
+      "id": "default",
+      "name": "default",
+      "boot": {
+        "kernel": "/assets/vmlinuz",
+        "initrd": ["/assets/initramfs.xz"],
+        "args": [
+          "initrd=initramfs.xz",
+          "init_on_alloc=1",
+          "slab_nomerge",
+          "pti=on",
+          "console=tty0",
+          "console=ttyS0",
+          "printk.devkmsg=on",
+          "talos.platform=metal"
+        ]
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bootbox-groups
+data:
+  default.json: |
+    {
+      "id": "default",
+      "name": "default",
+      "profile": "default"
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bootbox-configs
+data:

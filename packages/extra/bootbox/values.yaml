@@ -1,0 +1,19 @@
+## @section Common parameters
+
+## @param machines [array] Configuration of physcial machines instances
+##
+## Example:
+## machines:
+## - hostname: machine1
+##   arch: x86_64
+##   ip:
+##     address: 10.8.2.2
+##     gateway: 10.8.2.1
+##     netmask: 255.255.255.0
+##   leaseTime: 86400
+##   mac: [d6:fa:af:52:25:93]
+##   nameServers: [1.1.1.1,8.8.8.8]
+##   timeServers: [pool.ntp.org]
+##   uefi: true
+
+machines: []

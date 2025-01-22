@@ -1,0 +1,14 @@
+{
+  "title": "Chart Values",
+  "type": "object",
+  "properties": {
+    "machines": {
+      "type": "array",
+      "description": "Configuration of physcial machines instances",
+      "default": "[]",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}
