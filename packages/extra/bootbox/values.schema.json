@@ -15,7 +15,7 @@
     },
     "machines": {
       "type": "array",
-      "description": "Configuration of physcial machines instances",
+      "description": "Configuration of physical machine instances",
       "default": "[]",
       "items": {
         "type": "object"

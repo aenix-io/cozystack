@@ -8,4 +8,4 @@
 | --------------- | ----------------------------------------------------- | ------ |
 | `whitelistHTTP` | Secure HTTP by enabling  client networks whitelisting | `true` |
 | `whitelist`     | List of client networks                               | `[]`   |
-| `machines`      | Configuration of physcial machines instances          | `[]`   |
+| `machines`      | Configuration of physical machine instances           | `[]`   |

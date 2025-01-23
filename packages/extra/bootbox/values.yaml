@@ -11,7 +11,7 @@
 whitelistHTTP: true
 whitelist: []
 
-## @param machines [array] Configuration of physcial machines instances
+## @param machines [array] Configuration of physical machine instances
 ##
 ## Example:
 ## machines:
