@@ -9,7 +9,7 @@ update:
 	tag=$$(git ls-remote --tags --sort="v:refname" https://github.com/clastix/kamaji | grep refs/tags/edge- | awk -F'[/^]' 'END{print $$3}') && \
 	curl -sSL https://github.com/clastix/kamaji/archive/refs/tags/$${tag}.tar.gz | \
 	tar -xzvf - --strip 1 kamaji-$${tag}/charts && \
-	sed -i "/^FROM clastix/ s|:.*|:$${tag}|g" images/kamaji/Dockerfile
+	sed -i "/ARG VERSION/ s|=.*|=$${tag}|g" images/kamaji/Dockerfile
 
 image:
 	docker buildx build images/kamaji \
