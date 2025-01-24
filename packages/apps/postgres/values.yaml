@@ -7,6 +7,7 @@
 ##
 external: false
 size: 10Gi
+walSize: 1Gi
 replicas: 2
 storageClass: ""
 

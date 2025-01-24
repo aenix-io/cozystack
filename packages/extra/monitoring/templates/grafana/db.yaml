@@ -6,10 +6,10 @@ spec:
   instances: 2
   storage:
     size: {{ .Values.grafana.db.size }}
-
+  walStorage:
+    size: 1Gi
   monitoring:
     enablePodMonitor: true
-
   inheritedMetadata:
     labels:
       policy.cozystack.io/allow-to-apiserver: "true"

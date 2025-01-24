@@ -16,16 +16,15 @@ spec:
 
   minSyncReplicas: {{ .Values.quorum.minSyncReplicas }}
   maxSyncReplicas: {{ .Values.quorum.maxSyncReplicas }}
-
   monitoring:
     enablePodMonitor: true
-
   storage:
     size: {{ required ".Values.size is required" .Values.size }}
     {{- with .Values.storageClass }}
     storageClass: {{ . }}
     {{- end }}
-
+  walStorage:
+    size: {{ .Values.walSize | default "1Gi" }}
   inheritedMetadata:
     labels:
       policy.cozystack.io/allow-to-apiserver: "true"
