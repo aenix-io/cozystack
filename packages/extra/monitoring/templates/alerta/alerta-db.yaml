@@ -10,10 +10,10 @@ spec:
     {{- with .Values.alerta.storageClassName }}
     storageClass: {{ . }}
     {{- end }}
-
+  walStorage:
+    size: 1Gi
   monitoring:
     enablePodMonitor: true
-
   inheritedMetadata:
     labels:
       policy.cozystack.io/allow-to-apiserver: "true"
