@@ -6,6 +6,7 @@ build:
 	make -C packages/apps/mysql image
 	make -C packages/apps/clickhouse image
 	make -C packages/apps/kubernetes image
+	make -C packages/extra/monitoring image
 	make -C packages/system/cozystack-api image
 	make -C packages/system/cozystack-controller image
 	make -C packages/system/cilium image
