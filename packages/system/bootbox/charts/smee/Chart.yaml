@@ -1,8 +1,7 @@
 apiVersion: v2
-#name: Virtual Machine
-name: virtual-machine
-description: Virtual Machine (simple)
-icon: /logos/vm.svg
+name: smee
+description: Smee is the network boot service for Tinkerbell
+icon: https://github.com/tinkerbell/artwork/blob/6f07de53d75cb8932dbc7d14201e038cf3a3b230/Tinkerbell-Icon-Dark.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -17,10 +16,10 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.7.1
+version: 0.6.2
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "0.7.1"
+appVersion: "0.15.1"

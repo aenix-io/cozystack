@@ -199,3 +199,11 @@ releases:
   namespace: cozy-keycloak
   optional: true
   dependsOn: [keycloak]
+
+- name: bootbox
+  releaseName: bootbox
+  chart: cozy-bootbox
+  namespace: cozy-bootbox
+  privileged: true
+  optional: true
+  dependsOn: [cilium]

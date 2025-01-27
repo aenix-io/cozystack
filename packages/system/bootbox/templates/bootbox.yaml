@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    cozystack.io/ui: "true"
+  name: bootbox
+  namespace: tenant-root
+spec:
+  chart:
+    spec:
+      chart: bootbox
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-extra
+        namespace: cozy-public
+      version: '*'
+  interval: 1m0s
+  timeout: 5m0s

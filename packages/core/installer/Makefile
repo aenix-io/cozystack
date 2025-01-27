@@ -55,6 +55,8 @@ image-matchbox:  run-builder
 		--metadata-file images/matchbox.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
+	echo "$(REGISTRY)/matchbox:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/matchbox.json -o json -r)" \
+		> ../../extra/bootbox/images/matchbox.tag
 	rm -f images/matchbox.json
 
 assets: talos-iso talos-nocloud talos-metal
