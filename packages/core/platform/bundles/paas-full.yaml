@@ -281,6 +281,14 @@ releases:
   optional: true
   dependsOn: [cilium,kubeovn]
 
+- name: bootbox
+  releaseName: bootbox
+  chart: cozy-bootbox
+  namespace: cozy-bootbox
+  privileged: true
+  optional: true
+  dependsOn: [cilium,kubeovn]
+
 {{- if $oidcEnabled }}
 - name: keycloak
   releaseName: keycloak

@@ -347,3 +347,17 @@ kubeapps:
                       kind: HelmRepository
                       name: cozystack-extra
                       namespace: cozy-public
+              - application:
+                  kind: BootBox
+                  plural: bootboxes
+                  singular: bootbox
+                release:
+                  prefix: ""
+                  labels:
+                    cozystack.io/ui: "true"
+                  chart:
+                    name: bootbox
+                    sourceRef:
+                      kind: HelmRepository
+                      name: cozystack-extra
+                      namespace: cozy-public
