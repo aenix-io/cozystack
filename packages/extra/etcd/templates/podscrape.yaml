@@ -1,7 +1,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMPodScrape
 metadata:
-  name: example-pod-scrape
+  name: etcd-pod-scrape
 spec:
   podMetricsEndpoints:
     - port: metrics
