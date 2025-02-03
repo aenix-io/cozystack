@@ -30,5 +30,5 @@ main/nodes
 control-plane/control-plane-status
 control-plane/deprecated-resources
 control-plane/dns-coredns
-control-plane/kube-etcd3
+control-plane/kube-etcd
 kubevirt/kubevirt-control-plane
