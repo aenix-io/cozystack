@@ -97,6 +97,10 @@ releases:
   namespace: cozy-monitoring
   privileged: true
   dependsOn: [cilium,kubeovn,victoria-metrics-operator]
+  values:
+    scrapeRules:
+      etcd:
+        enabled: true
 
 - name: kubevirt-operator
   releaseName: kubevirt-operator
