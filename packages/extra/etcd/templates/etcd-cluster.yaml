@@ -40,6 +40,12 @@ spec:
       labels:
         cozystack.io/service: etcd
     spec:
+      containers:
+      - name: etcd
+        ports:
+        - name: metrics
+          containerPort: 2381
+          protocol: TCP
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: "kubernetes.io/hostname"
