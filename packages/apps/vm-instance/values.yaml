@@ -1,8 +1,10 @@
 ## @section Common parameters
 
 ## @param external Enable external access from outside the cluster
+## @param externalMethod specify method to passthrough the traffic to the virtual machine. Allowed values: `ports` and `wholeIP`
 ## @param externalPorts [array] Specify ports to forward from outside the cluster
 external: false
+externalMethod: "wholeIP"
 externalPorts:
 - 22
 
