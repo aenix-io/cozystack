@@ -32,3 +32,5 @@ control-plane/deprecated-resources
 control-plane/dns-coredns
 control-plane/kube-etcd
 kubevirt/kubevirt-control-plane
+flux/flux-control-plane
+flux/flux-stats

@@ -78,6 +78,8 @@ modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/pod.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/namespace/namespaces.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/namespace/namespace.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/capacity-planning/capacity-planning.json
+modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//flux/flux-control-plane.json
+modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//flux/flux-stats.json
 EOT
 
 
