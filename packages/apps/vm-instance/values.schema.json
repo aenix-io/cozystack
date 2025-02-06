@@ -9,11 +9,11 @@
     },
     "externalMethod": {
       "type": "string",
-      "description": "specify method to passthrough the traffic to the virtual machine. Allowed values: `ports` and `wholeIP`",
-      "default": "wholeIP",
+      "description": "specify method to passthrough the traffic to the virtual machine. Allowed values: `WholeIP` and `PortList`",
+      "default": "WholeIP",
       "enum": [
-        "ports",
-        "wholeIP"
+        "WholeIP",
+        "PortList"
       ]
     },
     "externalPorts": {

@@ -6,7 +6,7 @@ metadata:
   name: {{ include "virtual-machine.fullname" . }}
   labels:
     {{- include "virtual-machine.labels" . | nindent 4 }}
-  {{- if eq .Values.externalMethod "wholeIP" }}
+  {{- if eq .Values.externalMethod "WholeIP" }}
   annotations:
     networking.cozystack.io/wholeIP: "true"
   {{- end }}
@@ -17,7 +17,7 @@ spec:
   selector:
     {{- include "virtual-machine.labels" . | nindent 4 }}
   ports:
-    {{- if eq .Values.externalMethod "wholeIP" }}
+    {{- if eq .Values.externalMethod "WholeIP" }}
     - port: 65535
     {{- else }}
     {{- range .Values.externalPorts }}

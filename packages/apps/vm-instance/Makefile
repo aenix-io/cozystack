@@ -8,4 +8,4 @@ generate:
 	PREFERENCES=$$(yq e '.metadata.name' -o=json -r ../../system/kubevirt-instancetypes/templates/preferences.yaml | yq 'split(" ") | . + [""]' -o json) \
 	  && yq -i -o json ".properties.instanceProfile.optional=true | .properties.instanceProfile.enum = $${PREFERENCES}" values.schema.json
 	yq -i -o json '.properties.externalPorts.items.type = "integer"' values.schema.json
-	yq -i -o json '.properties.externalMethod.enum = ["ports", "wholeIP"]' values.schema.json
+	yq -i -o json '.properties.externalMethod.enum = ["WholeIP", "PortList"]' values.schema.json
