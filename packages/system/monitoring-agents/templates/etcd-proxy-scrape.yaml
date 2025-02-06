@@ -25,6 +25,11 @@ spec:
         args:
         - "--secure-listen-address=$(NODE_IP):9443"
         - "--upstream=http://127.0.0.1:2381/"
+        env:
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+                status.hostIP
         ports:
         - containerPort: 9443
           name: etcd-metrics
