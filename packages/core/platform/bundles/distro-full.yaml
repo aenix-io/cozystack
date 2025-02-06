@@ -82,6 +82,10 @@ releases:
   privileged: true
   optional: true
   dependsOn: [cilium,victoria-metrics-operator]
+  values:
+    scrapeRules:
+      etcd:
+        enabled: true
 
 - name: metallb
   releaseName: metallb
