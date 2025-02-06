@@ -1,6 +1,6 @@
 # cilium
 
-![Version: 1.16.5](https://img.shields.io/badge/Version-1.16.5-informational?style=flat-square) ![AppVersion: 1.16.5](https://img.shields.io/badge/AppVersion-1.16.5-informational?style=flat-square)
+![Version: 1.16.6](https://img.shields.io/badge/Version-1.16.6-informational?style=flat-square) ![AppVersion: 1.16.6](https://img.shields.io/badge/AppVersion-1.16.6-informational?style=flat-square)
 
 Cilium is open source software for providing and transparently securing
 network connectivity and loadbalancing between application workloads such as
@@ -83,7 +83,7 @@ contributors across the globe, there is almost always someone available to help.
 | authentication.mutual.spire.install.agent.tolerations | list | `[{"effect":"NoSchedule","key":"node.kubernetes.io/not-ready"},{"effect":"NoSchedule","key":"node-role.kubernetes.io/master"},{"effect":"NoSchedule","key":"node-role.kubernetes.io/control-plane"},{"effect":"NoSchedule","key":"node.cloudprovider.kubernetes.io/uninitialized","value":"true"},{"key":"CriticalAddonsOnly","operator":"Exists"}]` | SPIRE agent tolerations configuration By default it follows the same tolerations as the agent itself to allow the Cilium agent on this node to connect to SPIRE. ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ |
 | authentication.mutual.spire.install.enabled | bool | `true` | Enable SPIRE installation. This will only take effect only if authentication.mutual.spire.enabled is true |
 | authentication.mutual.spire.install.existingNamespace | bool | `false` | SPIRE namespace already exists. Set to true if Helm should not create, manage, and import the SPIRE namespace. |
-| authentication.mutual.spire.install.initImage | object | `{"digest":"sha256:d75b758a4fea99ffff4db799e16f853bbde8643671b5b72464a8ba94cbe3dbe3","override":null,"pullPolicy":"IfNotPresent","repository":"docker.io/library/busybox","tag":"1.36.1","useDigest":true}` | init container image of SPIRE agent and server |
+| authentication.mutual.spire.install.initImage | object | `{"digest":"sha256:71b79694b71639e633452f57fd9de40595d524de308349218d9a6a144b40be02","override":null,"pullPolicy":"IfNotPresent","repository":"docker.io/library/busybox","tag":"1.36.1","useDigest":true}` | init container image of SPIRE agent and server |
 | authentication.mutual.spire.install.namespace | string | `"cilium-spire"` | SPIRE namespace to install into |
 | authentication.mutual.spire.install.server.affinity | object | `{}` | SPIRE server affinity configuration |
 | authentication.mutual.spire.install.server.annotations | object | `{}` | SPIRE server annotations |
@@ -182,7 +182,7 @@ contributors across the globe, there is almost always someone available to help.
 | clustermesh.apiserver.extraVolumeMounts | list | `[]` | Additional clustermesh-apiserver volumeMounts. |
 | clustermesh.apiserver.extraVolumes | list | `[]` | Additional clustermesh-apiserver volumes. |
 | clustermesh.apiserver.healthPort | int | `9880` | TCP port for the clustermesh-apiserver health API. |
-| clustermesh.apiserver.image | object | `{"digest":"sha256:37a7fdbef806b78ef63df9f1a9828fdddbf548d1f0e43b8eb10a6bdc8fa03958","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/clustermesh-apiserver","tag":"v1.16.5","useDigest":true}` | Clustermesh API server image. |
+| clustermesh.apiserver.image | object | `{"digest":"sha256:ab2070ea48a52a55d961b81b7b5fbac7d40a3f428be9b1b6b9071d47f194456a","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/clustermesh-apiserver","tag":"v1.16.6","useDigest":true}` | Clustermesh API server image. |
 | clustermesh.apiserver.kvstoremesh.enabled | bool | `true` | Enable KVStoreMesh. KVStoreMesh caches the information retrieved from the remote clusters in the local etcd instance. |
 | clustermesh.apiserver.kvstoremesh.extraArgs | list | `[]` | Additional KVStoreMesh arguments. |
 | clustermesh.apiserver.kvstoremesh.extraEnv | list | `[]` | Additional KVStoreMesh environment variables. |
@@ -353,7 +353,7 @@ contributors across the globe, there is almost always someone available to help.
 | envoy.extraVolumes | list | `[]` | Additional envoy volumes. |
 | envoy.healthPort | int | `9878` | TCP port for the health API. |
 | envoy.idleTimeoutDurationSeconds | int | `60` | Set Envoy upstream HTTP idle connection timeout seconds. Does not apply to connections with pending requests. Default 60s |
-| envoy.image | object | `{"digest":"sha256:709c08ade3d17d52da4ca2af33f431360ec26268d288d9a6cd1d98acc9a1dced","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/cilium-envoy","tag":"v1.30.8-1733837904-eaae5aca0fb988583e5617170a65ac5aa51c0aa8","useDigest":true}` | Envoy container image. |
+| envoy.image | object | `{"digest":"sha256:a69dfe0e54b24b0ff747385c8feeae0612cfbcae97bfcc8ee42a773bb3f69c88","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/cilium-envoy","tag":"v1.30.9-1737073743-40a016d11c0d863b772961ed0168eea6fe6b10a5","useDigest":true}` | Envoy container image. |
 | envoy.initialFetchTimeoutSeconds | int | `30` | Time in seconds after which the initial fetch on an xDS stream is considered timed out |
 | envoy.livenessProbe.failureThreshold | int | `10` | failure threshold of liveness probe |
 | envoy.livenessProbe.periodSeconds | int | `30` | interval between checks of the liveness probe |
@@ -485,7 +485,7 @@ contributors across the globe, there is almost always someone available to help.
 | hubble.relay.extraVolumes | list | `[]` | Additional hubble-relay volumes. |
 | hubble.relay.gops.enabled | bool | `true` | Enable gops for hubble-relay |
 | hubble.relay.gops.port | int | `9893` | Configure gops listen port for hubble-relay |
-| hubble.relay.image | object | `{"digest":"sha256:6cfae1d1afa566ba941f03d4d7e141feddd05260e5cd0a1509aba1890a45ef00","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/hubble-relay","tag":"v1.16.5","useDigest":true}` | Hubble-relay container image. |
+| hubble.relay.image | object | `{"digest":"sha256:ca8dcaa5a81a37743b1397ba2221d16d5d63e4a47607584f1bf50a3b0882bf3b","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/hubble-relay","tag":"v1.16.6","useDigest":true}` | Hubble-relay container image. |
 | hubble.relay.listenHost | string | `""` | Host to listen to. Specify an empty string to bind to all the interfaces. |
 | hubble.relay.listenPort | string | `"4245"` | Port to listen to. |
 | hubble.relay.nodeSelector | object | `{"kubernetes.io/os":"linux"}` | Node labels for pod assignment ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector |
@@ -591,7 +591,7 @@ contributors across the globe, there is almost always someone available to help.
 | hubble.ui.updateStrategy | object | `{"rollingUpdate":{"maxUnavailable":1},"type":"RollingUpdate"}` | hubble-ui update strategy. |
 | identityAllocationMode | string | `"crd"` | Method to use for identity allocation (`crd` or `kvstore`). |
 | identityChangeGracePeriod | string | `"5s"` | Time to wait before using new identity on endpoint identity change. |
-| image | object | `{"digest":"sha256:758ca0793f5995bb938a2fa219dcce63dc0b3fa7fc4ce5cc851125281fb7361d","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/cilium","tag":"v1.16.5","useDigest":true}` | Agent container image. |
+| image | object | `{"digest":"sha256:1e0896b1c4c188b4812c7e0bed7ec3f5631388ca88325c1391a0ef9172c448da","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/cilium","tag":"v1.16.6","useDigest":true}` | Agent container image. |
 | imagePullSecrets | list | `[]` | Configure image pull secrets for pulling container images |
 | ingressController.default | bool | `false` | Set cilium ingress controller to be the default ingress controller This will let cilium ingress controller route entries without ingress class set |
 | ingressController.defaultSecretName | string | `nil` | Default secret name for ingresses without .spec.tls[].secretName set. |
@@ -718,7 +718,7 @@ contributors across the globe, there is almost always someone available to help.
 | operator.hostNetwork | bool | `true` | HostNetwork setting |
 | operator.identityGCInterval | string | `"15m0s"` | Interval for identity garbage collection. |
 | operator.identityHeartbeatTimeout | string | `"30m0s"` | Timeout for identity heartbeats. |
-| operator.image | object | `{"alibabacloudDigest":"sha256:c0edf4c8d089e76d6565d3c57128b98bc6c73d14bb4590126ee746aeaedba5e0","awsDigest":"sha256:97e1fe0c2b522583033138eb10c170919d8de49d2788ceefdcff229a92210476","azureDigest":"sha256:265e2b78f572c76b523f91757083ea5f0b9b73b82f2d9714e5a8fb848e4048f9","genericDigest":"sha256:f7884848483bbcd7b1e0ccfd34ba4546f258b460cb4b7e2f06a1bcc96ef88039","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/operator","suffix":"","tag":"v1.16.5","useDigest":true}` | cilium-operator image. |
+| operator.image | object | `{"alibabacloudDigest":"sha256:0e3c7fbcb6bde9a247cd2dd3d25230e2859d40d2eb58aba6265a2aab216775a9","awsDigest":"sha256:d11ee1cfa3465defe2df7ec1c6e8a77bcaf280b44d2c61aa7496c58b29550f6d","azureDigest":"sha256:0a05d7aea760923897aabd715213ab11a706051673d41fab3874a37f897c1bdd","genericDigest":"sha256:13d32071d5a52c069fb7c35959a56009c6914439adc73e99e098917646d154fc","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/operator","suffix":"","tag":"v1.16.6","useDigest":true}` | cilium-operator image. |
 | operator.nodeGCInterval | string | `"5m0s"` | Interval for cilium node garbage collection. |
 | operator.nodeSelector | object | `{"kubernetes.io/os":"linux"}` | Node labels for cilium-operator pod assignment ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector |
 | operator.podAnnotations | object | `{}` | Annotations to be added to cilium-operator pods |
@@ -768,7 +768,7 @@ contributors across the globe, there is almost always someone available to help.
 | preflight.extraEnv | list | `[]` | Additional preflight environment variables. |
 | preflight.extraVolumeMounts | list | `[]` | Additional preflight volumeMounts. |
 | preflight.extraVolumes | list | `[]` | Additional preflight volumes. |
-| preflight.image | object | `{"digest":"sha256:758ca0793f5995bb938a2fa219dcce63dc0b3fa7fc4ce5cc851125281fb7361d","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/cilium","tag":"v1.16.5","useDigest":true}` | Cilium pre-flight image. |
+| preflight.image | object | `{"digest":"sha256:1e0896b1c4c188b4812c7e0bed7ec3f5631388ca88325c1391a0ef9172c448da","override":null,"pullPolicy":"IfNotPresent","repository":"quay.io/cilium/cilium","tag":"v1.16.6","useDigest":true}` | Cilium pre-flight image. |
 | preflight.nodeSelector | object | `{"kubernetes.io/os":"linux"}` | Node labels for preflight pod assignment ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector |
 | preflight.podAnnotations | object | `{}` | Annotations to be added to preflight pods |
 | preflight.podDisruptionBudget.enabled | bool | `false` | enable PodDisruptionBudget ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/ |
