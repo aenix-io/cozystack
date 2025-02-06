@@ -23,7 +23,7 @@ spec:
       - name: kube-rbac-proxy
         image: quay.io/brancz/kube-rbac-proxy:v0.11.0
         args:
-        - "--secure-listen-address=0.0.0.0:9443"
+        - "--secure-listen-address=$(NODE_IP):9443"
         - "--upstream=http://127.0.0.1:2381/"
         ports:
         - containerPort: 9443
