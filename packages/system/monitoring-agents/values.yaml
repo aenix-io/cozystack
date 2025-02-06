@@ -359,3 +359,7 @@ fluent-bit:
           Name modify
           Match *
           Add cluster root-cluster
+
+scrapeRules:
+  etcd:
+    enabled: false

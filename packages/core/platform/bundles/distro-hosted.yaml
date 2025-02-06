@@ -58,6 +58,10 @@ releases:
   privileged: true
   optional: true
   dependsOn: [victoria-metrics-operator]
+  values:
+    scrapeRules:
+      etcd:
+        enabled: true
 
 - name: etcd-operator
   releaseName: etcd-operator

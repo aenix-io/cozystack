@@ -50,6 +50,12 @@ releases:
         SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
         JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
 
+- name: cozy-proxy
+  releaseName: cozystack
+  chart: cozy-cozy-proxy
+  namespace: cozy-system
+  dependsOn: [cilium,kubeovn]
+
 - name: cert-manager-crds
   releaseName: cert-manager-crds
   chart: cozy-cert-manager-crds
@@ -97,6 +103,10 @@ releases:
   namespace: cozy-monitoring
   privileged: true
   dependsOn: [cilium,kubeovn,victoria-metrics-operator]
+  values:
+    scrapeRules:
+      etcd:
+        enabled: true
 
 - name: kubevirt-operator
   releaseName: kubevirt-operator
