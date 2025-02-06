@@ -31,6 +31,13 @@ releases:
       autoDirectNodeRoutes: true
       routingMode: native
 
+- name: cozy-proxy
+  releaseName: cozystack
+  chart: cozy-cozy-proxy
+  namespace: cozy-system
+  optional: true
+  dependsOn: [cilium]
+
 - name: cert-manager-crds
   releaseName: cert-manager-crds
   chart: cozy-cert-manager-crds
