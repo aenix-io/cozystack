@@ -78,3 +78,13 @@ spec:
            policy.cozystack.io/allow-to-apiserver: "true"
       spec:
         enableServiceLinks: false
+  kafkaExporter:
+    groupRegex: ".*"
+    topicRegex: ".*"
+    resources:
+      requests:
+        cpu: 200m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 128Mi
