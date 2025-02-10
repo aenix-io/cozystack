@@ -36,6 +36,7 @@ assets:
 	make -C packages/core/installer/ assets
 
 test:
+	test -f _out/assets/nocloud-amd64.raw.xz || make -C packages/core/installer talos-nocloud
 	make -C packages/core/testing apply
 	make -C packages/core/testing test
 	make -C packages/core/testing test-applications

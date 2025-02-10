@@ -68,7 +68,7 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.24.1"
+        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.25.0"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
@@ -87,7 +87,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
       - name: assets
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.24.1"
+        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.25.0"
         command:
         - /usr/bin/cozystack-assets-server
         - "-dir=/cozystack/assets"

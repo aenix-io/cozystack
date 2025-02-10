@@ -12,7 +12,7 @@ metadata:
   labels:
     {{- include "virtual-machine.labels" . | nindent 4 }}
 spec:
-  running: {{ .Values.running | default "true" }}
+  running: {{ .Values.running }}
   {{- with .Values.instanceType }}
   instancetype:
     kind: VirtualMachineClusterInstancetype
