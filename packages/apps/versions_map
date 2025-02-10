@@ -23,7 +23,8 @@ kafka 0.2.1 3ac17018
 kafka 0.2.2 d0758692
 kafka 0.2.3 5ca8823
 kafka 0.3.0 c07c4bbd
-kafka 0.3.1 HEAD
+kafka 0.3.1 b7375f73
+kafka 0.3.2 HEAD
 kubernetes 0.1.0 f642698
 kubernetes 0.2.0 7cd7de73
 kubernetes 0.3.0 7caccec1
