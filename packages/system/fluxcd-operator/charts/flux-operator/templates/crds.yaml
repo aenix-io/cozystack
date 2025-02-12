@@ -142,6 +142,11 @@ spec:
                       e.g. 'oci://ghcr.io/controlplaneio-fluxcd/flux-operator-manifests:latest'.
                     pattern: ^oci://.*$
                     type: string
+                  artifactPullSecret:
+                    description: |-
+                      ArtifactPullSecret is the name of the Kubernetes secret
+                      to use for pulling the Kubernetes manifests for the distribution specified in the Artifact field.
+                    type: string
                   imagePullSecret:
                     description: |-
                       ImagePullSecret is the name of the Kubernetes secret
@@ -722,6 +727,515 @@ spec:
                   - type
                   type: object
                 type: array
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile request value, so a change of the annotation value
+                  can be detected.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.1
+    helm.sh/resource-policy: keep
+  labels:
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ .Chart.Name }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+  name: resourcesetinputproviders.fluxcd.controlplane.io
+spec:
+  group: fluxcd.controlplane.io
+  names:
+    kind: ResourceSetInputProvider
+    listKind: ResourceSetInputProviderList
+    plural: resourcesetinputproviders
+    shortNames:
+    - rsip
+    singular: resourcesetinputprovider
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Ready")].message
+      name: Status
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: ResourceSetInputProvider is the Schema for the ResourceSetInputProviders
+          API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ResourceSetInputProviderSpec defines the desired state of
+              ResourceSetInputProvider
+            properties:
+              certSecretRef:
+                description: |-
+                  CertSecretRef specifies the Kubernetes Secret containing either or both of
+
+                  - a PEM-encoded CA certificate (`ca.crt`)
+                  - a PEM-encoded client certificate (`tls.crt`) and private key (`tls.key`)
+
+                  When connecting to a Git provider that uses self-signed certificates, the CA certificate
+                  must be set in the Secret under the 'ca.crt' key to establish the trust relationship.
+                properties:
+                  name:
+                    description: Name of the referent.
+                    type: string
+                required:
+                - name
+                type: object
+              defaultValues:
+                additionalProperties:
+                  x-kubernetes-preserve-unknown-fields: true
+                description: |-
+                  DefaultValues contains the default values for the inputs.
+                  These values are used to populate the inputs when the provider
+                  response does not contain them.
+                type: object
+              filter:
+                description: Filter defines the filter to apply to the input provider
+                  response.
+                properties:
+                  excludeBranch:
+                    description: |-
+                      ExcludeBranch specifies the regular expression to filter the branches
+                      that the input provider should exclude.
+                    type: string
+                  includeBranch:
+                    description: |-
+                      IncludeBranch specifies the regular expression to filter the branches
+                      that the input provider should include.
+                    type: string
+                  labels:
+                    description: Labels specifies the list of labels to filter the
+                      input provider response.
+                    items:
+                      type: string
+                    type: array
+                  limit:
+                    description: |-
+                      Limit specifies the maximum number of input sets to return.
+                      When not set, the default limit is 100.
+                    type: integer
+                type: object
+              secretRef:
+                description: |-
+                  SecretRef specifies the Kubernetes Secret containing the basic-auth credentials
+                  to access the input provider. The secret must contain the keys
+                  'username' and 'password'.
+                  When connecting to a Git provider, the password should be a personal access token
+                  that grants read-only access to the repository.
+                properties:
+                  name:
+                    description: Name of the referent.
+                    type: string
+                required:
+                - name
+                type: object
+              type:
+                description: Type specifies the type of the input provider.
+                enum:
+                - GitHubBranch
+                - GitHubPullRequest
+                - GitLabBranch
+                - GitLabMergeRequest
+                type: string
+              url:
+                description: |-
+                  URL specifies the HTTP/S address of the input provider API.
+                  When connecting to a Git provider, the URL should point to the repository address.
+                pattern: ^(http|https)://.*$
+                type: string
+            required:
+            - type
+            - url
+            type: object
+          status:
+            description: ResourceSetInputProviderStatus defines the observed state
+              of ResourceSetInputProvider.
+            properties:
+              conditions:
+                description: Conditions contains the readiness conditions of the object.
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              exportedInputs:
+                description: ExportedInputs contains the list of inputs exported by
+                  the provider.
+                items:
+                  additionalProperties:
+                    x-kubernetes-preserve-unknown-fields: true
+                  description: ResourceSetInput defines the key-value pairs of the
+                    ResourceSet input.
+                  type: object
+                type: array
+              lastExportedRevision:
+                description: |-
+                  LastExportedRevision is the digest of the
+                  inputs that were last reconcile.
+                type: string
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile request value, so a change of the annotation value
+                  can be detected.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.1
+    helm.sh/resource-policy: keep
+  labels:
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/name: '{{ .Chart.Name }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
+  name: resourcesets.fluxcd.controlplane.io
+spec:
+  group: fluxcd.controlplane.io
+  names:
+    kind: ResourceSet
+    listKind: ResourceSetList
+    plural: resourcesets
+    shortNames:
+    - rset
+    singular: resourceset
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Ready")].message
+      name: Status
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: ResourceSet is the Schema for the ResourceSets API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ResourceSetSpec defines the desired state of ResourceSet
+            properties:
+              commonMetadata:
+                description: |-
+                  CommonMetadata specifies the common labels and annotations that are
+                  applied to all resources. Any existing label or annotation will be
+                  overridden if its key matches a common one.
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: Annotations to be added to the object's metadata.
+                    type: object
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: Labels to be added to the object's metadata.
+                    type: object
+                type: object
+              dependsOn:
+                description: |-
+                  DependsOn specifies the list of Kubernetes resources that must
+                  exist on the cluster before the reconciliation process starts.
+                items:
+                  description: Dependency defines a ResourceSet dependency on a Kubernetes
+                    resource.
+                  properties:
+                    apiVersion:
+                      description: APIVersion of the resource to depend on.
+                      type: string
+                    kind:
+                      description: Kind of the resource to depend on.
+                      type: string
+                    name:
+                      description: Name of the resource to depend on.
+                      type: string
+                    namespace:
+                      description: Namespace of the resource to depend on.
+                      type: string
+                    ready:
+                      description: Ready checks if the resource Ready status condition
+                        is true.
+                      type: boolean
+                    readyExpr:
+                      description: |-
+                        ReadyExpr checks if the resource satisfies the given CEL expression.
+                        The expression replaces the default readiness check and
+                        is only evaluated if Ready is set to 'true'.
+                      type: string
+                  required:
+                  - apiVersion
+                  - kind
+                  - name
+                  type: object
+                type: array
+              inputs:
+                description: Inputs contains the list of ResourceSet inputs.
+                items:
+                  additionalProperties:
+                    x-kubernetes-preserve-unknown-fields: true
+                  description: ResourceSetInput defines the key-value pairs of the
+                    ResourceSet input.
+                  type: object
+                type: array
+              inputsFrom:
+                description: |-
+                  InputsFrom contains the list of references to input providers.
+                  When set, the inputs are fetched from the providers and concatenated
+                  with the in-line inputs defined in the ResourceSet.
+                items:
+                  properties:
+                    apiVersion:
+                      description: |-
+                        APIVersion of the input provider resource.
+                        When not set, the APIVersion of the ResourceSet is used.
+                      type: string
+                    kind:
+                      description: Kind of the input provider resource.
+                      enum:
+                      - ResourceSetInputProvider
+                      type: string
+                    name:
+                      description: Name of the input provider resource.
+                      type: string
+                  required:
+                  - kind
+                  - name
+                  type: object
+                type: array
+              resources:
+                description: Resources contains the list of Kubernetes resources to
+                  reconcile.
+                items:
+                  x-kubernetes-preserve-unknown-fields: true
+                type: array
+              resourcesTemplate:
+                description: |-
+                  ResourcesTemplate is a Go template that generates the list of
+                  Kubernetes resources to reconcile. The template is rendered
+                  as multi-document YAML, the resources should be separated by '---'.
+                  When both Resources and ResourcesTemplate are set, the resulting
+                  objects are merged and deduplicated, with the ones from Resources taking precedence.
+                type: string
+              serviceAccountName:
+                description: |-
+                  The name of the Kubernetes service account to impersonate
+                  when reconciling the generated resources.
+                type: string
+              wait:
+                description: |-
+                  Wait instructs the controller to check the health
+                  of all the reconciled resources.
+                type: boolean
+            type: object
+          status:
+            description: ResourceSetStatus defines the observed state of ResourceSet.
+            properties:
+              conditions:
+                description: Conditions contains the readiness conditions of the object.
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              inventory:
+                description: |-
+                  Inventory contains a list of Kubernetes resource object references
+                  last applied on the cluster.
+                properties:
+                  entries:
+                    description: Entries of Kubernetes resource object references.
+                    items:
+                      description: ResourceRef contains the information necessary
+                        to locate a resource within a cluster.
+                      properties:
+                        id:
+                          description: |-
+                            ID is the string representation of the Kubernetes resource object's metadata,
+                            in the format '<namespace>_<name>_<group>_<kind>'.
+                          type: string
+                        v:
+                          description: Version is the API version of the Kubernetes
+                            resource object's kind.
+                          type: string
+                      required:
+                      - id
+                      - v
+                      type: object
+                    type: array
+                required:
+                - entries
+                type: object
+              lastAppliedRevision:
+                description: |-
+                  LastAppliedRevision is the digest of the
+                  generated resources that were last reconcile.
+                type: string
               lastHandledReconcileAt:
                 description: |-
                   LastHandledReconcileAt holds the value of the most recent
