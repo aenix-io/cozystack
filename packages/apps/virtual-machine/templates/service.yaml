@@ -15,7 +15,7 @@ spec:
   externalTrafficPolicy: Local
   allocateLoadBalancerNodePorts: false
   selector:
-    {{- include "virtual-machine.labels" . | nindent 4 }}
+    {{- include "virtual-machine.selectorLabels" . | nindent 4 }}
   ports:
     {{- if eq .Values.externalMethod "WholeIP" }}
     - port: 65535
