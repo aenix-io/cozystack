@@ -1,7 +1,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMPodScrape
 metadata:
-  name: {{ .Release.Name }}-pod-scrape
+  name: {{ .Release.Name }}
 spec:
   podMetricsEndpoints:
     - port: tcp-prometheus
@@ -20,13 +20,13 @@ spec:
       - sourceLabels: [__meta_kubernetes_pod_name]
         separator: ;
         regex: (.*)
-        targetLabel: kubernetes_pod_name
+        targetLabel: pod
         replacement: $1
         action: replace
       - sourceLabels: [__meta_kubernetes_pod_node_name]
         separator: ;
         regex: (.*)
-        targetLabel: node_name
+        targetLabel: node
         replacement: $1
         action: replace
       - sourceLabels: [__meta_kubernetes_pod_host_ip]
