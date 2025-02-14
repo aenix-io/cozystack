@@ -29,6 +29,9 @@
   {{- $cookieSecret = randAlphaNum 16 }}
 {{- end }}
 
+{{- $wlConfigmap := lookup "v1" "ConfigMap" "cozy-dashboard" "white-label" }}
+{{- $locale := index $wlConfigmap.data "locale" }}
+
 ---
 
 apiVersion: v1
@@ -83,6 +86,9 @@ metadata:
 spec:
   realmName: cozy
   clusterKeycloakRef: keycloak-cozy
+  {{- if $locale }}
+  displayNameHtml: {{ $locale }}
+  {{- end }}
 
 ---
 

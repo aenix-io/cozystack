@@ -112,7 +112,7 @@ virtual-machine 0.5.0 cad9cde
 virtual-machine 0.6.0 0e728870
 virtual-machine 0.7.0 af58018a
 virtual-machine 0.7.1 05857b95
-virtual-machine 0.8.0 3fa4dd3a
+virtual-machine 0.8.0 3fa4dd3
 virtual-machine 0.8.1 HEAD
 vm-disk 0.1.0 HEAD
 vm-instance 0.1.0 ced8e5b9
@@ -120,7 +120,7 @@ vm-instance 0.2.0 4f767ee3
 vm-instance 0.3.0 0e728870
 vm-instance 0.4.0 af58018a
 vm-instance 0.4.1 05857b95
-vm-instance 0.5.0 3fa4dd3a
+vm-instance 0.5.0 3fa4dd3
 vm-instance 0.5.1 HEAD
 vpn 0.1.0 f642698
 vpn 0.2.0 7151424
