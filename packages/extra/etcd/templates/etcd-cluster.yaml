@@ -73,11 +73,8 @@ spec:
   - "key encipherment"
   - "cert sign"
   commonName: etcd-peer-ca
-  subject:
-    organizations:
-      - ACME Inc.
-    organizationalUnits:
-      - Widgets
+  duration: {{ .Values.caDuration }}
+  subject: {{- .Values.subject | toYaml | nindent 4}}
   secretName: etcd-peer-ca-tls
   privateKey:
     algorithm: RSA
@@ -98,11 +95,8 @@ spec:
   - "key encipherment"
   - "cert sign"
   commonName: etcd-ca
-  subject:
-    organizations:
-      - ACME Inc.
-    organizationalUnits:
-      - Widgets
+  duration: {{ .Values.caDuration }}
+  subject: {{- .Values.subject | toYaml | nindent 4}}
   secretName: etcd-ca-tls
   privateKey:
     algorithm: RSA
@@ -133,9 +127,12 @@ kind: Certificate
 metadata:
   name: etcd-server
 spec:
+  commonName: etcd-server
   secretName: etcd-server-tls
+  subject: {{- .Values.subject | toYaml | nindent 4}}
   isCA: false
   usages:
+    - "client auth"
     - "server auth"
     - "signing"
     - "key encipherment"
@@ -146,6 +143,7 @@ spec:
   - etcd-{{ $i }}.etcd-headless.{{ $.Release.Namespace }}.svc
   {{- end }}
   - localhost
+  ipAddresses:
   - "127.0.0.1"
   privateKey:
     rotationPolicy: Always
@@ -159,7 +157,9 @@ kind: Certificate
 metadata:
   name: etcd-peer
 spec:
+  commonName: etcd-peer
   secretName: etcd-peer-tls
+  subject: {{- .Values.subject | toYaml | nindent 4}}
   isCA: false
   usages:
     - "server auth"
@@ -173,6 +173,7 @@ spec:
   - etcd-{{ $i }}.etcd-headless.{{ $.Release.Namespace }}.svc
   {{- end }}
   - localhost
+  ipAddresses:
   - "127.0.0.1"
   privateKey:
     rotationPolicy: Always
@@ -188,6 +189,7 @@ metadata:
 spec:
   commonName: root
   secretName: etcd-client-tls
+  subject: {{- .Values.subject | toYaml | nindent 4}}
   usages:
   - "signing"
   - "key encipherment"
