@@ -17,6 +17,9 @@ spec:
     version: {{ .Values.instance.distribution.version }}
     registry: {{ .Values.instance.distribution.registry }}
     artifact: {{ .Values.instance.distribution.artifact }}
+    {{- if .Values.instance.distribution.artifactPullSecret }}
+    artifactPullSecret: {{ .Values.instance.distribution.artifactPullSecret }}
+    {{- end }}
     {{- if .Values.instance.distribution.imagePullSecret }}
     imagePullSecret: {{ .Values.instance.distribution.imagePullSecret }}
     {{- end }}
@@ -37,6 +40,7 @@ spec:
   {{- if .Values.instance.sync.url }}
   sync:
     kind: {{ .Values.instance.sync.kind }}
+    interval: {{ .Values.instance.sync.interval }}
     url: {{ .Values.instance.sync.url }}
     ref: {{ .Values.instance.sync.ref }}
     path: {{ .Values.instance.sync.path }}
