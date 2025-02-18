@@ -1,8 +1,8 @@
 {{- if and .Values.instanceType (not (lookup "instancetype.kubevirt.io/v1beta1" "VirtualMachineClusterInstancetype" "" .Values.instanceType)) }}
-{{-   fail (printf "Specified instancetype not exists in cluster: %s" .Values.instanceType) }}
+{{-   fail (printf "Specified instanceType does not exist in the cluster: %s" .Values.instanceType) }}
 {{- end }}
 {{- if and .Values.instanceProfile (not (lookup "instancetype.kubevirt.io/v1beta1" "VirtualMachineClusterPreference" "" .Values.instanceProfile)) }}
-{{-   fail (printf "Specified profile not exists in cluster: %s" .Values.instanceProfile) }}
+{{-   fail (printf "Specified instanceProfile does not exist in the cluster: %s" .Values.instanceProfile) }}
 {{- end }}
 
 apiVersion: kubevirt.io/v1
