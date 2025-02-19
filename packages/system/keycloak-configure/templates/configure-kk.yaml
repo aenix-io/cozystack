@@ -87,7 +87,7 @@ spec:
   realmName: cozy
   clusterKeycloakRef: keycloak-cozy
   {{- if $locale }}
-  displayNameHtml: {{ $locale }}
+  displayHtmlName: {{ $locale }}
   displayName: {{ $locale }}
   {{- end }}
 
