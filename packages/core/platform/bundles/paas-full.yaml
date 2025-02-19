@@ -260,11 +260,11 @@ releases:
         customStyle: |
           {{- if $locale }}
           .welcome {
-            innerHTML: 'Welcome to, <span>{{ $locale }}</span>!';
+            innerHTML: 'Welcome to <span>{{ $locale }}</span>!';
           }
           {{- else }}
           .welcome {
-            innerHTML: 'Welcome to, <span>Cozystack</span>!';
+            innerHTML: 'Welcome to <span>Cozystack</span>!';
           }
           {{- end }}
           {{- $logoImage := dig "data" "logo" "" $wlConfigmap }}
