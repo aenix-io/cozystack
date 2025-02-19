@@ -88,6 +88,7 @@ spec:
   clusterKeycloakRef: keycloak-cozy
   {{- if $locale }}
   displayNameHtml: {{ $locale }}
+  displayName: {{ $locale }}
   {{- end }}
 
 ---
