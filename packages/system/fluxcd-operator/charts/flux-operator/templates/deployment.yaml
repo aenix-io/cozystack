@@ -50,6 +50,9 @@ spec:
         - name: manager
           args:
             - --log-level={{ .Values.logLevel }}
+            {{- if .Values.multitenancy.enabled }}
+            - --default-service-account={{ .Values.multitenancy.defaultServiceAccount }}
+            {{- end }}
             {{- range .Values.extraArgs }}
             - {{ . }}
             {{- end }}
