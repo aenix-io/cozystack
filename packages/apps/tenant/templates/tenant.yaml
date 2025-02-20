@@ -272,6 +272,7 @@ rules:
     - virtualmachines
     - vmdisks
     - vminstances
+    - infos
     verbs:
     - get
     - list

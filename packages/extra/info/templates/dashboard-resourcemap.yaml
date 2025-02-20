@@ -1,13 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "tenant.name" . }}-dashboard-resources
-  namespace: {{ .Release.namespace }}
+  name: info-dashboard-resources
 rules:
 - apiGroups:
   - ""
   resources:
   - secrets
   resourceNames:
-  - kubeconfig-{{ include "tenant.name" . }}
+  - kubeconfig-{{ .Release.Namespace }}
   verbs: ["get", "list", "watch"]
