@@ -4,20 +4,12 @@
 # syntax = docker/dockerfile:1
 
 FROM alpine as source
-ARG VERSION=v2.11.0
+ARG COMMIT_REF=dd02680d796c962b8dcc4e5ea70960a846c1acdc
 RUN apk add --no-cache patch
 WORKDIR /source
-RUN wget -O- https://github.com/vmware-tanzu/kubeapps/archive/refs/tags/${VERSION}.tar.gz | tar xzf - --strip-components=1
-COPY fluxcd.diff /patches/fluxcd.diff
-COPY labels.diff /patches/labels.diff
-COPY reconcile-strategy.diff /patches/reconcile-strategy.diff
-COPY dashboard-resource.diff /patches/dashboard-resource.diff
-RUN patch -p1 < /patches/fluxcd.diff
-RUN patch -p1 < /patches/labels.diff
-RUN patch -p1 < /patches/reconcile-strategy.diff
-RUN patch -p1 < /patches/dashboard-resource.diff
+RUN wget -O- https://github.com/aenix-io/kubeapps/archive/${COMMIT_REF}.tar.gz | tar xzf - --strip-components=1
 
-FROM bitnami/golang:1.22.5 AS builder
+FROM bitnami/golang:1.23.4 AS builder
 WORKDIR /go/src/github.com/vmware-tanzu/kubeapps
 COPY --from=source /source/go.mod /source/go.sum ./
 ARG VERSION="devel"
@@ -27,13 +19,13 @@ ARG TARGETARCH
 ARG lint
 
 # https://github.com/bufbuild/buf/releases/
-ARG BUF_VERSION="1.34.0"
+ARG BUF_VERSION="1.45.0"
 
 # https://github.com/golangci/golangci-lint/releases
-ARG GOLANGCILINT_VERSION="1.59.1"
+ARG GOLANGCILINT_VERSION="1.61.0"
 
 # https://github.com/grpc-ecosystem/grpc-health-probe/releases/
-ARG GRPC_HEALTH_PROBE_VERSION="0.4.28"
+ARG GRPC_HEALTH_PROBE_VERSION="0.4.34"
 
 # Install lint tools
 RUN if [ ! -z ${lint:-} ]; then \
@@ -44,7 +36,6 @@ RUN curl -sSL "https://github.com/bufbuild/buf/releases/download/v$BUF_VERSION/b
 
 # TODO: Remove and instead use built-in gRPC container probes once we're supporting >= 1.24 only. https://kubernetes.io/blog/2022/05/13/grpc-probes-now-in-beta/
 RUN curl -sSL "https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH}" -o "/bin/grpc_health_probe" && chmod +x "/bin/grpc_health_probe"
-
 
 # With the trick below, Go's build cache is kept between builds.
 # https://github.com/golang/go/issues/27719#issuecomment-514747274

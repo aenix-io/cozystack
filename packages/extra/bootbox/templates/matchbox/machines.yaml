@@ -1,0 +1,47 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $issuerType := (index $cozyConfig.data "clusterissuer") | default "http01" }}
+
+{{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
+{{- $host := index $myNS.metadata.annotations "namespace.cozystack.io/host" }}
+
+{{ range $m := .Values.machines }}
+---
+apiVersion: tinkerbell.org/v1alpha1
+kind: Hardware
+metadata:
+  name: {{ $m.hostname }}
+  namespace: cozy-bootbox
+spec:
+  interfaces:
+  {{- range $mac := $m.mac }}
+  - dhcp:
+      hostname: {{ $m.hostname }}
+      mac: {{ $mac }}
+      {{- with $m.arch }}
+      arch: {{ . }}
+      {{- end }}
+      {{- with $m.ip }}
+      ip:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $m.leaseTime }}
+      lease_time: {{ . }}
+      {{- end }}
+      {{- with $m.uefi }}
+      uefi: {{ . }}
+      {{- end }}
+      {{- with $m.nameServers }}
+      name_servers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $m.timeServers }}
+      time_servers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    netboot:
+      allowPXE: true
+      ipxe:
+        url: "https://{{ printf "bootbox.%s" ($.Values.host | default $host) }}/boot.ipxe"
+  {{- end }}
+{{- end }}

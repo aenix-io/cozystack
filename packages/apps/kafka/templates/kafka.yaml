@@ -57,6 +57,12 @@ spec:
         class: {{ . }}
         {{- end }}
         deleteClaim: true
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: {{ .Release.Name }}-metrics
+          key: kafka-metrics-config.yml
   zookeeper:
     replicas: {{ .Values.zookeeper.replicas }}
     storage:
@@ -68,6 +74,12 @@ spec:
       class: {{ . }}
       {{- end }}
       deleteClaim: false
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: {{ .Release.Name }}-metrics
+          key: kafka-metrics-config.yml
   entityOperator:
     topicOperator: {}
     userOperator: {}

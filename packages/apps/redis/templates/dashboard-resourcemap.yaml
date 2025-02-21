@@ -13,3 +13,18 @@ rules:
   - rfrs-{{ .Release.Name }}
   - "{{ .Release.Name }}-external-lb"
   verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  resourceNames:
+  - "{{ .Release.Name }}-auth"
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - cozystack.io
+  resources:
+  - workloadmonitors
+  resourceNames:
+  - {{ .Release.Name }}-redis
+  - {{ .Release.Name }}-sentinel
+  verbs: ["get", "list", "watch"]

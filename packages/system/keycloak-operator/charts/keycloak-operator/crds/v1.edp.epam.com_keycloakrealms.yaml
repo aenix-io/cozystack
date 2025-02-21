@@ -1,0 +1,284 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+  name: keycloakrealms.v1.edp.epam.com
+spec:
+  group: v1.edp.epam.com
+  names:
+    kind: KeycloakRealm
+    listKind: KeycloakRealmList
+    plural: keycloakrealms
+    singular: keycloakrealm
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Is the resource available
+      jsonPath: .status.available
+      name: Available
+      type: boolean
+    - description: Reconcilation status
+      jsonPath: .status.value
+      name: Status
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: KeycloakRealm is the Schema for the keycloak realms API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: KeycloakRealmSpec defines the desired state of KeycloakRealm.
+            properties:
+              browserFlow:
+                description: BrowserFlow specifies the authentication flow to use
+                  for the realm's browser clients.
+                nullable: true
+                type: string
+              browserSecurityHeaders:
+                additionalProperties:
+                  type: string
+                description: BrowserSecurityHeaders is a map of security headers to
+                  apply to HTTP responses from the realm's browser clients.
+                nullable: true
+                type: object
+              displayHtmlName:
+                description: DisplayHTMLName name to render in the UI
+                type: string
+              displayName:
+                description: DisplayName is the display name of the realm.
+                type: string
+              frontendUrl:
+                description: FrontendURL Set the frontend URL for the realm. Use in
+                  combination with the default hostname provider to override the base
+                  URL for frontend requests for a specific realm.
+                type: string
+              id:
+                description: ID is the ID of the realm.
+                nullable: true
+                type: string
+              keycloakOwner:
+                description: |-
+                  Deprecated: use KeycloakRef instead.
+                  KeycloakOwner specifies the name of the Keycloak instance that owns the realm.
+                nullable: true
+                type: string
+              keycloakRef:
+                description: KeycloakRef is reference to Keycloak custom resource.
+                properties:
+                  kind:
+                    description: Kind specifies the kind of the Keycloak resource.
+                    enum:
+                    - Keycloak
+                    - ClusterKeycloak
+                    type: string
+                  name:
+                    description: Name specifies the name of the Keycloak resource.
+                    type: string
+                type: object
+              passwordPolicy:
+                description: PasswordPolicies is a list of password policies to apply
+                  to the realm.
+                items:
+                  properties:
+                    type:
+                      description: Type of password policy.
+                      type: string
+                    value:
+                      description: Value of password policy.
+                      type: string
+                  required:
+                  - type
+                  - value
+                  type: object
+                nullable: true
+                type: array
+              realmEventConfig:
+                description: RealmEventConfig is the configuration for events in the
+                  realm.
+                nullable: true
+                properties:
+                  adminEventsDetailsEnabled:
+                    description: AdminEventsDetailsEnabled indicates whether to enable
+                      detailed admin events.
+                    type: boolean
+                  adminEventsEnabled:
+                    description: AdminEventsEnabled indicates whether to enable admin
+                      events.
+                    type: boolean
+                  enabledEventTypes:
+                    description: EnabledEventTypes is a list of event types to enable.
+                    items:
+                      type: string
+                    type: array
+                  eventsEnabled:
+                    description: EventsEnabled indicates whether to enable events.
+                    type: boolean
+                  eventsExpiration:
+                    description: EventsExpiration is the number of seconds after which
+                      events expire.
+                    type: integer
+                  eventsListeners:
+                    description: EventsListeners is a list of event listeners to enable.
+                    items:
+                      type: string
+                    type: array
+                type: object
+              realmName:
+                description: RealmName specifies the name of the realm.
+                type: string
+              themes:
+                description: Themes is a map of themes to apply to the realm.
+                nullable: true
+                properties:
+                  accountTheme:
+                    description: AccountTheme specifies the account theme to use for
+                      the realm.
+                    nullable: true
+                    type: string
+                  adminConsoleTheme:
+                    description: AdminConsoleTheme specifies the admin console theme
+                      to use for the realm.
+                    nullable: true
+                    type: string
+                  emailTheme:
+                    description: EmailTheme specifies the email theme to use for the
+                      realm.
+                    nullable: true
+                    type: string
+                  internationalizationEnabled:
+                    description: InternationalizationEnabled indicates whether to
+                      enable internationalization.
+                    nullable: true
+                    type: boolean
+                  loginTheme:
+                    description: LoginTheme specifies the login theme to use for the
+                      realm.
+                    nullable: true
+                    type: string
+                type: object
+              tokenSettings:
+                description: TokenSettings is the configuration for tokens in the
+                  realm.
+                nullable: true
+                properties:
+                  accessCodeLifespan:
+                    default: 60
+                    description: |-
+                      AccessCodeLifespan specifies max time(in seconds)a client has to finish the access token protocol.
+                      This should normally be 1 minute.
+                    type: integer
+                  accessToken:
+                    default: 900
+                    description: AccessTokenLifespanForImplicitFlow specifies max
+                      time(in seconds) before an access token is expired for implicit
+                      flow.
+                    type: integer
+                  accessTokenLifespan:
+                    default: 300
+                    description: |-
+                      AccessTokenLifespan specifies max time(in seconds) before an access token is expired.
+                      This value is recommended to be short relative to the SSO timeout.
+                    type: integer
+                  actionTokenGeneratedByAdminLifespan:
+                    default: 43200
+                    description: |-
+                      ActionTokenGeneratedByAdminLifespan specifies max time(in seconds) before an action permit sent to a user by administrator is expired.
+                      This value is recommended to be long to allow administrators to send e-mails for users that are currently offline.
+                      The default timeout can be overridden immediately before issuing the token.
+                    type: integer
+                  actionTokenGeneratedByUserLifespan:
+                    default: 300
+                    description: |-
+                      AccessCodeLifespanUserAction specifies max time(in seconds) before an action permit sent by a user (such as a forgot password e-mail) is expired.
+                      This value is recommended to be short because it's expected that the user would react to self-created action quickly.
+                    type: integer
+                  defaultSignatureAlgorithm:
+                    default: RS256
+                    description: DefaultSignatureAlgorithm specifies the default algorithm
+                      used to sign tokens for the realm
+                    enum:
+                    - ES256
+                    - ES384
+                    - ES512
+                    - EdDSA
+                    - HS256
+                    - HS384
+                    - HS512
+                    - PS256
+                    - PS384
+                    - PS512
+                    - RS256
+                    - RS384
+                    - RS512
+                    example: RS256
+                    type: string
+                  refreshTokenMaxReuse:
+                    default: 0
+                    description: |-
+                      RefreshTokenMaxReuse specifies maximum number of times a refresh token can be reused.
+                      When a different token is used, revocation is immediate.
+                    type: integer
+                  revokeRefreshToken:
+                    default: false
+                    description: |-
+                      RevokeRefreshToken if enabled a refresh token can only be used up to 'refreshTokenMaxReuse' and
+                      is revoked when a different token is used.
+                      Otherwise, refresh tokens are not revoked when used and can be used multiple times.
+                    type: boolean
+                type: object
+              users:
+                description: Users is a list of users to create in the realm.
+                items:
+                  properties:
+                    realmRoles:
+                      description: RealmRoles is a list of roles attached to keycloak
+                        user.
+                      items:
+                        type: string
+                      type: array
+                    username:
+                      description: Username of keycloak user.
+                      type: string
+                  required:
+                  - username
+                  type: object
+                nullable: true
+                type: array
+            required:
+            - realmName
+            type: object
+          status:
+            description: KeycloakRealmStatus defines the observed state of KeycloakRealm.
+            properties:
+              available:
+                type: boolean
+              failureCount:
+                format: int64
+                type: integer
+              value:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

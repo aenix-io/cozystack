@@ -18,10 +18,10 @@ spec:
     key: prometheus-additional.yaml
   resources:
     limits:
-      memory: 500Mi
+      memory: 1024Mi
     requests:
       cpu: 50m
-      memory: 200Mi
+      memory: 768Mi
   #statefulMode: true
   #statefulStorage:
   #  volumeClaimTemplate:

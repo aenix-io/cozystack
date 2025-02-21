@@ -1,0 +1,12 @@
+image:
+  repository: ghcr.io/aenix-io/cozystack/cozy-proxy
+  tag: v0.1.2
+  pullPolicy: IfNotPresent
+
+daemonset:
+  hostNetwork: true
+  podAnnotations: {}
+  podLabels: {}
+
+rbac:
+  create: true

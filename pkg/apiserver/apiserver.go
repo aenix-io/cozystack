@@ -29,12 +29,11 @@ import (
 	"k8s.io/client-go/dynamic"
 	restclient "k8s.io/client-go/rest"
 
-	"github.com/aenix.io/cozystack/pkg/apis/apps"
-	"github.com/aenix.io/cozystack/pkg/apis/apps/install"
-	appsv1alpha1 "github.com/aenix.io/cozystack/pkg/apis/apps/v1alpha1"
-	"github.com/aenix.io/cozystack/pkg/config"
-	appsregistry "github.com/aenix.io/cozystack/pkg/registry"
-	applicationstorage "github.com/aenix.io/cozystack/pkg/registry/apps/application"
+	"github.com/aenix-io/cozystack/pkg/apis/apps"
+	"github.com/aenix-io/cozystack/pkg/apis/apps/install"
+	"github.com/aenix-io/cozystack/pkg/config"
+	appsregistry "github.com/aenix-io/cozystack/pkg/registry"
+	applicationstorage "github.com/aenix-io/cozystack/pkg/registry/apps/application"
 )
 
 var (
@@ -111,12 +110,6 @@ func (c completedConfig) New() (*AppsServer, error) {
 	}
 
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(apps.GroupName, Scheme, metav1.ParameterCodec, Codecs)
-
-	// Dynamically register types based on the configuration.
-	err = appsv1alpha1.RegisterDynamicTypes(Scheme, c.ResourceConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to register dynamic types: %v", err)
-	}
 
 	// Create a dynamic client for HelmRelease using InClusterConfig.
 	inClusterConfig, err := restclient.InClusterConfig()

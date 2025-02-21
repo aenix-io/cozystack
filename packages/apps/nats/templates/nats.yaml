@@ -40,8 +40,9 @@ spec:
     nats:
       fullnameOverride: {{ .Release.Name }}
       config:
-        {{- if gt (len $passwords) 0 }}
+        {{- if or (gt (len $passwords) 0) (gt (len .Values.config.merge) 0) }}
         merge:
+          {{- if gt (len $passwords) 0 }}
           accounts:
             A:
               users:
@@ -49,6 +50,14 @@ spec:
                 - user: "{{ $username }}"
                   password: "{{ $password }}"
                 {{- end }}
+          {{- end }}
+          {{- if and .Values.config (hasKey .Values.config "merge") }}
+          {{ toYaml .Values.config.merge | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        {{- if and .Values.config (hasKey .Values.config "resolver") }}
+        resolver:
+          {{ toYaml .Values.config.resolver | nindent 12 }}
         {{- end }}
         cluster:
           enabled: true
@@ -58,10 +67,10 @@ spec:
         jetstream:
           enabled: true
           fileStore:
-            enabled: true
+            enabled: {{ .Values.jetstream.enabled }}
             pvc:
               enabled: true
-              size: 10Gi
+              size: {{ .Values.jetstream.size }}
               {{- with .Values.storageClass }}
               storageClassName: {{ . }}
               {{- end }}

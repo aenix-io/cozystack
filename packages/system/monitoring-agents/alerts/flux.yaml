@@ -1,18 +1,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMRule
 metadata:
-  annotations:
-    meta.helm.sh/release-name: monitoring
-    meta.helm.sh/release-namespace: cozy-monitoring
-  labels:
-    app: victoria-metrics-k8s-stack
-    app.kubernetes.io/instance: monitoring
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: victoria-metrics-k8s-stack
-    app.kubernetes.io/version: v1.102.1
-    helm.sh/chart: victoria-metrics-k8s-stack-0.25.17
   name: alerts-flux-resources
-  namespace: cozy-monitoring
 spec:
   groups:
   - name: flux-resources-alerts

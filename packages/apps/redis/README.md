@@ -19,5 +19,6 @@ Service utilizes the Spotahome Redis Operator for efficient management and orche
 | `size`         | Persistent Volume size                          | `1Gi`   |
 | `replicas`     | Number of Redis replicas                        | `2`     |
 | `storageClass` | StorageClass used to store the data             | `""`    |
+| `authEnabled`  | Enable password generation                      | `true`  |
 
 

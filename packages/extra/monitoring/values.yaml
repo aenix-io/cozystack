@@ -5,17 +5,59 @@ host: ""
 
 ## @param metricsStorages [array] Configuration of metrics storage instances
 ##
+## Example:
+## metricsStorages:
+## - name: shortterm
+##   retentionPeriod: "3d"
+##   deduplicationInterval: "15s"
+##   storage: 10Gi
+##   storageClassName: ""
+##   vminsert:
+##     resources:
+##       limits:
+##         memory: 1024Mi
+##       requests:
+##         cpu: 200m
+##         memory: 512Mi
+##   vmselect:
+##     resources:
+##       limits:
+##         memory: 2048Mi
+##       requests:
+##         cpu: 300m
+##         memory: 1Gi
+##   vmstorage:
+##     resources:
+##       limits:
+##         memory: 4096Mi
+##       requests:
+##         cpu: 500m
+##         memory: 2Gi
+##
 metricsStorages:
 - name: shortterm
   retentionPeriod: "3d"
-  deduplicationInterval: "5m"
-  storage: 10Gi
-  storageClassName: ""
-- name: longterm
-  retentionPeriod: "14d"
   deduplicationInterval: "15s"
   storage: 10Gi
   storageClassName: ""
+  vminsert:
+    resources: {}
+  vmselect:
+    resources: {}
+  vmstorage:
+    resources: {}
+- name: longterm
+  retentionPeriod: "14d"
+  deduplicationInterval: "5m"
+  storage: 10Gi
+  storageClassName: ""
+  vminsert:
+    resources: {}
+  vmselect:
+    resources: {}
+  vmstorage:
+    resources: {}
+
 
 ## @param logsStorages [array] Configuration of logs storage instances
 ##
@@ -36,11 +78,20 @@ alerta:
   alerts:
     ## @param alerta.alerts.telegram.token telegram token for your bot
     ## @param alerta.alerts.telegram.chatID specify multiple ID's separated by comma. Get yours in https://t.me/chatid_echo_bot
+    ## @param alerta.alerts.telegram.disabledSeverity list of severity without alerts, separated comma like: "informational,warning"
     ## example:
     ##   telegram:
     ##     token: "7262461387:AAGtwq16iwuVtWtzoN6TUEMpF00fpC9Xz34"
     ##     chatID: "-4520856007"
+    ##     disabledSeverity: "informational,warning"
     ##
     telegram:
       token: ""
       chatID: ""
+      disabledSeverity: ""
+
+## Configuration for Grafana
+## @param grafana.db.size Persistent Volume size for grafana database
+grafana:
+  db:
+    size: 10Gi

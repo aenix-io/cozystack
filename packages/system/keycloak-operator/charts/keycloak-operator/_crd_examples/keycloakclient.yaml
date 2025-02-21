@@ -1,0 +1,117 @@
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClient
+metadata:
+  name: keycloakclient-sample
+spec:
+  realmRef:
+    name: keycloakrealm-sample
+    kind: KeycloakRealm
+  advancedProtocolMappers: true
+  clientId: agocd
+  directAccess: true
+  public: false
+  secret: $client-secret-name:client-secret-key
+  webUrl: https://argocd.example.com
+  defaultClientScopes:
+    - groups
+  redirectUris:
+    - /url1/*
+    - /url2/*
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClient
+metadata:
+  name: keycloakclient-policy-sample
+spec:
+  realmRef:
+    name: keycloakrealm-sample
+    kind: KeycloakRealm
+  clientId: policy-sample
+  secret: $client-secret-policy-sample:client-secret-key
+  webUrl: http://example.com
+  directAccess: true
+  authorizationServicesEnabled: true
+  serviceAccount:
+    enabled: true
+  authorization:
+    policies:
+      - name: role-policy
+        type: role
+        decisionStrategy: AFFIRMATIVE
+        logic: POSITIVE
+        description: "Role policy"
+        rolePolicy:
+          roles:
+            - name: developer
+              required: true
+      - type: aggregate
+        name: aggregate-policy
+        description: "Aggregate policy"
+        aggregatedPolicy:
+          policies:
+            - policy1
+            - policy2
+      - type: client
+        name: client-policy
+        description: "Client policy"
+        clientPolicy:
+          clients:
+            - client1
+            - client2
+      - type: group
+        name: group-policy
+        description: "Group policy"
+        groupPolicy:
+          groups:
+            - name: group1
+              extendChildren: true
+      - type: role
+        name: role-policy
+        description: "Role policy"
+        rolePolicy:
+          roles:
+            - name: developer
+              required: true
+      - type: time
+        name: time-policy
+        description: "Time policy"
+        timePolicy:
+          notBefore: "2021-01-01T00:00:00Z"
+          notOnOrAfter: "2021-12-31T23:59:59Z"
+      - type: user
+        name: user-policy
+        description: "User policy"
+        userPolicy:
+          users:
+            - user1
+            - user2
+    permissions:
+      - name: resource-permission
+        type: resource
+        logic: POSITIVE
+        description: "Resource permission"
+        decisionStrategy: AFFIRMATIVE
+        policies:
+          - role-policy
+        resources:
+          - resource1
+      - name: scope-permission
+        type: scope
+        logic: POSITIVE
+        description: "Scope permission"
+        decisionStrategy: CONSENSUS
+        policies:
+          - role-policy
+        scopes:
+          - scope1
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: client-secret-policy-sample
+data:
+  client-secret-key: cGFzc3dvcmQ=

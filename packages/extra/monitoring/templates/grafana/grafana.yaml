@@ -1,5 +1,5 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
-{{- $issuerType := (index $cozyConfig.data "clusterissuer") | default "http01" }} 
+{{- $issuerType := (index $cozyConfig.data "clusterissuer") | default "http01" }}
 
 {{- $myNS := lookup "v1" "Namespace" "" .Release.Namespace }}
 {{- $ingress := index $myNS.metadata.annotations "namespace.cozystack.io/ingress" }}
@@ -30,44 +30,25 @@ spec:
       admin_user: user
       admin_password: ${GF_PASSWORD}
     plugins:
-      allow_loading_unsigned_plugins: "victorialogs-datasource"
+      allow_loading_unsigned_plugins: "victoriametrics-logs-datasource"
   deployment:
     spec:
       replicas: 2
       template:
         spec:
-          initContainers:
-            - name: "load-vm-ds-plugin"
-              image: "curlimages/curl:7.85.0"
-              command: [ "/bin/sh" ]
-              workingDir: "/var/lib/grafana"
-              securityContext:
-                runAsUser: 10001
-                runAsNonRoot: true
-                runAsGroup: 10001
-              args:
-                - "-c"
-                - |
-                  set -ex
-                  mkdir -p /var/lib/grafana/plugins/
-                  ver=$(curl -s https://api.github.com/repos/VictoriaMetrics/victorialogs-datasource/releases/latest | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-                  curl -L https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/$ver/victorialogs-datasource-$ver.tar.gz -o /var/lib/grafana/plugins/vl-plugin.tar.gz
-                  tar -xf /var/lib/grafana/plugins/vl-plugin.tar.gz -C /var/lib/grafana/plugins/
-                  rm /var/lib/grafana/plugins/vl-plugin.tar.gz
-              volumeMounts:
-                - name: grafana-data
-                  mountPath: /var/lib/grafana
           containers:
             - name: grafana
-              image: grafana/grafana:11.2.0
+              image: "{{ $.Files.Get "images/grafana.tag" | trim }}"
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: false
               readinessProbe:
                 failureThreshold: 3
               env:
-              - name: GF_INSTALL_PLUGINS
-                value: grafana-worldmap-panel,natel-discrete-panel
+              #- name: GF_INSTALL_PLUGINS
+              #  value: grafana-worldmap-panel,natel-discrete-panel
+              - name: GF_PATHS_PLUGINS
+                value: /var/lib/grafana-plugins
               - name: ONCALL_API_URL
                 value: http://grafana-oncall-engine:8080
               - name: GF_DATABASE_HOST
@@ -114,3 +95,16 @@ spec:
       - hosts:
         - "{{ printf "grafana.%s" (.Values.host | default $host) }}"
         secretName: grafana-ingress-tls
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: grafana
+spec:
+  replicas: 2
+  minReplicas: 1
+  kind: monitoring
+  type: grafana
+  selector:
+    app: grafana
+  version: {{ $.Chart.Version }}

@@ -31,11 +31,29 @@ releases:
       autoDirectNodeRoutes: true
       routingMode: native
 
+- name: cozy-proxy
+  releaseName: cozystack
+  chart: cozy-cozy-proxy
+  namespace: cozy-system
+  optional: true
+  dependsOn: [cilium]
+
 - name: cert-manager-crds
   releaseName: cert-manager-crds
   chart: cozy-cert-manager-crds
   namespace: cozy-cert-manager
   dependsOn: [cilium]
+
+- name: cozystack-controller
+  releaseName: cozystack-controller
+  chart: cozy-cozystack-controller
+  namespace: cozy-system
+  dependsOn: [cilium]
+  {{- if eq (index $cozyConfig.data "telemetry-enabled") "false" }}
+  values:
+    cozystackController:
+      disableTelemetry: true
+  {{- end }}
 
 - name: cert-manager
   releaseName: cert-manager
@@ -64,6 +82,10 @@ releases:
   privileged: true
   optional: true
   dependsOn: [cilium,victoria-metrics-operator]
+  values:
+    scrapeRules:
+      etcd:
+        enabled: true
 
 - name: metallb
   releaseName: metallb
@@ -98,7 +120,7 @@ releases:
   chart: cozy-postgres-operator
   namespace: cozy-postgres-operator
   optional: true
-  dependsOn: [cilium,cert-manager]
+  dependsOn: [cilium,cert-manager,victoria-metrics-operator]
 
 - name: kafka-operator
   releaseName: kafka-operator
@@ -181,3 +203,18 @@ releases:
   namespace: cozy-keycloak
   optional: true
   dependsOn: [postgres-operator]
+
+- name: keycloak-operator
+  releaseName: keycloak-operator
+  chart: cozy-keycloak-operator
+  namespace: cozy-keycloak
+  optional: true
+  dependsOn: [keycloak]
+
+- name: bootbox
+  releaseName: bootbox
+  chart: cozy-bootbox
+  namespace: cozy-bootbox
+  privileged: true
+  optional: true
+  dependsOn: [cilium]

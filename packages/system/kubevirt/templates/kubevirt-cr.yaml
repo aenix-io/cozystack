@@ -13,4 +13,5 @@ spec:
       - ExpandDisks
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
+  monitorNamespace: tenant-root
   workloadUpdateStrategy: {}

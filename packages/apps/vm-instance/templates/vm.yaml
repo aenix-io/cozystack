@@ -12,20 +12,17 @@ metadata:
   labels:
     {{- include "virtual-machine.labels" . | nindent 4 }}
 spec:
-  running: {{ .Values.running | default "true" }}
+  running: {{ .Values.running }}
   {{- with .Values.instanceType }}
   instancetype:
     kind: VirtualMachineClusterInstancetype
     name: {{ . }}
-    revisionName: null
-  {{- end }}
+    {{- end }}
   {{- with .Values.instanceProfile }}
   preference:
     kind: VirtualMachineClusterPreference
     name: {{ . }}
-    revisionName: null
-  {{- end }}
-
+    {{- end }}
   template:
     metadata:
       annotations:
@@ -47,7 +44,7 @@ spec:
           disks:
           {{- range $i, $disk := .Values.disks }}
           - name: disk-{{ .name }}
-            {{- $disk := lookup "cdi.kubevirt.io/v1beta1" "DataVolume" $.Release.Namespace .name }}
+            {{- $disk := lookup "cdi.kubevirt.io/v1beta1" "DataVolume" $.Release.Namespace (printf "vm-disk-%s" .name) }}
             {{- if $disk }}
             {{- if and (hasKey $disk.metadata.annotations "vm-disk.cozystack.io/optical") (eq (index $disk.metadata.annotations "vm-disk.cozystack.io/optical") "true") }}
             cdrom: {}
@@ -85,7 +82,7 @@ spec:
       {{- range .Values.disks }}
       - name: disk-{{ .name }}
         dataVolume:
-          name: {{ .name }}
+          name: vm-disk-{{ .name }}
       {{- end }}
       {{- if or .Values.sshKeys .Values.cloudInit }}
       - name: cloudinitdisk

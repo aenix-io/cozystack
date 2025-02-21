@@ -113,8 +113,6 @@ machine:
         - usermode_helper=disabled
     - name: zfs
     - name: spl
-  install:
-    image: ghcr.io/aenix-io/cozystack/talos:v1.8.2
   files:
   - content: |
       [plugins]
@@ -124,6 +122,12 @@ machine:
     op: create
 
 cluster:
+  apiServer:
+    extraArgs:
+      oidc-issuer-url: "https://keycloak.example.org/realms/cozy"
+      oidc-client-id: "kubernetes"
+      oidc-username-claim: "preferred_username"
+      oidc-groups-claim: "groups"
   network:
     cni:
       name: none
@@ -136,6 +140,9 @@ EOT
 
 cat > patch-controlplane.yaml <<\EOT
 machine:
+  nodeLabels:
+    node.kubernetes.io/exclude-from-external-load-balancers:
+      $patch: delete
   network:
     interfaces:
     - interface: eth0
@@ -182,7 +189,8 @@ timeout 60 sh -c 'until nc -nzv 192.168.123.11 50000 && nc -nzv 192.168.123.12 5
 timeout 10 sh -c 'until talosctl bootstrap -n 192.168.123.11 -e 192.168.123.11; do sleep 1; done'
 
 # Wait for etcd
-timeout 180 sh -c 'while talosctl etcd members -n 192.168.123.11,192.168.123.12,192.168.123.13 -e 192.168.123.10 2>&1 | grep "rpc error"; do sleep 1; done'
+timeout 180 sh -c 'until timeout -s 9 2 talosctl etcd members -n 192.168.123.11,192.168.123.12,192.168.123.13 -e 192.168.123.10 2>&1; do sleep 1; done'
+timeout 60 sh -c 'while talosctl etcd members -n 192.168.123.11,192.168.123.12,192.168.123.13 -e 192.168.123.10 2>&1 | grep "rpc error"; do sleep 1; done'
 
 rm -f kubeconfig
 talosctl kubeconfig kubeconfig -e 192.168.123.10 -n 192.168.123.10
@@ -203,6 +211,8 @@ data:
   ipv4-pod-gateway: "10.244.0.1"
   ipv4-svc-cidr: "10.96.0.0/16"
   ipv4-join-cidr: "100.64.0.0/16"
+  root-host: example.org
+  api-server-endpoint: https://192.168.123.10:6443
 EOT
 
 #
@@ -219,6 +229,7 @@ sleep 5
 kubectl get hr -A | awk 'NR>1 {print "kubectl wait --timeout=15m --for=condition=ready -n " $1 " hr/" $2 " &"} END{print "wait"}' | sh -x
 
 # Wait for Cluster-API providers
+timeout 30 sh -c 'until kubectl get deploy -n cozy-cluster-api capi-controller-manager capi-kamaji-controller-manager capi-kubeadm-bootstrap-controller-manager capi-operator-cluster-api-operator capk-controller-manager; do sleep 1; done'
 kubectl wait deploy --timeout=30s --for=condition=available -n cozy-cluster-api capi-controller-manager capi-kamaji-controller-manager capi-kubeadm-bootstrap-controller-manager capi-operator-cluster-api-operator capk-controller-manager
 
 # Wait for linstor controller
@@ -287,13 +298,16 @@ spec:
   avoidBuggyIPs: false
 EOT
 
-kubectl patch -n tenant-root hr/tenant-root --type=merge -p '{"spec":{ "values":{
+# Wait for cozystack-api
+kubectl wait --for=condition=Available apiservices v1alpha1.apps.cozystack.io --timeout=2m
+
+kubectl patch -n tenant-root tenants.apps.cozystack.io root --type=merge -p '{"spec":{
   "host": "example.org",
   "ingress": true,
   "monitoring": true,
   "etcd": true,
   "isolated": true
-}}}'
+}}'
 
 # Wait for HelmRelease be created
 timeout 60 sh -c 'until kubectl get hr -n tenant-root etcd ingress monitoring tenant-root; do sleep 1; done'
@@ -301,9 +315,9 @@ timeout 60 sh -c 'until kubectl get hr -n tenant-root etcd ingress monitoring te
 # Wait for HelmReleases be installed
 kubectl wait --timeout=2m --for=condition=ready -n tenant-root hr etcd ingress monitoring tenant-root
 
-kubectl patch -n tenant-root hr/ingress --type=merge -p '{"spec":{ "values":{
+kubectl patch -n tenant-root ingresses.apps.cozystack.io ingress --type=merge -p '{"spec":{
   "dashboard": true
-}}}'
+}}'
 
 # Wait for nginx-ingress-controller
 timeout 60 sh -c 'until kubectl get deploy -n tenant-root root-ingress-controller; do sleep 1; done'
@@ -313,7 +327,7 @@ kubectl wait --timeout=5m --for=condition=available -n tenant-root deploy root-i
 kubectl wait --timeout=5m --for=jsonpath=.status.readyReplicas=3 -n tenant-root sts etcd
 
 # Wait for Victoria metrics
-kubectl wait --timeout=5m --for=jsonpath=.status.updateStatus=operational -n tenant-root vmalert/vmalert-longterm vmalert/vmalert-shortterm vmalertmanager/alertmanager
+kubectl wait --timeout=5m --for=jsonpath=.status.updateStatus=operational -n tenant-root vmalert/vmalert-shortterm vmalertmanager/alertmanager
 kubectl wait --timeout=5m --for=jsonpath=.status.status=operational -n tenant-root vlogs/generic
 kubectl wait --timeout=5m --for=jsonpath=.status.clusterStatus=operational -n tenant-root vmcluster/shortterm vmcluster/longterm
 
@@ -326,3 +340,12 @@ ip=$(kubectl get svc -n tenant-root root-ingress-controller -o jsonpath='{.statu
 
 # Check Grafana
 curl -sS -k "https://$ip" -H 'Host: grafana.example.org' | grep Found
+
+
+# Test OIDC
+kubectl patch -n cozy-system cm/cozystack --type=merge -p '{"data":{
+  "oidc-enabled": "true"
+}}'
+
+timeout 60 sh -c 'until kubectl get hr -n cozy-keycloak keycloak keycloak-configure keycloak-operator; do sleep 1; done'
+kubectl wait --timeout=10m --for=condition=ready -n cozy-keycloak hr keycloak keycloak-configure keycloak-operator

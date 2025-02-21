@@ -6,7 +6,9 @@ build:
 	make -C packages/apps/mysql image
 	make -C packages/apps/clickhouse image
 	make -C packages/apps/kubernetes image
+	make -C packages/extra/monitoring image
 	make -C packages/system/cozystack-api image
+	make -C packages/system/cozystack-controller image
 	make -C packages/system/cilium image
 	make -C packages/system/kubeovn image
 	make -C packages/system/dashboard image
@@ -34,6 +36,10 @@ assets:
 	make -C packages/core/installer/ assets
 
 test:
+	test -f _out/assets/nocloud-amd64.raw.xz || make -C packages/core/installer talos-nocloud
 	make -C packages/core/testing apply
 	make -C packages/core/testing test
 	make -C packages/core/testing test-applications
+
+generate:
+	hack/update-codegen.sh

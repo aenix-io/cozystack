@@ -1,0 +1,237 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $host := index $cozyConfig.data "root-host" }}
+{{- $extraRedirectUris := splitList "," ((index $cozyConfig.data "extra-keycloak-redirect-uri-for-dashboard") | default "") }}
+{{- $rootSaConfigMap := lookup "v1" "ConfigMap" "kube-system" "kube-root-ca.crt" }}
+{{- $k8sCa := index $rootSaConfigMap.data "ca.crt" | b64enc }}
+
+{{- $existingK8sSecret := lookup "v1" "Secret" .Release.Namespace "k8s-client" }}
+{{- $existingKubeappsSecret := lookup "v1" "Secret" .Release.Namespace "kubeapps-client" }}
+{{- $existingAuthConfig := lookup "v1" "Secret" "cozy-dashboard" "kubeapps-auth-config" }}
+
+{{ $k8sClient := "" }}
+{{- if $existingK8sSecret }}
+  {{- $k8sClient = index $existingK8sSecret.data "client-secret-key" | b64dec }}
+{{- else }}
+  {{- $k8sClient = randAlphaNum 32 }}
+{{- end }}
+
+{{ $kubeappsClient := "" }}
+{{- if $existingKubeappsSecret }}
+  {{- $kubeappsClient = index $existingKubeappsSecret.data "client-secret-key" | b64dec }}
+{{- else }}
+  {{- $kubeappsClient = randAlphaNum 32 }}
+{{- end }}
+
+{{ $cookieSecret := "" }}
+{{- if $existingAuthConfig }}
+  {{- $cookieSecret = index $existingAuthConfig.data "cookieSecret" | b64dec }}
+{{- else }}
+  {{- $cookieSecret = randAlphaNum 16 }}
+{{- end }}
+
+{{- $wlConfigmap := lookup "v1" "ConfigMap" "cozy-dashboard" "white-label" }}
+{{- $locale := index $wlConfigmap.data "locale" }}
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: k8s-client
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+data:
+  client-secret-key: {{ $k8sClient | b64enc }}
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubeapps-client
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+data:
+  client-secret-key: {{ $kubeappsClient | b64enc }}
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubeapps-auth-config
+  namespace: cozy-dashboard
+type: Opaque
+data:
+  cookieSecret: {{ $cookieSecret | b64enc }}
+
+---
+
+apiVersion: v1.edp.epam.com/v1alpha1
+kind: ClusterKeycloak
+metadata:
+  name: keycloak-cozy
+  namespace: {{ .Release.Namespace }}
+spec:
+  secret: keycloak-credentials
+  url: https://keycloak.{{ $host }}
+
+---
+
+apiVersion: v1.edp.epam.com/v1alpha1
+kind: ClusterKeycloakRealm
+metadata:
+  name: keycloakrealm-cozy
+  namespace: {{ .Release.Namespace }}
+spec:
+  realmName: cozy
+  clusterKeycloakRef: keycloak-cozy
+  {{- if $locale }}
+  displayNameHtml: {{ $locale }}
+  {{- end }}
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClientScope
+metadata:
+  name: keycloakclientscope-cozy
+spec:
+  name: groups
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+  description: "Group Membership"
+  protocol: openid-connect
+  default: true
+  protocolMappers:
+    - name: groups
+      protocol: openid-connect
+      protocolMapper: "oidc-group-membership-mapper"
+      config:
+        "access.token.claim": "true"
+        "claim.name": "groups"
+        "full.path": "false"
+        "id.token.claim": "true"
+        "userinfo.token.claim": "true"
+  attributes:
+    "include.in.token.scope": "true"
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClient
+metadata:
+  name: keycloakclient
+spec:
+  serviceAccount:
+    enabled: true
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+  secret: $k8s-client:client-secret-key
+  advancedProtocolMappers: true
+  authorizationServicesEnabled: true
+  name: kubernetes
+  clientId: kubernetes
+  directAccess: true
+  public: false
+  webUrl: https://localhost:8000/oauth2/callback
+  webOrigins:
+    - /*
+  defaultClientScopes:
+    - groups
+  redirectUris:
+    - http://localhost:18000
+    - http://localhost:8000
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClientScope
+metadata:
+  name: kubernetes-client
+spec:
+  name: kubernetes-client
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+  description: "kubernetes-client"
+  protocol: openid-connect
+  default: true
+  attributes:
+    "include.in.token.scope": "true"
+  protocolMappers:
+    - name: audience
+      protocol: openid-connect
+      protocolMapper: "oidc-audience-mapper"
+      config:
+        "included.client.audience": "kubernetes"
+        "id.token.claim": "true"
+        "access.token.claim": "true"
+        "lightweight.claim": "false"
+        "introspection.token.claim": "true"
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClient
+metadata:
+  name: kubeapps-client
+spec:
+  serviceAccount:
+    enabled: true
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+  secret: $kubeapps-client:client-secret-key
+  advancedProtocolMappers: true
+  authorizationServicesEnabled: true
+  name: kubeapps
+  clientId: kubeapps
+  directAccess: true
+  public: false
+  webUrl: "https://dashboard.{{ $host }}"
+  defaultClientScopes:
+    - groups
+    - kubernetes-client
+  redirectUris:
+    - "http://dashboard.{{ $host }}/oauth2/callback/*"
+    {{- range $i, $v := $extraRedirectUris }}
+    - "{{ $v }}"
+    {{- end }}
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubeapps-auth-config
+  namespace: cozy-dashboard
+data:
+  values.yaml: |
+    kubeapps:
+      authProxy:
+        enabled: true
+        provider: "oidc"
+        clientID: "kubeapps"
+        clientSecret: {{ $kubeappsClient }}
+        cookieSecret: {{ $cookieSecret }}
+        extraFlags:
+          - --ssl-insecure-skip-verify
+          - --cookie-secure=false
+          - --scope=openid email groups
+          - --oidc-issuer-url=https://keycloak.{{ $host }}/realms/cozy
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: cozystack-cluster-admin
+  namespace: cozy-system
+spec:
+  name: cozystack-cluster-admin
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm

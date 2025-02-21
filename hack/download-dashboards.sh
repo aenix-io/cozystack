@@ -21,7 +21,7 @@ fix_d8() {
 }
 
 swap_pvc_overview() {
- jq '(.panels[] | select(.title=="PVC Detailed") | .panels[] | select(.title=="Overview")) as $a | del(.panels[] | select(.title=="PVC Detailed").panels[] | select(.title=="Overview")) | ( (.panels[] | select(.title=="PVC Detailed"))) as $b | del( .panels[] | select(.title=="PVC Detailed")) | (.panels[.panels|length]=($a|.gridPos.y=$b.gridPos.y)) | (.panels[.panels|length]=($b|.gridPos.y=$a.gridPos.y))' 
+ jq '(.panels[] | select(.title=="PVC Detailed") | .panels[] | select(.title=="Overview")) as $a | del(.panels[] | select(.title=="PVC Detailed").panels[] | select(.title=="Overview")) | ( (.panels[] | select(.title=="PVC Detailed"))) as $b | del( .panels[] | select(.title=="PVC Detailed")) | (.panels[.panels|length]=($a|.gridPos.y=$b.gridPos.y)) | (.panels[.panels|length]=($b|.gridPos.y=$a.gridPos.y))'
 }
 
 deprectaed_remove_faq() {
@@ -68,7 +68,7 @@ modules/402-ingress-nginx/monitoring/grafana-dashboards/ingress-nginx/namespace/
 modules/402-ingress-nginx/monitoring/grafana-dashboards/ingress-nginx/vhost/vhost_detail.json
 modules/402-ingress-nginx/monitoring/grafana-dashboards/ingress-nginx/vhost/vhosts.json
 modules/340-monitoring-kubernetes-control-plane/monitoring/grafana-dashboards/kubernetes-cluster/control-plane-status.json
-modules/340-monitoring-kubernetes-control-plane/monitoring/grafana-dashboards/kubernetes-cluster/kube-etcd3.json                #TODO
+modules/340-monitoring-kubernetes-control-plane/monitoring/grafana-dashboards/kubernetes-cluster/kube-etcd.json                #TODO
 modules/340-monitoring-kubernetes-control-plane/monitoring/grafana-dashboards/kubernetes-cluster/deprecated-resources.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//kubernetes-cluster/nodes/ntp.json                              #TODO
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//kubernetes-cluster/nodes/nodes.json
@@ -78,6 +78,9 @@ modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/pod.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/namespace/namespaces.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/namespace/namespace.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/capacity-planning/capacity-planning.json
+modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//flux/flux-control-plane.json
+modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//flux/flux-stats.json
+modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//kafka/strimzi-kafka.json
 EOT
 
 
@@ -109,4 +112,3 @@ done <<\EOT
 	https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
 	https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
 EOT
-

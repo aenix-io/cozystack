@@ -1,13 +1,19 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
 {{- $host := index $cozyConfig.data "root-host" }}
+
+{{- $existingPassword := lookup "v1" "Secret" "cozy-keycloak" (printf "%s-credentials" .Release.Name) }}
 {{- $password := randAlphaNum 16 -}}
+{{- if $existingPassword }}
+  {{- $password = index $existingPassword.data "password" | b64dec }}
+{{- end }}
 
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ .Release.Name }}-credentials
 stringData:
-  admin: {{ $password }}
+  username: admin
+  password: {{ $password }}
 
 ---
 
@@ -124,12 +130,4 @@ spec:
               port: http
             initialDelaySeconds: 60
             timeoutSeconds: 1
-      volumes:
-        - name: init-script
-          configMap:
-            name: keycloak-init-script
-      volumeMounts:
-        - name: init-script
-          mountPath: /scripts
-          readOnly: true
       terminationGracePeriodSeconds: 60

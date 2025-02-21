@@ -8,7 +8,6 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: kube-state-metrics
-      app.kubernetes.io/instance: "monitoring"
   endpoints:
   - port: http
     honorLabels: true

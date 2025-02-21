@@ -20,6 +20,17 @@ releases:
   namespace: cozy-cert-manager
   dependsOn: []
 
+- name: cozystack-controller
+  releaseName: cozystack-controller
+  chart: cozy-cozystack-controller
+  namespace: cozy-system
+  dependsOn: [cilium]
+  {{- if eq (index $cozyConfig.data "telemetry-enabled") "false" }}
+  values:
+    cozystackController:
+      disableTelemetry: true
+  {{- end }}
+
 - name: cert-manager
   releaseName: cert-manager
   chart: cozy-cert-manager
@@ -47,6 +58,10 @@ releases:
   privileged: true
   optional: true
   dependsOn: [victoria-metrics-operator]
+  values:
+    scrapeRules:
+      etcd:
+        enabled: true
 
 - name: etcd-operator
   releaseName: etcd-operator
@@ -74,7 +89,7 @@ releases:
   chart: cozy-postgres-operator
   namespace: cozy-postgres-operator
   optional: true
-  dependsOn: [cert-manager]
+  dependsOn: [victoria-metrics-operator]
 
 - name: kafka-operator
   releaseName: kafka-operator
@@ -131,3 +146,10 @@ releases:
   namespace: cozy-keycloak
   optional: true
   dependsOn: [postgres-operator]
+
+- name: keycloak-operator
+  releaseName: keycloak-operator
+  chart: cozy-keycloak-operator
+  namespace: cozy-keycloak
+  optional: true
+  dependsOn: [keycloak]

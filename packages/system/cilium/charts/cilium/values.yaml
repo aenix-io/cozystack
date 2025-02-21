@@ -153,10 +153,10 @@ image:
   # @schema
   override: ~
   repository: "quay.io/cilium/cilium"
-  tag: "v1.16.3"
+  tag: "v1.16.6"
   pullPolicy: "IfNotPresent"
   # cilium-digest
-  digest: "sha256:62d2a09bbef840a46099ac4c69421c90f84f28d018d479749049011329aa7f28"
+  digest: "sha256:1e0896b1c4c188b4812c7e0bed7ec3f5631388ca88325c1391a0ef9172c448da"
   useDigest: true
 # -- Affinity for cilium-agent.
 affinity:
@@ -997,6 +997,8 @@ socketLB:
   # hostNamespaceOnly: false
   # -- Enable terminating pod connections to deleted service backends.
   # terminatePodConnections: true
+  # -- Enables tracing for socket-based load balancing.
+  # tracing: true
 # -- Configure certificate generation for Hubble integration.
 # If hubble.tls.auto.method=cronJob, these values are used
 # for the Kubernetes CronJob which will be scheduled regularly to
@@ -1266,7 +1268,10 @@ hubble:
       # - certmanager:  This method use cert-manager to generate & rotate certificates.
       method: helm
       # -- Generated certificates validity duration in days.
-      certValidityDuration: 1095
+      #
+      # Defaults to 365 days (1 year) because MacOS does not accept
+      # self-signed certificates with expirations > 825 days.
+      certValidityDuration: 365
       # -- Schedule for certificates regeneration (regardless of their expiration date).
       # Only used if method is "cronJob". If nil, then no recurring job will be created.
       # Instead, only the one-shot job is deployed to generate the certificates at
@@ -1309,9 +1314,9 @@ hubble:
       # @schema
       override: ~
       repository: "quay.io/cilium/hubble-relay"
-      tag: "v1.16.3"
+      tag: "v1.16.6"
       # hubble-relay-digest
-      digest: "sha256:feb60efd767e0e7863a94689f4a8db56a0acc7c1d2b307dee66422e3dc25a089"
+      digest: "sha256:ca8dcaa5a81a37743b1397ba2221d16d5d63e4a47607584f1bf50a3b0882bf3b"
       useDigest: true
       pullPolicy: "IfNotPresent"
     # -- Specifies the resources for the hubble-relay pods
@@ -2140,6 +2145,8 @@ envoy:
     path: ""
   # -- Time in seconds after which a TCP connection attempt times out
   connectTimeoutSeconds: 2
+  # -- Time in seconds after which the initial fetch on an xDS stream is considered timed out
+  initialFetchTimeoutSeconds: 30
   # -- ProxyMaxRequestsPerConnection specifies the max_requests_per_connection setting for Envoy
   maxRequestsPerConnection: 0
   # -- Set Envoy HTTP option max_connection_duration seconds. Default 0 (disable)
@@ -2158,9 +2165,9 @@ envoy:
     # @schema
     override: ~
     repository: "quay.io/cilium/cilium-envoy"
-    tag: "v1.29.9-1728346947-0d05e48bfbb8c4737ec40d5781d970a550ed2bbd"
+    tag: "v1.30.9-1737073743-40a016d11c0d863b772961ed0168eea6fe6b10a5"
     pullPolicy: "IfNotPresent"
-    digest: "sha256:42614a44e508f70d03a04470df5f61e3cffd22462471a0be0544cf116f2c50ba"
+    digest: "sha256:a69dfe0e54b24b0ff747385c8feeae0612cfbcae97bfcc8ee42a773bb3f69c88"
     useDigest: true
   # -- Additional containers added to the cilium Envoy DaemonSet.
   extraContainers: []
@@ -2439,7 +2446,6 @@ routingMode: ""
 # @default -- Port 8472 for VXLAN, Port 6081 for Geneve
 tunnelPort: 0
 # -- Configure what the response should be to traffic for a service without backends.
-# "reject" only works on kernels >= 5.10, on lower kernels we fallback to "drop".
 # Possible values:
 #  - reject (default)
 #  - drop
@@ -2474,15 +2480,15 @@ operator:
     # @schema
     override: ~
     repository: "quay.io/cilium/operator"
-    tag: "v1.16.3"
+    tag: "v1.16.6"
     # operator-generic-digest
-    genericDigest: "sha256:6e2925ef47a1c76e183c48f95d4ce0d34a1e5e848252f910476c3e11ce1ec94b"
+    genericDigest: "sha256:13d32071d5a52c069fb7c35959a56009c6914439adc73e99e098917646d154fc"
     # operator-azure-digest
-    azureDigest: "sha256:2882aaf03c32525a99181b7c065b2bb19c03eba6626fc736aebe368d90791542"
+    azureDigest: "sha256:0a05d7aea760923897aabd715213ab11a706051673d41fab3874a37f897c1bdd"
     # operator-aws-digest
-    awsDigest: "sha256:47f5abc5fa528472d3509c3199d7aab1e120833fb68df455e3b4476916385916"
+    awsDigest: "sha256:d11ee1cfa3465defe2df7ec1c6e8a77bcaf280b44d2c61aa7496c58b29550f6d"
     # operator-alibabacloud-digest
-    alibabacloudDigest: "sha256:d80a785c0e807fc708264a3fcb19be404114f619fd756dd5214f4cad5a281898"
+    alibabacloudDigest: "sha256:0e3c7fbcb6bde9a247cd2dd3d25230e2859d40d2eb58aba6265a2aab216775a9"
     useDigest: true
     pullPolicy: "IfNotPresent"
     suffix: ""
@@ -2756,9 +2762,9 @@ preflight:
     # @schema
     override: ~
     repository: "quay.io/cilium/cilium"
-    tag: "v1.16.3"
+    tag: "v1.16.6"
     # cilium-digest
-    digest: "sha256:62d2a09bbef840a46099ac4c69421c90f84f28d018d479749049011329aa7f28"
+    digest: "sha256:1e0896b1c4c188b4812c7e0bed7ec3f5631388ca88325c1391a0ef9172c448da"
     useDigest: true
     pullPolicy: "IfNotPresent"
   # -- The priority class to use for the preflight pod.
@@ -2905,9 +2911,9 @@ clustermesh:
       # @schema
       override: ~
       repository: "quay.io/cilium/clustermesh-apiserver"
-      tag: "v1.16.3"
+      tag: "v1.16.6"
       # clustermesh-apiserver-digest
-      digest: "sha256:598cb4fd30b47bf2bc229cd6a011e451cf14753e56a80bb9ef01a09a519f52fb"
+      digest: "sha256:ab2070ea48a52a55d961b81b7b5fbac7d40a3f428be9b1b6b9071d47f194456a"
       useDigest: true
       pullPolicy: "IfNotPresent"
     # -- TCP port for the clustermesh-apiserver health API.
@@ -3406,7 +3412,7 @@ authentication:
           override: ~
           repository: "docker.io/library/busybox"
           tag: "1.36.1"
-          digest: "sha256:c230832bd3b0be59a6c47ed64294f9ce71e91b327957920b6929a0caa8353140"
+          digest: "sha256:71b79694b71639e633452f57fd9de40595d524de308349218d9a6a144b40be02"
           useDigest: true
           pullPolicy: "IfNotPresent"
         # SPIRE agent configuration

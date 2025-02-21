@@ -1,0 +1,29 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-dashboard-resources
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  resourceNames:
+  - {{ $.Release.Name }}-s3
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  resourceNames:
+  - ingress-{{ $.Release.Name }}-s3
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - cozystack.io
+  resources:
+  - workloadmonitors
+  resourceNames:
+  - {{ $.Release.Name }}-master
+  - {{ $.Release.Name }}-filer
+  - {{ $.Release.Name }}-volume
+  - {{ $.Release.Name }}-db
+  verbs: ["get", "list", "watch"]

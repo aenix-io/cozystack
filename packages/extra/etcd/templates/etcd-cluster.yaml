@@ -40,6 +40,12 @@ spec:
       labels:
         cozystack.io/service: etcd
     spec:
+      containers:
+      - name: etcd
+        ports:
+        - name: metrics
+          containerPort: 2381
+          protocol: TCP
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: "kubernetes.io/hostname"
@@ -193,3 +199,19 @@ spec:
   issuerRef:
     name: etcd-issuer
     kind: Issuer
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ $.Release.Name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  minReplicas: {{ div .Values.replicas 2 | add1 }}
+  kind: etcd
+  type: etcd
+  selector:
+    app.kubernetes.io/instance: etcd
+    app.kubernetes.io/managed-by: etcd-operator
+    app.kubernetes.io/name: etcd
+  version: {{ $.Chart.Version }}

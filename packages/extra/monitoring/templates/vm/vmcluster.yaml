@@ -6,22 +6,35 @@ metadata:
   name: {{ .name }}
 spec:
   replicationFactor: 2
-  retentionPeriod: "3"
+  retentionPeriod: {{ .retentionPeriod | quote }}
   vminsert:
     replicaCount: 2
-    resources: {}
-  vmselect:
-    replicaCount: 2
     resources:
+      {{- if and (hasKey . "vminsert") (hasKey .vminsert "resources") }}
+      {{- toYaml .vminsert.resources | nindent 6 }}
+      {{- else }}
       limits:
         memory: 1000Mi
       requests:
         cpu: 100m
         memory: 500Mi
+      {{- end }}
+  vmselect:
+    replicaCount: 2
+    resources:
+      {{- if and (hasKey . "vmselect") (hasKey .vmselect "resources") }}
+      {{- toYaml .vmselect.resources | nindent 6 }}
+      {{- else }}
+      limits:
+        memory: 1000Mi
+      requests:
+        cpu: 100m
+        memory: 500Mi
+      {{- end }}
     extraArgs:
       search.maxUniqueTimeseries: "600000"
       vmalert.proxyURL: http://vmalert-{{ .name }}.{{ $.Release.Namespace }}.svc:8080
-      dedup.minScrapeInterval: "15s"
+      dedup.minScrapeInterval: {{ .deduplicationInterval | quote}}
     cacheMountPath: /select-cache
     storage:
       volumeClaimTemplate:
@@ -34,6 +47,16 @@ spec:
               storage: 2Gi
   vmstorage:
     replicaCount: 2
+    resources:
+      {{- if and (hasKey . "vmstorage") (hasKey .vmstorage "resources") }}
+      {{- toYaml .vmstorage.resources | nindent 6 }}
+      {{- else }}
+      limits:
+        memory: 2048Mi
+      requests:
+        cpu: 100m
+        memory: 500Mi
+      {{- end }}
     storage:
       volumeClaimTemplate:
         spec:
@@ -44,4 +67,49 @@ spec:
             requests:
               storage: {{ .storage }}
     storageDataPath: /vm-data
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ .name }}-vmstorage
+spec:
+  replicas: 2
+  minReplicas: 1
+  kind: monitoring
+  type: vmstorage
+  selector:
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/instance: {{ .name }}
+    app.kubernetes.io/name: vmstorage
+  version: {{ $.Chart.Version }}
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ .name }}-vmselect
+spec:
+  replicas: 2
+  minReplicas: 1
+  kind: monitoring
+  type: vmselect
+  selector:
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/instance: {{ .name }}
+    app.kubernetes.io/name: vmselect
+  version: {{ $.Chart.Version }}
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ .name }}-vminsert
+spec:
+  replicas: 2
+  minReplicas: 1
+  kind: monitoring
+  type: vminsert
+  selector:
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/instance: {{ .name }}
+    app.kubernetes.io/name: vminsert
+  version: {{ $.Chart.Version }}
 {{- end }}

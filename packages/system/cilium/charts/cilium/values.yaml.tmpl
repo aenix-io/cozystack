@@ -1006,6 +1006,8 @@ socketLB:
   # hostNamespaceOnly: false
   # -- Enable terminating pod connections to deleted service backends.
   # terminatePodConnections: true
+  # -- Enables tracing for socket-based load balancing.
+  # tracing: true
 # -- Configure certificate generation for Hubble integration.
 # If hubble.tls.auto.method=cronJob, these values are used
 # for the Kubernetes CronJob which will be scheduled regularly to
@@ -1275,7 +1277,10 @@ hubble:
       # - certmanager:  This method use cert-manager to generate & rotate certificates.
       method: helm
       # -- Generated certificates validity duration in days.
-      certValidityDuration: 1095
+      #
+      # Defaults to 365 days (1 year) because MacOS does not accept
+      # self-signed certificates with expirations > 825 days.
+      certValidityDuration: 365
       # -- Schedule for certificates regeneration (regardless of their expiration date).
       # Only used if method is "cronJob". If nil, then no recurring job will be created.
       # Instead, only the one-shot job is deployed to generate the certificates at
@@ -2154,6 +2159,8 @@ envoy:
     path: ""
   # -- Time in seconds after which a TCP connection attempt times out
   connectTimeoutSeconds: 2
+  # -- Time in seconds after which the initial fetch on an xDS stream is considered timed out
+  initialFetchTimeoutSeconds: 30
   # -- ProxyMaxRequestsPerConnection specifies the max_requests_per_connection setting for Envoy
   maxRequestsPerConnection: 0
   # -- Set Envoy HTTP option max_connection_duration seconds. Default 0 (disable)
@@ -2455,7 +2462,6 @@ routingMode: ""
 # @default -- Port 8472 for VXLAN, Port 6081 for Geneve
 tunnelPort: 0
 # -- Configure what the response should be to traffic for a service without backends.
-# "reject" only works on kernels >= 5.10, on lower kernels we fallback to "drop".
 # Possible values:
 #  - reject (default)
 #  - drop

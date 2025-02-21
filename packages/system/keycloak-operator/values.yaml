@@ -1,0 +1,8 @@
+keycloak-operator:
+  clusterReconciliationEnabled: true
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi

@@ -1,0 +1,119 @@
+{{- $vmName := include "virtual-machine.fullname" . -}}
+{{- $namespace := .Release.Namespace -}}
+
+{{- $existingVM := lookup "kubevirt.io/v1" "VirtualMachine" $namespace $vmName -}}
+{{- $existingPVC := lookup "v1" "PersistentVolumeClaim" $namespace $vmName -}}
+
+{{- $instanceType := .Values.instanceType | default "" -}}
+{{- $instanceProfile := .Values.instanceProfile | default "" -}}
+{{- $desiredStorage := .Values.systemDisk.storage | default "" -}}
+
+{{- $needUpdateType := false -}}
+{{- $needUpdateProfile := false -}}
+{{- $needResizePVC := false -}}
+
+{{- if and $existingVM $instanceType -}}
+  {{- if not (eq $existingVM.spec.instancetype.name $instanceType) -}}
+    {{- $needUpdateType = true -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if and $existingVM $instanceProfile -}}
+  {{- if not (eq $existingVM.spec.preference.name $instanceProfile) -}}
+    {{- $needUpdateProfile = true -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if and $existingPVC $desiredStorage -}}
+  {{- $currentStorage := $existingPVC.spec.resources.requests.storage | toString -}}
+  {{- if not (eq $currentStorage $desiredStorage) -}}
+    {{- $needResizePVC = true -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if or $needUpdateType $needUpdateProfile $needResizePVC }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ $.Release.Name }}-update-hook"
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation
+spec:
+  template:
+    metadata:
+      labels:
+        app: "{{ $.Release.Name }}-update-hook"
+        policy.cozystack.io/allow-to-apiserver: "true"
+    spec:
+      serviceAccountName: {{ $.Release.Name }}-update-hook
+      restartPolicy: Never
+      containers:
+        - name: update-resources
+          image: bitnami/kubectl:latest
+          command: ["sh", "-exc"]
+          args:
+            - |
+              {{- if $needUpdateType }}
+              echo "Patching VirtualMachine for instancetype update..."
+              kubectl patch virtualmachine {{ $vmName }} -n {{ $namespace }} \
+                --type merge \
+                -p '{"spec":{"instancetype":{"name": "{{ $instanceType }}", "revisionName": null}}}'
+              {{- end }}
+              
+              {{- if $needUpdateProfile }}
+              echo "Patching VirtualMachine for preference update..."
+              kubectl patch virtualmachine {{ $vmName }} -n {{ $namespace }} \
+                --type merge \
+                -p '{"spec":{"preference":{"name": "{{ $instanceProfile }}", "revisionName": null}}}'
+              {{- end }}
+
+              {{- if $needResizePVC }}
+              echo "Patching PVC for storage resize..."
+              kubectl patch pvc {{ $vmName }} -n {{ $namespace }} \
+                --type merge \
+                -p '{"spec":{"resources":{"requests":{"storage":"{{ $desiredStorage }}"}}}}'
+              {{- end }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $.Release.Name }}-update-hook
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ $.Release.Name }}-update-hook
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation
+rules:
+  - apiGroups: ["kubevirt.io"]
+    resources: ["virtualmachines"]
+    verbs: ["patch", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["patch", "get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $.Release.Name }}-update-hook
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation
+subjects:
+  - kind: ServiceAccount
+    name: {{ $.Release.Name }}-update-hook
+roleRef:
+  kind: Role
+  name: {{ $.Release.Name }}-update-hook
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

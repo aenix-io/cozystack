@@ -1,0 +1,53 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $oidcEnabled := index $cozyConfig.data "oidc-enabled" }}
+{{- if $oidcEnabled }}
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: {{ include "tenant.name" . }}-view
+  namespace: {{ include "tenant.name" . }}
+spec:
+  name: {{ include "tenant.name" . }}-view
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: {{ include "tenant.name" . }}-use
+  namespace: {{ include "tenant.name" . }}
+spec:
+  name: {{ include "tenant.name" . }}-use
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: {{ include "tenant.name" . }}-admin
+  namespace: {{ include "tenant.name" . }}
+spec:
+  name: {{ include "tenant.name" . }}-admin
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+
+---
+
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealmGroup
+metadata:
+  name: {{ include "tenant.name" . }}-super-admin
+  namespace: {{ include "tenant.name" . }}
+spec:
+  name: {{ include "tenant.name" . }}-super-admin
+  realmRef:
+    name: keycloakrealm-cozy
+    kind: ClusterKeycloakRealm
+{{- end }}

@@ -1,0 +1,30 @@
+## @section Common parameters
+
+## @param whitelistHTTP Secure HTTP by enabling  client networks whitelisting
+## @param whitelist List of client networks
+## Example:
+## whitelistHTTP: true
+## whitelist:
+## - "1.2.3.4"
+## - "10.8.0.0/16"
+##
+whitelistHTTP: true
+whitelist: []
+
+## @param machines [array] Configuration of physical machine instances
+##
+## Example:
+## machines:
+## - hostname: machine1
+##   arch: x86_64
+##   ip:
+##     address: 10.8.2.2
+##     gateway: 10.8.2.1
+##     netmask: 255.255.255.0
+##   leaseTime: 86400
+##   mac: [d6:fa:af:52:25:93]
+##   nameServers: [1.1.1.1,8.8.8.8]
+##   timeServers: [pool.ntp.org]
+##   uefi: true
+
+machines: []

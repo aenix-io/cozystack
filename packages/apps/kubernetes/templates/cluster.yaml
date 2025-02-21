@@ -29,6 +29,7 @@ spec:
             {{- range .group.roles }}
             node-role.kubernetes.io/{{ . }}: ""
             {{- end }}
+            cluster.x-k8s.io/deployment-name: {{ $.Release.Name }}-{{ .groupName }}
         spec:
           domain:
             {{- if and .group.resources .group.resources.cpu }}
@@ -126,6 +127,21 @@ spec:
   replicas: 2
   version: 1.30.1
 ---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 2
+  minReplicas: 1
+  kind: kubernetes
+  type: control-plane
+  selector:
+    kamaji.clastix.io/component: deployment
+    kamaji.clastix.io/name: {{ .Release.Name }}
+  version: {{ $.Chart.Version }}
+---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: KubevirtCluster
 metadata:
@@ -172,6 +188,7 @@ spec:
 ---
 {{- $context := deepCopy $ }}
 {{- $_ := set $context "group" $group }}
+{{- $_ := set $context "groupName" $groupName }}
 {{- $kubevirtmachinetemplate := include "kubevirtmachinetemplate" $context }}
 {{- $kubevirtmachinetemplateHash := $kubevirtmachinetemplate | sha256sum | trunc 6 }}
 {{- $kubevirtmachinetemplateName := printf "%s-%s-%s" $.Release.Name $groupName $kubevirtmachinetemplateHash }}
@@ -255,6 +272,21 @@ spec:
   - type: Ready
     status: "False"
     timeout: 300s
+---
+apiVersion: cozystack.io/v1alpha1
+kind: WorkloadMonitor
+metadata:
+  name: {{ $.Release.Name }}-{{ $groupName }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  minReplicas: {{ $group.minReplicas }}
+  kind: kubernetes
+  type: worker
+  selector:
+    cluster.x-k8s.io/cluster-name: {{ $.Release.Name }}
+    cluster.x-k8s.io/deployment-name: {{ $.Release.Name }}-{{ $groupName }}
+    cluster.x-k8s.io/role: worker
+  version: {{ $.Chart.Version }}
 {{- end }}
 ---
 {{- /*

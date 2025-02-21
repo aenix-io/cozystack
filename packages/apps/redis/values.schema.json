@@ -21,6 +21,11 @@
             "type": "string",
             "description": "StorageClass used to store the data",
             "default": ""
+        },
+        "authEnabled": {
+            "type": "boolean",
+            "description": "Enable password generation",
+            "default": true
         }
     }
 }

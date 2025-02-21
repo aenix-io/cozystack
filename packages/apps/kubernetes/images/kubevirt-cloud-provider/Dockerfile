@@ -3,13 +3,14 @@ FROM --platform=linux/amd64 golang:1.20.6 AS builder
 
 RUN git clone https://github.com/kubevirt/cloud-provider-kubevirt /go/src/kubevirt.io/cloud-provider-kubevirt \
  && cd /go/src/kubevirt.io/cloud-provider-kubevirt \
- && git checkout adbd6c27468b86b020cf38490e84f124ef24ab62
+ && git checkout da9e0cf
 
 WORKDIR /go/src/kubevirt.io/cloud-provider-kubevirt
 
-# see: https://github.com/kubevirt/cloud-provider-kubevirt/pull/291
+# see: https://github.com/kubevirt/cloud-provider-kubevirt/pull/335
+# see: https://github.com/kubevirt/cloud-provider-kubevirt/pull/336
 ADD patches /patches
-RUN git apply /patches/external-traffic-policy-local.diff
+RUN git apply /patches/*.diff
 RUN go get 'k8s.io/endpointslice/util@v0.28' 'k8s.io/apiserver@v0.28'
 RUN go mod tidy
 RUN go mod vendor

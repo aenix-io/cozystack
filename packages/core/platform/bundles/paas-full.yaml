@@ -1,4 +1,13 @@
 {{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $oidcEnabled := index $cozyConfig.data "oidc-enabled" }}
+{{- $host := index $cozyConfig.data "root-host" }}
+{{- if not $host }}
+{{- fail "ERROR need root-host in cozystack ConfigMap" }}
+{{- end }}
+{{- $apiServerEndpoint := index $cozyConfig.data "api-server-endpoint" }}
+{{- if not $apiServerEndpoint }}
+{{- fail "ERROR need api-server-endpoint in cozystack ConfigMap" }}
+{{- end }}
 
 releases:
 - name: fluxcd-operator
@@ -41,6 +50,12 @@ releases:
         SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
         JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
 
+- name: cozy-proxy
+  releaseName: cozystack
+  chart: cozy-cozy-proxy
+  namespace: cozy-system
+  dependsOn: [cilium,kubeovn]
+
 - name: cert-manager-crds
   releaseName: cert-manager-crds
   chart: cozy-cert-manager-crds
@@ -52,6 +67,17 @@ releases:
   chart: cozy-cozystack-api
   namespace: cozy-system
   dependsOn: [cilium,kubeovn]
+
+- name: cozystack-controller
+  releaseName: cozystack-controller
+  chart: cozy-cozystack-controller
+  namespace: cozy-system
+  dependsOn: [cilium,kubeovn]
+  {{- if eq (index $cozyConfig.data "telemetry-enabled") "false" }}
+  values:
+    cozystackController:
+      disableTelemetry: true
+  {{- end }}
 
 - name: cert-manager
   releaseName: cert-manager
@@ -77,12 +103,16 @@ releases:
   namespace: cozy-monitoring
   privileged: true
   dependsOn: [cilium,kubeovn,victoria-metrics-operator]
+  values:
+    scrapeRules:
+      etcd:
+        enabled: true
 
 - name: kubevirt-operator
   releaseName: kubevirt-operator
   chart: cozy-kubevirt-operator
   namespace: cozy-kubevirt
-  dependsOn: [cilium,kubeovn]
+  dependsOn: [cilium,kubeovn,victoria-metrics-operator]
 
 - name: kubevirt
   releaseName: kubevirt
@@ -200,11 +230,11 @@ releases:
   releaseName: dashboard
   chart: cozy-dashboard
   namespace: cozy-dashboard
-  dependsOn: [cilium,kubeovn]
-  {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
-  {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
+  dependsOn: [cilium,kubeovn,keycloak-configure]
   values:
     kubeapps:
+    {{- if .Capabilities.APIVersions.Has "source.toolkit.fluxcd.io/v1" }}
+    {{- with (lookup "source.toolkit.fluxcd.io/v1" "HelmRepository" "cozy-public" "").items }}
       redis:
         master:
           podAnnotations:
@@ -213,7 +243,61 @@ releases:
             repository.cozystack.io/{{ $repo.metadata.name }}: {{ quote . }}
             {{- end }}
             {{- end }}
+    {{- end }}
+    {{- end }}
+      dashboard:
+        image:
+          registry: ghcr.io/aenix-io/cozystack
+          repository: dashboard
+          tag: v0.25.0
+          digest: "sha256:81e7b625c667bce5fc339eb97c8e115eafb82f66df4501550b3677ac53f6e234"
+        {{- $wlConfigmap := lookup "v1" "ConfigMap" "cozy-dashboard" "white-label" }}
+        {{- $locale := dig "data" "locale" "" $wlConfigmap }}
+        {{- if $locale }}
+        customLocale:
+          "Kubeapps": {{ $locale }}
+        {{- end }}
+        customStyle: |
+          {{- $logoImage := dig "data" "logo" "" $wlConfigmap }}
+          {{- if $logoImage }}
+          .kubeapps-logo {
+            background-image: {{ $logoImage }}
+          }
+          {{- end }}
+          #serviceaccount-selector {
+            display: none;
+          }
+          .login-moreinfo {
+            display: none;
+          }
+          a[href="#/docs"] {
+            display: none;
+          }
+          .login-group .clr-form-control .clr-control-label {
+            display: none;
+          }
+          .appview-separator div.appview-first-row div.center {
+            display: none;
+          }
+          .appview-separator div.appview-first-row section[aria-labelledby="app-secrets"] {
+            display: none;
+          }
+          .appview-first-row section[aria-labelledby="access-urls-title"] {
+            width: 100%;
+          }
+  {{- $dashboardKCconfig := lookup "v1" "ConfigMap" "cozy-dashboard" "kubeapps-auth-config" }}
+  {{- $dashboardKCValues := dig "data" "values.yaml" "" $dashboardKCconfig }}
+  {{- if $dashboardKCValues }}
+  valuesFrom:
+  - kind: ConfigMap
+    name: kubeapps-auth-config
+    valuesKey: values.yaml
   {{- end }}
+
+  {{- if eq $oidcEnabled "true" }}
+  dependsOn: [keycloak-configure]
+  {{- else }}
+  dependsOn: []
   {{- end }}
 
 - name: kamaji
@@ -250,8 +334,33 @@ releases:
   optional: true
   dependsOn: [cilium,kubeovn]
 
+- name: bootbox
+  releaseName: bootbox
+  chart: cozy-bootbox
+  namespace: cozy-bootbox
+  privileged: true
+  optional: true
+  dependsOn: [cilium,kubeovn]
+
+{{- if $oidcEnabled }}
 - name: keycloak
   releaseName: keycloak
   chart: cozy-keycloak
   namespace: cozy-keycloak
   dependsOn: [postgres-operator]
+
+- name: keycloak-operator
+  releaseName: keycloak-operator
+  chart: cozy-keycloak-operator
+  namespace: cozy-keycloak
+  dependsOn: [keycloak]
+
+- name: keycloak-configure
+  releaseName: keycloak-configure
+  chart: cozy-keycloak-configure
+  namespace: cozy-keycloak
+  dependsOn: [keycloak-operator]
+  values:
+    cozystack:
+      configHash: {{ $cozyConfig | toJson | sha256sum }}
+{{- end }}

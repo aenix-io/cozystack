@@ -1,0 +1,3 @@
+talos:
+  imager:
+    image: ghcr.io/siderolabs/imager:v1.9.3
