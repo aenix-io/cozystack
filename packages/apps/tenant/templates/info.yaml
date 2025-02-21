@@ -1,0 +1,27 @@
+{{- $cozyConfig := lookup "v1" "ConfigMap" "cozy-system" "cozystack" }}
+{{- $oidcEnabled := index $cozyConfig.data "oidc-enabled" }}
+{{- if $oidcEnabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: info
+  namespace: {{ include "tenant.name" . }}
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    cozystack.io/ui: "true"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  chart:
+    spec:
+      chart: info
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: HelmRepository
+        name: cozystack-extra
+        namespace: cozy-public
+      version: "*"
+  interval: 1m0s
+  timeout: 5m0s
+{{- end }}

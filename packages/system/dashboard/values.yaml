@@ -361,3 +361,17 @@ kubeapps:
                       kind: HelmRepository
                       name: cozystack-extra
                       namespace: cozy-public
+              - application:
+                  kind: Info
+                  plural: infos
+                  singular: info
+                release:
+                  prefix: ""
+                  labels:
+                    cozystack.io/ui: "true"
+                  chart:
+                    name: info
+                    sourceRef:
+                      kind: HelmRepository
+                      name: cozystack-extra
+                      namespace: cozy-public
