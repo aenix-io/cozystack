@@ -1,0 +1,8 @@
+#!/bin/sh
+# Migration 9 --> 10
+
+# Upgrade kubernetes.apps to new chart version
+kubectl get kuberneteses.apps.cozystack.io -A -o yaml | sed -r -e 's/^  appVersion: [0-9.]+$/  appVersion: 0.15.1/' | kubectl apply -f-
+
+# Write version to cozystack-version config
+kubectl create configmap -n cozy-system cozystack-version --from-literal=version=10 --dry-run=client -o yaml | kubectl apply -f-
