@@ -88,7 +88,7 @@
     },
     "instanceProfile": {
       "type": "string",
-      "description": "Virtual Machine prefferences profile",
+      "description": "Virtual Machine preferences profile",
       "default": "ubuntu",
       "optional": true,
       "enum": [

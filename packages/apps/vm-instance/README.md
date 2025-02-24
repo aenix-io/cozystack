@@ -37,13 +37,13 @@ virtctl ssh <user>@<vm>
 ### Common parameters
 
 | Name               | Description                                                                                                | Value       |
-| ------------------ | ---------------------------------------------------------------------------------------------------------- |-------------|
+| ------------------ | ---------------------------------------------------------------------------------------------------------- | ----------- |
 | `external`         | Enable external access from outside the cluster                                                            | `false`     |
 | `externalMethod`   | specify method to passthrough the traffic to the virtual machine. Allowed values: `WholeIP` and `PortList` | `WholeIP`   |
 | `externalPorts`    | Specify ports to forward from outside the cluster                                                          | `[]`        |
 | `running`          | Determines if the virtual machine should be running                                                        | `true`      |
 | `instanceType`     | Virtual Machine instance type                                                                              | `u1.medium` |
-| `instanceProfile`  | Virtual Machine prefferences profile                                                                       | `ubuntu`    |
+| `instanceProfile`  | Virtual Machine preferences profile                                                                        | `ubuntu`    |
 | `disks`            | List of disks to attach                                                                                    | `[]`        |
 | `resources.cpu`    | The number of CPU cores allocated to the virtual machine                                                   | `""`        |
 | `resources.memory` | The amount of memory allocated to the virtual machine                                                      | `""`        |
