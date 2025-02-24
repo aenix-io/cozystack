@@ -75,6 +75,7 @@ spec:
             secret:
               secretName: {{ include "virtual-machine.fullname" $ }}-ssh-keys
           propagationMethod:
+            # keys will be injected into metadata part of cloud-init disk
             noCloud: {}
       {{- end }}
       terminationGracePeriodSeconds: 30
@@ -87,8 +88,14 @@ spec:
       {{- if or .Values.sshKeys .Values.cloudInit }}
       - name: cloudinitdisk
         cloudInitNoCloud:
+        {{- if .Values.cloudInit }}
           secretRef:
             name: {{ include "virtual-machine.fullname" . }}-cloud-init
+        {{- else }}
+          userData: |
+            #cloud-config
+            final_message: Cloud-init user-data was left blank intentionally.
+        {{- end }}
       {{- end }}
       networks:
       - name: default
