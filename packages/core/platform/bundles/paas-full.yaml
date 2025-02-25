@@ -364,3 +364,10 @@ releases:
     cozystack:
       configHash: {{ $cozyConfig | toJson | sha256sum }}
 {{- end }}
+
+- name: goldpinger
+  releaseName: goldpinger
+  chart: cozy-goldpinger
+  namespace: cozy-goldpinger
+  privileged: true
+  dependsOn: [monitoring-agents]
