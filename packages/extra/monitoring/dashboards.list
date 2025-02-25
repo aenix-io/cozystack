@@ -34,3 +34,5 @@ control-plane/kube-etcd
 kubevirt/kubevirt-control-plane
 flux/flux-control-plane
 flux/flux-stats
+kafka/strimzi-kafka
+goldpinger/goldpinger

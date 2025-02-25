@@ -80,6 +80,8 @@ modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/namespace/
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//main/capacity-planning/capacity-planning.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//flux/flux-control-plane.json
 modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//flux/flux-stats.json
+modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//kafka/strimzi-kafka.json
+modules/340-monitoring-kubernetes/monitoring/grafana-dashboards//goldpinger/goldpinger.json
 EOT
 
 

@@ -30,7 +30,7 @@ image-cozystack: run-builder
 		--provenance false \
 		--tag $(REGISTRY)/cozystack:$(call settag,$(TAG)) \
 		--cache-from type=registry,ref=$(REGISTRY)/cozystack:latest \
-		--platform linux/amd64,linux/arm64 \
+		--platform linux/amd64 \
 		--cache-to type=inline \
 		--metadata-file images/cozystack.json \
 		--push=$(PUSH) \
@@ -43,7 +43,7 @@ image-talos: run-builder
 	test -f ../../../_out/assets/installer-amd64.tar || make talos-installer
 	skopeo copy docker-archive:../../../_out/assets/installer-amd64.tar docker://$(REGISTRY)/talos:$(call settag,$(TALOS_VERSION))
 
-image-matchbox:  run-builder
+image-matchbox: run-builder
 	test -f ../../../_out/assets/kernel-amd64 || make talos-kernel
 	test -f ../../../_out/assets/initramfs-metal-amd64.xz || make talos-initramfs
 	docker buildx build -f images/matchbox/Dockerfile ../../.. \

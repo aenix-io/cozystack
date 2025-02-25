@@ -34,7 +34,11 @@ rules:
 - apiGroups: ["apps.cozystack.io"]
   resources: ['*']
   verbs: ['*']
-
+- apiGroups:
+  - cozystack.io
+  resources:
+  - workloadmonitors
+  verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -103,6 +107,11 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+    - cozystack.io
+    resources:
+    - workloadmonitors
+    verbs: ["get", "list", "watch"]
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -175,6 +184,11 @@ rules:
     verbs:
     - get
     - list
+  - apiGroups:
+    - cozystack.io
+    resources:
+    - workloadmonitors
+    verbs: ["get", "list", "watch"]
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -258,6 +272,7 @@ rules:
     - virtualmachines
     - vmdisks
     - vminstances
+    - infos
     verbs:
     - get
     - list
@@ -266,6 +281,11 @@ rules:
     - update
     - patch
     - delete
+  - apiGroups:
+    - cozystack.io
+    resources:
+    - workloadmonitors
+    verbs: ["get", "list", "watch"]
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -334,6 +354,11 @@ rules:
     - '*'
     verbs:
     - '*'
+  - apiGroups:
+    - cozystack.io
+    resources:
+    - workloadmonitors
+    verbs: ["get", "list", "watch"]
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
