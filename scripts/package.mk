@@ -15,7 +15,7 @@ apply: check suspend ## Apply Helm release to a Kubernetes cluster
 
 diff: check ## Diff Helm release against objects in a Kubernetes cluster
 	kubectl get hr -n $(NAMESPACE) $(NAME) -o jsonpath='{.spec.values}' | NAMESPACE=$(NAMESPACE) NAME=$(NAME) \
-		helm diff upgrade --show-secrets --allow-unreleased --post-renderer ../../../scripts/fluxcd-kustomize.sh -n $(NAMESPACE) $(NAME) . $(.VALUES_FILES)
+		helm diff upgrade --dry-run=server --show-secrets --allow-unreleased --post-renderer ../../../scripts/fluxcd-kustomize.sh -n $(NAMESPACE) $(NAME) . $(.VALUES_FILES)
 
 suspend: check ## Suspend reconciliation for an existing Helm release
 	kubectl patch hr -n $(NAMESPACE) $(NAME) -p '{"spec": {"suspend": true}}' --type=merge --field-manager=flux-client-side-apply
