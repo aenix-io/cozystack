@@ -1,6 +1,6 @@
 # flux-operator
 
-![Version: 0.13.0](https://img.shields.io/badge/Version-0.13.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.13.0](https://img.shields.io/badge/AppVersion-v0.13.0-informational?style=flat-square)
+![Version: 0.15.0](https://img.shields.io/badge/Version-0.15.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.15.0](https://img.shields.io/badge/AppVersion-v0.15.0-informational?style=flat-square)
 
 The [Flux Operator](https://github.com/controlplaneio-fluxcd/flux-operator) provides a
 declarative API for the installation and upgrade of CNCF [Flux](https://fluxcd.io) and the
@@ -44,9 +44,12 @@ see the Flux Operator [documentation](https://fluxcd.control-plane.io/operator/)
 | livenessProbe | object | `{"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20}` | Container liveness probe settings. |
 | logLevel | string | `"info"` | Container logging level flag. |
 | marketplace | object | `{"account":"","license":"","type":""}` | Marketplace settings. |
+| multitenancy | object | `{"defaultServiceAccount":"flux-operator","enabled":false}` | Enable [multitenancy lockdown](https://fluxcd.control-plane.io/operator/resourceset/#role-based-access-control) for the ResourceSet APIs. |
 | nameOverride | string | `""` |  |
 | podSecurityContext | object | `{}` | Pod security context settings. |
 | priorityClassName | string | `""` | Pod priority class name. Recommended value is system-cluster-critical. |
+| rbac.create | bool | `true` | Grant the cluster-admin role to the flux-operator service account (required for the Flux Instance deployment). |
+| rbac.createAggregation | bool | `true` | Grant the Kubernetes view, edit and admin roles access to ResourceSet APIs. |
 | readinessProbe | object | `{"httpGet":{"path":"/readyz","port":8081},"initialDelaySeconds":5,"periodSeconds":10}` | Container readiness probe settings. |
 | resources | object | `{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"64Mi"}}` | Container resources requests and limits settings. |
 | securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Container security context settings. The default is compliant with the pod security restricted profile. |
