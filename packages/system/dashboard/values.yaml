@@ -15,28 +15,6 @@ kubeapps:
     flux:
       enabled: true
   dashboard:
-    customStyle: |
-      #serviceaccount-selector {
-        display: none;
-      }
-      .login-moreinfo {
-        display: none;
-      }
-      a[href="#/docs"] {
-        display: none;
-      }
-      .login-group .clr-form-control .clr-control-label {
-        display: none;
-      }
-      .appview-separator div.appview-first-row div.center {
-        display: none;
-      }
-      .appview-separator div.appview-first-row section[aria-labelledby="app-secrets"] {
-        display: none;
-      }
-      .appview-first-row section[aria-labelledby="access-urls-title"] {
-        width: 100%;
-      }
     image:
       registry: ghcr.io/aenix-io/cozystack
       repository: dashboard

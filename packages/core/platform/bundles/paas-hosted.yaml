@@ -169,19 +169,14 @@ releases:
     {{- end }}
     {{- end }}
       dashboard:
-        image:
-          registry: ghcr.io/aenix-io/cozystack
-          repository: dashboard
-          tag: v0.25.0
-          digest: "sha256:81e7b625c667bce5fc339eb97c8e115eafb82f66df4501550b3677ac53f6e234"
-        {{- $wlConfigmap := lookup "v1" "ConfigMap" "cozy-dashboard" "white-label" }}
-        {{- $locale := dig "data" "locale" "" $wlConfigmap }}
-        {{- if $locale }}
+        {{- $cozystackBranding:= lookup "v1" "ConfigMap" "cozy-system" "cozystack-branding" }}
+        {{- $branding := dig "data" "branding" "" $cozystackBranding }}
+        {{- if $branding }}
         customLocale:
-          "Kubeapps": {{ $locale }}
+          "Kubeapps": {{ $branding }}
         {{- end }}
         customStyle: |
-          {{- $logoImage := dig "data" "logo" "" $wlConfigmap }}
+          {{- $logoImage := dig "data" "logo" "" $cozystackBranding }}
           {{- if $logoImage }}
           .kubeapps-logo {
             background-image: {{ $logoImage }}
