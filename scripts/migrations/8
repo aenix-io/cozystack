@@ -1,5 +1,5 @@
 #!/bin/sh
-# Migration 7 --> 9
+# Migration 8 --> 9
 
 if kubectl get clusterrolebinding kubeapps-admin-group; then
   kubectl delete clusterrolebinding kubeapps-admin-group
