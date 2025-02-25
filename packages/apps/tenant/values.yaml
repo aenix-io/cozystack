@@ -6,9 +6,18 @@
 ## @param ingress Deploy own Ingress Controller
 ## @param seaweedfs Deploy own SeaweedFS
 ## @param isolated Enforce tenant namespace with network policies
+## @param resourceQuotas Define resource quotas for the tenant
 host: ""
 etcd: false
 monitoring: false
 ingress: false
 seaweedfs: false
 isolated: false
+resourceQuotas: {}
+# resourceQuotas:
+#   requests.cpu: "1"
+#   requests.memory: "1Gi"
+#   limits.cpu: "2"
+#   limits.memory: "2Gi"
+#   requests.nvidia.com/gpu: 4
+#   requests.storage: 100Gi
