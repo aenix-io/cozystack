@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linstor-plunger
+  namespace: cozy-linstor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linstor-plunger
+  template:
+    metadata:
+      labels:
+        app: linstor-plunger
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/plunger/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: plunger
+        image: quay.io/piraeusdatastore/piraeus-server:v1.29.2
+        command: ["/bin/bash", "/scripts/plunger.sh"]
+        volumeMounts:
+        - mountPath: /etc/linstor/client
+          name: client-tls
+          readOnly: true
+        - mountPath: /etc/linstor
+          name: etc-linstor
+          readOnly: true
+        - mountPath: /scripts
+          name: script-volume
+          readOnly: true
+      enableServiceLinks: false
+      serviceAccountName: linstor-controller
+      tolerations:
+      - effect: NoSchedule
+        key: drbd.linbit.com/lost-quorum
+      - effect: NoSchedule
+        key: drbd.linbit.com/force-io-error
+      volumes:
+      - name: client-tls
+        projected:
+          sources:
+          - secret:
+              name: linstor-client-tls
+      - name: etc-linstor
+        configMap:
+          name: linstor-controller-config
+      - name: script-volume
+        configMap:
+          name: linstor-plunger
+          defaultMode: 0755
