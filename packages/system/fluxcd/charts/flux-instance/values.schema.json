@@ -148,6 +148,9 @@
                         "path": {
                             "type": "string"
                         },
+                        "provider": {
+                            "type": "string"
+                        },
                         "pullSecret": {
                             "type": "string"
                         },
