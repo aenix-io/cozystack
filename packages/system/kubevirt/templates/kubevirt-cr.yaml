@@ -11,6 +11,8 @@ spec:
       featureGates:
       - HotplugVolumes
       - ExpandDisks
+      - LiveMigration
+    evictionStrategy: LiveMigrate
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   monitorNamespace: tenant-root
