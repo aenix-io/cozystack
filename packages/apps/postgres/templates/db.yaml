@@ -6,7 +6,10 @@ metadata:
 spec:
   instances: {{ .Values.replicas }}
   enableSuperuserAccess: true
-
+  {{ if .Values.topologySpreadConstraints }}
+  topologySpreadConstraints:
+    {{- toYaml .Values.topologySpreadConstraints | nindent 4 }}
+  {{- end }}
   postgresql:
     parameters:
       max_wal_senders: "30"
