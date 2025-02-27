@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linstor-plunger
+  namespace: cozy-linstor
+data:
+  plunger.sh: |
+    #!/bin/bash
+    set -e
+    while true; do 
+      # workaround for https://github.com/LINBIT/linstor-server/issues/437
+      linstor -m s l | jq -r '.[][] | select(.flags | contains(["DELETE"])) | "linstor snapshot delete \(.resource_name) \(.name)"' | sh -x
+      sleep 1m
+    done

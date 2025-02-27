@@ -205,7 +205,7 @@ releases:
   chart: cozy-linstor
   namespace: cozy-linstor
   privileged: true
-  dependsOn: [piraeus-operator,cilium,kubeovn,cert-manager]
+  dependsOn: [piraeus-operator,cilium,kubeovn,cert-manager,snapshot-controller]
 
 - name: snapshot-controller
   releaseName: snapshot-controller
