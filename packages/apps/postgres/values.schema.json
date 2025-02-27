@@ -101,6 +101,12 @@
                     "default": "ChaXoveekoh6eigh4siesheeda2quai0"
                 }
             }
+        },
+        "topologySpreadConstraints": {
+            "type": "array",
+            "description": "The topologySpreadConstraints",
+            "default": [],
+            "items": {}
         }
     }
 }
