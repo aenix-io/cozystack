@@ -1,1 +1,1 @@
-ghcr.io/aenix-io/cozystack/grafana:1.8.0@sha256:1a484f970903cc38745251f3fbc1d4737065f2d0a8a08c0adccc8972aa25aa59
+ghcr.io/aenix-io/cozystack/grafana:1.8.0@sha256:0377abd3cb2c6e27b12ac297f1859aa4d550f1aa14989f824f2315d0dfd1a5b2
