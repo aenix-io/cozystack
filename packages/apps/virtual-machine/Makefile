@@ -8,4 +8,4 @@ generate:
 	  && yq -i -o json ".properties.instanceProfile.optional=true | .properties.instanceProfile.enum = $${PREFERENCES}" values.schema.json
 	yq -i -o json '.properties.externalPorts.items.type = "integer"' values.schema.json
 	yq -i -o json '.properties.systemDisk.properties.image.enum = ["ubuntu", "cirros", "alpine", "fedora", "talos"]' values.schema.json
-	yq -i -o json '.properties.externalMethod.enum = ["wholeIP", "PortList"]' values.schema.json
+	yq -i -o json '.properties.externalMethod.enum = ["WholeIP", "PortList"]' values.schema.json

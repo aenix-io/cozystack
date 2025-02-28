@@ -116,7 +116,8 @@ virtual-machine 0.6.0 0e728870
 virtual-machine 0.7.0 af58018a
 virtual-machine 0.7.1 05857b95
 virtual-machine 0.8.0 3fa4dd3
-virtual-machine 0.8.1 HEAD
+virtual-machine 0.8.1 3fa4dd3a
+virtual-machine 0.8.2 HEAD
 vm-disk 0.1.0 HEAD
 vm-instance 0.1.0 ced8e5b9
 vm-instance 0.2.0 4f767ee3
