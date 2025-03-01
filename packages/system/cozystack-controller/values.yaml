@@ -1,5 +1,5 @@
 cozystackController:
-  image: ghcr.io/aenix-io/cozystack/cozystack-controller:v0.26.0@sha256:d0601c3776387bc38af6706ef5b68cfc986c119a1209c28a37e5797089308f26
+  image: ghcr.io/aenix-io/cozystack/cozystack-controller:v0.26.1@sha256:186df3406dd2a75f59872ff7d11fe92b6e4ce5787f76da3bc7ad670358ea40fb
   debug: false
   disableTelemetry: false
-  cozystackVersion: "v0.26.0"
+  cozystackVersion: "v0.26.1"
