@@ -36,3 +36,4 @@ flux/flux-control-plane
 flux/flux-stats
 kafka/strimzi-kafka
 goldpinger/goldpinger
+storage/piraeus-dashboard
