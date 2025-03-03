@@ -11,6 +11,9 @@ spec:
     replicaCount: 2
     resources:
       limits:
+        {{- with . | dig "vminsert" "resources" "limits" "cpu" nil }}
+        cpu: {{ . | quote }}
+        {{- end }}
         memory: {{ . | dig "vminsert" "resources" "limits" "memory" "1000Mi" }}
       requests:
         cpu: {{ . | dig "vminsert" "resources" "requests" "cpu" "500m" }}
@@ -41,6 +44,9 @@ spec:
     replicaCount: 2
     resources:
       limits:
+        {{- with . | dig "vmstorage" "resources" "limits" "cpu" nil }}
+        cpu: {{ . | quote }}
+        {{- end }}
         memory: {{ . | dig "vmstorage" "resources" "limits" "memory" "2048Mi" }}
       requests:
         cpu: {{ . | dig "vmstorage" "resources" "requests" "cpu" "100m" }}
