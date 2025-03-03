@@ -22,6 +22,10 @@ spec:
     replicaCount: 2
     resources:
       limits:
+        # if we don't set the cpu limit, victoriametrics-operator will set 500m here, which is ridiculous small
+        # see internal/config/config.go in victoriametrics-operator
+        # 2 vcpu is the bare minimum for **single** Grafana user
+        cpu: {{ . | dig "vmselect" "resources" "limits" "cpu" "2000m" }}
         memory: {{ . | dig "vmselect" "resources" "limits" "memory" "1000Mi" }}
       requests:
         cpu: {{ . | dig "vmselect" "resources" "requests" "cpu" "500m" }}
