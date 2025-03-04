@@ -1,4 +1,6 @@
 altinity-clickhouse-operator:
+  serviceMonitor:
+    enabled: true
   configs:
     files:
       config.yaml:
