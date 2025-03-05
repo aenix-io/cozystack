@@ -4,26 +4,30 @@ metadata:
   name: cozystack-talos
 spec:
   patches:
-    - target:
-        kind: Pod
-        name: satellite
-      patch: |
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          name: satellite
-        spec:
-          initContainers:
+  - target:
+      group: apps
+      version: v1
+      kind: DaemonSet
+      name: linstor-satellite
+    patch: |
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: linstor-satellite
+      spec:
+        template:
+          spec:
+            initContainers:
             - name: drbd-shutdown-guard
               $patch: delete
             - name: drbd-module-loader
               $patch: delete
-          containers:
-          - name: linstor-satellite
-            volumeMounts:
-            - mountPath: /run
-              name: host-run
-          volumes:
+            containers:
+            - name: linstor-satellite
+              volumeMounts:
+              - mountPath: /run
+                name: host-run
+            volumes:
             - name: run-systemd-system
               $patch: delete
             - name: run-drbd-shutdown-guard
