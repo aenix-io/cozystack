@@ -1,16 +1,8 @@
 apiVersion: piraeus.io/v1
 kind: LinstorSatelliteConfiguration
 metadata:
-  name: linstor-satellites
+  name: cozystack-talos
 spec:
-  internalTLS:
-    certManager:
-      name: linstor-internal-ca
-      kind: Issuer
-  #storagePools:
-  #- name: "data"
-  #  lvmPool:
-  #    volumeGroup: "data"
   patches:
     - target:
         kind: Pod
