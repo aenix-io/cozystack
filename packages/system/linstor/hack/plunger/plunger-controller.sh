@@ -8,6 +8,9 @@ terminate() {
 
 trap terminate SIGINT SIGTERM
 
+echo "Running Linstor controller plunger:"
+cat "${0}"
+
 while true; do
   # timeout at the start of the loop to give some time for the linstor-controller to start
   sleep 1m

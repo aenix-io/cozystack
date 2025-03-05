@@ -1,0 +1,64 @@
+apiVersion: piraeus.io/v1
+kind: LinstorSatelliteConfiguration
+metadata:
+  name: cozystack-plunger
+spec:
+  internalTLS:
+    certManager:
+      name: linstor-internal-ca
+      kind: Issuer
+  podTemplate:
+    spec:
+      containers:
+      - name: plunger
+        image: {{ include "cozy.linstor.version.satellite" . }}
+        command:
+        - "/scripts/plunger-satellite.sh"
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          # make some room for live debugging
+          readOnlyRootFilesystem: false
+        volumeMounts:
+        - mountPath: /run
+          name: host-run
+{{/*          - mountPath: /etc/linstor/ssl-pem*/}}
+{{/*            name: internal-tls*/}}
+{{/*            readOnly: true*/}}
+{{/*          - mountPath: /etc/linstor/ssl*/}}
+{{/*            name: java-internal-tls*/}}
+{{/*          - mountPath: /etc/linstor*/}}
+{{/*            name: satellite-config*/}}
+{{/*            readOnly: true*/}}
+        - mountPath: /dev
+          name: dev
+{{/*          - mountPath: /var/log/linstor-satellite*/}}
+{{/*            name: var-log-linstor-satellite*/}}
+        - mountPath: /var/lib/drbd
+          name: var-lib-drbd
+        - mountPath: /var/lib/linstor.d
+          name: var-lib-linstor-d
+        - mountPath: /etc/lvm
+          name: container-etc-lvm
+        - mountPath: /etc/lvm/archive
+          name: etc-lvm-archive
+        - mountPath: /etc/lvm/backup
+          name: etc-lvm-backup
+{{/*          - mountPath: /tmp*/}}
+{{/*            name: tmp*/}}
+        - mountPath: /run/lock/lvm
+          name: run-lock-lvm
+        - mountPath: /run/lvm
+          name: run-lvm
+        - mountPath: /run/udev
+          name: run-udev
+          readOnly: true
+        - mountPath: /scripts
+          name: script-volume
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: linstor-plunger
+          defaultMode: 0755
