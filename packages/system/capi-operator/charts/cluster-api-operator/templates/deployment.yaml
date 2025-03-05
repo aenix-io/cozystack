@@ -47,6 +47,8 @@ spec:
       {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
+      serviceAccountName: capi-operator-manager
+      automountServiceAccountToken: true
       {{- with .Values.securityContext }}
       securityContext:
       {{- toYaml . | nindent 8 }}
@@ -63,14 +65,14 @@ spec:
         {{- if .Values.healthAddr }}
         - --health-addr={{ .Values.healthAddr }}
         {{- end }}
-        {{- if .Values.metricsBindAddr }}
-        - --metrics-bind-addr={{ .Values.metricsBindAddr }}
-        {{- end }}
         {{- if .Values.diagnosticsAddress }}
         - --diagnostics-address={{ .Values.diagnosticsAddress }}
         {{- end }}
         {{- if .Values.insecureDiagnostics }}
         - --insecure-diagnostics={{ .Values.insecureDiagnostics }}
+        {{- end }}
+        {{- if .Values.watchConfigSecret }}
+        - --watch-configsecret
         {{- end }}
         {{- with .Values.leaderElection }}
         - --leader-elect={{ .enabled }}
@@ -95,9 +97,15 @@ spec:
         - containerPort: 9443
           name: webhook-server
           protocol: TCP
-        - containerPort: {{ ( split ":" $.Values.metricsBindAddr)._1 | int }}
+          {{- if $.Values.diagnosticsAddress }}
+          {{- $diagnosticsPort := $.Values.diagnosticsAddress }}
+          {{- if contains ":" $diagnosticsPort -}}
+          {{ $diagnosticsPort = ( split ":" $.Values.diagnosticsAddress)._1 | int }}
+          {{- end }}
+        - containerPort: {{ $diagnosticsPort | int }}
           name: metrics
           protocol: TCP
+          {{- end }}
         {{- with .Values.resources.manager }}
         resources:
         {{- toYaml . | nindent 12 }}
@@ -114,6 +122,31 @@ spec:
         volumeMounts:
         {{- toYaml . | nindent 12 }}
         {{- end }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        {{- $healthAddr := $.Values.healthAddr }}
+        {{- if contains ":" $healthAddr -}}
+        {{ $healthAddr = ( split ":" $.Values.healthAddr)._1 | int }}
+        {{- end }}
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: {{ $healthAddr | default 9440 }}
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /readyz
+            port: {{ $healthAddr | default 9440 }}
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
       terminationGracePeriodSeconds: 10
       {{- with .Values.volumes }}
       volumes:

@@ -1,0 +1,73 @@
+# IPAM providers
+{{- if .Values.ipam }}
+{{- $ipams := split ";" .Values.ipam }}
+{{- $ipamNamespace := "" }}
+{{- $ipamName := "" }}
+{{- $ipamVersion := "" }}
+{{- range $ipam := $ipams }}
+{{- $ipamArgs := split ":" $ipam }}
+{{- $ipamArgsLen := len $ipamArgs }}
+{{-  if eq $ipamArgsLen 3 }}
+  {{- $ipamNamespace = $ipamArgs._0 }}
+  {{- $ipamName = $ipamArgs._1 }}
+  {{- $ipamVersion = $ipamArgs._2 }}
+{{-  else if eq $ipamArgsLen 2 }}
+  {{- $ipamNamespace = print $ipamArgs._0 "-ipam-system" }}
+  {{- $ipamName = $ipamArgs._0 }}
+  {{- $ipamVersion = $ipamArgs._1 }}
+{{-  else if eq $ipamArgsLen 1 }}
+  {{- $ipamNamespace = print $ipamArgs._0 "-ipam-system" }}
+  {{- $ipamName = $ipamArgs._0 }}
+{{- else }}
+  {{- fail "ipam provider argument should have the following format in-cluster:v1.0.0 or mynamespace:in-cluster:v1.0.0" }}
+{{- end }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "1"
+    "argocd.argoproj.io/sync-wave": "1"
+  name: {{ $ipamNamespace }}
+---
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: IPAMProvider
+metadata:
+  name: {{ $ipamName }}
+  namespace: {{ $ipamNamespace }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "2"
+    "argocd.argoproj.io/sync-wave": "2"
+{{- if or $ipamVersion $.Values.configSecret.name $.Values.manager $.Values.additionalDeployments }}
+spec:
+{{- end }}
+{{- if $ipamVersion }}
+  version: {{ $ipamVersion }}
+{{- end }}
+{{- if $.Values.manager }}
+  manager:
+{{- if and (kindIs "map" $.Values.manager.featureGates) (hasKey $.Values.manager.featureGates $ipamName) }}
+{{- range $key, $value := $.Values.manager.featureGates }}
+  {{- if eq $key $ipamName }}
+    featureGates:
+    {{- range $k, $v := $value }}
+      {{ $k }}: {{ $v }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if $.Values.configSecret.name }}
+  configSecret:
+    name: {{ $.Values.configSecret.name }}
+    {{- if $.Values.configSecret.namespace }}
+    namespace: {{ $.Values.configSecret.namespace }}
+    {{- end }}
+{{- end }}
+{{- if $.Values.additionalDeployments }}
+  additionalDeployments: {{ toYaml $.Values.additionalDeployments | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}
