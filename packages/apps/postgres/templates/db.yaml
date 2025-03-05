@@ -8,7 +8,7 @@ spec:
   enableSuperuserAccess: true
   {{- $configMap := lookup "v1" "ConfigMap" "cozy-system" "cozystack-scheduling" }}
   {{- if $configMap }}
-  {{- $rawConstraints := get $configMap.data "topologyConfig" }}
+  {{- $rawConstraints := get $configMap.data "globalAppTopologySpreadConstraints" }}
   {{- if $rawConstraints }}
   {{- $rawConstraints | fromYaml | toYaml | nindent 2 }}
   {{- end }}
