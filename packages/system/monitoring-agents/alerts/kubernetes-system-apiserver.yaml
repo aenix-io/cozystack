@@ -19,7 +19,7 @@ spec:
         < 604800
       for: 5m
       labels:
-        severity: warning
+        severity: informational
         exported_instance: '{{ $labels.namespace }}/{{ $labels.pod }}'
         service: kubernetes-system-apiserver
     - alert: KubeClientCertificateExpiration
@@ -34,7 +34,7 @@ spec:
         < 86400
       for: 5m
       labels:
-        severity: critical
+        severity: informational
         exported_instance: '{{ $labels.namespace }}/{{ $labels.pod }}'
         service: kubernetes-system-apiserver
     - alert: KubeAggregatedAPIErrors
