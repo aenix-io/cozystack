@@ -17,3 +17,11 @@ rules:
   resourceNames:
   - {{ .Release.Name }}-clients-ca
   verbs: ["get", "list", "watch"]
+- apiGroups:
+  - cozystack.io
+  resources:
+  - workloadmonitors
+  resourceNames:
+  - {{ .Release.Name }}
+  - {{ $.Release.Name }}-zookeeper
+  verbs: ["get", "list", "watch"]
