@@ -13,7 +13,7 @@ cat "${0}"
 
 while true; do
   # timeout at the start of the loop to give some time for the linstor-controller to start
-  sleep 60 &
+  sleep 30 &
   pid=$!
   wait $pid
 

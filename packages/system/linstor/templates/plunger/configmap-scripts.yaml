@@ -1,4 +1,5 @@
 {{- $files := .Files.Glob "hack/plunger/*.sh" -}}
+{{/* TODO Add checksum of scripts to the pod selectors */}}
 ---
 apiVersion: v1
 kind: ConfigMap

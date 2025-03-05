@@ -12,8 +12,9 @@ echo "Running Linstor per-satellite plunger:"
 cat "${0}"
 
 while true; do
+
   # timeout at the start of the loop to give a chance for the fresh linstor-satellite instance to cleanup itself
-  sleep 60 &
+  sleep 30 &
   pid=$!
   wait $pid
 
@@ -21,6 +22,20 @@ while true; do
   # the `/` path could not be a backing file for a loop device, so it's a good indicator of a stuck loop device
   # TODO describe the issue in more detail
   losetup --json \
-  | jq -r '.[][] | select(."back-file" == "/ (deleted)") | "losetup --detach \(.name)"' \
-  | sh -x
+  | jq -r '.[][]
+           | select(."back-file" == "/ (deleted)")
+           | "echo Detaching stuck loop device \(.name);
+              set -x;
+              losetup --detach \(.name)"' \
+  | sh
+
+  # Detect secondary volumes that lost connection and can be simply reconnected
+  disconnected_secondaries=$(drbdadm status | awk '/pvc-.*role:Secondary.*force-io-failures:yes/ {print $1}')
+  for secondary in $disconnected_secondaries; do (
+    echo "Trying to reconnect secondary volume ${secondary}"
+    set -x
+    drbdadm down "${secondary}"
+    drbdadm up "${secondary}"
+  ); done
+
 done
