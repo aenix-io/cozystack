@@ -13,7 +13,6 @@ spec:
         metadata:
           name: satellite
         spec:
-          hostNetwork: true
           initContainers:
             - name: drbd-shutdown-guard
               $patch: delete
@@ -24,8 +23,6 @@ spec:
             volumeMounts:
             - mountPath: /run
               name: host-run
-            securityContext:
-              readOnlyRootFilesystem: false
           volumes:
             - name: run-systemd-system
               $patch: delete
