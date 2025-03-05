@@ -6,14 +6,16 @@ terminate() {
   exit 0
 }
 
-trap terminate SIGINT SIGTERM
+trap terminate SIGINT SIGQUIT SIGTERM
 
 echo "Running Linstor per-satellite plunger:"
 cat "${0}"
 
 while true; do
   # timeout at the start of the loop to give a chance for the fresh linstor-satellite instance to cleanup itself
-  sleep 1m
+  sleep 60 &
+  pid=$!
+  wait $pid
 
   # Detect orphaned loop devices and detach them
   # the `/` path could not be a backing file for a loop device, so it's a good indicator of a stuck loop device

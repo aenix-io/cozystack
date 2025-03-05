@@ -6,14 +6,16 @@ terminate() {
   exit 0
 }
 
-trap terminate SIGINT SIGTERM
+trap terminate SIGINT SIGQUIT SIGTERM
 
 echo "Running Linstor controller plunger:"
 cat "${0}"
 
 while true; do
   # timeout at the start of the loop to give some time for the linstor-controller to start
-  sleep 1m
+  sleep 60 &
+  pid=$!
+  wait $pid
 
   # workaround for https://github.com/LINBIT/linstor-server/issues/437
   # try to delete snapshots that are stuck in the DELETE state
