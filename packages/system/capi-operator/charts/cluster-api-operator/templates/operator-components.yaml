@@ -13,7 +13,6 @@ spec:
     strategy: Webhook
     webhook:
       clientConfig:
-        caBundle: Cg==
         service:
           name: capi-operator-webhook-service
           namespace: '{{ .Release.Namespace }}'
@@ -1630,7 +1629,6 @@ spec:
     strategy: Webhook
     webhook:
       clientConfig:
-        caBundle: Cg==
         service:
           name: capi-operator-webhook-service
           namespace: '{{ .Release.Namespace }}'
@@ -4832,7 +4830,6 @@ spec:
     strategy: Webhook
     webhook:
       clientConfig:
-        caBundle: Cg==
         service:
           name: capi-operator-webhook-service
           namespace: '{{ .Release.Namespace }}'
@@ -8037,7 +8034,6 @@ spec:
     strategy: Webhook
     webhook:
       clientConfig:
-        caBundle: Cg==
         service:
           name: capi-operator-webhook-service
           namespace: '{{ .Release.Namespace }}'
@@ -11239,7 +11235,6 @@ spec:
     strategy: Webhook
     webhook:
       clientConfig:
-        caBundle: Cg==
         service:
           name: capi-operator-webhook-service
           namespace: '{{ .Release.Namespace }}'
@@ -14444,7 +14439,6 @@ spec:
     strategy: Webhook
     webhook:
       clientConfig:
-        caBundle: Cg==
         service:
           name: capi-operator-webhook-service
           namespace: '{{ .Release.Namespace }}'
@@ -16061,7 +16055,6 @@ spec:
     strategy: Webhook
     webhook:
       clientConfig:
-        caBundle: Cg==
         service:
           name: capi-operator-webhook-service
           namespace: '{{ .Release.Namespace }}'
