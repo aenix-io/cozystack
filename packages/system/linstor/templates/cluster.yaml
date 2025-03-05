@@ -13,3 +13,33 @@ spec:
     certManager:
       name: linstor-api-ca
       kind: Issuer
+  controller:
+    enabled: true
+    podTemplate:
+      spec:
+        containers:
+        - name: plunger
+          image: {{ include "cozy.linstor.version.controller" . }}
+          command:
+          - "/scripts/plunger-controller.sh"
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            # make some room for live debugging
+            readOnlyRootFilesystem: false
+          volumeMounts:
+          - mountPath: /etc/linstor/client
+            name: client-tls
+            readOnly: true
+          - mountPath: /etc/linstor
+            name: etc-linstor
+            readOnly: true
+          - mountPath: /scripts
+            name: script-volume
+            readOnly: true
+        volumes:
+        - name: script-volume
+          configMap:
+            name: linstor-plunger
+            defaultMode: 0755
