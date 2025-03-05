@@ -23,18 +23,8 @@ spec:
         volumeMounts:
         - mountPath: /run
           name: host-run
-{{/*          - mountPath: /etc/linstor/ssl-pem*/}}
-{{/*            name: internal-tls*/}}
-{{/*            readOnly: true*/}}
-{{/*          - mountPath: /etc/linstor/ssl*/}}
-{{/*            name: java-internal-tls*/}}
-{{/*          - mountPath: /etc/linstor*/}}
-{{/*            name: satellite-config*/}}
-{{/*            readOnly: true*/}}
         - mountPath: /dev
           name: dev
-{{/*          - mountPath: /var/log/linstor-satellite*/}}
-{{/*            name: var-log-linstor-satellite*/}}
         - mountPath: /var/lib/drbd
           name: var-lib-drbd
         - mountPath: /var/lib/linstor.d
@@ -45,8 +35,6 @@ spec:
           name: etc-lvm-archive
         - mountPath: /etc/lvm/backup
           name: etc-lvm-backup
-{{/*          - mountPath: /tmp*/}}
-{{/*            name: tmp*/}}
         - mountPath: /run/lock/lvm
           name: run-lock-lvm
         - mountPath: /run/lvm
