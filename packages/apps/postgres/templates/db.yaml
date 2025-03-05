@@ -6,7 +6,13 @@ metadata:
 spec:
   instances: {{ .Values.replicas }}
   enableSuperuserAccess: true
-
+  {{- $configMap := lookup "v1" "ConfigMap" "cozy-system" "cozystack-scheduling" }}
+  {{- if $configMap }}
+  {{- $rawConstraints := get $configMap.data "topologyConfig" }}
+  {{- if $rawConstraints }}
+  {{- $rawConstraints | fromYaml | toYaml | nindent 2 }}
+  {{- end }}
+  {{- end }}
   postgresql:
     parameters:
       max_wal_senders: "30"
