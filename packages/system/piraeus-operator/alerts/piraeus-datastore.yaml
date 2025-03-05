@@ -17,8 +17,8 @@ spec:
         - alert: linstorSatelliteErrorRate
           annotations:
             description: |
-              LINSTOR Satellite "{{ $labels.hostname }}" reports {{ $value }} errors in the last 15 minutes.
-              Use "linstor error-reports list --nodes {{ $labels.hostname }} --since 15minutes" to see them.
+              LINSTOR Satellite "{{ $labels.name }}" reports {{ $value }} errors in the last 15 minutes.
+              Use "linstor error-reports list --nodes {{ $labels.name }} --since 15minutes" to see them.
           expr: increase(linstor_error_reports_count{module="SATELLITE"}[15m]) > 0
           labels:
             severity: warning
@@ -33,7 +33,7 @@ spec:
         - alert: linstorSatelliteNotOnline
           annotations:
             description: |
-              LINSTOR Satellite "{{ $labels.hostname }}" is not ONLINE.
+              LINSTOR Satellite "{{ $labels.name }}" is not ONLINE.
               Check that the Satellite is running and reachable from the LINSTOR Controller.
           expr: linstor_node_state{nodetype="SATELLITE"} != 2
           labels:
