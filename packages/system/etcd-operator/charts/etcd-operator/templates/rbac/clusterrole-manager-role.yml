@@ -73,6 +73,7 @@ rules:
     verbs:
     - get
     - list
+    - watch
   - apiGroups:
       - etcd.aenix.io
     resources:
