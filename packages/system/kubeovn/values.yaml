@@ -22,4 +22,4 @@ global:
   images:
     kubeovn:
       repository: kubeovn
-      tag: v1.13.2@sha256:d3fa76c0cc48207aef15ff27f6332a3f8570e3db77fb97720af8505b812cdf61
+      tag: v1.13.2@sha256:5ce804458e9b14856300a5bbfa3ecac6cd47203759bbb8a4e62ddb5f0684ed7b
