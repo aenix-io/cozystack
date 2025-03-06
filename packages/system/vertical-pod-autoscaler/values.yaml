@@ -1,28 +1,28 @@
-updater:
-  resources:
-    limits:
-      memory: 1100Mi
-    requests:
-      cpu: 200m
-      memory: 1100Mi
+vertical-pod-autoscaler:
+  updater:
+    resources:
+      limits:
+        memory: 1100Mi
+      requests:
+        cpu: 200m
+        memory: 1100Mi
 
-recommender:
-  extraArgs:
-    storage: prometheus
-    prometheus-address: http://vmselect-shortterm.tenant-root.svc.cozy.local:8480
-    prometheus-cadvisor-job-name: cadvisor
+  recommender:
+    extraArgs:
+      storage: prometheus
+      prometheus-address: http://vmselect-shortterm.tenant-root.svc.cozy.local:8480
+      prometheus-cadvisor-job-name: cadvisor
+    resources:
+      limits:
+        memory: 1600Mi
+      requests:
+        cpu: 100m
+        memory: 1600Mi
 
-  resources:
-    limits:
-      memory: 1600Mi
-    requests:
-      cpu: 100m
-      memory: 1600Mi
-
-admissionController:
-  resources:
-    limits:
-      memory: 256Mi
-    requests:
-      cpu: 50m
-      memory: 50Mi
+  admissionController:
+    resources:
+      limits:
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 50Mi
