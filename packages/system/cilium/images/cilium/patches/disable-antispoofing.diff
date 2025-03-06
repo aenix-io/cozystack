@@ -1,0 +1,24 @@
+diff --git a/bpf/bpf_lxc.c b/bpf/bpf_lxc.c
+index 36ecfde895..39872d35c5 100644
+--- a/bpf/bpf_lxc.c
++++ b/bpf/bpf_lxc.c
+@@ -796,9 +796,6 @@ static __always_inline int __tail_handle_ipv6(struct __ctx_buff *ctx,
+ 	if (unlikely(is_icmp6_ndp(ctx, ip6, ETH_HLEN)))
+ 		return icmp6_ndp_handle(ctx, ETH_HLEN, METRIC_EGRESS, ext_err);
+ 
+-	if (unlikely(!is_valid_lxc_src_ip(ip6)))
+-		return DROP_INVALID_SIP;
+-
+ #ifdef ENABLE_PER_PACKET_LB
+ 	/* will tailcall internally or return error */
+ 	return __per_packet_lb_svc_xlate_6(ctx, ip6, ext_err);
+@@ -1361,9 +1358,6 @@ static __always_inline int __tail_handle_ipv4(struct __ctx_buff *ctx,
+ 		return DROP_FRAG_NOSUPPORT;
+ #endif
+ 
+-	if (unlikely(!is_valid_lxc_src_ipv4(ip4)))
+-		return DROP_INVALID_SIP;
+-
+ #ifdef ENABLE_MULTICAST
+ 	if (mcast_ipv4_is_igmp(ip4)) {
+ 		/* note:
