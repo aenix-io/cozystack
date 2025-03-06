@@ -1,0 +1,162 @@
+{{- if .Values.admissionController.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ include "vertical-pod-autoscaler.admissionController.fullname" . }}
+  labels:
+    {{- include "vertical-pod-autoscaler.admissionController.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.admissionController.deploymentAnnotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.admissionController.deploymentAnnotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.admissionController.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "vertical-pod-autoscaler.admissionController.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "vertical-pod-autoscaler.admissionController.selectorLabels" . | nindent 8 }}
+        {{- if .Values.admissionController.podLabels }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.admissionController.podLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.commonLabels }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- if not .Values.admissionController.tls.existingSecret }}
+        checksum/tls-secret: {{ include (print $.Template.BasePath "/admission-controller/tls-secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.admissionController.podAnnotations }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.admissionController.podAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.commonAnnotations }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+    spec:
+      enableServiceLinks: {{ .Values.admissionController.enableServiceLinks }}
+      {{- include "common.images.pullSecrets" ( dict "images" ( list .Values.admissionController.image ) "global" .Values.global ) | nindent 6 }}
+      {{- if .Values.admissionController.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.admissionController.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.admissionController.hostNetwork }}
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      {{- end }}
+      {{- if .Values.admissionController.priorityClassName }}
+      priorityClassName: {{ .Values.admissionController.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.admissionController.runtimeClassName }}
+      runtimeClassName: {{ .Values.admissionController.runtimeClassName | quote }}
+      {{- end }}
+      serviceAccountName: {{ include "vertical-pod-autoscaler.admissionController.serviceAccountName" . }}
+      {{- if .Values.admissionController.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.admissionController.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.admissionController.podSecurityContext | nindent 8 }}
+      containers:
+        - name: admission-controller
+          securityContext:
+            {{- toYaml .Values.admissionController.securityContext | nindent 12 }}
+          image: {{ include "common.images.image" ( dict "imageRoot" .Values.admissionController.image "global" .Values.global ) }}
+          imagePullPolicy: {{ .Values.admissionController.image.pullPolicy }}
+          args:
+            - --address=:{{ .Values.admissionController.containerPorts.metrics }}
+            - --port={{ .Values.admissionController.containerPorts.https }}
+            - --client-ca-file=/tls-secret/ca.crt
+            - --tls-cert-file=/tls-secret/tls.crt
+            - --tls-private-key=/tls-secret/tls.key
+            {{- range $key, $value := .Values.admissionController.extraArgs }}
+            - --{{ $key }}={{ $value }}
+            {{- end }}
+          env:
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+            {{- if .Values.admissionController.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.admissionController.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.admissionController.extraEnvVarsCM .Values.admissionController.extraEnvVarsSecret }}
+          envFrom:
+            {{- if .Values.admissionController.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.admissionController.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.admissionController.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.admissionController.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: https
+              containerPort: {{ .Values.admissionController.containerPorts.https }}
+              protocol: TCP
+            - name: http-metrics
+              containerPort: {{ .Values.admissionController.containerPorts.metrics }}
+              protocol: TCP
+          {{- if .Values.admissionController.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /health-check
+              port: http-metrics
+            initialDelaySeconds: {{ .Values.admissionController.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admissionController.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admissionController.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admissionController.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.admissionController.livenessProbe.successThreshold }}
+          {{- end }}
+          {{- if .Values.admissionController.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /health-check
+              port: http-metrics
+            initialDelaySeconds: {{ .Values.admissionController.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admissionController.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admissionController.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admissionController.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.admissionController.readinessProbe.successThreshold }}
+          {{- end }}
+          {{- if .Values.admissionController.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: /health-check
+              port: http-metrics
+            initialDelaySeconds: {{ .Values.admissionController.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admissionController.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admissionController.startupProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admissionController.startupProbe.failureThreshold }}
+            successThreshold: {{ .Values.admissionController.startupProbe.successThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.admissionController.resources | nindent 12 }}
+          volumeMounts:
+            - name: tls-secret
+              mountPath: /tls-secret
+              readOnly: true
+            {{- if .Values.admissionController.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.admissionController.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+      {{- with .Values.admissionController.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.admissionController.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.admissionController.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      volumes:
+        - name: tls-secret
+          secret:
+            secretName: {{ include "vertical-pod-autoscaler.admissionController.tls.secretName" . }}
+        {{- if .Values.admissionController.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.admissionController.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+{{- end }}
