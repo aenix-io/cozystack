@@ -45,6 +45,7 @@ instance:
     path: ""
     pullSecret: ""
     name: ""
+    provider: ""
   kustomize: # @schema required: false
     # -- Kustomize patches https://fluxcd.control-plane.io/operator/fluxinstance/#kustomize-patches
     patches: [] # @schema item: object
