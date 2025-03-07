@@ -1,3 +1,4 @@
+{{- $secretSyncEnabled := eq (include "secretSyncEnabled" .) "true" -}}
 {{- if and .Values.operator.enabled .Values.serviceAccounts.operator.create .Values.rbac.create }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -9,6 +10,9 @@ metadata:
   {{- end }}
   labels:
     app.kubernetes.io/part-of: cilium
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 rules:
 - apiGroups:
   - ""
@@ -87,7 +91,7 @@ rules:
   resources:
   # to check apiserver connectivity
   - namespaces
-{{- if or .Values.ingressController.enabled .Values.gatewayAPI.enabled  }}
+{{- if or .Values.ingressController.enabled .Values.gatewayAPI.enabled .Values.bgpControlPlane.enabled $secretSyncEnabled }}
   - secrets
 {{- end }}
   verbs:
@@ -197,6 +201,13 @@ rules:
   - delete
   - patch
 - apiGroups:
+  - cilium.io
+  resources:
+  - ciliumbgpclusterconfigs/status
+  - ciliumbgppeerconfigs/status
+  verbs:
+  - update
+- apiGroups:
   - apiextensions.k8s.io
   resources:
   - customresourcedefinitions
@@ -242,6 +253,7 @@ rules:
   - ciliumbgppeeringpolicies
   - ciliumbgpclusterconfigs
   - ciliumbgpnodeconfigoverrides
+  - ciliumbgppeerconfigs
   verbs:
   - get
   - list
@@ -336,11 +348,25 @@ rules:
 - apiGroups:
   - multicluster.x-k8s.io
   resources:
+  - serviceimports/status
+  verbs:
+  - update
+  - patch
+- apiGroups:
+  - multicluster.x-k8s.io
+  resources:
   - serviceexports
   verbs:
   - get
   - list
   - watch
+- apiGroups:
+  - multicluster.x-k8s.io
+  resources:
+  - serviceexports/status
+  verbs:
+  - update
+  - patch
 - apiGroups:
   - ""
   resources:

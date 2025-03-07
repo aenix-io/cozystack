@@ -4,7 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cilium-envoy
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "cilium.namespace" . }}
   {{- if or (not .Values.envoy.prometheus.serviceMonitor.enabled) .Values.envoy.annotations }}
   annotations:
   {{- if not .Values.envoy.prometheus.serviceMonitor.enabled }}
@@ -20,6 +20,9 @@ metadata:
     app.kubernetes.io/name: cilium-envoy
     app.kubernetes.io/part-of: cilium
     io.cilium/app: proxy
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   clusterIP: None
   type: ClusterIP
