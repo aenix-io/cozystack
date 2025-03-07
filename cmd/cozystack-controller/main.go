@@ -36,9 +36,9 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	cozystackiov1alpha1 "github.com/aenix-io/cozystack/api/v1alpha1"
-	"github.com/aenix-io/cozystack/internal/controller"
-	"github.com/aenix-io/cozystack/internal/telemetry"
+	cozystackiov1alpha1 "github.com/cozystack/cozystack/api/v1alpha1"
+	"github.com/cozystack/cozystack/internal/controller"
+	"github.com/cozystack/cozystack/internal/telemetry"
 	// +kubebuilder:scaffold:imports
 )
 

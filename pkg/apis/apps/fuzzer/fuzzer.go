@@ -17,7 +17,7 @@ limitations under the License.
 package fuzzer
 
 import (
-	"github.com/aenix-io/cozystack/pkg/apis/apps"
+	"github.com/cozystack/cozystack/pkg/apis/apps"
 	fuzz "github.com/google/gofuzz"
 
 	runtimeserializer "k8s.io/apimachinery/pkg/runtime/serializer"

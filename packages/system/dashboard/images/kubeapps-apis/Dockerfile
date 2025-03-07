@@ -7,7 +7,7 @@ FROM alpine as source
 ARG COMMIT_REF=dd02680d796c962b8dcc4e5ea70960a846c1acdc
 RUN apk add --no-cache patch
 WORKDIR /source
-RUN wget -O- https://github.com/aenix-io/kubeapps/archive/${COMMIT_REF}.tar.gz | tar xzf - --strip-components=1
+RUN wget -O- https://github.com/cozystack/kubeapps/archive/${COMMIT_REF}.tar.gz | tar xzf - --strip-components=1
 
 FROM bitnami/golang:1.23.4 AS builder
 WORKDIR /go/src/github.com/vmware-tanzu/kubeapps
