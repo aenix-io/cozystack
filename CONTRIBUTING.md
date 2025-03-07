@@ -23,7 +23,7 @@ We welcome many types of contributions including:
 * New features
 * Builds, CI/CD
 * Bug fixes
-* [Documentation](https://github.com/aenix-io/cozystack-website/tree/main)
+* [Documentation](https://github.com/cozystack/cozystack-website/tree/main)
 * Issue Triage
 * Answering questions on Slack or Github Discussions
 * Web design

@@ -1,4 +1,4 @@
-REGISTRY := ghcr.io/aenix-io/cozystack
+REGISTRY := ghcr.io/cozystack/cozystack
 PUSH := 1
 LOAD := 0
 VERSION = $(patsubst v%,%,$(shell git describe --tags --abbrev=0))
@@ -10,7 +10,7 @@ $(if $(filter $(TAG),latest),latest,$(1))
 endef
 
 ifeq ($(VERSION),)
-    $(shell git remote add upstream https://github.com/aenix-io/cozystack.git || true)
+    $(shell git remote add upstream https://github.com/cozystack/cozystack.git || true)
     $(shell git fetch upstream --tags)
     VERSION = $(patsubst v%,%,$(shell git describe --tags --abbrev=0))
 endif

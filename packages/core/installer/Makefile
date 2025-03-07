@@ -28,16 +28,16 @@ image-cozystack: run-builder
 	make -C ../../.. repos
 	docker buildx build -f images/cozystack/Dockerfile ../../.. \
 		--provenance false \
-		--tag $(REGISTRY)/cozystack:$(call settag,$(TAG)) \
-		--cache-from type=registry,ref=$(REGISTRY)/cozystack:latest \
+		--tag $(REGISTRY)/installer:$(call settag,$(TAG)) \
+		--cache-from type=registry,ref=$(REGISTRY)/installer:latest \
 		--platform linux/amd64 \
 		--cache-to type=inline \
-		--metadata-file images/cozystack.json \
+		--metadata-file images/installer.json \
 		--push=$(PUSH) \
 		--load=$(LOAD)
-	IMAGE="$(REGISTRY)/cozystack:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/cozystack.json -o json -r)" \
+	IMAGE="$(REGISTRY)/cozystack:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/installer.json -o json -r)" \
 		yq -i '.cozystack.image = strenv(IMAGE)' values.yaml
-	rm -f images/cozystack.json
+	rm -f images/installer.json
 
 image-talos: run-builder
 	test -f ../../../_out/assets/installer-amd64.tar || make talos-installer
