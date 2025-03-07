@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: clustermesh-apiserver
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "cilium.namespace" . }}
   {{- with .Values.clustermesh.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -15,6 +15,9 @@ metadata:
     k8s-app: clustermesh-apiserver
     app.kubernetes.io/part-of: cilium
     app.kubernetes.io/name: clustermesh-apiserver
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.clustermesh.apiserver.replicas }}
   selector:
@@ -34,6 +37,9 @@ spec:
         app.kubernetes.io/part-of: cilium
         app.kubernetes.io/name: clustermesh-apiserver
         k8s-app: clustermesh-apiserver
+        {{- with .Values.commonLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         {{- with .Values.clustermesh.apiserver.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -191,6 +197,9 @@ spec:
         {{- if .Values.clustermesh.apiserver.metrics.enabled }}
         - --prometheus-serve-addr=:{{ .Values.clustermesh.apiserver.metrics.port }}
         - --controller-group-metrics=all
+        {{- end }}
+        {{- if .Values.clustermesh.enableMCSAPISupport }}
+        - --clustermesh-enable-mcs-api
         {{- end }}
         {{- with .Values.clustermesh.apiserver.extraArgs }}
         {{- toYaml . | trim | nindent 8 }}

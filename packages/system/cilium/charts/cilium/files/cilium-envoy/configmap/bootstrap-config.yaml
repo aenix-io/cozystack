@@ -157,6 +157,9 @@ staticResources:
   - name: "ingress-cluster"
     type: "ORIGINAL_DST"
     connectTimeout: "{{ .Values.envoy.connectTimeoutSeconds }}s"
+    circuitBreakers:
+      thresholds:
+      - maxRetries: {{ .Values.envoy.maxConcurrentRetries }}
     lbPolicy: "CLUSTER_PROVIDED"
     typedExtensionProtocolOptions:
       envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
@@ -170,6 +173,9 @@ staticResources:
   - name: "egress-cluster-tls"
     type: "ORIGINAL_DST"
     connectTimeout: "{{ .Values.envoy.connectTimeoutSeconds }}s"
+    circuitBreakers:
+      thresholds:
+      - maxRetries: {{ .Values.envoy.maxConcurrentRetries }}
     lbPolicy: "CLUSTER_PROVIDED"
     typedExtensionProtocolOptions:
       envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
@@ -188,6 +194,9 @@ staticResources:
   - name: "egress-cluster"
     type: "ORIGINAL_DST"
     connectTimeout: "{{ .Values.envoy.connectTimeoutSeconds }}s"
+    circuitBreakers:
+      thresholds:
+      - maxRetries: {{ .Values.envoy.maxConcurrentRetries }}
     lbPolicy: "CLUSTER_PROVIDED"
     typedExtensionProtocolOptions:
       envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
@@ -201,6 +210,9 @@ staticResources:
   - name: "ingress-cluster-tls"
     type: "ORIGINAL_DST"
     connectTimeout: "{{ .Values.envoy.connectTimeoutSeconds }}s"
+    circuitBreakers:
+      thresholds:
+      - maxRetries: {{ .Values.envoy.maxConcurrentRetries }}
     lbPolicy: "CLUSTER_PROVIDED"
     typedExtensionProtocolOptions:
       envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
@@ -274,6 +286,13 @@ overloadManager:
     typedConfig:
       "@type": "type.googleapis.com/envoy.extensions.resource_monitors.downstream_connections.v3.DownstreamConnectionsConfig"
       max_active_downstream_connections: "50000"
+applicationLogConfig:
+  logFormat:
+    {{- if .Values.envoy.log.format_json }}
+    jsonFormat: "{{ .Values.envoy.log.format_json | toJson }}"
+    {{- else }}
+    textFormat: "{{ .Values.envoy.log.format }}"
+    {{- end }}
 admin:
   address:
     pipe:

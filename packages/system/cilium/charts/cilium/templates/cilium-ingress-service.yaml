@@ -3,11 +3,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.ingressController.service.name }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "cilium.namespace" . }}
   labels:
     cilium.io/ingress: "true"
+    app.kubernetes.io/part-of: cilium
     {{- if .Values.ingressController.service.labels }}
     {{- toYaml .Values.ingressController.service.labels | nindent 4 }}
+    {{- end }}
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- if .Values.ingressController.service.annotations }}
   annotations:
@@ -45,11 +49,14 @@ apiVersion: v1
 kind: Endpoints
 metadata:
   name: {{ .Values.ingressController.service.name }}
-  namespace: {{ .Release.Namespace }}
-  {{- if .Values.ingressController.service.labels }}
+  namespace: {{ include "cilium.namespace" . }}
   labels:
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingressController.service.labels }}
     {{- toYaml .Values.ingressController.service.labels | nindent 4 }}
-  {{- end }}
+    {{- end }}
   {{- if .Values.ingressController.service.annotations }}
   annotations:
     {{- toYaml .Values.ingressController.service.annotations | nindent 4 }}
