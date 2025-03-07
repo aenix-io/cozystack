@@ -366,3 +366,10 @@ releases:
   namespace: cozy-goldpinger
   privileged: true
   dependsOn: [monitoring-agents]
+
+- name: vertical-pod-autoscaler
+  releaseName: vertical-pod-autoscaler
+  chart: cozy-vertical-pod-autoscaler
+  namespace: cozy-vertical-pod-autoscaler
+  privileged: true
+  dependsOn: [monitoring-agents]
