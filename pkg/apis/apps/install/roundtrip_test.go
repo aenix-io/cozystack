@@ -19,7 +19,7 @@ package install
 import (
 	"testing"
 
-	appsfuzzer "github.com/aenix-io/cozystack/pkg/apis/apps/fuzzer"
+	appsfuzzer "github.com/cozystack/cozystack/pkg/apis/apps/fuzzer"
 	"k8s.io/apimachinery/pkg/api/apitesting/roundtrip"
 )
 

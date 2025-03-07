@@ -17,7 +17,7 @@ limitations under the License.
 package validation
 
 import (
-	"github.com/aenix-io/cozystack/pkg/apis/apps"
+	"github.com/cozystack/cozystack/pkg/apis/apps"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 

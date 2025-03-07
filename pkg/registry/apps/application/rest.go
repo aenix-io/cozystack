@@ -39,8 +39,8 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/klog/v2"
 
-	appsv1alpha1 "github.com/aenix-io/cozystack/pkg/apis/apps/v1alpha1"
-	"github.com/aenix-io/cozystack/pkg/config"
+	appsv1alpha1 "github.com/cozystack/cozystack/pkg/apis/apps/v1alpha1"
+	"github.com/cozystack/cozystack/pkg/config"
 
 	// Importing API errors package to construct appropriate error responses
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
