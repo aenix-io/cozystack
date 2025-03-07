@@ -80,7 +80,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
           ports:
             - name: http-metrics
               containerPort: 8080

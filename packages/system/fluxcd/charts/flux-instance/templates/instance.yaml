@@ -47,6 +47,9 @@ spec:
     {{- if .Values.instance.sync.name }}
     name: {{ .Values.instance.sync.name }}
     {{- end }}
+    {{- if .Values.instance.sync.provider }}
+    provider: {{ .Values.instance.sync.provider }}
+    {{- end }}
     {{- if .Values.instance.sync.pullSecret }}
     pullSecret: {{ .Values.instance.sync.pullSecret }}
     {{- end }}

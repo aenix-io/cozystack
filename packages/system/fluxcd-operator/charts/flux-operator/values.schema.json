@@ -94,6 +94,14 @@
         },
         "image": {
             "properties": {
+                "imagePullPolicy": {
+                    "enum": [
+                        "IfNotPresent",
+                        "Always",
+                        "Never"
+                    ],
+                    "type": "string"
+                },
                 "pullSecrets": {
                     "items": {
                         "type": "object"
