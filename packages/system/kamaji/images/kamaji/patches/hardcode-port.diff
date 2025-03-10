@@ -1,0 +1,13 @@
+diff --git a/internal/resources/kubeadm_config.go b/internal/resources/kubeadm_config.go
+index ae4cfc0..ec7a7da 100644
+--- a/internal/resources/kubeadm_config.go
++++ b/internal/resources/kubeadm_config.go
+@@ -96,7 +96,7 @@ func (r *KubeadmConfigResource) mutate(ctx context.Context, tenantControlPlane *
+ 			TenantControlPlanePort:          port,
+ 			TenantControlPlaneName:          tenantControlPlane.GetName(),
+ 			TenantControlPlaneNamespace:     tenantControlPlane.GetNamespace(),
+-			TenantControlPlaneEndpoint:      r.getControlPlaneEndpoint(tenantControlPlane.Spec.ControlPlane.Ingress, address, port),
++			TenantControlPlaneEndpoint:      r.getControlPlaneEndpoint(tenantControlPlane.Spec.ControlPlane.Ingress, address, 443),
+ 			TenantControlPlaneCertSANs:      tenantControlPlane.Spec.NetworkProfile.CertSANs,
+ 			TenantControlPlaneClusterDomain: tenantControlPlane.Spec.NetworkProfile.ClusterDomain,
+ 			TenantControlPlanePodCIDR:       tenantControlPlane.Spec.NetworkProfile.PodCIDR,
