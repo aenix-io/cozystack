@@ -23,6 +23,7 @@ image:
   repository: ghcr.io/controlplaneio-fluxcd/flux-operator # @schema required: true
   tag: ""
   pullSecrets: [ ] # @schema item: object ; uniqueItems: true
+  imagePullPolicy: IfNotPresent # @schema enum:[IfNotPresent, Always, Never]
 
 # -- Pod priority class name.
 # Recommended value is system-cluster-critical.
