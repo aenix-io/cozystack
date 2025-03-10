@@ -12,7 +12,7 @@ etcd: false
 monitoring: false
 ingress: false
 seaweedfs: false
-isolated: false
+isolated: true
 resourceQuotas: {}
 # resourceQuotas:
 #   requests.cpu: "1"
