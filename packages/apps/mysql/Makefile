@@ -14,6 +14,7 @@ image:
 		--cache-to type=inline \
 		--metadata-file images/mariadb-backup.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/mariadb-backup:$(call settag,$(MARIADB_BACKUP_TAG))@$$(yq e '."containerimage.digest"' images/mariadb-backup.json -o json -r)" \
 		> images/mariadb-backup.tag

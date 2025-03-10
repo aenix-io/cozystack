@@ -14,6 +14,7 @@ image-cozystack-api:
 		--cache-to type=inline \
 		--metadata-file images/cozystack-api.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	IMAGE="$(REGISTRY)/cozystack-api:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/cozystack-api.json -o json -r)" \
 		yq -i '.cozystackAPI.image = strenv(IMAGE)' values.yaml

@@ -24,6 +24,7 @@ image:
 		--cache-to type=inline \
 		--metadata-file images/cilium.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	REPOSITORY="$(REGISTRY)/cilium" \
 		yq -i '.cilium.image.repository = strenv(REPOSITORY)' values.yaml

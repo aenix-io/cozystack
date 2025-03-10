@@ -34,6 +34,7 @@ image-cozystack: run-builder
 		--cache-to type=inline \
 		--metadata-file images/installer.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	IMAGE="$(REGISTRY)/cozystack:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/installer.json -o json -r)" \
 		yq -i '.cozystack.image = strenv(IMAGE)' values.yaml
@@ -54,6 +55,7 @@ image-matchbox: run-builder
 		--cache-to type=inline \
 		--metadata-file images/matchbox.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/matchbox:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/matchbox.json -o json -r)" \
 		> ../../extra/bootbox/images/matchbox.tag

@@ -33,6 +33,7 @@ image-dashboard: update-version
 		--cache-to type=inline \
 		--metadata-file images/dashboard.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	REGISTRY="$(REGISTRY)" \
 		yq -i '.kubeapps.dashboard.image.registry = strenv(REGISTRY)' values.yaml
@@ -52,6 +53,7 @@ image-kubeapps-apis: update-version
 		--cache-to type=inline \
 		--metadata-file images/kubeapps-apis.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	REGISTRY="$(REGISTRY)" \
 		yq -i '.kubeapps.kubeappsapis.image.registry = strenv(REGISTRY)' values.yaml

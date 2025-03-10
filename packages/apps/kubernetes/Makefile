@@ -18,6 +18,7 @@ image-ubuntu-container-disk:
 		--cache-to type=inline \
 		--metadata-file images/ubuntu-container-disk.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/ubuntu-container-disk:$(call settag,$(UBUNTU_CONTAINER_DISK_TAG))@$$(yq e '."containerimage.digest"' images/ubuntu-container-disk.json -o json -r)" \
 		> images/ubuntu-container-disk.tag
@@ -32,6 +33,7 @@ image-kubevirt-cloud-provider:
 		--cache-to type=inline \
 		--metadata-file images/kubevirt-cloud-provider.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/kubevirt-cloud-provider:$(call settag,$(KUBERNETES_PKG_TAG))@$$(yq e '."containerimage.digest"' images/kubevirt-cloud-provider.json -o json -r)" \
 		> images/kubevirt-cloud-provider.tag
@@ -46,6 +48,7 @@ image-kubevirt-csi-driver:
 		--cache-to type=inline \
 		--metadata-file images/kubevirt-csi-driver.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/kubevirt-csi-driver:$(call settag,$(KUBERNETES_PKG_TAG))@$$(yq e '."containerimage.digest"' images/kubevirt-csi-driver.json -o json -r)" \
 		> images/kubevirt-csi-driver.tag
@@ -61,6 +64,7 @@ image-cluster-autoscaler:
 		--cache-to type=inline \
 		--metadata-file images/cluster-autoscaler.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/cluster-autoscaler:$(call settag,$(KUBERNETES_PKG_TAG))@$$(yq e '."containerimage.digest"' images/cluster-autoscaler.json -o json -r)" \
 		> images/cluster-autoscaler.tag

@@ -14,6 +14,7 @@ image:
 		--cache-to type=inline \
 		--metadata-file images/postgres-backup.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/postgres-backup:$(call settag,$(POSTGRES_BACKUP_TAG))@$$(yq e '."containerimage.digest"' images/postgres-backup.json -o json -r)" \
 		> images/postgres-backup.tag
