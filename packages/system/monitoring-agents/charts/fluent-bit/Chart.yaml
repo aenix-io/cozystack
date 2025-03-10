@@ -1,9 +1,9 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Updated Fluent Bit OCI image to v3.1.9"
+      description: "Updated Fluent Bit OCI image to v3.2.8."
 apiVersion: v1
-appVersion: 3.1.9
+appVersion: 3.2.8
 description: Fast and lightweight log processor and forwarder or Linux, OSX and BSD
   family operating systems.
 home: https://fluentbit.io/
@@ -24,4 +24,4 @@ maintainers:
 name: fluent-bit
 sources:
 - https://github.com/fluent/fluent-bit/
-version: 0.47.10
+version: 0.48.9

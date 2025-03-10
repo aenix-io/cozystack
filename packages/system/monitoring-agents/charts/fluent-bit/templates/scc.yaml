@@ -24,10 +24,14 @@ forbiddenSysctls:
 readOnlyRootFilesystem: false
 requiredDropCapabilities:
   - MKNOD
+{{- with .Values.openShift.securityContextConstraints.runAsUser }}
 runAsUser:
-  type: RunAsAny
+  {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.openShift.securityContextConstraints.seLinuxContext }}
 seLinuxContext:
-  type: MustRunAs
+  {{- toYaml . | nindent 4 }}
+{{- end }}
 supplementalGroups:
   type: RunAsAny
 volumes:

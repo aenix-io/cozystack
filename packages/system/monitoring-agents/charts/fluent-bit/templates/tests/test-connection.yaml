@@ -17,7 +17,7 @@ spec:
       image: {{ include "fluent-bit.image" .Values.testFramework.image | quote }}
       imagePullPolicy: {{ .Values.testFramework.image.pullPolicy }}
       command: ["sh"]
-      args: ["-c", "wget -O- {{ include "fluent-bit.fullname" . }}:{{ .Values.service.port }}"]
+      args: ["-c", "sleep 5s && wget -O- {{ include "fluent-bit.fullname" . }}:{{ .Values.service.port }}"]
   {{- with .Values.imagePullSecrets }}
   imagePullSecrets:
     {{- toYaml . | nindent 4 }}

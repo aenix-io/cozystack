@@ -45,6 +45,11 @@ rbac:
 podSecurityPolicy:
   create: false
   annotations: {}
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    # This policy assumes the nodes are using AppArmor rather than SELinux.
+    rule: RunAsAny
 
 # OpenShift-specific configuration
 openShift:
@@ -54,6 +59,10 @@ openShift:
     create: true
     name: ""
     annotations: {}
+    runAsUser:
+      type: RunAsAny
+    seLinuxContext:
+      type: MustRunAs
     # Use existing SCC in cluster, rather then create new one
     existingName: ""
 
@@ -98,13 +107,12 @@ service:
   # nodePort: 30020
   # clusterIP: 172.16.10.1
   annotations: {}
-#   prometheus.io/path: "/api/v1/metrics/prometheus"
-#   prometheus.io/port: "2020"
-#   prometheus.io/scrape: "true"
+  #   prometheus.io/path: "/api/v1/metrics/prometheus"
+  #   prometheus.io/port: "2020"
+  #   prometheus.io/scrape: "true"
   externalIPs: []
   # externalIPs:
   #  - 2.2.2.2
-
 
 serviceMonitor:
   enabled: false
@@ -362,6 +370,7 @@ networkPolicy:
 #   ingress:
 #     from: []
 
+# See Lua script configuration example in README.md
 luaScripts: {}
 
 ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/configuration-file
@@ -506,7 +515,8 @@ hotReload:
   enabled: false
   image:
     repository: ghcr.io/jimmidyson/configmap-reload
-    tag: v0.11.1
+    tag: v0.14.0
     digest:
     pullPolicy: IfNotPresent
   resources: {}
+  extraWatchVolumes: []
