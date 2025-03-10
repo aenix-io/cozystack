@@ -8,6 +8,6 @@ metadata:
     {{- include "fluent-bit.labels" . | nindent 4 }}
 data:
   {{ range $key, $value := .Values.luaScripts }}
-  {{ $key }}: {{ $value | quote }}
+  {{ $key }}: {{ (tpl $value $) | quote }}
   {{ end }}
 {{- end -}}

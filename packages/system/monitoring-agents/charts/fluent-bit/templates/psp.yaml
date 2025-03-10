@@ -20,12 +20,15 @@ spec:
   hostNetwork: {{ .Values.hostNetwork }}
   hostIPC: false
   hostPID: false
+{{- with .Values.podSecurityPolicy.runAsUser }}
   runAsUser:
-    # TODO: Require the container to run without root privileges.
-    rule: 'RunAsAny'
+  {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.podSecurityPolicy.seLinux }}
   seLinux:
-    # This policy assumes the nodes are using AppArmor rather than SELinux.
-    rule: 'RunAsAny'
+  {{- toYaml . | nindent 4 }}
+{{- end }}
+
   supplementalGroups:
     rule: 'MustRunAs'
     ranges:
