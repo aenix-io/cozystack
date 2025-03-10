@@ -15,7 +15,7 @@ vertical-pod-autoscaler:
       storage: prometheus
       memory-saver: true
       pod-label-prefix: label_
-      metric-for-pod-labels: container_cpu_usage_seconds_total
+      metric-for-pod-labels: kube_pod_labels{job="kube-state-metrics"}[8d]
       pod-name-label: pod
       pod-namespace-label: namespace
       prometheus-address: http://vmselect-shortterm.tenant-root.svc.cozy.local:8481/select/0/prometheus/
