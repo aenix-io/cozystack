@@ -1,13 +1,17 @@
-{{- if and .Values.hubble.enabled .Values.hubble.metrics.enabled }}
+{{- if and .Values.hubble.enabled (or .Values.hubble.metrics.enabled .Values.hubble.metrics.dynamic.enabled) }}
 apiVersion: v1
 kind: Service
 metadata:
   name: hubble-metrics
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "cilium.namespace" . }}
   labels:
     k8s-app: hubble
     app.kubernetes.io/name: hubble
     app.kubernetes.io/part-of: cilium
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+
   annotations:
     {{- with .Values.hubble.annotations }}
     {{- toYaml . | nindent 4 }}
