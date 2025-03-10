@@ -23,6 +23,7 @@ image:
 		--cache-to type=inline \
 		--metadata-file images/kubeovn.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	REGISTRY="$(REGISTRY)" \
 		yq -i '.global.registry.address = strenv(REGISTRY)' values.yaml
