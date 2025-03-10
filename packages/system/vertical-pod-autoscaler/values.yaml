@@ -9,8 +9,16 @@ vertical-pod-autoscaler:
 
   recommender:
     extraArgs:
+      container-name-label: container
+      container-namespace-label: namespace
+      container-pod-name-label: pod
       storage: prometheus
-      prometheus-address: http://vmselect-shortterm.tenant-root.svc.cozy.local:8480
+      memory-saver: true
+      pod-label-prefix: label_
+      metric-for-pod-labels: container_cpu_usage_seconds_total
+      pod-name-label: pod
+      pod-namespace-label: namespace
+      prometheus-address: http://vmselect-shortterm.tenant-root.svc.cozy.local:8481/select/0/prometheus/
       prometheus-cadvisor-job-name: cadvisor
     resources:
       limits:
