@@ -50,6 +50,13 @@ releases:
         SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
         JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
 
+- name: kubeovn-webhook
+  releaseName: kubeovn-webhook
+  chart: cozy-kubeovn-webhook
+  namespace: cozy-kubeovn
+  privileged: true
+  dependsOn: [cilium,kubeovn,cert-manager]
+
 - name: cozy-proxy
   releaseName: cozystack
   chart: cozy-cozy-proxy

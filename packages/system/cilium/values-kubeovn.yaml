@@ -1,4 +1,6 @@
 cilium:
+  daemon:
+    enableSourceIPVerification: false
   sctp:
     enabled: true
   autoDirectNodeRoutes: false
