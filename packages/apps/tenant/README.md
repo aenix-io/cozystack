@@ -57,5 +57,5 @@ tenant-u1
 | `monitoring`     | Deploy own Monitoring Stack                                                                                                 | `false` |
 | `ingress`        | Deploy own Ingress Controller                                                                                               | `false` |
 | `seaweedfs`      | Deploy own SeaweedFS                                                                                                        | `false` |
-| `isolated`       | Enforce tenant namespace with network policies                                                                              | `false` |
+| `isolated`       | Enforce tenant namespace with network policies                                                                              | `true`  |
 | `resourceQuotas` | Define resource quotas for the tenant                                                                                       | `{}`    |
