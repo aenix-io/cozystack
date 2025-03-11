@@ -11,6 +11,7 @@ build:
 	make -C packages/system/cozystack-controller image
 	make -C packages/system/cilium image
 	make -C packages/system/kubeovn image
+	make -C packages/system/kubeovn-webhook image
 	make -C packages/system/dashboard image
 	make -C packages/system/kamaji image
 	make -C packages/system/bucket image
