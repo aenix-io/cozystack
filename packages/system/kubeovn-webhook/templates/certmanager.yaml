@@ -13,7 +13,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   secretName: {{ include "namespace-annotation-webhook.fullname" . }}-root-ca
-  duration: 43800h  # 5 лет
+  duration: 43800h  # 5 years
   commonName: {{ include "namespace-annotation-webhook.fullname" . }}-root-ca
   issuerRef:
     name: {{ include "namespace-annotation-webhook.fullname" . }}-selfsigned-issuer

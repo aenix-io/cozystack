@@ -13,4 +13,5 @@ WORKDIR /app
 COPY --from=builder /app/webhook /app/webhook
 
 EXPOSE 8443
+USER 65534
 ENTRYPOINT ["/app/webhook", "--tls-cert-file=/etc/webhook/certs/tls.crt", "--tls-key-file=/etc/webhook/certs/tls.key"]

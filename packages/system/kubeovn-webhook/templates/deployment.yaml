@@ -19,7 +19,9 @@ spec:
     spec:
       serviceAccountName: {{ include "namespace-annotation-webhook.fullname" . }}
       securityContext:
-        runAsNonRoot: false
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 65534
       containers:
         - name: {{ include "namespace-annotation-webhook.name" . }}
           image: "{{ .Values.image }}"
@@ -32,7 +34,7 @@ spec:
           resources:
             requests:
               cpu: 10m
-              memory: 32Mi
+              memory: 64Mi
             limits:
               cpu: 100m
               memory: 128Mi
@@ -59,3 +61,4 @@ spec:
         - name: webhook-certs
           secret:
             secretName: namespace-annotation-webhook-tls
+            defaultMode: 0400
