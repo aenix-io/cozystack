@@ -1,4 +1,4 @@
-export NAME=kubevirt-common-instancetypes
+export NAME=kubevirt-instancetypes
 export NAMESPACE=cozy-kubevirt
 
 include ../../../scripts/package.mk
