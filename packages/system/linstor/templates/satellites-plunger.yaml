@@ -16,8 +16,12 @@ spec:
         - "/scripts/plunger-satellite.sh"
         securityContext:
           capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_ADMIN
             drop:
             - ALL
+          privileged: true
           # make some room for live debugging
           readOnlyRootFilesystem: false
         volumeMounts:
