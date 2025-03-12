@@ -21,16 +21,16 @@ while true; do
   # Detect orphaned loop devices and detach them
   # the `/` path could not be a backing file for a loop device, so it's a good indicator of a stuck loop device
   # TODO describe the issue in more detail
-  losetup --json \
-  | jq -r '.[][]
-           | select(."back-file" == "/ (deleted)")
-           | "echo Detaching stuck loop device \(.name);
-              set -x;
-              losetup --detach \(.name)"' \
-  | sh
+  # Using the direct /usr/sbin/losetup as the linstor-satellite image has own wrapper in /usr/local
+  stale_loopbacks=$(/usr/sbin/losetup --json | jq -r '.[][] | select(."back-file" == "/ (deleted)").name')
+  for stale_device in $stale_loopbacks; do (
+    echo "Detaching stuck loop device ${stale_device}"
+    set -x
+    /usr/sbin/losetup --detach "${stale_device}"
+  ); done
 
   # Detect secondary volumes that lost connection and can be simply reconnected
-  disconnected_secondaries=$(drbdadm status | awk '/pvc-.*role:Secondary.*force-io-failures:yes/ {print $1}')
+  disconnected_secondaries=$(drbdadm status 2>/dev/null | awk '/pvc-.*role:Secondary.*force-io-failures:yes/ {print $1}')
   for secondary in $disconnected_secondaries; do (
     echo "Trying to reconnect secondary volume ${secondary}"
     set -x
