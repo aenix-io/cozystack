@@ -1,10 +1,10 @@
 # syntax = docker/dockerfile:experimental
-ARG VERSION=v1.13.2
+ARG VERSION=v1.13.3
 ARG BASE_TAG=$VERSION
 
 FROM golang:1.23-bookworm as builder
 
-ARG TAG=v1.13.2
+ARG TAG=v1.13.3
 RUN git clone --branch ${TAG} --depth 1 https://github.com/kubeovn/kube-ovn /source
 
 WORKDIR /source
@@ -25,16 +25,15 @@ COPY --from=builder /source/dist/images/01-kube-ovn.conflist /kube-ovn/01-kube-o
 COPY --from=builder /source/dist/images/kube-ovn /kube-ovn/kube-ovn
 COPY --from=builder /source/dist/images/kube-ovn-cmd /kube-ovn/kube-ovn-cmd
 COPY --from=builder /source/dist/images/kube-ovn-daemon /kube-ovn/kube-ovn-daemon
-COPY --from=builder /source/dist/images/kube-ovn-pinger /kube-ovn/kube-ovn-pinger
-RUN ln -s /kube-ovn/kube-ovn-cmd /kube-ovn/kube-ovn-controller && \
-    ln -s /kube-ovn/kube-ovn-cmd /kube-ovn/kube-ovn-monitor && \
+COPY --from=builder /source/dist/images/kube-ovn-controller /kube-ovn/kube-ovn-controller
+RUN ln -s /kube-ovn/kube-ovn-cmd /kube-ovn/kube-ovn-monitor && \
     ln -s /kube-ovn/kube-ovn-cmd /kube-ovn/kube-ovn-speaker && \
     ln -s /kube-ovn/kube-ovn-cmd /kube-ovn/kube-ovn-webhook && \
-    ln -s /kube-ovn/kube-ovn-cmd /kube-ovn/kube-ovn-healthcheck && \
     ln -s /kube-ovn/kube-ovn-cmd /kube-ovn/kube-ovn-leader-checker && \
     ln -s /kube-ovn/kube-ovn-cmd /kube-ovn/kube-ovn-ic-controller && \
+    ln -s /kube-ovn/kube-ovn-controller /kube-ovn/kube-ovn-pinger && \
     setcap CAP_NET_BIND_SERVICE+eip /kube-ovn/kube-ovn-cmd && \
-    setcap CAP_NET_RAW,CAP_NET_BIND_SERVICE+eip /kube-ovn/kube-ovn-pinger && \
+    setcap CAP_NET_RAW,CAP_NET_BIND_SERVICE+eip /kube-ovn/kube-ovn-controller && \
     setcap CAP_NET_ADMIN,CAP_NET_RAW,CAP_NET_BIND_SERVICE,CAP_SYS_ADMIN+eip /kube-ovn/kube-ovn-daemon
 
 FROM kubeovn/kube-ovn-base:$BASE_TAG
@@ -51,4 +50,5 @@ WORKDIR /kube-ovn
 RUN setcap CAP_NET_ADMIN,CAP_NET_BIND_SERVICE,CAP_SYS_ADMIN+eip /usr/lib/openvswitch-switch/ovs-vswitchd \
  && setcap CAP_NET_ADMIN,CAP_NET_BIND_SERVICE,CAP_SYS_ADMIN+eip /usr/sbin/xtables-legacy-multi \
  && setcap CAP_NET_ADMIN,CAP_NET_BIND_SERVICE,CAP_SYS_ADMIN+eip /usr/sbin/xtables-nft-multi \
- && setcap CAP_NET_ADMIN,CAP_NET_RAW,CAP_NET_BIND_SERVICE,CAP_SYS_ADMIN+eip /usr/sbin/ipset
+ && setcap CAP_NET_ADMIN,CAP_NET_RAW,CAP_NET_BIND_SERVICE,CAP_SYS_ADMIN+eip /usr/sbin/ipset \
+ && setcap CAP_NET_ADMIN,CAP_NET_RAW,CAP_SYS_ADMIN+eip /usr/bin/ip

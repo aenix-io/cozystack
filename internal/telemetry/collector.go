@@ -16,7 +16,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	cozyv1alpha1 "github.com/aenix-io/cozystack/api/v1alpha1"
+	cozyv1alpha1 "github.com/cozystack/cozystack/api/v1alpha1"
 )
 
 // Collector handles telemetry data collection and sending

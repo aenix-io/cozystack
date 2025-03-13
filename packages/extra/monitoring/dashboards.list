@@ -35,3 +35,6 @@ kubevirt/kubevirt-control-plane
 flux/flux-control-plane
 flux/flux-stats
 kafka/strimzi-kafka
+goldpinger/goldpinger
+clickhouse/altinity-clickhouse-operator-dashboard
+storage/linstor

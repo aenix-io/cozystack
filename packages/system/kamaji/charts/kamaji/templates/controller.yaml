@@ -33,8 +33,9 @@ spec:
         - --leader-elect
         - --metrics-bind-address={{ .Values.metricsBindAddress }}
         - --tmp-directory={{ .Values.temporaryDirectoryPath }}
-        {{- $datastoreName := .Values.defaultDatastoreName | required ".Values.defaultDatastoreName is required!" }}
-        - --datastore={{ $datastoreName }}
+        {{- if not (eq .Values.defaultDatastoreName "") }}
+        - --datastore={{ .Values.defaultDatastoreName }}
+        {{- end }}
         {{- if .Values.telemetry.disabled }}
         - --disable-telemetry
         {{- end }}

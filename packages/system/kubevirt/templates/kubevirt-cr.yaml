@@ -7,10 +7,14 @@ metadata:
 spec:
   certificateRotateStrategy: {}
   configuration:
+    commonInstancetypesDeployment:
+      enabled: false
     developerConfiguration:
       featureGates:
       - HotplugVolumes
       - ExpandDisks
+      - LiveMigration
+    evictionStrategy: LiveMigrate
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   monitorNamespace: tenant-root

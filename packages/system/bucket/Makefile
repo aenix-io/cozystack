@@ -19,6 +19,7 @@ image-s3manager:
 		--cache-to type=inline \
 		--metadata-file images/s3manager.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/s3manager:$(call settag,$(S3MANAGER_TAG))@$$(yq e '."containerimage.digest"' images/s3manager.json -o json -r)" \
 		> images/s3manager.tag

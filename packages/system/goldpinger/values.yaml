@@ -1,0 +1,5 @@
+goldpinger:
+  serviceMonitor:
+    enabled: true
+  prometheusRule:
+    enabled: true

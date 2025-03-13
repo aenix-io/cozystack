@@ -20,3 +20,10 @@ rules:
   resourceNames:
   - {{ .Release.Name }}
   verbs: ["get", "list", "watch"]
+- apiGroups:
+  - cozystack.io
+  resources:
+  - workloadmonitors
+  resourceNames:
+  - {{ .Release.Name }}
+  verbs: ["get", "list", "watch"]

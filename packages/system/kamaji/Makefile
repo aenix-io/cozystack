@@ -19,7 +19,7 @@ image:
 		--cache-to type=inline \
 		--metadata-file images/kamaji.json \
 		--push=$(PUSH) \
-		--label "org.opencontainers.image.source=https://github.com/aenix-io/cozystack"
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack"
 		--load=$(LOAD)
 	REPOSITORY="$(REGISTRY)/kamaji" \
 		yq -i '.kamaji.image.repository = strenv(REPOSITORY)' values.yaml

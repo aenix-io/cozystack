@@ -1,4 +1,4 @@
-KUBEOVN_TAG = v1.13.2
+KUBEOVN_TAG = v1.13.3
 
 export NAME=kubeovn
 export NAMESPACE=cozy-$(NAME)
@@ -23,6 +23,7 @@ image:
 		--cache-to type=inline \
 		--metadata-file images/kubeovn.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	REGISTRY="$(REGISTRY)" \
 		yq -i '.global.registry.address = strenv(REGISTRY)' values.yaml

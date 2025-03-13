@@ -28,6 +28,8 @@ metrics-server:
     name: vmalertmanager-alertmanager
 
 kube-state-metrics:
+  extraArgs:
+    - --metric-labels-allowlist=pods=[*],deployments=[*]
   rbac:
     extraRules:
       - apiGroups:

@@ -3,11 +3,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: clustermesh-apiserver
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "cilium.namespace" . }}
   labels:
     k8s-app: clustermesh-apiserver
     app.kubernetes.io/part-of: cilium
     app.kubernetes.io/name: clustermesh-apiserver
+    {{- with .Values.commonLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+
   {{- if or .Values.clustermesh.apiserver.service.annotations .Values.clustermesh.annotations }}
   annotations:
     {{- with .Values.clustermesh.annotations }}
@@ -31,6 +35,10 @@ spec:
   {{- end }}
   {{- if and (eq "LoadBalancer" .Values.clustermesh.apiserver.service.type) .Values.clustermesh.apiserver.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.clustermesh.apiserver.service.loadBalancerIP }}
+  {{- end }}
+  {{- if and (eq "LoadBalancer" .Values.clustermesh.apiserver.service.type) .Values.clustermesh.apiserver.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml .Values.clustermesh.apiserver.service.loadBalancerSourceRanges | nindent 4 }}
   {{- end }}
   {{- if .Values.clustermesh.apiserver.service.externalTrafficPolicy }}
   externalTrafficPolicy: {{ .Values.clustermesh.apiserver.service.externalTrafficPolicy }}

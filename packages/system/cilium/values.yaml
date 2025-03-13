@@ -11,8 +11,8 @@ cilium:
   ipam:
     mode: "kubernetes"
   image:
-    repository: ghcr.io/aenix-io/cozystack/cilium
-    tag: 1.16.6
-    digest: "sha256:cf64df62897b071d5a9a005564ecbfb9124aa82a96957e329ce28a187864f113"
+    repository: ghcr.io/cozystack/cozystack/cilium
+    tag: 1.17.1
+    digest: "sha256:bb2ad64dfc01f774b429a96108527740c1f08230cac4b848a4939627dfce7a4a"
   envoy:
     enabled: false

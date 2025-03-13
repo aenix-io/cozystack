@@ -30,7 +30,12 @@
         "isolated": {
             "type": "boolean",
             "description": "Enforce tenant namespace with network policies",
-            "default": false
+            "default": true
+        },
+        "resourceQuotas": {
+            "type": "object",
+            "description": "Define resource quotas for the tenant",
+            "default": {}
         }
     }
 }

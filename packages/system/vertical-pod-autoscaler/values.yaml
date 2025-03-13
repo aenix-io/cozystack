@@ -1,0 +1,36 @@
+vertical-pod-autoscaler:
+  updater:
+    resources:
+      limits:
+        memory: 1100Mi
+      requests:
+        cpu: 200m
+        memory: 1100Mi
+
+  recommender:
+    extraArgs:
+      container-name-label: container
+      container-namespace-label: namespace
+      container-pod-name-label: pod
+      storage: prometheus
+      memory-saver: true
+      pod-label-prefix: label_
+      metric-for-pod-labels: kube_pod_labels{job="kube-state-metrics"}[8d]
+      pod-name-label: pod
+      pod-namespace-label: namespace
+      prometheus-address: http://vmselect-shortterm.tenant-root.svc.cozy.local:8481/select/0/prometheus/
+      prometheus-cadvisor-job-name: cadvisor
+    resources:
+      limits:
+        memory: 1600Mi
+      requests:
+        cpu: 100m
+        memory: 1600Mi
+
+  admissionController:
+    resources:
+      limits:
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 50Mi

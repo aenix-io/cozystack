@@ -25,7 +25,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    "helm.sh/hook": "post-install"
+    "helm.sh/hook": "post-install,post-upgrade"
     "helm.sh/hook-weight": "1"
   name: {{ $coreNamespace }}
 ---
@@ -35,10 +35,10 @@ metadata:
   name: {{ $coreName }}
   namespace: {{ $coreNamespace }}
   annotations:
-    "helm.sh/hook": "post-install"
+    "helm.sh/hook": "post-install,post-upgrade"
     "helm.sh/hook-weight": "2"
     "argocd.argoproj.io/sync-wave": "2"
-{{- if or $coreVersion $.Values.configSecret.name }}
+{{- if or $coreVersion $.Values.configSecret.name $.Values.manager }}
 spec:
 {{- end}}
 {{- if $coreVersion }}

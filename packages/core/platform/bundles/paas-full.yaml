@@ -50,6 +50,13 @@ releases:
         SVC_CIDR: "{{ index $cozyConfig.data "ipv4-svc-cidr" }}"
         JOIN_CIDR: "{{ index $cozyConfig.data "ipv4-join-cidr" }}"
 
+- name: kubeovn-webhook
+  releaseName: kubeovn-webhook
+  chart: cozy-kubeovn-webhook
+  namespace: cozy-kubeovn
+  privileged: true
+  dependsOn: [cilium,kubeovn,cert-manager]
+
 - name: cozy-proxy
   releaseName: cozystack
   chart: cozy-cozy-proxy
@@ -205,7 +212,7 @@ releases:
   chart: cozy-linstor
   namespace: cozy-linstor
   privileged: true
-  dependsOn: [piraeus-operator,cilium,kubeovn,cert-manager]
+  dependsOn: [piraeus-operator,cilium,kubeovn,cert-manager,snapshot-controller]
 
 - name: snapshot-controller
   releaseName: snapshot-controller
@@ -246,19 +253,14 @@ releases:
     {{- end }}
     {{- end }}
       dashboard:
-        image:
-          registry: ghcr.io/aenix-io/cozystack
-          repository: dashboard
-          tag: v0.25.0
-          digest: "sha256:81e7b625c667bce5fc339eb97c8e115eafb82f66df4501550b3677ac53f6e234"
-        {{- $wlConfigmap := lookup "v1" "ConfigMap" "cozy-dashboard" "white-label" }}
-        {{- $locale := dig "data" "locale" "" $wlConfigmap }}
-        {{- if $locale }}
+        {{- $cozystackBranding:= lookup "v1" "ConfigMap" "cozy-system" "cozystack-branding" }}
+        {{- $branding := dig "data" "branding" "" $cozystackBranding }}
+        {{- if $branding }}
         customLocale:
-          "Kubeapps": {{ $locale }}
+          "Kubeapps": {{ $branding }}
         {{- end }}
         customStyle: |
-          {{- $logoImage := dig "data" "logo" "" $wlConfigmap }}
+          {{- $logoImage := dig "data" "logo" "" $cozystackBranding }}
           {{- if $logoImage }}
           .kubeapps-logo {
             background-image: {{ $logoImage }}
@@ -364,3 +366,17 @@ releases:
     cozystack:
       configHash: {{ $cozyConfig | toJson | sha256sum }}
 {{- end }}
+
+- name: goldpinger
+  releaseName: goldpinger
+  chart: cozy-goldpinger
+  namespace: cozy-goldpinger
+  privileged: true
+  dependsOn: [monitoring-agents]
+
+- name: vertical-pod-autoscaler
+  releaseName: vertical-pod-autoscaler
+  chart: cozy-vertical-pod-autoscaler
+  namespace: cozy-vertical-pod-autoscaler
+  privileged: true
+  dependsOn: [monitoring-agents]

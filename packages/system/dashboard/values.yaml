@@ -15,39 +15,17 @@ kubeapps:
     flux:
       enabled: true
   dashboard:
-    customStyle: |
-      #serviceaccount-selector {
-        display: none;
-      }
-      .login-moreinfo {
-        display: none;
-      }
-      a[href="#/docs"] {
-        display: none;
-      }
-      .login-group .clr-form-control .clr-control-label {
-        display: none;
-      }
-      .appview-separator div.appview-first-row div.center {
-        display: none;
-      }
-      .appview-separator div.appview-first-row section[aria-labelledby="app-secrets"] {
-        display: none;
-      }
-      .appview-first-row section[aria-labelledby="access-urls-title"] {
-        width: 100%;
-      }
     image:
-      registry: ghcr.io/aenix-io/cozystack
+      registry: ghcr.io/cozystack/cozystack
       repository: dashboard
-      tag: v0.25.2
-      digest: "sha256:4a5dab471c358f826920693591d153dacb81ff7d499daa19edd1f74109f12224"
+      tag: v0.28.0
+      digest: "sha256:ebef6a0c4b0c9f0857fc82699abcaa7a135d18b5dafe129febc0bf90707f2f48"
   kubeappsapis:
     image:
-      registry: ghcr.io/aenix-io/cozystack
+      registry: ghcr.io/cozystack/cozystack
       repository: kubeapps-apis
-      tag: v0.25.2
-      digest: "sha256:69e16490aff84e9084748011b7ae212679b8916cb882032436df450202aea37b"
+      tag: v0.28.0
+      digest: "sha256:281093b1e80221074188fdfea97775494de1cdef16974ee1f3c3d47b313eee0e"
     pluginConfig:
       flux:
         packages:

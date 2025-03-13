@@ -19,7 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	cozyv1alpha1 "github.com/aenix-io/cozystack/api/v1alpha1"
+	cozyv1alpha1 "github.com/cozystack/cozystack/api/v1alpha1"
 )
 
 // WorkloadMonitorReconciler reconciles a WorkloadMonitor object

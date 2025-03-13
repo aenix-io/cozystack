@@ -13,6 +13,7 @@ image-nginx:
 		--cache-to type=inline \
 		--metadata-file images/nginx-cache.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/nginx-cache:$(call settag,$(NGINX_CACHE_TAG))@$$(yq e '."containerimage.digest"' images/nginx-cache.json -o json -r)" \
 		> images/nginx-cache.tag

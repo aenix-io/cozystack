@@ -25,3 +25,5 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN"]
+      tolerations:
+      - operator: Exists

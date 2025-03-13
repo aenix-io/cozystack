@@ -174,7 +174,7 @@ releases:
   chart: cozy-linstor
   namespace: cozy-linstor
   privileged: true
-  dependsOn: [piraeus-operator,cilium,cert-manager]
+  dependsOn: [piraeus-operator,cilium,cert-manager,snapshot-controller]
 
 - name: telepresence
   releaseName: traffic-manager

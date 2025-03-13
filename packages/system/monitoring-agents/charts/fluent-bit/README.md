@@ -27,7 +27,7 @@ Fluent Bit allows us to build filter to modify the incoming records using custom
 
 ### How to use Lua scripts with this Chart
 
-First, you should add your Lua scripts to `luaScripts` in values.yaml, for example:
+First, you should add your Lua scripts to `luaScripts` in values.yaml, templating is supported.
 
 ```yaml
 luaScripts:

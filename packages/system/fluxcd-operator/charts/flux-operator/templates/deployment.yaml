@@ -50,6 +50,9 @@ spec:
         - name: manager
           args:
             - --log-level={{ .Values.logLevel }}
+            {{- if .Values.multitenancy.enabled }}
+            - --default-service-account={{ .Values.multitenancy.defaultServiceAccount }}
+            {{- end }}
             {{- range .Values.extraArgs }}
             - {{ . }}
             {{- end }}
@@ -77,7 +80,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
           ports:
             - name: http-metrics
               containerPort: 8080

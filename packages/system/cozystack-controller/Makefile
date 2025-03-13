@@ -14,6 +14,7 @@ image-cozystack-controller:
 		--cache-to type=inline \
 		--metadata-file images/cozystack-controller.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	IMAGE="$(REGISTRY)/cozystack-controller:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/cozystack-controller.json -o json -r)" \
 		yq -i '.cozystackController.image = strenv(IMAGE)' values.yaml

@@ -15,7 +15,7 @@ spec:
     containerPolicies:
     - containerName: {{ .Chart.Name }}
       {{- with .Values.autoscaling.vpa.controlledResources }}
-      controlledResources:
+      controlledResources: 
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.autoscaling.vpa.maxAllowed }}

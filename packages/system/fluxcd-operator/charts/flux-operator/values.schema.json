@@ -94,6 +94,14 @@
         },
         "image": {
             "properties": {
+                "imagePullPolicy": {
+                    "enum": [
+                        "IfNotPresent",
+                        "Always",
+                        "Never"
+                    ],
+                    "type": "string"
+                },
                 "pullSecrets": {
                     "items": {
                         "type": "object"
@@ -169,6 +177,20 @@
             },
             "type": "object"
         },
+        "multitenancy": {
+            "properties": {
+                "defaultServiceAccount": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "defaultServiceAccount"
+            ],
+            "type": "object"
+        },
         "nameOverride": {
             "type": "string"
         },
@@ -182,6 +204,17 @@
         "priorityClassName": {
             "default": "system-cluster-critical",
             "type": "string"
+        },
+        "rbac": {
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                },
+                "createAggregation": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
         },
         "readinessProbe": {
             "default": {

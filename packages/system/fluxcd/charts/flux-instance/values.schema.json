@@ -74,6 +74,9 @@
                         "artifact": {
                             "type": "string"
                         },
+                        "artifactPullSecret": {
+                            "type": "string"
+                        },
                         "imagePullSecret": {
                             "type": "string"
                         },
@@ -128,6 +131,9 @@
                 },
                 "sync": {
                     "properties": {
+                        "interval": {
+                            "type": "string"
+                        },
                         "kind": {
                             "enum": [
                                 "GitRepository",
@@ -140,6 +146,9 @@
                             "type": "string"
                         },
                         "path": {
+                            "type": "string"
+                        },
+                        "provider": {
                             "type": "string"
                         },
                         "pullSecret": {

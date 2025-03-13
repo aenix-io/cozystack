@@ -108,11 +108,18 @@ containers:
       - {{ printf "-webhook-url=http://localhost:%s/api/v2/reload" (toString .Values.metricsPort) }}
       - -volume-dir=/watch/config
       - -volume-dir=/watch/scripts
+      {{- range $idx, $val := .Values.hotReload.extraWatchVolumes }}
+      - {{ printf "-volume-dir=/watch/extra-%d" (int $idx) }}
+      {{- end }}
     volumeMounts:
       - name: config
         mountPath: /watch/config
       - name: luascripts
         mountPath: /watch/scripts
+      {{- range $idx, $val := .Values.hotReload.extraWatchVolumes }}
+      - name: {{ $val }}
+        mountPath: {{ printf "/watch/extra-%d" (int $idx) }}
+      {{- end }}
     {{- with .Values.hotReload.resources }}
     resources:
       {{- toYaml . | nindent 12 }}
@@ -132,7 +139,7 @@ volumes:
 {{- if or .Values.luaScripts .Values.hotReload.enabled }}
   - name: luascripts
     configMap:
-      name: {{ include "fluent-bit.fullname" . }}-luascripts
+      name: {{ include "fluent-bit.fullname" . }}-luascripts 
 {{- end }}
 {{- if eq .Values.kind "DaemonSet" }}
   {{- toYaml .Values.daemonSetVolumes | nindent 2 }}

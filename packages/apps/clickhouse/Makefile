@@ -14,6 +14,7 @@ image:
 		--cache-to type=inline \
 		--metadata-file images/clickhouse-backup.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/clickhouse-backup:$(call settag,$(CLICKHOUSE_BACKUP_TAG))@$$(yq e '."containerimage.digest"' images/clickhouse-backup.json -o json -r)" \
 		> images/clickhouse-backup.tag

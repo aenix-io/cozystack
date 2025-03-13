@@ -20,6 +20,7 @@ image:
 		--cache-to type=inline \
 		--metadata-file images/grafana.json \
 		--push=$(PUSH) \
+		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
 	echo "$(REGISTRY)/grafana:$(call settag,$(GRAFANA_TAG))@$$(yq e '."containerimage.digest"' images/grafana.json -o json -r)" \
 		> images/grafana.tag

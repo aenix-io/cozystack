@@ -6,7 +6,9 @@ etcd 2.1.0 2b00fcf8
 etcd 2.2.0 5ca8823
 etcd 2.3.0 b908400d
 etcd 2.4.0 cb7b8158
-etcd 2.5.0 HEAD
+etcd 2.5.0 861e6c46
+etcd 2.6.0 a7425b0
+etcd 2.6.1 HEAD
 info 1.0.0 HEAD
 ingress 1.0.0 f642698
 ingress 1.1.0 838bee5d
@@ -27,7 +29,9 @@ monitoring 1.5.4 d4634797
 monitoring 1.6.0 cb7b8158
 monitoring 1.6.1 3bb97596
 monitoring 1.7.0 749110aa
-monitoring 1.8.0 HEAD
+monitoring 1.8.0 80b4c151
+monitoring 1.8.1 06daf341
+monitoring 1.9.0 HEAD
 seaweedfs 0.1.0 5ca8823
 seaweedfs 0.2.0 9e33dc0
 seaweedfs 0.2.1 249bf35

@@ -2,6 +2,18 @@
 # @schema
 # type: [null, string]
 # @schema
+# -- namespaceOverride allows to override the destination namespace for Cilium resources.
+# This property allows to use Cilium as part of an Umbrella Chart with different targets.
+namespaceOverride: ""
+# @schema
+# type: [null, object]
+# @schema
+# -- commonLabels allows users to add common labels for all Cilium resources.
+commonLabels: {}
+
+# @schema
+# type: [null, string]
+# @schema
 # -- upgradeCompatibility helps users upgrading to ensure that the configMap for
 # Cilium will not change critical values to ensure continued operation
 # This flag is not required for new installations.
@@ -34,35 +46,64 @@ rbac:
 imagePullSecrets: []
 # - name: "image-pull-secret"
 
+# -- Configure iptables--random-fully. Disabled by default. View https://github.com/cilium/cilium/issues/13037 for more information.
+iptablesRandomFully: false
+
 # -- (string) Kubernetes config path
 # @default -- `"~/.kube/config"`
 kubeConfigPath: ""
-# -- (string) Kubernetes service host - use "auto" for automatic lookup from the cluster-info ConfigMap (kubeadm-based clusters only)
+# -- (string) Kubernetes service host - use "auto" for automatic lookup from the cluster-info ConfigMap
 k8sServiceHost: ""
 # @schema
 # type: [string, integer]
 # @schema
 # -- (string) Kubernetes service port
 k8sServicePort: ""
-# -- Configure the client side rate limit for the agent and operator
+# @schema
+# type: [null, string]
+# @schema
+# -- (string) When `k8sServiceHost=auto`, allows to customize the configMap name. It defaults to `cluster-info`.
+k8sServiceLookupConfigMapName: ""
+# @schema
+# type: [null, string]
+# @schema
+# -- (string) When `k8sServiceHost=auto`, allows to customize the namespace that contains `k8sServiceLookupConfigMapName`. It defaults to `kube-public`.
+k8sServiceLookupNamespace: ""
+# -- Configure the client side rate limit for the agent
 #
 # If the amount of requests to the Kubernetes API server exceeds the configured
-# rate limit, the agent and operator will start to throttle requests by delaying
+# rate limit, the agent will start to throttle requests by delaying
 # them until there is budget or the request times out.
 k8sClientRateLimit:
   # @schema
   # type: [null, integer]
   # @schema
   # -- (int) The sustained request rate in requests per second.
-  # @default -- 5 for k8s up to 1.26. 10 for k8s version 1.27+
+  # @default -- 10
   qps:
   # @schema
   # type: [null, integer]
   # @schema
   # -- (int) The burst request rate in requests per second.
   # The rate limiter will allow short bursts with a higher rate.
-  # @default -- 10 for k8s up to 1.26. 20 for k8s version 1.27+
+  # @default -- 20
   burst:
+  # -- Configure the client side rate limit for the Cilium Operator
+  operator:
+    # @schema
+    # type: [null, integer]
+    # @schema
+    # -- (int) The sustained request rate in requests per second.
+    # @default -- 100
+    qps:
+    # @schema
+    # type: [null, integer]
+    # @schema
+    # -- (int) The burst request rate in requests per second.
+    # The rate limiter will allow short bursts with a higher rate.
+    # @default -- 200
+    burst:
+
 cluster:
   # -- Name of the cluster. Only required for Cluster Mesh and mutual authentication with SPIRE.
   # It must respect the following constraints:
@@ -156,6 +197,19 @@ image:
   # cilium-digest
   digest: ${CILIUM_DIGEST}
   useDigest: ${USE_DIGESTS}
+# -- Scheduling configurations for cilium pods
+scheduling:
+  # @schema
+  # enum: ["anti-affinity", "kube-scheduler"]
+  # @schema
+  # -- Mode specifies how Cilium daemonset pods should be scheduled to Nodes.
+  # `anti-affinity` mode applies a pod anti-affinity rule to the cilium daemonset.
+  # Pod anti-affinity may significantly impact scheduling throughput for large clusters.
+  # See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  # `kube-scheduler` mode forgoes the anti-affinity rule for full scheduling throughput.
+  # Kube-scheduler avoids host port conflict when scheduling pods.
+  # @default -- Defaults to apply a pod anti-affinity rule to the agent pod - `anti-affinity`
+  mode: anti-affinity
 # -- Affinity for cilium-agent.
 affinity:
   podAntiAffinity:
@@ -389,16 +443,6 @@ l2podAnnouncements:
   enabled: false
   # -- Interface used for sending Gratuitous ARP pod announcements
   interface: "eth0"
-# -- Configure BGP
-bgp:
-  # -- Enable BGP support inside Cilium; embeds a new ConfigMap for BGP inside
-  # cilium-agent and cilium-operator
-  enabled: false
-  announce:
-    # -- Enable allocation and announcement of service LoadBalancer IPs
-    loadbalancerIP: false
-    # -- Enable announcement of node pod CIDR
-    podCIDR: false
 # -- This feature set enables virtual BGP routers to be created via
 # CiliumBGPPeeringPolicy CRDs.
 bgpControlPlane:
@@ -410,6 +454,12 @@ bgpControlPlane:
     create: false
     # -- The name of the secret namespace to which Cilium agents are given read access
     name: kube-system
+  # -- Status reporting settings (BGPv2 only)
+  statusReport:
+    # -- Enable/Disable BGPv2 status reporting
+    # It is recommended to enable status reporting in general, but if you have any issue
+    # such as high API server load, you can disable it by setting this to false.
+    enabled: true
 pmtuDiscovery:
   # -- Enable path MTU discovery to send ICMP fragmentation-needed replies to
   # the client.
@@ -434,6 +484,8 @@ bpf:
   # -- (int) Configure the maximum number of entries in auth map.
   # @default -- `524288`
   authMapMax: ~
+  # -- Enable CT accounting for packets and bytes
+  ctAccounting: false
   # @schema
   # type: [null, integer]
   # @schema
@@ -449,7 +501,25 @@ bpf:
   # @default -- `262144`
   ctAnyMax: ~
   # -- Control events generated by the Cilium datapath exposed to Cilium monitor and Hubble.
+  # Helm configuration for BPF events map rate limiting is experimental and might change
+  # in upcoming releases.
   events:
+    # -- Default settings for all types of events except dbg and pcap.
+    default:
+      # -- (int) Configure the limit of messages per second that can be written to
+      # BPF events map. The number of messages is averaged, meaning that if no messages
+      # were written to the map over 5 seconds, it's possible to write more events
+      # in the 6th second. If rateLimit is greater than 0, non-zero value for burstLimit must
+      # also be provided lest the configuration is considered invalid. Setting both burstLimit
+      # and rateLimit to 0 disables BPF events rate limiting.
+      # @default -- `0`
+      rateLimit: ~
+      # -- (int) Configure the maximum number of messages that can be written to BPF events
+      # map in 1 second. If burstLimit is greater than 0, non-zero value for rateLimit must
+      # also be provided lest the configuration is considered invalid. Setting both burstLimit
+      # and rateLimit to 0 disables BPF events rate limiting.
+      # @default -- `0`
+      burstLimit: ~
     drop:
       # -- Enable drop events.
       enabled: true
@@ -504,8 +574,23 @@ bpf:
   # -- Configure which TCP flags trigger notifications when seen for the
   # first time in a connection.
   monitorFlags: "all"
-  # -- Allow cluster external access to ClusterIP services.
+  # -- (bool) Allow cluster external access to ClusterIP services.
+  # @default -- `false`
   lbExternalClusterIP: false
+  # -- (bool) Enable loadBalancerSourceRanges CIDR filtering for all service
+  # types, not just LoadBalancer services. The corresponding NodePort and
+  # ClusterIP (if enabled for cluster-external traffic) will also apply the
+  # CIDR filter.
+  # @default -- `false`
+  lbSourceRangeAllTypes: false
+  # -- (bool) Enable the option to define the load balancing algorithm on
+  # a per-service basis through service.cilium.io/lb-algorithm annotation.
+  # @default -- `false`
+  lbAlgorithmAnnotation: false
+  # -- (bool) Enable the option to define the load balancing mode (SNAT or DSR)
+  # on a per-service basis through service.cilium.io/forwarding-mode annotation.
+  # @default -- `false`
+  lbModeAnnotation: false
   # @schema
   # type: [null, boolean]
   # @schema
@@ -524,7 +609,7 @@ bpf:
   # @schema
   # type: [null, boolean]
   # @schema
-  # -- (bool) Configure the eBPF-based TPROXY to reduce reliance on iptables rules
+  # -- (bool) Configure the eBPF-based TPROXY (beta) to reduce reliance on iptables rules
   # for implementing Layer 7 policy.
   # @default -- `false`
   tproxy: ~
@@ -681,6 +766,14 @@ daemon:
   #
   # By default, all keys may be overridden.
   blockedConfigOverrides: ~
+  # @schema
+  # type: [null, boolean]
+  # @schema
+  # -- enableSourceIPVerification is a boolean flag to enable or disable the Source IP verification
+  # of endpoints. This flag is useful when Cilium is chained with other CNIs.
+  #
+  # By default, this functionality is enabled
+  enableSourceIPVerification: true
 # -- Specify which network interfaces can run the eBPF datapath. This means
 # that a packet sent from a pod to a destination outside the cluster will be
 # masqueraded (to an output device IPv4 address), if the output device runs the
@@ -727,11 +820,16 @@ ciliumEndpointSlice:
     limit: 10
     burst: 20
   - nodes: 100
-    limit: 7
-    burst: 15
-  - nodes: 500
-    limit: 5
-    burst: 10
+    limit: 50
+    burst: 100
+
+  # @schema
+  # enum: ["identity", "fcfs"]
+  # @schema
+  # -- The slicing mode to use for CiliumEndpointSlices.
+  # identity groups together CiliumEndpoints that share the same identity.
+  # fcfs groups together CiliumEndpoints in a first-come-first-serve basis, filling in the largest non-full slice first.
+  sliceMode: identity
 
 envoyConfig:
   # -- Enable CiliumEnvoyConfig CRD
@@ -924,8 +1022,6 @@ encryption:
     # -- Enable IPsec encrypted overlay
     encryptedOverlay: false
   wireguard:
-    # -- Enables the fallback to the user-space implementation (deprecated).
-    userspaceFallback: false
     # -- Controls WireGuard PersistentKeepalive option. Set 0s to disable.
     persistentKeepalive: 0s
 endpointHealthChecking:
@@ -941,6 +1037,8 @@ endpointRoutes:
 k8sNetworkPolicy:
   # -- Enable support for K8s NetworkPolicy
   enabled: true
+# -- Enable endpoint lockdown on policy map overflow.
+endpointLockdownOnMapOverflow: false
 eni:
   # -- Enable Elastic Network Interface (ENI) integration.
   enabled: false
@@ -991,6 +1089,8 @@ gke:
 healthChecking: true
 # -- TCP port for the agent health API. This is not the port for cilium-health.
 healthPort: 9879
+# -- Number of ICMP requests sent for each health check before marking a node or endpoint unreachable.
+healthCheckICMPFailureThreshold: 3
 # -- Configure the host firewall.
 hostFirewall:
   # -- Enables the enforcement of host policies in the eBPF datapath.
@@ -1013,6 +1113,8 @@ socketLB:
 # for the Kubernetes CronJob which will be scheduled regularly to
 # (re)generate any certificates not provided manually.
 certgen:
+  # -- When set to true the certificate authority secret is created.
+  generateCA: true
   image:
     # @schema
     # type: [null, string]
@@ -1031,6 +1133,12 @@ certgen:
   annotations:
     job: {}
     cronJob: {}
+  # -- Node selector for certgen
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+  nodeSelector: {}
+  # -- Priority class for certgen
+  # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass
+  priorityClassName: ""
   # -- Node tolerations for pod assignment on nodes with taints
   # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
   tolerations: []
@@ -1156,6 +1264,21 @@ hubble:
       namespace: ~
       labelValue: "1"
       annotations: {}
+    # Dynamic metrics  may be reconfigured without a need of agent restarts.
+    dynamic:
+      enabled: false
+      config:
+        # ---- Name of configmap with configuration that may be altered to reconfigure metric handlers within a running agent.
+        configMapName: cilium-dynamic-metrics-config
+        # ---- True if helm installer should create config map.
+        # Switch to false if you want to self maintain the file content.
+        createConfigMap: true
+        # ---- Exporters configuration in YAML format.
+        content:
+          - name: all
+            contextOptions: []
+            includeFilters: []
+            excludeFilters: []
   # -- Unix domain socket path to listen to when Hubble is enabled.
   socketPath: /var/run/cilium/hubble.sock
   # -- Enables redacting sensitive information present in Layer 7 flows.
@@ -1407,7 +1530,7 @@ hubble:
           - ALL
     # -- hubble-relay service configuration.
     service:
-      # --- The type of service used for Hubble Relay access, either ClusterIP or NodePort.
+      # --- The type of service used for Hubble Relay access, either ClusterIP, NodePort or LoadBalancer.
       type: ClusterIP
       # --- The port to use when the service type is set to NodePort.
       nodePort: 31234
@@ -1463,6 +1586,8 @@ hubble:
     # type: [null, string]
     # @schema
     # -- Dial timeout to connect to the local hubble instance to receive peer information (e.g. "30s").
+    #
+    # This option has been deprecated and is a no-op.
     dialTimeout: ~
     # @schema
     # type: [null, string]
@@ -1634,6 +1759,8 @@ hubble:
     replicas: 1
     # -- Annotations to be added to all top-level hubble-ui objects (resources under templates/hubble-ui)
     annotations: {}
+    # -- Additional labels to be added to 'hubble-ui' deployment object
+    labels: {}
     # -- Annotations to be added to hubble-ui pods
     podAnnotations: {}
     # -- Labels to be added to hubble-ui pods
@@ -1771,7 +1898,7 @@ hubble:
       - auth_required
       - policy_denied
 
-# -- Method to use for identity allocation (`crd` or `kvstore`).
+# -- Method to use for identity allocation (`crd`, `kvstore` or `doublewrite-readkvstore` / `doublewrite-readcrd` for migrating between identity backends).
 identityAllocationMode: "crd"
 # -- (string) Time to wait before using new identity on endpoint identity change.
 # @default -- `"5s"`
@@ -1787,6 +1914,10 @@ ipam:
   mode: "cluster-pool"
   # -- Maximum rate at which the CiliumNode custom resource is updated.
   ciliumNodeUpdateRate: "15s"
+  # -- Pre-allocation settings for IPAM in Multi-Pool mode
+  multiPoolPreAllocation: ""
+  # -- Install ingress/egress routes through uplink on host for Pods when working with delegated IPAM plugin.
+  installUplinkRoutesForDelegatedIPAM: false
   operator:
     # @schema
     # type: [array, string]
@@ -1829,6 +1960,12 @@ ipam:
     # refill the bucket up to the burst size capacity.
     # @default -- `4.0`
     externalAPILimitQPS: ~
+# -- defaultLBServiceIPAM indicates the default LoadBalancer Service IPAM when
+# no LoadBalancer class is set. Applicable values: lbipam, nodeipam, none
+# @schema
+# type: [string]
+# @schema
+defaultLBServiceIPAM: lbipam
 nodeIPAM:
   # -- Configure Node IPAM
   # ref: https://docs.cilium.io/en/stable/network/node-ipam/
@@ -2011,6 +2148,10 @@ loadBalancer:
   # endpoints filtering
   # serviceTopology: false
 
+  # -- experimental enables support for the experimental load-balancing
+  # control-plane.
+  experimental: false
+
   # -- L7 LoadBalancer
   l7:
     # -- Enable L7 service load balancing via envoy proxy.
@@ -2081,6 +2222,7 @@ pprof:
   port: 6060
 # -- Configure prometheus metrics on the configured port at /metrics
 prometheus:
+  metricsService: false
   enabled: false
   port: 9962
   serviceMonitor:
@@ -2153,14 +2295,51 @@ envoy:
   # Only needs to be changed if multiple Envoy instances will run on the same node and may have conflicts. Supported values: 0 - 4294967295. Defaults to '0'
   baseID: 0
   log:
-    # -- The format string to use for laying out the log message metadata of Envoy.
+    # @schema
+    # type: [null, string]
+    # @schema
+    # -- The format string to use for laying out the log message metadata of Envoy. If specified, Envoy will use text format output.
+    # This setting is mutually exclusive with envoy.log.format_json.
     format: "[%Y-%m-%d %T.%e][%t][%l][%n] [%g:%#] %v"
+    # @schema
+    # type: [null, object]
+    # @schema
+    # -- The JSON logging format to use for Envoy. This setting is mutually exclusive with envoy.log.format.
+    # ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/bootstrap/v3/bootstrap.proto#envoy-v3-api-field-config-bootstrap-v3-bootstrap-applicationlogconfig-logformat-json-format
+    format_json: null
+      # date: "%Y-%m-%dT%T.%e"
+      # thread_id: "%t"
+      # source_line: "%s:%#"
+      # level: "%l"
+      # logger: "%n"
+      # message: "%j"
     # -- Path to a separate Envoy log file, if any. Defaults to /dev/stdout.
     path: ""
+    # @schema
+    # oneOf:
+    # - type: [null]
+    # - enum: [trace,debug,info,warning,error,critical,off]
+    # @schema
+    # -- Default log level of Envoy application log that is configured if Cilium debug / verbose logging isn't enabled.
+    # This option allows to have a different log level than the Cilium Agent - e.g. lower it to `critical`.
+    # Possible values: trace, debug, info, warning, error, critical, off
+    # @default -- Defaults to the default log level of the Cilium Agent - `info`
+    defaultLevel: ~
+    # @schema
+    # type: [null, integer]
+    # @schema
+    # -- Size of the Envoy access log buffer created within the agent in bytes.
+    # Tune this value up if you encounter "Envoy: Discarded truncated access log message" errors.
+    # Large request/response header sizes (e.g. 16KiB) will require a larger buffer size.
+    accessLogBufferSize: 4096
   # -- Time in seconds after which a TCP connection attempt times out
   connectTimeoutSeconds: 2
   # -- Time in seconds after which the initial fetch on an xDS stream is considered timed out
   initialFetchTimeoutSeconds: 30
+  # -- Maximum number of concurrent retries on Envoy clusters
+  maxConcurrentRetries: 128
+  # -- Maximum number of retries for each HTTP request
+  httpRetryCount: 3
   # -- ProxyMaxRequestsPerConnection specifies the max_requests_per_connection setting for Envoy
   maxRequestsPerConnection: 0
   # -- Set Envoy HTTP option max_connection_duration seconds. Default 0 (disable)
@@ -2217,6 +2396,15 @@ envoy:
       maxUnavailable: 2
   # -- Roll out cilium envoy pods automatically when configmap is updated.
   rollOutPods: false
+  # -- ADVANCED OPTION: Bring your own custom Envoy bootstrap ConfigMap. Provide the name of a ConfigMap with a `bootstrap-config.json` key.
+  # When specified, Envoy will use this ConfigMap instead of the default provided by the chart.
+  # WARNING: Use of this setting has the potential to prevent cilium-envoy from starting up, and can cause unexpected behavior (e.g. due to
+  # syntax error or semantically incorrect configuration). Before submitting an issue, please ensure you have disabled this feature, as support
+  # cannot be provided for custom Envoy bootstrap configs.
+  # @schema
+  # type: [null, string]
+  # @schema
+  bootstrapConfigMap: ~
   # -- Annotations to be added to all top-level cilium-envoy objects (resources under templates/cilium-envoy)
   annotations: {}
   # -- Security Context for cilium-envoy pods.
@@ -2404,12 +2592,42 @@ svcSourceRangeCheck: true
 synchronizeK8sNodes: true
 # -- Configure TLS configuration in the agent.
 tls:
+  # @schema
+  # type: [null, string]
+  # @schema
   # -- This configures how the Cilium agent loads the secrets used TLS-aware CiliumNetworkPolicies
   # (namely the secrets referenced by terminatingTLS and originatingTLS).
+  # This value is DEPRECATED and will be removed in a future version.
+  # Use `tls.readSecretsOnlyFromSecretsNamespace` instead.
   # Possible values:
   #   - local
   #   - k8s
-  secretsBackend: local
+  secretsBackend: ~
+  # @schema
+  # type: [null, boolean]
+  # @schema  
+  # -- Configure if the Cilium Agent will only look in `tls.secretsNamespace` for
+  #    CiliumNetworkPolicy relevant Secrets.
+  #    If false, the Cilium Agent will be granted READ (GET/LIST/WATCH) access
+  #    to _all_ secrets in the entire cluster. This is not recommended and is
+  #    included for backwards compatibility.
+  #    This value obsoletes `tls.secretsBackend`, with `true` == `local` in the old
+  #    setting, and `false` == `k8s`.
+  readSecretsOnlyFromSecretsNamespace: ~
+  # -- Configures where secrets used in CiliumNetworkPolicies will be looked for
+  secretsNamespace:
+    # -- Create secrets namespace for TLS Interception secrets.
+    create: true
+    # -- Name of TLS Interception secret namespace.
+    name: cilium-secrets
+  # -- Configures settings for synchronization of TLS Interception Secrets
+  secretSync:
+    # @schema
+    # type: [null, boolean]
+    # @schema
+    # -- Enable synchronization of Secrets for TLS Interception. If disabled and
+    # tls.secretsBackend is set to 'k8s', then secrets will be read directly by the agent.
+    enabled: ~
   # -- Base64 encoded PEM values for the CA certificate and private key.
   # This can be used as common CA to generate certificates used by hubble and clustermesh components.
   # It is neither required nor used when cert-manager is used to generate the certificates.
@@ -2628,6 +2846,7 @@ operator:
   # -- Enable prometheus metrics for cilium-operator on the configured port at
   # /metrics
   prometheus:
+    metricsService: false
     enabled: true
     port: 9963
     serviceMonitor:
@@ -3034,9 +3253,11 @@ clustermesh:
       # NodePort will be redirected to a local backend, regardless of whether the
       # destination node belongs to the local or the remote cluster.
       nodePort: 32379
-      # -- Annotations for the clustermesh-apiserver
-      # For GKE LoadBalancer, use annotation cloud.google.com/load-balancer-type: "Internal"
-      # For EKS LoadBalancer, use annotation service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      # -- Annotations for the clustermesh-apiserver service.
+      # Example annotations to configure an internal load balancer on different cloud providers:
+      # * AKS: service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      # * EKS: service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+      # * GKE: networking.gke.io/load-balancer-type: "Internal"
       annotations: {}
       # @schema
       # enum: [Local, Cluster]
@@ -3080,6 +3301,10 @@ clustermesh:
       # Allows to configure a specific loadBalancerIP on the clustermesh-apiserver
       # LB service in case the Service type is set to LoadBalancer.
       loadBalancerIP: ~
+      # -- Configure loadBalancerSourceRanges.
+      # Allows to configure the source IP ranges allowed to access the
+      # clustermesh-apiserver LB service in case the Service type is set to LoadBalancer.
+      loadBalancerSourceRanges: []
     # -- Number of replicas run for the clustermesh-apiserver deployment.
     replicas: 1
     # -- lifecycle setting for the apiserver container
@@ -3372,7 +3597,7 @@ dnsProxy:
   # -- Allow the DNS proxy to compress responses to endpoints that are larger than 512 Bytes or the EDNS0 option, if present.
   enableDnsCompression: true
   # -- Maximum number of IPs to maintain per FQDN name for each endpoint.
-  endpointMaxIpPerHostname: 50
+  endpointMaxIpPerHostname: 1000
   # -- Time during which idle but previously active connections with expired DNS lookups are still considered alive.
   idleConnectionGracePeriod: 0s
   # -- Maximum number of IPs to retain for expired DNS lookups with still-active connections.
@@ -3394,6 +3619,8 @@ dnsProxy:
 sctp:
   # -- Enable SCTP support. NOTE: Currently, SCTP support does not support rewriting ports or multihoming.
   enabled: false
+# -- Enable Non-Default-Deny policies
+enableNonDefaultDenyPolicies: true
 # Configuration for types of authentication for Cilium (beta)
 authentication:
   # -- Enable authentication processing and garbage collection.
@@ -3442,6 +3669,8 @@ authentication:
           pullPolicy: "${PULL_POLICY}"
         # SPIRE agent configuration
         agent:
+          # -- The priority class to use for the spire agent
+          priorityClassName: ""
           # -- SPIRE agent image
           image:
             # @schema
@@ -3461,6 +3690,8 @@ authentication:
           annotations: {}
           # -- SPIRE agent labels
           labels: {}
+          # -- container resource limits & requests
+          resources: {}
           # -- SPIRE Workload Attestor kubelet verification.
           skipKubeletVerification: true
           # -- SPIRE agent tolerations configuration
@@ -3493,6 +3724,8 @@ authentication:
           # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
           securityContext: {}
         server:
+          # -- The priority class to use for the spire server
+          priorityClassName: ""
           # -- SPIRE server image
           image:
             # @schema
@@ -3515,6 +3748,8 @@ authentication:
           # -- SPIRE server labels
           labels: {}
           # SPIRE server service configuration
+          # -- container resource limits & requests
+          resources: {}
           service:
             # -- Service type for the SPIRE server service
             type: ClusterIP
@@ -3580,3 +3815,7 @@ authentication:
       agentSocketPath: /run/spire/sockets/agent/agent.sock
       # -- SPIRE connection timeout
       connectionTimeout: 30s
+# -- Enable Internal Traffic Policy
+enableInternalTrafficPolicy: true
+# -- Enable LoadBalancer IP Address Management
+enableLBIPAM: true

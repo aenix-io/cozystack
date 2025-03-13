@@ -1,0 +1,10 @@
+{{- if .Values.resourceQuotas }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tenant-quota
+  namespace: {{ include "tenant.name" . }}
+spec:
+  hard:
+    {{- toYaml .Values.resourceQuotas | nindent 4 }}
+{{- end }}
