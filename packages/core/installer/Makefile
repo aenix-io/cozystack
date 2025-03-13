@@ -36,7 +36,7 @@ image-cozystack: run-builder
 		--push=$(PUSH) \
 		--label "org.opencontainers.image.source=https://github.com/cozystack/cozystack" \
 		--load=$(LOAD)
-	IMAGE="$(REGISTRY)/cozystack:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/installer.json -o json -r)" \
+	IMAGE="$(REGISTRY)/installer:$(call settag,$(TAG))@$$(yq e '."containerimage.digest"' images/installer.json -o json -r)" \
 		yq -i '.cozystack.image = strenv(IMAGE)' values.yaml
 	rm -f images/installer.json
 

@@ -18,7 +18,7 @@ kube-ovn:
   DISABLE_MODULES_MANAGEMENT: true
 global:
   registry:
-    address: ghcr.io/aenix-io/cozystack
+    address: ghcr.io/cozystack/cozystack
   images:
     kubeovn:
       repository: kubeovn
