@@ -5,6 +5,7 @@ kind: Namespace
 metadata:
   name: cozy-system
   labels:
+    cozystack.io/system: "true"
     pod-security.kubernetes.io/enforce: privileged
 ---
 # Source: cozy-installer/templates/cozystack.yaml
@@ -68,7 +69,7 @@ spec:
       serviceAccountName: cozystack
       containers:
       - name: cozystack
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.27.0"
+        image: "ghcr.io/cozystack/cozystack/installer:v0.28.0"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: localhost
@@ -87,7 +88,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
       - name: assets
-        image: "ghcr.io/aenix-io/cozystack/cozystack:v0.27.0"
+        image: "ghcr.io/cozystack/cozystack/installer:v0.28.0"
         command:
         - /usr/bin/cozystack-assets-server
         - "-dir=/cozystack/assets"

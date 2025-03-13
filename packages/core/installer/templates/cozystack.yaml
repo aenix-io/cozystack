@@ -4,6 +4,7 @@ kind: Namespace
 metadata:
   name: cozy-system
   labels:
+    cozystack.io/system: "true"
     pod-security.kubernetes.io/enforce: privileged
 ---
 apiVersion: v1

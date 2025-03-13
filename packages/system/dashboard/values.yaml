@@ -16,16 +16,16 @@ kubeapps:
       enabled: true
   dashboard:
     image:
-      registry: ghcr.io/aenix-io/cozystack
+      registry: ghcr.io/cozystack/cozystack
       repository: dashboard
-      tag: v0.27.0
-      digest: "sha256:a363361571a7740c8544ecc22745e426ad051068a6bbe62d7e7d5e91df4d988e"
+      tag: v0.28.0
+      digest: "sha256:ebef6a0c4b0c9f0857fc82699abcaa7a135d18b5dafe129febc0bf90707f2f48"
   kubeappsapis:
     image:
-      registry: ghcr.io/aenix-io/cozystack
+      registry: ghcr.io/cozystack/cozystack
       repository: kubeapps-apis
-      tag: v0.27.0
-      digest: "sha256:dcffdd5a02433a4caec7b5e9753847cbeb05f2004146c38ec7cee44d02179423"
+      tag: v0.28.0
+      digest: "sha256:281093b1e80221074188fdfea97775494de1cdef16974ee1f3c3d47b313eee0e"
     pluginConfig:
       flux:
         packages:

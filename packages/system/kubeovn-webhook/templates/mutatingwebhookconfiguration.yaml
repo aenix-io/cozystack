@@ -5,7 +5,7 @@ metadata:
   annotations:
     cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "namespace-annotation-webhook.fullname" . }}-cert
   labels:
-    app.kubernetes.io/name: namespace-annotation-webhook
+    app.kubernetes.io/name: {{ include "namespace-annotation-webhook.fullname" . }}
 webhooks:
   - name: kube-ovn-webhook.cozystack.io
     admissionReviewVersions: ["v1"]
