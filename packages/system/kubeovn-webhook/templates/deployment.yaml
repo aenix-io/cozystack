@@ -60,5 +60,5 @@ spec:
       volumes:
         - name: webhook-certs
           secret:
-            secretName: namespace-annotation-webhook-tls
+            secretName: {{ include "namespace-annotation-webhook.fullname" . }}-tls
             defaultMode: 0400
