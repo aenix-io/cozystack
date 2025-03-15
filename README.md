@@ -29,7 +29,8 @@ You can use Cozystack as Kubernetes distribution for Bare Metal
 
 ## Screenshot
 
-![Cozystack screenshot](https://cozystack.io/img/screenshot.png)
+![Cozystack screenshot](https://cozystack.io/img/screenshot.png#gh-light-mode-only)
+![Cozystack screenshot](https://cozystack.io/img/screenshot-dark.png#gh-dark-mode-only)
 
 ## Documentation
 
