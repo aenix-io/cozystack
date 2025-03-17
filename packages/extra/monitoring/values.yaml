@@ -61,7 +61,13 @@ logsStorages:
 alerta:
   storage: 10Gi
   storageClassName: ""
-
+  resources:
+    limits:
+      cpu: 1024m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
   alerts:
     ## @param alerta.alerts.telegram.token telegram token for your bot
     ## @param alerta.alerts.telegram.chatID specify multiple ID's separated by comma. Get yours in https://t.me/chatid_echo_bot
@@ -82,3 +88,10 @@ alerta:
 grafana:
   db:
     size: 10Gi
+  resources:
+    limits:
+      cpu: 1024m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
