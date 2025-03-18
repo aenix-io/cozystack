@@ -1,2 +1,2 @@
 cozystack:
-  image: kklinch0/installer:0.27.39@sha256:9f62b963a79fcd5774af28e248c74082a0fe5f7c443e18648101da01d36cf715
+  image: kklinch0/installer:0.27.49@sha256:baf71ad11ade3ef10b9c77325a6385438054541f44248332afa3f95f8f66f7e5
