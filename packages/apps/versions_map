@@ -55,7 +55,8 @@ kubernetes 0.14.1 fde4bcfa
 kubernetes 0.15.0 cb7b8158
 kubernetes 0.15.1 43e593c7
 kubernetes 0.15.2 43e593c7
-kubernetes 0.16.0 HEAD
+kubernetes 0.16.0 3d03b227
+kubernetes 0.17.0 HEAD
 mysql 0.1.0 f642698
 mysql 0.2.0 8b975ff0
 mysql 0.3.0 5ca8823
@@ -126,7 +127,8 @@ tenant 1.6.7 06afcf27
 tenant 1.6.8 4cc48e6f
 tenant 1.7.0 6c73e3f3
 tenant 1.8.0 e2369ba
-tenant 1.9.0 HEAD
+tenant 1.9.0 43e593c7
+tenant 1.9.1 HEAD
 virtual-machine 0.1.4 f2015d6
 virtual-machine 0.1.5 7cd7de7
 virtual-machine 0.2.0 5ca8823
