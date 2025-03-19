@@ -100,6 +100,15 @@ master:
     storageClass: ""
     hostPathPrefix: /ssd
 
+  # You may use ANY storage-class, example with local-path-provisioner
+  # Annotations are optional.
+  # logs:
+  #   type: "persistentVolumeClaim"
+  #   size: "24Ti"
+  #   storageClass: "local-path-provisioner"
+  #   annotations:
+  #     "key": "value"
+
   # You can also use emptyDir storage:
   #  logs:
   #    type: "emptyDir"
@@ -450,7 +459,7 @@ volume:
   livenessProbe:
     enabled: true
     httpGet:
-      path: /status
+      path: /healthz
       scheme: HTTP
     initialDelaySeconds: 20
     periodSeconds: 90
@@ -463,7 +472,7 @@ volume:
   readinessProbe:
     enabled: true
     httpGet:
-      path: /status
+      path: /healthz
       scheme: HTTP
     initialDelaySeconds: 15
     periodSeconds: 15
@@ -534,6 +543,15 @@ filer:
     size: ""
     storageClass: ""
     hostPathPrefix: /storage
+
+  # You may use ANY storage-class, example with local-path-provisioner
+  # Annotations are optional.
+  # logs:
+  #   type: "persistentVolumeClaim"
+  #   size: "24Ti"
+  #   storageClass: "local-path-provisioner"
+  #   annotations:
+  #     "key": "value"
 
   # You can also use emptyDir storage:
   #  logs:

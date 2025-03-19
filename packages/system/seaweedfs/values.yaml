@@ -81,6 +81,7 @@ seaweedfs:
       httpsPort: 0
       # Suffix of the host name, {bucket}.{domainName}
       domainName: ""
+      #allowEmptyFolder: true
       # enable user & permission to s3 (need to inject to all services)
       enableAuth: false
       # set to the name of an existing kubernetes Secret with the s3 json config file
