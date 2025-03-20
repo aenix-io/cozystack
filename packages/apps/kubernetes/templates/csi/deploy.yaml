@@ -67,7 +67,7 @@ spec:
               cpu: 512m
               memory: 512Mi
             requests:
-              cpu: 124m
+              cpu: 125m
               memory: 128Mi
         - name: csi-provisioner
           image: quay.io/openshift/origin-csi-external-provisioner:latest
@@ -76,7 +76,7 @@ spec:
               cpu: 512m
               memory: 512Mi
             requests:
-              cpu: 124m
+              cpu: 125m
               memory: 128Mi
           args:
             - "--csi-address=$(ADDRESS)"
@@ -116,7 +116,7 @@ spec:
               cpu: 512m
               memory: 512Mi
             requests:
-              cpu: 124m
+              cpu: 125m
               memory: 128Mi
         - name: csi-liveness-probe
           image: quay.io/openshift/origin-csi-livenessprobe:latest
@@ -132,7 +132,7 @@ spec:
               cpu: 512m
               memory: 512Mi
             requests:
-              cpu: 124m
+              cpu: 125m
               memory: 128Mi
       volumes:
         - name: socket-dir
