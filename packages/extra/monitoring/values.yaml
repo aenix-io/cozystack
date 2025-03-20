@@ -63,7 +63,7 @@ alerta:
   storageClassName: ""
   resources:
     limits:
-      cpu: 1024m
+      cpu: "1"
       memory: 1Gi
     requests:
       cpu: 100m
@@ -90,7 +90,7 @@ grafana:
     size: 10Gi
   resources:
     limits:
-      cpu: 1024m
+      cpu: "1"
       memory: 1Gi
     requests:
       cpu: 100m

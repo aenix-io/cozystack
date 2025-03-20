@@ -49,7 +49,7 @@ ingress-nginx:
       ssl-session-tickets: "true"
     resources:
       limits:
-        cpu: 1024m
+        cpu: "1"
         memory: 2048Mi
       requests:
         cpu: 100m

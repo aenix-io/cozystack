@@ -19,7 +19,7 @@ spec:
     {{- end }}
   resources:
     limits:
-      cpu: 1024m
+      cpu: "1"
       memory: 2048Mi
     requests:
       cpu: 100m
