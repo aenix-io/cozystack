@@ -32,7 +32,7 @@ spec:
             memory: 512Mi
           requests:
             cpu: 124m
-            memory: 124Mi
+            memory: 128Mi
         command:
         - /cluster-autoscaler
         args:
